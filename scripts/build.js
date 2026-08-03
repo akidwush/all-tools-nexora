@@ -9,7 +9,8 @@ const required = [
   "assets/css/core.css", "assets/css/components.css",
   "assets/js/core/app.js", "assets/js/core/shell.js", "assets/js/core/lazy-loader.js",
   "assets/module-manifest.json",
-  "api/health.js", "api/feedback.js", "api/database.js", "lib/database.js", "database/schema.sql"
+  "api/health.js", "api/feedback.js", "api/database.js", "api/audit.js",
+  "lib/database.js", "lib/audit.js", "database/schema.sql"
 ];
 const missing = required.filter((file) => !fs.existsSync(path.join(root, file)));
 if (missing.length) {
@@ -34,4 +35,4 @@ if (failed.length) { console.error(`Build gagal membuat output: ${failed.join(",
 const before = 3917113;
 const after = fs.statSync(path.join(root, "index.html")).size;
 console.log(`Build selesai: public/ dibuat. index.html ${after.toLocaleString()} byte (turun ${Math.max(0, Math.round((1-after/before)*100))}%).`);
-console.log("Feature payload besar dimuat hanya saat tool dibuka; API serverless tetap di api/.");
+console.log("Feature payload besar dimuat hanya saat tool dibuka; live audit serverless tersedia di /api/audit.");

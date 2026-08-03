@@ -1,14 +1,14 @@
 {
   "name": "all-tools-nexora-developer-dika",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "private": true,
-  "description": "All Tools Nexora v4 — modular index and on-demand feature loading",
+  "description": "All Tools Nexora v4.1 \u2014 modular lazy loading with live asset and endpoint audit",
   "scripts": {
     "dev": "node serve-local.js",
     "start": "node serve-local.js",
     "check": "node scripts/check-project.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test-api.js"
+    "test": "node scripts/test-api.js && node scripts/test-audit.js"
   },
   "engines": {
     "node": ">=18"

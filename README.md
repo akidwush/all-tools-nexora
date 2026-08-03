@@ -1,35 +1,83 @@
-# All Tools Nexora — Developer Dika v3
+# All Tools Nexora v4.1 — Modular Lazy Load + Live Audit
 
-Versi ini merupakan kelanjutan dari arsip `all-tools-nexora-developer-dika-fixed.zip`. Proyek tetap ringan untuk Termux, tetapi sekarang memiliki backend database yang benar-benar siap dipakai, health check koneksi Supabase nyata, dan laporan asset serta dynamic endpoint pada mesin Get Code HTML.
+Versi 4.1 mempertahankan modularisasi v4.0 dan meningkatkan mesin **Get Code HTML** dengan pemeriksaan jaringan nyata terhadap asset serta endpoint yang ditemukan pada source.
 
-## Patch v3
+## Fitur utama v4.1
 
-- `/api/health` benar-benar menghubungi Supabase dan mengukur latency, bukan hanya memeriksa keberadaan environment variable.
-- `/api/database` menyediakan pembacaan aman untuk `status`, `tools`, dan `settings` tanpa membocorkan service-role key ke browser.
-- Helper database memiliki timeout, klasifikasi error, validasi URL, dan deteksi schema yang belum dijalankan.
-- Skema Supabase idempotent, memiliki trigger `updated_at`, RLS, index, dan seed pengaturan publik.
-- Mesin Get Code menghasilkan laporan terstruktur berisi asset HTML/CSS serta endpoint dinamis dari `fetch`, Axios, XHR, WebSocket, EventSource, beacon, dan form action.
-- Laporan Get Code dapat disalin atau diunduh sebagai JSON.
-- Build audit memverifikasi endpoint baru serta keberadaan fitur laporan Get Code.
+- `index.html` tetap ringan; payload fitur dimuat hanya ketika kartu tool dibuka.
+- Get Code tetap mendeteksi asset HTML/CSS serta endpoint dari `fetch`, Axios, XHR, WebSocket, EventSource, beacon, form, dan data attribute.
+- Tombol **Run Live Audit** menguji resource publik melalui `/api/audit`.
+- Pemeriksaan live mencakup:
+  - status HTTP;
+  - latency;
+  - redirect dan URL akhir;
+  - `Content-Type` serta indikasi MIME mismatch;
+  - indikasi risiko CORS untuk endpoint, module script, dan font lintas origin;
+  - endpoint yang memerlukan autentikasi;
+  - timeout, resource hilang, dan upstream error.
+- Dashboard laporan menampilkan **Asset Readiness**, **API Readiness**, jumlah resource terjangkau, dan jumlah masalah.
+- Hasil static report beserta live audit dapat disalin atau diunduh sebagai JSON.
 
-## Jalankan di Termux
+## Probe aman
+
+Live audit tidak mengirim data formulir dan tidak menjalankan request mutasi:
+
+- asset serta endpoint `GET/HEAD` diperiksa dengan `HEAD`;
+- jika server menolak `HEAD`, probe terbatas memakai `GET` dengan header `Range`;
+- endpoint `POST`, `PUT`, `PATCH`, dan `DELETE` hanya diperiksa memakai `OPTIONS`;
+- URL lokal, private network, reserved IP, kredensial URL, protokol non-HTTP, dan port berisiko diblokir;
+- setiap redirect divalidasi ulang dan koneksi dipasang ke alamat IP publik hasil DNS untuk mengurangi risiko DNS rebinding;
+- audit browser diproses per batch kecil dan dibatasi maksimal 120 resource per proses.
+
+## Menjalankan di Termux
 
 ```bash
 pkg install nodejs -y
-cd all-tools-nexora-developer-dika-v3
+cd all-tools-nexora-v4.1-live-audit
 npm run check
 npm test
 npm run build
 npm run dev
 ```
 
-Buka `http://127.0.0.1:4173` di browser HP.
+Buka:
 
-## Aktifkan Supabase
+```text
+http://127.0.0.1:4173
+```
 
-1. Buat project Supabase.
-2. Buka **SQL Editor**, lalu jalankan seluruh isi `database/schema.sql`.
-3. Tambahkan environment berikut di Vercel:
+`serve-local.js` mendukung endpoint berikut:
+
+```text
+GET  /api/health
+GET  /api/database?resource=status
+POST /api/feedback
+POST /api/audit
+```
+
+## Request API audit
+
+```json
+{
+  "target": "https://example.com/page",
+  "items": [
+    {
+      "id": "asset-0",
+      "type": "asset",
+      "kind": "script",
+      "method": "HEAD",
+      "url": "https://example.com/assets/app.js",
+      "scope": "internal"
+    }
+  ]
+}
+```
+
+Setiap request API menerima maksimal 16 item secara default. Frontend Get Code otomatis membagi audit menjadi beberapa batch.
+
+## Environment Variables
+
+Konfigurasi Supabase tetap sama:
 
 ```env
 SUPABASE_URL=https://PROJECT_ID.supabase.co
@@ -38,38 +86,22 @@ DATABASE_TIMEOUT_MS=8000
 FEEDBACK_HASH_SALT=random_string_panjang
 ```
 
-4. Redeploy.
-5. Buka `/api/health`. Koneksi berhasil ketika `database.status` bernilai `ready`, `connected` bernilai `true`, dan `schemaReady` bernilai `true`.
+Tuning live audit bersifat opsional:
 
-## Database API
-
-Endpoint aman yang tersedia:
-
-```text
-GET /api/database?resource=status
-GET /api/database?resource=tools
-GET /api/database?resource=settings
-POST /api/feedback
-GET /api/health
+```env
+AUDIT_TIMEOUT_MS=4000
+AUDIT_MAX_ITEMS=16
+AUDIT_CONCURRENCY=6
 ```
 
-`SUPABASE_SERVICE_ROLE_KEY` hanya digunakan di serverless function. Jangan menaruhnya di HTML, JavaScript browser, GitHub, atau screenshot publik.
+Jangan menaruh `SUPABASE_SERVICE_ROLE_KEY` di HTML, JavaScript browser, GitHub, atau screenshot publik.
 
-
-## v4.0 — Modular index + lazy-load
-
-- `index.html` tidak lagi membawa CSS/JavaScript besar secara inline.
-- Aset inti berada di `assets/css/` dan `assets/js/core/`.
-- Payload fitur besar berada di `assets/js/features/` dan hanya dimuat saat kartu tool dibuka.
-- Pemetaan modul terdokumentasi di `assets/module-manifest.json`.
-- Kartu menggunakan `data-tool-id` agar routing tidak bergantung pada teks tampilan.
-- Build membuat folder `public/` untuk Vercel, sedangkan endpoint serverless tetap berada di `api/`.
-- `npm run check` memverifikasi ukuran index, sintaks seluruh modul, referensi manifest, serta audit rahasia.
-
-### Validasi
+## Validasi
 
 ```bash
 npm run check
 npm test
 npm run build
 ```
+
+Dokumentasi hasil validasi tersedia di `V4_1_VALIDATION.md`.

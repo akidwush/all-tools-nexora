@@ -5,6 +5,9 @@
   "use strict";
 
   var API_ENDPOINT="https://api.resellergaming.my.id/tools/getcode?url=";
+  var LIVE_AUDIT_ENDPOINT="/api/audit";
+  var LIVE_AUDIT_CHUNK_SIZE=12;
+  var LIVE_AUDIT_MAX_ITEMS=120;
   var SOURCE_APP_ORIGIN="https://kaze-extract.netlify.app/";
   var FORCE_HOSTED_SOURCE=false;
   var FAST_ROUTE_KEY="nexus_get_html_fast_route";
@@ -25,6 +28,8 @@
   var processRatio=0;
   var sessionStart=Date.now();
   var activeController=null;
+  var liveAuditController=null;
+  var liveAuditRunning=false;
   var currentHtml="";
   var currentUrl="";
   var currentReport=null;
@@ -1161,16 +1166,40 @@
     return ["internal","external","dynamic"].includes(scope)?scope:"";
   }
 
+  function auditStateClass(state){
+    return ["ok","warning","auth","missing","timeout","blocked","error","skipped"].includes(state)?state:"";
+  }
+
+  function auditStateLabel(audit){
+    if(!audit) return "NOT TESTED";
+    if(audit.httpStatus) return String(audit.httpStatus)+" "+String(audit.state||"").toUpperCase();
+    return String(audit.state||"unknown").toUpperCase();
+  }
+
+  function auditMetaHtml(audit){
+    if(!audit) return "";
+    var chips=[];
+    if(Number.isFinite(Number(audit.latencyMs))) chips.push('<span class="nxgc-audit-chip">'+escapeHtml(audit.latencyMs+' ms')+'</span>');
+    if(audit.contentType) chips.push('<span class="nxgc-audit-chip" title="'+escapeHtml(audit.contentType)+'">'+escapeHtml(String(audit.contentType).split(";")[0])+'</span>');
+    if(audit.redirects && audit.redirects.length) chips.push('<span class="nxgc-audit-chip warn">'+audit.redirects.length+' redirect</span>');
+    if(audit.cors && audit.cors.relevant) chips.push('<span class="nxgc-audit-chip '+(audit.cors.allowed?'good':'bad')+'">CORS '+(audit.cors.allowed?'OK':'RISK')+'</span>');
+    if(audit.mime && audit.mime.matches===false) chips.push('<span class="nxgc-audit-chip bad">MIME mismatch</span>');
+    if(audit.methodUsed) chips.push('<span class="nxgc-audit-chip">Probe '+escapeHtml(audit.methodUsed)+'</span>');
+    return chips.join("");
+  }
+
   function renderReportRows(items,isEndpoint){
     if(!items.length) return '<div class="nxgc-report-empty">Tidak ada '+(isEndpoint?"dynamic endpoint":"asset")+' yang terdeteksi pada source HTML.</div>';
     var visible=items.slice(0,150);
     var rows=visible.map(function(item){
       var badge=isEndpoint?(item.method+" · "+item.kind):item.kind;
-      return '<div class="nxgc-report-row">'+
+      var audit=item.audit||null;
+      return '<div class="nxgc-report-row '+(audit?'has-audit':'')+'">'+
         '<span class="nxgc-report-badge" title="'+escapeHtml(badge)+'">'+escapeHtml(badge)+'</span>'+
         '<span class="nxgc-report-row-copy">'+
-          '<span class="nxgc-report-url" title="'+escapeHtml(item.url)+'">'+escapeHtml(item.url)+'</span>'+
-          '<span class="nxgc-report-meta"><span class="nxgc-report-scope '+reportScopeClass(item.scope)+'">'+escapeHtml(item.scope)+'</span><span>'+escapeHtml(item.source||"")+'</span></span>'+
+          '<span class="nxgc-report-row-top"><span class="nxgc-report-url" title="'+escapeHtml(item.url)+'">'+escapeHtml(item.url)+'</span><span class="nxgc-audit-state '+auditStateClass(audit&&audit.state)+'">'+escapeHtml(auditStateLabel(audit))+'</span></span>'+
+          '<span class="nxgc-report-meta"><span class="nxgc-report-scope '+reportScopeClass(item.scope)+'">'+escapeHtml(item.scope)+'</span><span>'+escapeHtml(item.source||"")+'</span>'+auditMetaHtml(audit)+'</span>'+
+          (audit&&audit.message?'<span class="nxgc-audit-message" title="'+escapeHtml(audit.message)+'">'+escapeHtml(audit.message)+'</span>':'')+
         '</span>'+
       '</div>';
     }).join("");
@@ -1178,10 +1207,184 @@
     return rows;
   }
 
+  function scoreWeight(state){
+    if(state==="ok") return 1;
+    if(state==="warning") return .7;
+    if(state==="auth") return .4;
+    return 0;
+  }
+
+  function summarizeLiveItems(items){
+    var audited=items.filter(function(item){return item.audit;});
+    var scorable=audited.filter(function(item){return item.audit.state!=="skipped";});
+    return {
+      total:audited.length,
+      reachable:audited.filter(function(item){return item.audit.reachable;}).length,
+      issues:audited.filter(function(item){return item.audit.state!=="ok";}).length,
+      score:scorable.length?Math.round(scorable.reduce(function(total,item){return total+scoreWeight(item.audit.state);},0)/scorable.length*100):null,
+      corsRisk:audited.filter(function(item){return (item.audit.issues||[]).includes("CORS_RISK");}).length,
+      mimeMismatch:audited.filter(function(item){return (item.audit.issues||[]).includes("MIME_MISMATCH");}).length
+    };
+  }
+
+  function buildLiveAuditSummary(report,startedAt){
+    var asset=summarizeLiveItems(report.assets||[]);
+    var endpoint=summarizeLiveItems(report.endpoints||[]);
+    return {
+      version:1,
+      generatedAt:new Date().toISOString(),
+      durationMs:Date.now()-startedAt,
+      assets:asset,
+      endpoints:endpoint,
+      total:asset.total+endpoint.total,
+      reachable:asset.reachable+endpoint.reachable,
+      issues:asset.issues+endpoint.issues,
+      corsRisk:asset.corsRisk+endpoint.corsRisk,
+      mimeMismatch:asset.mimeMismatch+endpoint.mimeMismatch
+    };
+  }
+
+  function setAuditScore(id,value){
+    var element=byId(id);
+    if(element) element.textContent=value==null?"—":value+"%";
+  }
+
+  function updateLiveAuditSummary(summary){
+    setAuditScore("nxgcAssetScore",summary&&summary.assets?summary.assets.score:null);
+    setAuditScore("nxgcApiScore",summary&&summary.endpoints?summary.endpoints.score:null);
+    var reachable=byId("nxgcAuditReachable");
+    var issues=byId("nxgcAuditIssues");
+    if(reachable) reachable.textContent=summary?String(summary.reachable):"0";
+    if(issues) issues.textContent=summary?String(summary.issues):"0";
+  }
+
+  function setLiveAuditUi(state,message,completed,total){
+    var button=byId("nxgcRunAudit");
+    var status=byId("nxgcAuditStatus");
+    var progress=byId("nxgcAuditProgressBar");
+    var counter=byId("nxgcAuditProgressText");
+    var ratio=total?Math.max(0,Math.min(100,Math.round(completed/total*100))):0;
+    if(status) status.textContent=message||"Belum dijalankan.";
+    if(progress) progress.style.width=ratio+"%";
+    if(counter) counter.textContent=completed+" / "+total;
+    if(button){
+      button.disabled=state==="running" || !currentReport;
+      button.classList.toggle("running",state==="running");
+      button.innerHTML=state==="running"
+        ?'<i class="fas fa-spinner fa-spin"></i> Auditing '+ratio+'%'
+        :'<i class="fas fa-satellite-dish"></i> '+(state==="done"?"Audit Ulang":"Run Live Audit");
+    }
+  }
+
+  function auditCandidates(report){
+    var items=[];
+    (report.assets||[]).forEach(function(item,index){
+      item.auditId="asset-"+index;
+      if(/^https?:\/\//i.test(item.url) && ["internal","external"].includes(item.scope)){
+        items.push({id:item.auditId,type:"asset",kind:item.kind,method:"HEAD",url:item.url,scope:item.scope,source:item.source});
+      }
+    });
+    (report.endpoints||[]).forEach(function(item,index){
+      item.auditId="endpoint-"+index;
+      if(/^https?:\/\//i.test(item.url) && ["internal","external"].includes(item.scope)){
+        items.push({id:item.auditId,type:"endpoint",kind:item.kind,method:item.method||"GET",url:item.url,scope:item.scope,source:item.source});
+      }
+    });
+    return items;
+  }
+
+  function mergeAuditResults(results){
+    if(!currentReport) return;
+    var lookup=new Map((results||[]).map(function(result){return [result.id,result];}));
+    [currentReport.assets,currentReport.endpoints].forEach(function(items){
+      (items||[]).forEach(function(item){
+        if(lookup.has(item.auditId)) item.audit=lookup.get(item.auditId);
+      });
+    });
+    byId("nxgcAssetReportList").innerHTML=renderReportRows(currentReport.assets,false);
+    byId("nxgcEndpointReportList").innerHTML=renderReportRows(currentReport.endpoints,true);
+  }
+
+  function auditFailureResult(item,error){
+    return {
+      id:item.id,type:item.type,kind:item.kind,method:item.method,requestedUrl:item.url,
+      state:"error",reachable:false,httpStatus:null,statusText:null,methodUsed:null,latencyMs:null,
+      finalUrl:null,redirects:[],contentType:null,contentLength:null,cors:null,mime:null,
+      issues:["AUDIT_REQUEST_FAILED"],errorCode:"AUDIT_REQUEST_FAILED",
+      message:error&&error.message?error.message:"Batch audit gagal."
+    };
+  }
+
+  async function runLiveAudit(){
+    if(!currentReport || liveAuditRunning) return;
+    var allCandidates=auditCandidates(currentReport);
+    var candidates=allCandidates.slice(0,LIVE_AUDIT_MAX_ITEMS);
+    var auditTruncated=allCandidates.length>candidates.length;
+    if(!candidates.length){
+      showToast("Tidak ada URL HTTP publik yang dapat diaudit.","fail");
+      return;
+    }
+    if(liveAuditController){try{liveAuditController.abort();}catch(error){}}
+    liveAuditController=new AbortController();
+    liveAuditRunning=true;
+    var startedAt=Date.now();
+    currentReport.liveAudit=null;
+    currentReport.assets.forEach(function(item){delete item.audit;});
+    currentReport.endpoints.forEach(function(item){delete item.audit;});
+    updateLiveAuditSummary(null);
+    setLiveAuditUi("running","Menghubungi asset dan endpoint secara aman...",0,candidates.length);
+    var completed=0;
+    try{
+      for(var offset=0;offset<candidates.length;offset+=LIVE_AUDIT_CHUNK_SIZE){
+        var chunk=candidates.slice(offset,offset+LIVE_AUDIT_CHUNK_SIZE);
+        var response=await NEXUS_NATIVE_FETCH(LIVE_AUDIT_ENDPOINT,{
+          method:"POST",
+          headers:{"Content-Type":"application/json","Accept":"application/json"},
+          body:JSON.stringify({target:currentUrl,items:chunk}),
+          signal:liveAuditController.signal,
+          credentials:"same-origin"
+        });
+        var payload=null;
+        try{payload=await response.json();}catch(error){}
+        if(!response.ok || !payload || !payload.ok){
+          throw new Error(payload&&payload.message?payload.message:"Live audit HTTP "+response.status);
+        }
+        mergeAuditResults(payload.audit.results||[]);
+        completed+=chunk.length;
+        var interim=buildLiveAuditSummary(currentReport,startedAt);
+        updateLiveAuditSummary(interim);
+        setLiveAuditUi("running","Menguji status, redirect, CORS, dan MIME...",completed,candidates.length);
+      }
+      currentReport.liveAudit=buildLiveAuditSummary(currentReport,startedAt);
+      currentReport.liveAudit.truncated=auditTruncated;
+      currentReport.liveAudit.available=allCandidates.length;
+      updateLiveAuditSummary(currentReport.liveAudit);
+      setLiveAuditUi("done","Audit selesai dalam "+currentReport.liveAudit.durationMs+" ms"+(auditTruncated?" · dibatasi "+candidates.length+" dari "+allCandidates.length+" URL.":"."),candidates.length,candidates.length);
+      showToast("Live audit selesai: "+currentReport.liveAudit.reachable+" resource terjangkau.","success");
+    }catch(error){
+      if(error&&error.name==="AbortError"){
+        setLiveAuditUi("idle","Audit dibatalkan.",completed,candidates.length);
+      }else{
+        var remaining=candidates.slice(completed).map(function(item){return auditFailureResult(item,error);});
+        mergeAuditResults(remaining);
+        currentReport.liveAudit=buildLiveAuditSummary(currentReport,startedAt);
+        currentReport.liveAudit.truncated=auditTruncated;
+        currentReport.liveAudit.available=allCandidates.length;
+        updateLiveAuditSummary(currentReport.liveAudit);
+        setLiveAuditUi("error",error&&error.message?error.message:"Live audit gagal.",completed,candidates.length);
+        showToast(error&&error.message?error.message:"Live audit gagal.","fail");
+      }
+    }finally{
+      liveAuditRunning=false;
+      liveAuditController=null;
+    }
+  }
+
   function renderSourceReport(report){
     var section=byId("nxgcReport");
     if(!section || !report) return;
     currentReport=report;
+    auditCandidates(report);
     byId("nxgcReportAssets").textContent=String(report.summary.assets);
     byId("nxgcReportExternal").textContent=String(report.summary.externalAssets);
     byId("nxgcReportEndpoints").textContent=String(report.summary.endpoints);
@@ -1192,14 +1395,25 @@
     byId("nxgcEndpointReportList").innerHTML=renderReportRows(report.endpoints,true);
     byId("nxgcCopyReport").disabled=false;
     byId("nxgcDownloadReport").disabled=false;
+    updateLiveAuditSummary(null);
+    var availableCount=auditCandidates(report).length;
+    var candidateCount=Math.min(availableCount,LIVE_AUDIT_MAX_ITEMS);
+    setLiveAuditUi("idle",candidateCount+" URL siap diuji tanpa mengirim data form"+(availableCount>candidateCount?" · "+(availableCount-candidateCount)+" item disimpan hanya di static report.":"."),0,candidateCount);
+    var auditButton=byId("nxgcRunAudit");
+    if(auditButton) auditButton.disabled=candidateCount===0;
     section.classList.add("show");
   }
 
   function clearSourceReport(){
+    if(liveAuditController){try{liveAuditController.abort();}catch(error){}}
+    liveAuditController=null;
+    liveAuditRunning=false;
     currentReport=null;
     var section=byId("nxgcReport");
     if(section) section.classList.remove("show");
-    ["nxgcCopyReport","nxgcDownloadReport"].forEach(function(id){var button=byId(id);if(button) button.disabled=true;});
+    ["nxgcCopyReport","nxgcDownloadReport","nxgcRunAudit"].forEach(function(id){var button=byId(id);if(button) button.disabled=true;});
+    updateLiveAuditSummary(null);
+    setLiveAuditUi("idle","Belum dijalankan.",0,0);
   }
 
   function sourceReportJson(){
@@ -1220,7 +1434,7 @@
     var anchor=document.createElement("a");
     var base=fileNameFromUrl(currentUrl).replace(/\.html$/i,"");
     anchor.href=objectUrl;
-    anchor.download=base+"-source-report.json";
+    anchor.download=base+"-live-audit-report.json";
     document.body.appendChild(anchor);
     anchor.click();
     anchor.remove();
@@ -1334,6 +1548,7 @@
     byId("nxgcToolbarClear").addEventListener("click",function(){clearResult(false);});
     byId("nxgcCopyReport").addEventListener("click",copySourceReport);
     byId("nxgcDownloadReport").addEventListener("click",downloadSourceReport);
+    byId("nxgcRunAudit").addEventListener("click",runLiveAudit);
     byId("nxgcRefreshPreview").addEventListener("click",function(){
       if(currentHtml){
         renderPreview();
@@ -1436,8 +1651,8 @@
             '</section>'+
             '<section class="nxgc-report" id="nxgcReport">'+
               '<div class="nxgc-report-head">'+
-                '<div class="nxgc-report-title"><i class="fas fa-diagram-project"></i><span>Asset &amp; Dynamic Endpoint Report</span></div>'+ 
-                '<div class="nxgc-report-actions"><button id="nxgcCopyReport" type="button" disabled><i class="fas fa-copy"></i> Copy JSON</button><button id="nxgcDownloadReport" type="button" disabled><i class="fas fa-file-arrow-down"></i> Download JSON</button></div>'+ 
+                '<div class="nxgc-report-title"><i class="fas fa-satellite-dish"></i><span>Live Asset &amp; Endpoint Audit</span></div>'+ 
+                '<div class="nxgc-report-actions"><button class="nxgc-audit-run" id="nxgcRunAudit" type="button" disabled><i class="fas fa-satellite-dish"></i> Run Live Audit</button><button id="nxgcCopyReport" type="button" disabled><i class="fas fa-copy"></i> Copy JSON</button><button id="nxgcDownloadReport" type="button" disabled><i class="fas fa-file-arrow-down"></i> Download JSON</button></div>'+ 
               '</div>'+ 
               '<div class="nxgc-report-summary">'+
                 '<div class="nxgc-report-stat"><span>Total Asset</span><b id="nxgcReportAssets">0</b></div>'+ 
@@ -1445,11 +1660,22 @@
                 '<div class="nxgc-report-stat"><span>Endpoint</span><b id="nxgcReportEndpoints">0</b></div>'+ 
                 '<div class="nxgc-report-stat"><span>Dynamic/Unresolved</span><b id="nxgcReportDynamic">0</b></div>'+ 
               '</div>'+ 
+              '<div class="nxgc-live-audit-control">'+
+                '<div class="nxgc-live-audit-copy"><b>HTTP PROBE STATUS</b><span id="nxgcAuditStatus">Belum dijalankan.</span></div>'+ 
+                '<div class="nxgc-live-audit-progress"><span id="nxgcAuditProgressBar"></span></div>'+ 
+                '<span class="nxgc-live-audit-count" id="nxgcAuditProgressText">0 / 0</span>'+ 
+              '</div>'+ 
+              '<div class="nxgc-audit-score-grid">'+
+                '<div class="nxgc-audit-score"><span>Asset Readiness</span><b id="nxgcAssetScore">—</b></div>'+ 
+                '<div class="nxgc-audit-score"><span>API Readiness</span><b id="nxgcApiScore">—</b></div>'+ 
+                '<div class="nxgc-audit-score"><span>Reachable</span><b id="nxgcAuditReachable">0</b></div>'+ 
+                '<div class="nxgc-audit-score"><span>Issues</span><b id="nxgcAuditIssues">0</b></div>'+ 
+              '</div>'+ 
               '<div class="nxgc-report-grid">'+
                 '<section class="nxgc-report-column"><div class="nxgc-report-column-head"><span><i class="fas fa-boxes-stacked"></i> Assets</span><span id="nxgcAssetReportCount">0 ITEM</span></div><div class="nxgc-report-list" id="nxgcAssetReportList"></div></section>'+ 
                 '<section class="nxgc-report-column"><div class="nxgc-report-column-head"><span><i class="fas fa-network-wired"></i> Dynamic Endpoints</span><span id="nxgcEndpointReportCount">0 ITEM</span></div><div class="nxgc-report-list" id="nxgcEndpointReportList"></div></section>'+ 
               '</div>'+ 
-              '<p class="nxgc-report-note">Laporan dibuat dari source yang berhasil diekstrak. URL template, route relatif, dan endpoint runtime ditandai tanpa menjalankan request tambahan.</p>'+ 
+              '<p class="nxgc-report-note">Static report dibuat dari source. Live Audit memakai probe HEAD/OPTIONS/GET terbatas, memeriksa status HTTP, redirect, latency, MIME, dan risiko CORS tanpa mengirim data form.</p>'+ 
             '</section>'+
             '<section class="nxgc-preview" id="nxgcPreview">'+
               '<div class="nxgc-preview-head">'+
@@ -1516,6 +1742,11 @@
     if(activeController){
       try{activeController.abort();}catch(error){}
       activeController=null;
+    }
+    if(liveAuditController){
+      try{liveAuditController.abort();}catch(error){}
+      liveAuditController=null;
+      liveAuditRunning=false;
     }
     overlay.classList.remove("on");
     overlay.setAttribute("aria-hidden","true");

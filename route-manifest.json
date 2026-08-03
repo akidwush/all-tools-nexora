@@ -10,6 +10,7 @@
   "apiRoutes": [
     "/api/health",
     "/api/database",
-    "/api/feedback"
+    "/api/feedback",
+    "/api/audit"
   ]
 }

@@ -24,7 +24,7 @@ module.exports = async function handler(request, response) {
     status: database.status === "ready" ? "healthy" : database.configured ? "degraded" : "healthy-without-database",
     app: "All Tools Nexora",
     developer: "Dika",
-    version: "3.0.0",
+    version: "4.1.0",
     database: {
       configured: database.configured,
       connected: database.connected,

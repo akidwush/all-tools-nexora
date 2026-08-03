@@ -1022,3 +1022,41 @@ body.nx-getcode-open{overflow:hidden!important}
 .nxgc-report-scope.dynamic{color:#f0abfc;background:rgba(240,171,252,.09)}
 .nxgc-report-note{margin:0;padding:0 14px 13px;color:#776789;font-size:7px;line-height:1.55}
 @media(max-width:700px){.nxgc-report-head{align-items:flex-start;flex-direction:column}.nxgc-report-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}.nxgc-report-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.nxgc-report-grid{grid-template-columns:1fr}.nxgc-report-list{max-height:240px}}
+
+/* ===== Get Code v4.1 live asset and endpoint audit ===== */
+.nxgc-report-actions .nxgc-audit-run{border-color:rgba(74,222,128,.34);background:rgba(22,101,52,.18);color:#86efac}
+.nxgc-report-actions .nxgc-audit-run.running{border-color:rgba(103,232,249,.35);background:rgba(8,145,178,.13);color:#a5f3fc}
+.nxgc-live-audit-control{display:grid;grid-template-columns:minmax(150px,1fr) minmax(120px,1.4fr) auto;align-items:center;gap:11px;margin:0 14px 10px;padding:11px 12px;border:1px solid rgba(103,232,249,.16);border-radius:14px;background:rgba(5,22,28,.58)}
+.nxgc-live-audit-copy{min-width:0}
+.nxgc-live-audit-copy b{display:block;color:#a5f3fc;font-size:7px;letter-spacing:.12em}
+.nxgc-live-audit-copy span{display:block;margin-top:4px;color:#8aa5ac;font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nxgc-live-audit-progress{height:7px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden}
+.nxgc-live-audit-progress span{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,#22d3ee,#a855f7,#4ade80);transition:width .24s ease}
+.nxgc-live-audit-count{color:#9ec8d0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:8px;font-weight:900;white-space:nowrap}
+.nxgc-audit-score-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:0 14px 12px}
+.nxgc-audit-score{min-height:54px;padding:10px;border:1px solid rgba(103,232,249,.1);border-radius:13px;background:linear-gradient(180deg,rgba(8,47,73,.18),rgba(255,255,255,.018))}
+.nxgc-audit-score span{display:block;color:#789da5;font-size:7px;font-weight:850;letter-spacing:.07em;text-transform:uppercase}
+.nxgc-audit-score b{display:block;margin-top:5px;color:#d9fbff;font-size:15px;line-height:1}
+.nxgc-report-row.has-audit{border:1px solid rgba(255,255,255,.035);background:rgba(255,255,255,.012)}
+.nxgc-report-row-top{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:7px}
+.nxgc-audit-state{align-self:start;padding:3px 5px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:rgba(255,255,255,.04);color:#756487;font-size:5.5px;font-weight:950;letter-spacing:.05em;white-space:nowrap}
+.nxgc-audit-state.ok{border-color:rgba(74,222,128,.24);background:rgba(74,222,128,.08);color:#86efac}
+.nxgc-audit-state.warning{border-color:rgba(251,191,36,.24);background:rgba(251,191,36,.08);color:#fde68a}
+.nxgc-audit-state.auth{border-color:rgba(192,132,252,.28);background:rgba(192,132,252,.09);color:#d8b4fe}
+.nxgc-audit-state.missing,.nxgc-audit-state.error{border-color:rgba(251,113,133,.27);background:rgba(251,113,133,.08);color:#fda4af}
+.nxgc-audit-state.timeout{border-color:rgba(251,146,60,.27);background:rgba(251,146,60,.08);color:#fdba74}
+.nxgc-audit-state.blocked,.nxgc-audit-state.skipped{border-color:rgba(148,163,184,.22);background:rgba(148,163,184,.07);color:#cbd5e1}
+.nxgc-audit-chip{padding:2px 5px;border-radius:999px;background:rgba(103,232,249,.065);color:#8fc5ce;text-transform:none}
+.nxgc-audit-chip.good{background:rgba(74,222,128,.08);color:#86efac}
+.nxgc-audit-chip.warn{background:rgba(251,191,36,.08);color:#fde68a}
+.nxgc-audit-chip.bad{background:rgba(251,113,133,.08);color:#fda4af}
+.nxgc-audit-message{display:block;margin-top:5px;color:#7e6f8d;font-size:6px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:700px){
+  .nxgc-report-actions{grid-template-columns:1fr 1fr 1fr}
+  .nxgc-report-actions button{padding:0 6px;font-size:6.5px}
+  .nxgc-live-audit-control{grid-template-columns:1fr auto;margin:0 10px 9px}
+  .nxgc-live-audit-progress{grid-column:1/-1;grid-row:2}
+  .nxgc-audit-score-grid{grid-template-columns:repeat(2,minmax(0,1fr));padding:0 10px 10px}
+  .nxgc-report-row-top{grid-template-columns:minmax(0,1fr)}
+  .nxgc-audit-state{justify-self:start}
+}

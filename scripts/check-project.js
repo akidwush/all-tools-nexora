@@ -46,9 +46,17 @@ for(const token of ["ensureModule","toolModules","NexoraModules","get-code","nex
   if(!loader.includes(token)) fail(`lazy-loader belum lengkap: ${token}`);
 }
 const getCode=fs.readFileSync(path.join(root,"assets/js/features/get-code.js"),"utf8");
-for(const token of ["nxgcReport","analyzeExtractedSource","downloadSourceReport"]){
+for(const token of ["nxgcReport","analyzeExtractedSource","downloadSourceReport","runLiveAudit","LIVE_AUDIT_ENDPOINT","nxgcAssetScore"]){
   if(!getCode.includes(token)) fail(`Get Code module belum berisi ${token}`);
 }
+
+const auditApi=fs.readFileSync(path.join(root,"api/audit.js"),"utf8");
+const auditLib=fs.readFileSync(path.join(root,"lib/audit.js"),"utf8");
+for(const token of ["auditBatch","AUDIT_RATE_LIMITED","MAX_BODY_BYTES"]){ if(!auditApi.includes(token)) fail(`Audit API belum lengkap: ${token}`); }
+for(const token of ["assertPublicUrl","PRIVATE_IP_BLOCKED","readHeadersWithRedirects","CORS_RISK","MIME_MISMATCH"]){ if(!auditLib.includes(token)) fail(`Audit library belum lengkap: ${token}`); }
+const routeManifest=JSON.parse(fs.readFileSync(path.join(root,"route-manifest.json"),"utf8"));
+if(!(routeManifest.apiRoutes||[]).includes("/api/audit")) fail("route-manifest belum mencantumkan /api/audit");
+
 const manifest=JSON.parse(fs.readFileSync(path.join(root,"assets/module-manifest.json"),"utf8"));
 for(const [name,spec] of Object.entries(manifest.modules||{})){
   for(const asset of [...(spec.css||[]),...(spec.js||[])]){
@@ -70,4 +78,4 @@ for(const file of scanFiles){
   }
 }
 if(failed) process.exit(1);
-console.log(`Audit v4 lulus: index ${indexBytes.toLocaleString()} byte, ${jsFiles.length} file JS valid, manifest lazy lengkap.`);
+console.log(`Audit v4.1 lulus: index ${indexBytes.toLocaleString()} byte, ${jsFiles.length} file JS valid, lazy-load dan live HTTP audit lengkap.`);
