@@ -1,5 +1,18 @@
--- Jalankan sekali melalui Supabase SQL Editor saat database siap dipakai.
+-- Jalankan sekali melalui Supabase SQL Editor.
+-- Aman dijalankan ulang: tabel, index, policy, dan trigger menggunakan bentuk idempotent.
 create extension if not exists pgcrypto;
+
+create or replace function public.set_updated_at()
+returns trigger
+language plpgsql
+security invoker
+set search_path = public
+as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
 
 create table if not exists public.feedback (
   id uuid primary key default gen_random_uuid(),
@@ -49,9 +62,28 @@ drop policy if exists "public read active tools" on public.tools;
 create policy "public read active tools" on public.tools
   for select to anon using (is_active = true);
 
--- Feedback ditulis melalui /api/feedback menggunakan service role server-side.
--- Tidak ada policy insert anon agar input tidak dapat melewati validasi endpoint.
+-- Feedback ditulis melalui /api/feedback memakai service role server-side.
+-- Sengaja tidak ada policy insert anon agar validasi endpoint tidak dapat dilewati.
+
+drop trigger if exists feedback_set_updated_at on public.feedback;
+create trigger feedback_set_updated_at
+before update on public.feedback
+for each row execute function public.set_updated_at();
+
+drop trigger if exists app_settings_set_updated_at on public.app_settings;
+create trigger app_settings_set_updated_at
+before update on public.app_settings
+for each row execute function public.set_updated_at();
+
+drop trigger if exists tools_set_updated_at on public.tools;
+create trigger tools_set_updated_at
+before update on public.tools
+for each row execute function public.set_updated_at();
 
 create index if not exists feedback_created_at_idx on public.feedback (created_at desc);
 create index if not exists feedback_status_idx on public.feedback (status, created_at desc);
 create index if not exists tools_active_sort_idx on public.tools (is_active, sort_order, name);
+
+insert into public.app_settings (key, value, is_public)
+values ('site', '{"name":"All Tools Nexora","developer":"Dika"}'::jsonb, true)
+on conflict (key) do nothing;

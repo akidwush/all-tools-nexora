@@ -2,7 +2,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const root = path.resolve(__dirname, "..");
-const required = ["index.html", "about.html", "feedback.html", "vercel.json", "api/health.js", "api/feedback.js"];
+const required = ["index.html", "about.html", "feedback.html", "vercel.json", "api/health.js", "api/feedback.js", "api/database.js", "lib/database.js", "database/schema.sql"];
 const missing = required.filter((file) => !fs.existsSync(path.join(root, file)));
 
 if (missing.length) {

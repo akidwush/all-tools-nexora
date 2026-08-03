@@ -73,6 +73,9 @@ http.createServer(async (request, response) => {
   if (pathname === "/api/feedback" || pathname === "/api/feedback.js") {
     return runApi(path.join(root, "api", "feedback.js"), request, response);
   }
+  if (pathname === "/api/database" || pathname === "/api/database.js") {
+    return runApi(path.join(root, "api", "database.js"), request, response);
+  }
 
   if (!["GET", "HEAD"].includes(request.method || "GET")) {
     response.writeHead(405, { Allow: "GET, HEAD" });
