@@ -1,0 +1,130 @@
+{
+  "version": 1,
+  "modules": {
+    "get-code": {
+      "css": [
+        "assets/css/features/get-code.css"
+      ],
+      "js": [
+        "assets/js/features/get-code.js"
+      ]
+    },
+    "tiktok": {
+      "css": [
+        "assets/css/features/tiktok.css"
+      ],
+      "js": [
+        "assets/js/features/tiktok.js"
+      ]
+    },
+    "tiktok-quote": {
+      "css": [
+        "assets/css/features/tiktok-quote.css"
+      ],
+      "js": [
+        "assets/js/features/tiktok-quote.js"
+      ]
+    },
+    "virus-scan": {
+      "css": [
+        "assets/css/features/virus-scan.css"
+      ],
+      "js": [
+        "assets/js/features/virus-scan.js"
+      ]
+    },
+    "comic-reader": {
+      "css": [
+        "assets/css/features/comic-reader.css"
+      ],
+      "js": [
+        "assets/js/features/comic-reader.js"
+      ]
+    },
+    "source-features": {
+      "css": [
+        "assets/css/features/source-tools.css"
+      ],
+      "js": [
+        "assets/js/features/source-features.js"
+      ]
+    },
+    "imported-tools": {
+      "css": [
+        "assets/css/features/imported-tools.css"
+      ],
+      "js": [
+        "assets/js/features/imported-tools.js"
+      ]
+    },
+    "generator-pack": {
+      "css": [],
+      "js": [
+        "assets/js/features/generator-pack.js"
+      ]
+    },
+    "download-pack": {
+      "css": [
+        "assets/css/features/source-tools.css"
+      ],
+      "js": [
+        "assets/js/features/source-features.js",
+        "assets/js/features/download-pack.js"
+      ]
+    },
+    "unban-whatsapp": {
+      "css": [],
+      "js": [
+        "assets/js/features/unban-whatsapp.js"
+      ]
+    },
+    "nexus-ai": {
+      "css": [
+        "assets/css/features/nexus-ai.css"
+      ],
+      "js": [
+        "assets/js/features/nexus-ai.js"
+      ]
+    },
+    "pix-vault": {
+      "css": [
+        "assets/css/features/pix-vault.css"
+      ],
+      "js": [
+        "assets/js/features/pix-vault.js"
+      ]
+    },
+    "deploy-center": {
+      "css": [
+        "assets/css/features/deploy-center.css"
+      ],
+      "js": [
+        "assets/js/features/deploy-center.js"
+      ]
+    }
+  },
+  "tools": {
+    "getcode": "get-code",
+    "tiktok": "tiktok",
+    "ttquote": "tiktok-quote",
+    "virusscan": "virus-scan",
+    "comicreader": "comic-reader",
+    "sertifikat": "source-features",
+    "fakedev": "source-features",
+    "promptgenerate": "imported-tools",
+    "fakeovo": "imported-tools",
+    "quotegenerator": "imported-tools",
+    "carifakta": "imported-tools",
+    "mltools": "imported-tools",
+    "iqc": "generator-pack",
+    "winquotes": "generator-pack",
+    "nokiamsg": "generator-pack",
+    "terabox": "download-pack",
+    "fakebankjago": "download-pack",
+    "spotify": "download-pack",
+    "unbanwa": "unban-whatsapp",
+    "zxvai": "nexus-ai",
+    "fotolink": "pix-vault",
+    "vdeploy": "deploy-center"
+  }
+}

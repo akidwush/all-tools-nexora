@@ -1,0 +1,86 @@
+/* TikTok Quote embedded app shell — generated from index.html v3 */
+
+/* ===== original style block 1 ===== */
+/* TikTok Quote Nexus — aplikasi sumber ditanam terisolasi agar tidak bentrok */
+#nxUniversalRoom[data-tool="ttquote"] .nx-room-scroll{
+  overflow:hidden;
+}
+#nxUniversalRoom[data-tool="ttquote"] .nx-room-wrap{
+  width:100%;
+  max-width:none;
+  height:100%;
+  padding:0;
+}
+#nxUniversalRoom[data-tool="ttquote"] .nx-room-hero{
+  display:none!important;
+}
+#nxUniversalRoom[data-tool="ttquote"] .nx-room-panel{
+  height:100%;
+  min-height:0;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:#050713!important;
+  box-shadow:none!important;
+  overflow:hidden;
+}
+#nxUniversalRoom[data-tool="ttquote"] .nx-room-tool-body{
+  height:100%;
+  min-height:0;
+}
+#nxUniversalRoom[data-tool="ttquote"] .tool-api-line{
+  display:none!important;
+}
+.nx-ttquote-embed{
+  position:relative;
+  width:100%;
+  height:calc(100dvh - 76px);
+  min-height:620px;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 18% 12%,rgba(56,247,255,.12),transparent 30%),
+    radial-gradient(circle at 82% 18%,rgba(255,63,164,.12),transparent 32%),
+    #050713;
+}
+.nx-ttquote-frame{
+  display:block;
+  width:100%;
+  height:100%;
+  border:0;
+  background:#050713;
+}
+.nx-ttquote-loading{
+  position:absolute;
+  inset:0;
+  z-index:2;
+  display:grid;
+  place-items:center;
+  pointer-events:none;
+  background:#050713;
+  color:#dffbff;
+  font:900 12px/1.5 'Poppins',sans-serif;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  transition:opacity .3s ease,visibility .3s ease;
+}
+.nx-ttquote-loading.is-hidden{
+  opacity:0;
+  visibility:hidden;
+}
+.nx-ttquote-loading::before{
+  content:'';
+  width:42px;
+  height:42px;
+  margin-right:12px;
+  border-radius:50%;
+  border:3px solid rgba(103,232,249,.16);
+  border-top-color:#67e8f9;
+  border-right-color:#ec4899;
+  animation:spin .85s linear infinite;
+}
+@media(max-width:600px){
+  .nx-ttquote-embed{
+    height:calc(100dvh - 64px);
+    min-height:520px;
+  }
+}

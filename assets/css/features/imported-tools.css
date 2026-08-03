@@ -1,0 +1,179 @@
+/* Imported source applications — generated from index.html v3 */
+
+/* ===== original style block 7 ===== */
+.nx-imported-source{
+  min-width:0;
+  display:grid;
+  gap:12px;
+}
+.nx-imported-toolbar{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:11px 12px;
+  border:1px solid rgba(var(--nx-room-rgb),.18);
+  border-radius:16px;
+  background:
+    linear-gradient(135deg,rgba(var(--nx-room-rgb),.09),rgba(255,255,255,.018));
+}
+.nx-imported-toolbar-icon{
+  width:34px;
+  height:34px;
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
+  border:1px solid rgba(var(--nx-room-rgb),.26);
+  border-radius:11px;
+  background:rgba(var(--nx-room-rgb),.10);
+  color:var(--nx-room-accent);
+}
+.nx-imported-toolbar-copy{
+  min-width:0;
+  display:grid;
+  gap:2px;
+}
+.nx-imported-toolbar-copy b{
+  color:#f6efff;
+  font-size:11px;
+  font-weight:900;
+}
+.nx-imported-toolbar-copy span{
+  overflow:hidden;
+  color:#887c9e;
+  font-size:8px;
+  font-weight:700;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.nx-imported-engine{
+  margin-left:auto;
+  flex:0 0 auto;
+  padding:5px 8px;
+  border:1px solid rgba(var(--nx-room-rgb),.18);
+  border-radius:999px;
+  background:rgba(var(--nx-room-rgb),.07);
+  color:var(--nx-room-accent);
+  font-size:7px;
+  font-weight:900;
+  letter-spacing:.08em;
+}
+.nx-imported-stage{
+  position:relative;
+  min-width:0;
+  min-height:620px;
+  overflow:hidden;
+  border:1px solid rgba(var(--nx-room-rgb),.18);
+  border-radius:22px;
+  background:#08030f;
+  box-shadow:0 24px 70px rgba(0,0,0,.36);
+}
+.nx-imported-frame{
+  width:100%;
+  height:min(78dvh,920px);
+  min-height:620px;
+  display:block;
+  border:0;
+  background:#08030f;
+}
+.nx-imported-loading{
+  position:absolute;
+  inset:0;
+  z-index:3;
+  display:grid;
+  place-items:center;
+  background:
+    radial-gradient(circle at 50% 30%,rgba(var(--nx-room-rgb),.13),transparent 36%),
+    #08030f;
+  transition:opacity .24s ease,visibility .24s ease;
+}
+.nx-imported-loading.is-hidden{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+}
+.nx-imported-loader-box{
+  display:grid;
+  justify-items:center;
+  gap:12px;
+  color:#aa9bbb;
+  font-size:9px;
+  font-weight:850;
+}
+.nx-imported-spinner{
+  width:31px;
+  height:31px;
+  border:3px solid rgba(var(--nx-room-rgb),.13);
+  border-top-color:var(--nx-room-accent);
+  border-radius:50%;
+  animation:nxImportedSpin .7s linear infinite;
+}
+@keyframes nxImportedSpin{
+  to{transform:rotate(360deg)}
+}
+@media(max-width:600px){
+  .nx-imported-toolbar{
+    padding:9px;
+  }
+  .nx-imported-engine{
+    display:none;
+  }
+  .nx-imported-stage,
+  .nx-imported-frame{
+    min-height:680px;
+  }
+  .nx-imported-frame{
+    height:82dvh;
+  }
+}
+
+/* ===== original style block 10 ===== */
+#nxUniversalRoom[data-tool="mltools"] .nx-room-scroll{
+  overflow:hidden!important;
+  padding:0!important;
+}
+#nxUniversalRoom[data-tool="mltools"] .nx-room-hero{
+  display:none!important;
+}
+#nxUniversalRoom[data-tool="mltools"] .nx-room-panel{
+  height:calc(100dvh - 58px)!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:hidden!important;
+  border:0!important;
+  border-radius:0!important;
+  background:#06020b!important;
+  box-shadow:none!important;
+}
+#nxUniversalRoom[data-tool="mltools"] .nx-mltools-full-body{
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:hidden!important;
+}
+#nxUniversalRoom[data-tool="mltools"] .nx-imported-source-full{
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  display:block!important;
+}
+#nxUniversalRoom[data-tool="mltools"] .nx-imported-source-full .nx-imported-stage{
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  overflow:hidden!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+#nxUniversalRoom[data-tool="mltools"] .nx-imported-source-full .nx-imported-frame{
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  border:0!important;
+}
+#nxUniversalRoom[data-tool="mltools"] .tool-api-line{
+  display:none!important;
+}

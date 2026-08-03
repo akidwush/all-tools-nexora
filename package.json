@@ -1,8 +1,8 @@
 {
   "name": "all-tools-nexora-developer-dika",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "private": true,
-  "description": "All Tools Nexora \u2014 Developer Dika",
+  "description": "All Tools Nexora v4 — modular index and on-demand feature loading",
   "scripts": {
     "dev": "node serve-local.js",
     "start": "node serve-local.js",

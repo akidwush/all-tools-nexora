@@ -54,3 +54,22 @@ GET /api/health
 ```
 
 `SUPABASE_SERVICE_ROLE_KEY` hanya digunakan di serverless function. Jangan menaruhnya di HTML, JavaScript browser, GitHub, atau screenshot publik.
+
+
+## v4.0 — Modular index + lazy-load
+
+- `index.html` tidak lagi membawa CSS/JavaScript besar secara inline.
+- Aset inti berada di `assets/css/` dan `assets/js/core/`.
+- Payload fitur besar berada di `assets/js/features/` dan hanya dimuat saat kartu tool dibuka.
+- Pemetaan modul terdokumentasi di `assets/module-manifest.json`.
+- Kartu menggunakan `data-tool-id` agar routing tidak bergantung pada teks tampilan.
+- Build membuat folder `public/` untuk Vercel, sedangkan endpoint serverless tetap berada di `api/`.
+- `npm run check` memverifikasi ukuran index, sintaks seluruh modul, referensi manifest, serta audit rahasia.
+
+### Validasi
+
+```bash
+npm run check
+npm test
+npm run build
+```
