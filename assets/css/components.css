@@ -1491,3 +1491,54 @@ body.nx-universal-room-open{overflow:hidden!important}
 .tools-card.is-module-loading{pointer-events:none;opacity:.72;filter:saturate(.72)}
 .tools-card.is-module-loading::after{content:'Memuat…';position:absolute;inset:auto 12px 10px 12px;padding:6px 9px;border-radius:999px;background:rgba(10,1,24,.88);border:1px solid rgba(192,132,252,.32);color:#e9d5ff;font-size:10px;font-weight:800;text-align:center}
 @media(max-width:600px){#nxModuleToast{bottom:16px}}
+
+/* =========================================================
+   NEXORA v4.2 — TOOL HEALTH MONITORING
+   ========================================================= */
+.nx-tool-health{margin:14px 0 18px;position:relative;--nx-health:#94a3b8;--nx-health-rgb:148,163,184}
+.nx-tool-health[data-health-status="operational"]{--nx-health:#34d399;--nx-health-rgb:52,211,153}
+.nx-tool-health[data-health-status="degraded"]{--nx-health:#fbbf24;--nx-health-rgb:251,191,36}
+.nx-tool-health[data-health-status="offline"]{--nx-health:#fb7185;--nx-health-rgb:251,113,133}
+.nx-health-summary{width:100%;display:flex;align-items:center;gap:13px;padding:14px 15px;border:1px solid rgba(var(--nx-health-rgb),.22);border-radius:18px;background:linear-gradient(135deg,rgba(var(--nx-health-rgb),.09),rgba(15,23,42,.62));color:#e5eefc;text-align:left;box-shadow:0 16px 42px rgba(2,6,23,.22);cursor:pointer;transition:transform .2s ease,border-color .2s ease,background .2s ease}
+.nx-health-summary:hover,.nx-health-summary:focus-visible{transform:translateY(-1px);border-color:rgba(var(--nx-health-rgb),.46);outline:none}
+.nx-health-summary-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:14px;color:var(--nx-health);background:rgba(var(--nx-health-rgb),.12);box-shadow:inset 0 0 0 1px rgba(var(--nx-health-rgb),.18);font-size:18px;flex:0 0 auto}
+.nx-health-summary-copy{min-width:0;flex:1;display:grid;gap:3px}
+.nx-health-summary-copy b{font-size:13px;color:#f8fafc;letter-spacing:.01em}
+.nx-health-summary-copy span{font-size:10px;color:#94a3b8;line-height:1.45}
+.nx-health-badge{display:inline-flex;align-items:center;justify-content:center;min-width:76px;padding:7px 10px;border-radius:999px;background:rgba(var(--nx-health-rgb),.12);border:1px solid rgba(var(--nx-health-rgb),.24);color:var(--nx-health);font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;flex:0 0 auto}
+.nx-health-summary-arrow{color:#64748b;font-size:12px}
+.nx-health-dialog{position:fixed;inset:0;z-index:10080;display:flex;align-items:flex-end;justify-content:center;padding:12px;background:rgba(2,6,23,.76);backdrop-filter:blur(12px);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .22s ease,visibility .22s ease}
+.nx-health-dialog.is-open{opacity:1;visibility:visible;pointer-events:auto}
+.nx-health-panel{width:min(720px,100%);max-height:min(84vh,760px);display:flex;flex-direction:column;border:1px solid rgba(148,163,184,.2);border-radius:24px 24px 18px 18px;background:linear-gradient(180deg,#111827,#070b14);box-shadow:0 30px 100px rgba(0,0,0,.52);overflow:hidden;transform:translateY(24px);transition:transform .24s ease}
+.nx-health-dialog.is-open .nx-health-panel{transform:translateY(0)}
+.nx-health-panel-head{display:flex;align-items:center;gap:12px;padding:18px;border-bottom:1px solid rgba(148,163,184,.12)}
+.nx-health-panel-mark{width:44px;height:44px;display:grid;place-items:center;border-radius:15px;color:#67e8f9;background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.18);font-size:18px}
+.nx-health-panel-title{min-width:0;flex:1}
+.nx-health-panel-title b{display:block;color:#f8fafc;font-size:14px}
+.nx-health-panel-title span{display:block;margin-top:3px;color:#64748b;font-size:10px}
+.nx-health-close{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;border:1px solid rgba(148,163,184,.14);background:rgba(148,163,184,.06);color:#cbd5e1;cursor:pointer}
+.nx-health-panel-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;background:rgba(15,23,42,.56);border-bottom:1px solid rgba(148,163,184,.09)}
+.nx-health-panel-toolbar span{font-size:10px;color:#64748b}
+.nx-health-refresh{display:inline-flex;align-items:center;gap:7px;padding:8px 11px;border-radius:11px;border:1px solid rgba(34,211,238,.18);background:rgba(34,211,238,.08);color:#67e8f9;font-size:10px;font-weight:700;cursor:pointer}
+.nx-health-refresh:disabled{opacity:.55;cursor:wait}
+.nx-health-refresh.is-loading i{animation:nx-health-spin .8s linear infinite}
+.nx-health-list{padding:14px;overflow:auto;display:grid;gap:9px}
+.nx-health-item{padding:13px;border:1px solid rgba(148,163,184,.1);border-radius:16px;background:rgba(15,23,42,.58);--item:#94a3b8;--item-rgb:148,163,184}
+.nx-health-item[data-status="operational"]{--item:#34d399;--item-rgb:52,211,153}
+.nx-health-item[data-status="degraded"]{--item:#fbbf24;--item-rgb:251,191,36}
+.nx-health-item[data-status="offline"]{--item:#fb7185;--item-rgb:251,113,133}
+.nx-health-item-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.nx-health-item-identity{min-width:0;display:flex;align-items:center;gap:9px;color:#e2e8f0;font-size:11px}
+.nx-health-item-identity b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nx-health-dot{width:8px;height:8px;border-radius:999px;background:var(--item);box-shadow:0 0 0 4px rgba(var(--item-rgb),.1),0 0 14px rgba(var(--item-rgb),.4);flex:0 0 auto}
+.nx-health-item-status{padding:5px 8px;border-radius:999px;color:var(--item);background:rgba(var(--item-rgb),.09);font-size:8px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.nx-health-item-metrics{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+.nx-health-item-metrics span{padding:5px 7px;border-radius:8px;background:rgba(148,163,184,.06);color:#64748b;font-size:8px}
+.nx-health-item-error{margin:9px 0 0;color:#94a3b8;font-size:9px;line-height:1.5}
+.nx-health-empty{padding:28px;text-align:center;color:#64748b;font-size:11px}
+body.nx-health-lock{overflow:hidden}
+.nx-tool-health.is-loading .nx-health-summary-icon i{animation:nx-health-pulse 1s ease-in-out infinite}
+@keyframes nx-health-spin{to{transform:rotate(360deg)}}
+@keyframes nx-health-pulse{50%{opacity:.35;transform:scale(.85)}}
+@media(min-width:700px){.nx-health-dialog{align-items:center}.nx-health-panel{border-radius:24px}.nx-health-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:420px){.nx-health-summary{padding:12px}.nx-health-badge{min-width:68px;padding-inline:8px}.nx-health-summary-copy span{max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}

@@ -1,4 +1,5 @@
 const { getDatabaseConfig, pingDatabase } = require("../lib/database");
+const { readCachedToolHealth, normalizeCachedRows, summarizeHealth } = require("../lib/tool-health");
 
 function send(response, status, payload, headOnly) {
   response.setHeader("Cache-Control", "no-store, max-age=0");
@@ -16,15 +17,30 @@ module.exports = async function handler(request, response) {
 
   const config = getDatabaseConfig();
   const database = await pingDatabase();
-  const appHealthy = !database.configured || database.status === "ready";
-  const status = database.configured && database.status !== "ready" ? 503 : 200;
+  let toolHealth = summarizeHealth([]);
+  let toolHealthAvailable = false;
+  try {
+    const rows = normalizeCachedRows(await readCachedToolHealth());
+    toolHealth = summarizeHealth(rows);
+    toolHealthAvailable = rows.length > 0;
+  } catch {}
 
-  return send(response, status, {
+  const appHealthy = !database.configured || database.status === "ready";
+  const httpStatus = database.configured && database.status !== "ready" ? 503 : 200;
+  const serviceStatus = !appHealthy
+    ? "degraded"
+    : toolHealthAvailable && toolHealth.status !== "operational"
+      ? "healthy-with-tool-warnings"
+      : database.status === "ready"
+        ? "healthy"
+        : "healthy-without-database";
+
+  return send(response, httpStatus, {
     ok: appHealthy,
-    status: database.status === "ready" ? "healthy" : database.configured ? "degraded" : "healthy-without-database",
+    status: serviceStatus,
     app: "All Tools Nexora",
     developer: "Dika",
-    version: "4.1.0",
+    version: "4.2.0",
     database: {
       configured: database.configured,
       connected: database.connected,
@@ -35,6 +51,10 @@ module.exports = async function handler(request, response) {
       urlConfigured: config.urlConfigured,
       keyConfigured: config.keyConfigured,
       validUrl: config.validUrl
+    },
+    toolHealth: {
+      available: toolHealthAvailable,
+      ...toolHealth
     },
     time: new Date().toISOString()
   }, request.method === "HEAD");

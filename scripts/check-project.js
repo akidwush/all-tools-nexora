@@ -36,9 +36,10 @@ for(const file of jsFiles){
 const index=fs.readFileSync(path.join(root,"index.html"),"utf8");
 const indexBytes=Buffer.byteLength(index);
 if(indexBytes>180000) fail(`index.html masih terlalu besar: ${indexBytes} byte.`);
-for(const token of ["assets/css/core.css","assets/js/core/app.js","assets/js/core/lazy-loader.js"]){
+for(const token of ["assets/css/core.css","assets/js/core/app.js","assets/js/core/tool-health.js","assets/js/core/lazy-loader.js"]){
   if(!index.includes(token)) fail(`index.html belum merujuk aset modular: ${token}`);
 }
+if(!index.includes('id="nxToolHealth"')) fail("index.html belum memiliki panel tool health.");
 const app=fs.readFileSync(path.join(root,"assets/js/core/app.js"),"utf8");
 if(!app.includes('data-tool-id="${item.id}"')) fail("app.js belum memberi data-tool-id stabil pada kartu.");
 const loader=fs.readFileSync(path.join(root,"assets/js/core/lazy-loader.js"),"utf8");
@@ -56,6 +57,19 @@ for(const token of ["auditBatch","AUDIT_RATE_LIMITED","MAX_BODY_BYTES"]){ if(!au
 for(const token of ["assertPublicUrl","PRIVATE_IP_BLOCKED","readHeadersWithRedirects","CORS_RISK","MIME_MISMATCH"]){ if(!auditLib.includes(token)) fail(`Audit library belum lengkap: ${token}`); }
 const routeManifest=JSON.parse(fs.readFileSync(path.join(root,"route-manifest.json"),"utf8"));
 if(!(routeManifest.apiRoutes||[]).includes("/api/audit")) fail("route-manifest belum mencantumkan /api/audit");
+if(!(routeManifest.apiRoutes||[]).includes("/api/tool-health")) fail("route-manifest belum mencantumkan /api/tool-health");
+
+const healthApi=fs.readFileSync(path.join(root,"api/tool-health.js"),"utf8");
+const healthLib=fs.readFileSync(path.join(root,"lib/tool-health.js"),"utf8");
+const healthUi=fs.readFileSync(path.join(root,"assets/js/core/tool-health.js"),"utf8");
+for(const token of ["HEALTH_CHECK_TOKEN","refresh === \"force\"","executeRun","readCachedToolHealth"]){ if(!healthApi.includes(token.replaceAll('\\"','"'))) fail(`Tool health API belum lengkap: ${token}`); }
+for(const token of ["TOOL_CATALOG","runToolHealthChecks","persistHealthResults","classifyProbe","summarizeHealth"]){ if(!healthLib.includes(token)) fail(`Tool health library belum lengkap: ${token}`); }
+for(const token of ["nxToolHealth","/api/tool-health?refresh=auto","renderList","CACHE_KEY"]){ if(!healthUi.includes(token)) fail(`Tool health UI belum lengkap: ${token}`); }
+const schema=fs.readFileSync(path.join(root,"database/schema.sql"),"utf8");
+for(const token of ["create table if not exists public.tool_health","consecutive_failures","success_rate"]){ if(!schema.includes(token)) fail(`Schema tool health belum lengkap: ${token}`); }
+if(!fs.existsSync(path.join(root,"database/migrations/002_tool_health.sql"))) fail("Migration tool health belum tersedia.");
+const healthCatalog=require(path.join(root,"lib/tool-health.js")).TOOL_CATALOG;
+if(!Array.isArray(healthCatalog)||healthCatalog.length!==22) fail(`Tool health catalog harus memuat 22 tools, ditemukan ${healthCatalog?.length||0}.`);
 
 const manifest=JSON.parse(fs.readFileSync(path.join(root,"assets/module-manifest.json"),"utf8"));
 for(const [name,spec] of Object.entries(manifest.modules||{})){
@@ -78,4 +92,4 @@ for(const file of scanFiles){
   }
 }
 if(failed) process.exit(1);
-console.log(`Audit v4.1 lulus: index ${indexBytes.toLocaleString()} byte, ${jsFiles.length} file JS valid, lazy-load dan live HTTP audit lengkap.`);
+console.log(`Audit v4.2 lulus: index ${indexBytes.toLocaleString()} byte, ${jsFiles.length} file JS valid, lazy-load, live HTTP audit, dan tool health monitoring lengkap.`);

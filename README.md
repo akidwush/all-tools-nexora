@@ -1,39 +1,101 @@
-# All Tools Nexora v4.1 — Modular Lazy Load + Live Audit
+# All Tools Nexora v4.2 — Tool Health Monitoring
 
-Versi 4.1 mempertahankan modularisasi v4.0 dan meningkatkan mesin **Get Code HTML** dengan pemeriksaan jaringan nyata terhadap asset serta endpoint yang ditemukan pada source.
+Versi 4.2 dibangun di atas modularisasi v4.0 dan live audit v4.1. Upgrade ini menambahkan pemantauan kesehatan untuk 22 tools, penyimpanan statistik di Supabase, serta panel status langsung pada halaman utama.
 
-## Fitur utama v4.1
+## Fitur utama v4.2
 
-- `index.html` tetap ringan; payload fitur dimuat hanya ketika kartu tool dibuka.
-- Get Code tetap mendeteksi asset HTML/CSS serta endpoint dari `fetch`, Axios, XHR, WebSocket, EventSource, beacon, form, dan data attribute.
-- Tombol **Run Live Audit** menguji resource publik melalui `/api/audit`.
-- Pemeriksaan live mencakup:
-  - status HTTP;
+- Endpoint baru: `GET /api/tool-health` dan `POST /api/tool-health`.
+- Panel **Tool Health Monitoring** pada halaman utama.
+- Status per tools:
+  - `operational`;
+  - `degraded`;
+  - `offline`;
+  - `unknown`.
+- Metrik yang disimpan:
   - latency;
-  - redirect dan URL akhir;
-  - `Content-Type` serta indikasi MIME mismatch;
-  - indikasi risiko CORS untuk endpoint, module script, dan font lintas origin;
-  - endpoint yang memerlukan autentikasi;
-  - timeout, resource hilang, dan upstream error.
-- Dashboard laporan menampilkan **Asset Readiness**, **API Readiness**, jumlah resource terjangkau, dan jumlah masalah.
-- Hasil static report beserta live audit dapat disalin atau diunduh sebagai JSON.
+  - HTTP status;
+  - persentase keberhasilan;
+  - jumlah pemeriksaan;
+  - kegagalan berturut-turut;
+  - error terakhir;
+  - waktu pemeriksaan dan keberhasilan terakhir.
+- Pemeriksaan 22 tools memakai target dependency yang sudah ditentukan di server, bukan URL bebas dari pengguna.
+- Target yang sama diperiksa sekali lalu hasilnya dibagikan ke tools yang memakai dependency tersebut.
+- Cache Supabase mencegah pemeriksaan jaringan pada setiap kunjungan.
+- Pemeriksaan otomatis hanya dilakukan jika data sudah kedaluwarsa.
+- Pemeriksaan paksa dilindungi `HEALTH_CHECK_TOKEN`.
+- `/api/health` sekarang turut menampilkan ringkasan tool health tanpa menjadikan gangguan API eksternal sebagai kegagalan inti website.
 
-## Probe aman
+## SQL Supabase wajib
 
-Live audit tidak mengirim data formulir dan tidak menjalankan request mutasi:
+Untuk upgrade dari v4.1, jalankan file berikut melalui Supabase SQL Editor:
 
-- asset serta endpoint `GET/HEAD` diperiksa dengan `HEAD`;
-- jika server menolak `HEAD`, probe terbatas memakai `GET` dengan header `Range`;
-- endpoint `POST`, `PUT`, `PATCH`, dan `DELETE` hanya diperiksa memakai `OPTIONS`;
-- URL lokal, private network, reserved IP, kredensial URL, protokol non-HTTP, dan port berisiko diblokir;
-- setiap redirect divalidasi ulang dan koneksi dipasang ke alamat IP publik hasil DNS untuk mengurangi risiko DNS rebinding;
-- audit browser diproses per batch kecil dan dibatasi maksimal 120 resource per proses.
+```text
+database/migrations/002_tool_health.sql
+```
+
+Untuk instalasi baru, cukup jalankan:
+
+```text
+database/schema.sql
+```
+
+Tabel `tool_health` tidak memiliki policy anon. Browser membaca status melalui API server-side sehingga URL dependency dan statistik internal tidak dapat diambil langsung melalui Supabase anon key.
+
+## Endpoint
+
+### Ringkasan publik
+
+```http
+GET /api/tool-health?refresh=auto
+```
+
+API menggunakan cache. Jika data belum ada atau sudah melewati `HEALTH_STALE_MS`, server menjalankan pemeriksaan baru dan mencoba menyimpannya ke Supabase.
+
+### Hanya membaca cache
+
+```http
+GET /api/tool-health?refresh=0
+```
+
+### Pemeriksaan paksa
+
+```http
+POST /api/tool-health
+Authorization: Bearer HEALTH_CHECK_TOKEN
+```
+
+Pemeriksaan paksa ditolak jika token belum dipasang atau tidak cocok.
+
+## Environment Variables
+
+Konfigurasi lama tetap digunakan:
+
+```env
+SUPABASE_URL=https://PROJECT_ID.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=service_role_key_server_only
+DATABASE_TIMEOUT_MS=8000
+FEEDBACK_HASH_SALT=random_string_panjang
+```
+
+Tambahkan untuk v4.2:
+
+```env
+HEALTH_CHECK_TOKEN=random_token_panjang
+HEALTH_CHECK_TIMEOUT_MS=4500
+HEALTH_CHECK_CONCURRENCY=6
+HEALTH_STALE_MS=900000
+HEALTH_DEGRADED_LATENCY_MS=2500
+```
+
+Hanya `HEALTH_CHECK_TOKEN` yang perlu dibuat sendiri. Nilai tuning lain memiliki default dan bersifat opsional.
+
+Jangan menaruh service role key atau health token di HTML, JavaScript browser, GitHub, atau screenshot publik.
 
 ## Menjalankan di Termux
 
 ```bash
 pkg install nodejs -y
-cd all-tools-nexora-v4.1-live-audit
 npm run check
 npm test
 npm run build
@@ -46,55 +108,16 @@ Buka:
 http://127.0.0.1:4173
 ```
 
-`serve-local.js` mendukung endpoint berikut:
+`serve-local.js` mendukung:
 
 ```text
 GET  /api/health
 GET  /api/database?resource=status
 POST /api/feedback
 POST /api/audit
+GET  /api/tool-health
+POST /api/tool-health
 ```
-
-## Request API audit
-
-```json
-{
-  "target": "https://example.com/page",
-  "items": [
-    {
-      "id": "asset-0",
-      "type": "asset",
-      "kind": "script",
-      "method": "HEAD",
-      "url": "https://example.com/assets/app.js",
-      "scope": "internal"
-    }
-  ]
-}
-```
-
-Setiap request API menerima maksimal 16 item secara default. Frontend Get Code otomatis membagi audit menjadi beberapa batch.
-
-## Environment Variables
-
-Konfigurasi Supabase tetap sama:
-
-```env
-SUPABASE_URL=https://PROJECT_ID.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=service_role_key_server_only
-DATABASE_TIMEOUT_MS=8000
-FEEDBACK_HASH_SALT=random_string_panjang
-```
-
-Tuning live audit bersifat opsional:
-
-```env
-AUDIT_TIMEOUT_MS=4000
-AUDIT_MAX_ITEMS=16
-AUDIT_CONCURRENCY=6
-```
-
-Jangan menaruh `SUPABASE_SERVICE_ROLE_KEY` di HTML, JavaScript browser, GitHub, atau screenshot publik.
 
 ## Validasi
 
@@ -104,4 +127,4 @@ npm test
 npm run build
 ```
 
-Dokumentasi hasil validasi tersedia di `V4_1_VALIDATION.md`.
+Laporan lengkap tersedia di `V4_2_VALIDATION.md`.

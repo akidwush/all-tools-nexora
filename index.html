@@ -191,6 +191,35 @@
 </div>
 </div>
 </div>
+<section aria-label="Status tools" class="nx-tool-health" data-health-status="unknown" id="nxToolHealth">
+<button aria-controls="nxHealthDialog" class="nx-health-summary" data-health-open type="button">
+<span class="nx-health-summary-icon"><i class="fa-solid fa-circle-question" data-health-icon></i></span>
+<span class="nx-health-summary-copy">
+<b data-health-title>Status belum tersedia</b>
+<span data-health-description>Memeriksa layanan dan dependency tools...</span>
+<span data-health-time>Terakhir dicek: Belum diperiksa</span>
+</span>
+<span class="nx-health-badge" data-health-badge>Unknown</span>
+<span class="nx-health-summary-arrow"><i class="fa-solid fa-chevron-right"></i></span>
+</button>
+<div aria-hidden="true" class="nx-health-dialog" data-health-dialog id="nxHealthDialog">
+<section aria-labelledby="nxHealthDialogTitle" aria-modal="true" class="nx-health-panel" role="dialog">
+<header class="nx-health-panel-head">
+<span class="nx-health-panel-mark"><i class="fa-solid fa-heart-pulse"></i></span>
+<span class="nx-health-panel-title">
+<b id="nxHealthDialogTitle">Tool Health Monitoring</b>
+<span>Status live, latency, HTTP, dan tingkat keberhasilan.</span>
+</span>
+<button aria-label="Tutup status tools" class="nx-health-close" data-health-close type="button"><i class="fa-solid fa-xmark"></i></button>
+</header>
+<div class="nx-health-panel-toolbar">
+<span>Pemeriksaan otomatis memakai cache Supabase agar ringan.</span>
+<button class="nx-health-refresh" data-health-refresh type="button"><i class="fa-solid fa-rotate"></i>Perbarui</button>
+</div>
+<div class="nx-health-list" data-health-list></div>
+</section>
+</div>
+</section>
 <div class="nav-tabs" id="navTabs">
 <button class="nav-tab active" data-tab="all"><i class="fas fa-th-large"></i> All</button>
 <button class="nav-tab" data-tab="downloader"><i class="fas fa-download"></i> Downloader</button>
@@ -952,4 +981,4 @@
 
 
 
-<script src="assets/js/core/app.js"></script><script src="assets/js/core/shell.js"></script><script src="assets/branding.js"></script><script src="assets/js/core/lazy-loader.js"></script></body></html>
+<script src="assets/js/core/app.js"></script><script src="assets/js/core/shell.js"></script><script src="assets/branding.js"></script><script src="assets/js/core/tool-health.js"></script><script src="assets/js/core/lazy-loader.js"></script></body></html>

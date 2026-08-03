@@ -11,6 +11,7 @@
     "/api/health",
     "/api/database",
     "/api/feedback",
-    "/api/audit"
+    "/api/audit",
+    "/api/tool-health"
   ]
 }

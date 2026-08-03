@@ -79,6 +79,9 @@ http.createServer(async (request, response) => {
   if (pathname === "/api/audit" || pathname === "/api/audit.js") {
     return runApi(path.join(root, "api", "audit.js"), request, response);
   }
+  if (pathname === "/api/tool-health" || pathname === "/api/tool-health.js") {
+    return runApi(path.join(root, "api", "tool-health.js"), request, response);
+  }
 
   if (!["GET", "HEAD"].includes(request.method || "GET")) {
     response.writeHead(405, { Allow: "GET, HEAD" });
