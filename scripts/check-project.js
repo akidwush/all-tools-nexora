@@ -12,14 +12,14 @@ function walk(dir){
     return entry.isDirectory()?walk(full):[full];
   });
 }
-for(const filename of ["index.html","about.html","feedback.html"]){
+for(const filename of ["index.html","about.html","feedback.html","admin/index.html","admin/login.html"]){
   const source=fs.readFileSync(path.join(root,filename),"utf8");
   if(!/<\/html>\s*$/i.test(source)) fail(`${filename}: penutup HTML tidak valid.`);
   let scriptIndex=0;
   for(const match of source.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/gi)){
     scriptIndex++;
     if(/\bsrc\s*=/.test(match[1])) continue;
-    if(filename==="index.html" && match[2].trim()) fail(`${filename}: masih memiliki JavaScript inline pada blok ${scriptIndex}.`);
+    if((filename==="index.html" || filename.startsWith("admin/")) && match[2].trim()) fail(`${filename}: masih memiliki JavaScript inline pada blok ${scriptIndex}.`);
     if(filename!=="index.html" && match[2].trim()){
       try{ new vm.Script(match[2],{filename:`${filename}:inline-${scriptIndex}`}); }
       catch(error){ fail(`${filename}: ${error.message}`); }
@@ -68,6 +68,23 @@ for(const token of ["nxToolHealth","/api/tool-health?refresh=auto","renderList",
 const schema=fs.readFileSync(path.join(root,"database/schema.sql"),"utf8");
 for(const token of ["create table if not exists public.tool_health","consecutive_failures","success_rate"]){ if(!schema.includes(token)) fail(`Schema tool health belum lengkap: ${token}`); }
 if(!fs.existsSync(path.join(root,"database/migrations/002_tool_health.sql"))) fail("Migration tool health belum tersedia.");
+
+const adminRequired = [
+  "admin/index.html", "admin/login.html", "assets/css/admin.css", "assets/js/admin/login.js", "assets/js/admin/dashboard.js",
+  "api/admin/auth.js", "api/admin/dashboard.js", "api/admin/tools.js", "lib/admin-auth.js",
+  "database/migrations/003_admin_dashboard.sql", "database/setup-first-admin.sql"
+];
+for (const file of adminRequired) if (!fs.existsSync(path.join(root, file))) fail(`Admin v5.0 file hilang: ${file}`);
+const adminAuth = fs.readFileSync(path.join(root,"lib/admin-auth.js"),"utf8");
+for (const token of ["nx_admin_access","nx_admin_refresh","nx_admin_csrf","HttpOnly","verifyMutationRequest","refreshSession"]) if(!adminAuth.includes(token)) fail(`Admin auth belum lengkap: ${token}`);
+const adminApi = fs.readFileSync(path.join(root,"api/admin/auth.js"),"utf8");
+for (const token of ["LOGIN_RATE_LIMITED","ADMIN_NOT_ALLOWED","setSessionCookies"]) if(!adminApi.includes(token)) fail(`Admin login API belum lengkap: ${token}`);
+const adminTools = fs.readFileSync(path.join(root,"api/admin/tools.js"),"utf8");
+for (const token of ["requireAdmin","verifyMutationRequest","INVALID_EXTERNAL_URL"]) if(!adminTools.includes(token)) fail(`Admin tools API belum lengkap: ${token}`);
+const adminMigration = fs.readFileSync(path.join(root,"database/migrations/003_admin_dashboard.sql"),"utf8");
+for (const token of ["create table if not exists public.admin_users","references auth.users","grant select, insert, update, delete","on conflict (id) do nothing"]) if(!adminMigration.includes(token)) fail(`Migration admin belum lengkap: ${token}`);
+for (const route of ["/admin","/admin/login"]) if(!routeManifest.routes?.[route]) fail(`route-manifest belum mencantumkan ${route}`);
+for (const route of ["/api/admin/auth","/api/admin/dashboard","/api/admin/tools"]) if(!(routeManifest.apiRoutes||[]).includes(route)) fail(`route-manifest belum mencantumkan ${route}`);
 const healthCatalog=require(path.join(root,"lib/tool-health.js")).TOOL_CATALOG;
 if(!Array.isArray(healthCatalog)||healthCatalog.length!==22) fail(`Tool health catalog harus memuat 22 tools, ditemukan ${healthCatalog?.length||0}.`);
 
@@ -92,4 +109,4 @@ for(const file of scanFiles){
   }
 }
 if(failed) process.exit(1);
-console.log(`Audit v4.2 lulus: index ${indexBytes.toLocaleString()} byte, ${jsFiles.length} file JS valid, lazy-load, live HTTP audit, dan tool health monitoring lengkap.`);
+console.log(`Audit v5.0 lulus: index ${indexBytes.toLocaleString()} byte, ${jsFiles.length} file JS valid, lazy-load, live audit, tool health, login, dan dashboard admin lengkap.`);

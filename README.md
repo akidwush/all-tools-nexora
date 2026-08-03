@@ -1,123 +1,39 @@
-# All Tools Nexora v4.2 — Tool Health Monitoring
+# All Tools Nexora v5.0
 
-Versi 4.2 dibangun di atas modularisasi v4.0 dan live audit v4.1. Upgrade ini menambahkan pemantauan kesehatan untuk 22 tools, penyimpanan statistik di Supabase, serta panel status langsung pada halaman utama.
+Website tools modular dengan lazy loading, Get Code live audit, tool health monitoring, Supabase database, serta login dan dashboard admin.
 
-## Fitur utama v4.2
+## Fitur v5.0
 
-- Endpoint baru: `GET /api/tool-health` dan `POST /api/tool-health`.
-- Panel **Tool Health Monitoring** pada halaman utama.
-- Status per tools:
-  - `operational`;
-  - `degraded`;
-  - `offline`;
-  - `unknown`.
-- Metrik yang disimpan:
-  - latency;
-  - HTTP status;
-  - persentase keberhasilan;
-  - jumlah pemeriksaan;
-  - kegagalan berturut-turut;
-  - error terakhir;
-  - waktu pemeriksaan dan keberhasilan terakhir.
-- Pemeriksaan 22 tools memakai target dependency yang sudah ditentukan di server, bukan URL bebas dari pengguna.
-- Target yang sama diperiksa sekali lalu hasilnya dibagikan ke tools yang memakai dependency tersebut.
-- Cache Supabase mencegah pemeriksaan jaringan pada setiap kunjungan.
-- Pemeriksaan otomatis hanya dilakukan jika data sudah kedaluwarsa.
-- Pemeriksaan paksa dilindungi `HEALTH_CHECK_TOKEN`.
-- `/api/health` sekarang turut menampilkan ringkasan tool health tanpa menjadikan gangguan API eksternal sebagai kegagalan inti website.
+- Login admin menggunakan Supabase Auth email/password.
+- Allowlist admin melalui tabel `admin_users` dengan role `super_admin`, `admin`, dan `viewer`.
+- Cookie sesi HttpOnly, refresh token server-side, SameSite, CSRF token, origin validation, dan rate limit login.
+- Dashboard `/admin` dengan ringkasan tools, feedback, database, dan tool health.
+- Manajemen tools: nama, deskripsi, kategori, badge, icon, URL eksternal, status aktif, dan urutan.
+- Perubahan tools aktif diterapkan ke halaman publik melalui `/api/database?resource=tools`.
+- Elevated key modern `SUPABASE_SECRET_KEY` dan legacy `SUPABASE_SERVICE_ROLE_KEY` sama-sama didukung.
 
-## SQL Supabase wajib
+## Setup database v5.0
 
-Untuk upgrade dari v4.1, jalankan file berikut melalui Supabase SQL Editor:
+1. Jalankan `database/migrations/003_admin_dashboard.sql` melalui Supabase SQL Editor.
+2. Buka Supabase **Authentication → Users → Add user**, lalu buat email dan password admin.
+3. Buka `database/setup-first-admin.sql`, ganti `GANTI_EMAIL_ADMIN`, lalu jalankan melalui SQL Editor.
+4. Login melalui `/admin/login`.
 
-```text
-database/migrations/002_tool_health.sql
-```
+Untuk instalasi baru, `database/schema.sql` sudah memuat seluruh schema sampai v5.0.
 
-Untuk instalasi baru, cukup jalankan:
+## Environment Vercel
 
-```text
-database/schema.sql
-```
-
-Tabel `tool_health` tidak memiliki policy anon. Browser membaca status melalui API server-side sehingga URL dependency dan statistik internal tidak dapat diambil langsung melalui Supabase anon key.
-
-## Endpoint
-
-### Ringkasan publik
-
-```http
-GET /api/tool-health?refresh=auto
-```
-
-API menggunakan cache. Jika data belum ada atau sudah melewati `HEALTH_STALE_MS`, server menjalankan pemeriksaan baru dan mencoba menyimpannya ke Supabase.
-
-### Hanya membaca cache
-
-```http
-GET /api/tool-health?refresh=0
-```
-
-### Pemeriksaan paksa
-
-```http
-POST /api/tool-health
-Authorization: Bearer HEALTH_CHECK_TOKEN
-```
-
-Pemeriksaan paksa ditolak jika token belum dipasang atau tidak cocok.
-
-## Environment Variables
-
-Konfigurasi lama tetap digunakan:
+Minimal:
 
 ```env
 SUPABASE_URL=https://PROJECT_ID.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=service_role_key_server_only
+SUPABASE_SECRET_KEY=sb_secret_...
 DATABASE_TIMEOUT_MS=8000
-FEEDBACK_HASH_SALT=random_string_panjang
+FEEDBACK_HASH_SALT=random_long_value
+HEALTH_CHECK_TOKEN=random_long_value
 ```
 
-Tambahkan untuk v4.2:
-
-```env
-HEALTH_CHECK_TOKEN=random_token_panjang
-HEALTH_CHECK_TIMEOUT_MS=4500
-HEALTH_CHECK_CONCURRENCY=6
-HEALTH_STALE_MS=900000
-HEALTH_DEGRADED_LATENCY_MS=2500
-```
-
-Hanya `HEALTH_CHECK_TOKEN` yang perlu dibuat sendiri. Nilai tuning lain memiliki default dan bersifat opsional.
-
-Jangan menaruh service role key atau health token di HTML, JavaScript browser, GitHub, atau screenshot publik.
-
-## Menjalankan di Termux
-
-```bash
-pkg install nodejs -y
-npm run check
-npm test
-npm run build
-npm run dev
-```
-
-Buka:
-
-```text
-http://127.0.0.1:4173
-```
-
-`serve-local.js` mendukung:
-
-```text
-GET  /api/health
-GET  /api/database?resource=status
-POST /api/feedback
-POST /api/audit
-GET  /api/tool-health
-POST /api/tool-health
-```
+Legacy `SUPABASE_SERVICE_ROLE_KEY=eyJ...` tetap didukung. `SUPABASE_PUBLISHABLE_KEY` opsional; backend dapat memakai elevated key untuk berkomunikasi dengan Supabase Auth tanpa mengeksposnya ke browser.
 
 ## Validasi
 
@@ -127,4 +43,4 @@ npm test
 npm run build
 ```
 
-Laporan lengkap tersedia di `V4_2_VALIDATION.md`.
+Build statis dibuat pada `public/`, sedangkan API Vercel tetap berada di folder `api/`.

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#090312">
+  <title>Login Admin — Nexora</title>
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="../assets/css/admin.css" rel="stylesheet">
+</head>
+<body class="admin-login-page">
+  <main class="login-shell">
+    <a class="login-back" href="/"><i class="fa-solid fa-arrow-left"></i> Kembali ke website</a>
+    <section class="login-card" aria-labelledby="loginTitle">
+      <div class="login-brand">
+        <span class="brand-orb"><i class="fa-solid fa-shield-halved"></i></span>
+        <div>
+          <p>NEXORA CONTROL</p>
+          <h1 id="loginTitle">Admin Login</h1>
+        </div>
+      </div>
+      <p class="login-copy">Masuk menggunakan akun Supabase Auth yang sudah terdaftar sebagai admin aktif.</p>
+      <form id="adminLoginForm" novalidate>
+        <label class="field-label" for="adminEmail">Email admin</label>
+        <div class="field-wrap">
+          <i class="fa-regular fa-envelope"></i>
+          <input id="adminEmail" name="email" type="email" autocomplete="username" inputmode="email" placeholder="admin@nexora.id" maxlength="254" required>
+        </div>
+        <label class="field-label" for="adminPassword">Kata sandi</label>
+        <div class="field-wrap">
+          <i class="fa-solid fa-lock"></i>
+          <input id="adminPassword" name="password" type="password" autocomplete="current-password" placeholder="Minimal 6 karakter" maxlength="200" required>
+          <button class="password-toggle" id="passwordToggle" type="button" aria-label="Tampilkan kata sandi"><i class="fa-regular fa-eye"></i></button>
+        </div>
+        <div class="form-message" id="loginMessage" role="status" aria-live="polite"></div>
+        <button class="primary-button login-submit" id="loginSubmit" type="submit">
+          <span>Masuk ke Dashboard</span><i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+      <div class="login-security">
+        <i class="fa-solid fa-lock"></i>
+        <span>Sesi disimpan dalam cookie HttpOnly dan dilindungi CSRF.</span>
+      </div>
+    </section>
+    <p class="login-foot">All Tools Nexora · Admin Console v5.0</p>
+  </main>
+  <script src="../assets/js/admin/login.js" defer></script>
+</body>
+</html>

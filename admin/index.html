@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#090312">
+  <title>Dashboard Admin — Nexora</title>
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="../assets/css/admin.css" rel="stylesheet">
+</head>
+<body class="admin-dashboard-page">
+  <div class="admin-loader" id="adminLoader"><span></span><p>Memverifikasi sesi admin...</p></div>
+  <div class="admin-app" id="adminApp" hidden>
+    <aside class="admin-sidebar">
+      <a class="admin-logo" href="/admin">
+        <span><i class="fa-solid fa-bolt"></i></span>
+        <div><b>NEXORA</b><small>CONTROL PANEL</small></div>
+      </a>
+      <nav class="admin-nav" aria-label="Navigasi admin">
+        <button class="admin-nav-item is-active" data-section="overview" type="button"><i class="fa-solid fa-grid-2"></i><span>Ringkasan</span></button>
+        <button class="admin-nav-item" data-section="tools" type="button"><i class="fa-solid fa-screwdriver-wrench"></i><span>Tools</span></button>
+        <button class="admin-nav-item" data-section="health" type="button"><i class="fa-solid fa-heart-pulse"></i><span>Health</span></button>
+        <button class="admin-nav-item" data-section="feedback" type="button"><i class="fa-regular fa-message"></i><span>Feedback</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <a href="/" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Lihat website</a>
+        <button id="logoutButton" type="button"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
+      </div>
+    </aside>
+
+    <div class="admin-main">
+      <header class="admin-topbar">
+        <div>
+          <p class="eyebrow">ADMINISTRATION</p>
+          <h1 id="pageHeading">Ringkasan Sistem</h1>
+        </div>
+        <div class="admin-user-chip">
+          <span class="admin-avatar" id="adminAvatar">A</span>
+          <div><b id="adminName">Admin</b><small id="adminRole">admin</small></div>
+        </div>
+      </header>
+
+      <main class="admin-content">
+        <section class="admin-section is-active" data-panel="overview">
+          <div class="metric-grid" id="metricGrid"></div>
+          <div class="dashboard-grid">
+            <article class="panel-card panel-wide">
+              <div class="panel-head"><div><p class="eyebrow">STATUS LIVE</p><h2>Kesehatan Tools</h2></div><button class="ghost-button" data-go-section="health" type="button">Lihat detail</button></div>
+              <div class="health-summary" id="healthSummary"></div>
+            </article>
+            <article class="panel-card">
+              <div class="panel-head"><div><p class="eyebrow">FEEDBACK</p><h2>Terbaru</h2></div><button class="ghost-button" data-go-section="feedback" type="button">Semua</button></div>
+              <div class="compact-list" id="recentFeedback"></div>
+            </article>
+            <article class="panel-card">
+              <div class="panel-head"><div><p class="eyebrow">DATABASE</p><h2>Konfigurasi Situs</h2></div></div>
+              <div class="settings-list" id="settingsList"></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="admin-section" data-panel="tools">
+          <div class="section-toolbar">
+            <label class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input id="toolSearch" type="search" placeholder="Cari nama atau ID tools"></label>
+            <select id="toolStatusFilter" class="select-box"><option value="all">Semua status</option><option value="active">Aktif</option><option value="inactive">Nonaktif</option></select>
+            <select id="toolCategoryFilter" class="select-box"><option value="all">Semua kategori</option><option value="downloader">Downloader</option><option value="maker">Maker</option><option value="tools">Tools</option><option value="vault">Vault</option><option value="external">External</option></select>
+          </div>
+          <div class="tool-admin-grid" id="toolAdminGrid"></div>
+          <div class="empty-state" id="toolEmpty" hidden><i class="fa-solid fa-box-open"></i><b>Tools tidak ditemukan</b><span>Coba ubah pencarian atau filter.</span></div>
+        </section>
+
+        <section class="admin-section" data-panel="health">
+          <article class="panel-card">
+            <div class="panel-head"><div><p class="eyebrow">MONITORING</p><h2>Detail Kesehatan Tools</h2></div><span class="panel-time" id="healthTime">Belum diperiksa</span></div>
+            <div class="health-table-wrap"><table class="health-table"><thead><tr><th>Tool</th><th>Status</th><th>HTTP</th><th>Latency</th><th>Success</th><th>Terakhir</th></tr></thead><tbody id="healthTableBody"></tbody></table></div>
+          </article>
+        </section>
+
+        <section class="admin-section" data-panel="feedback">
+          <article class="panel-card">
+            <div class="panel-head"><div><p class="eyebrow">INBOX</p><h2>Feedback Terbaru</h2></div><span class="read-only-badge">Read-only v5.0</span></div>
+            <div class="feedback-grid" id="feedbackGrid"></div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <nav class="admin-bottom-nav" aria-label="Navigasi admin mobile">
+      <button class="is-active" data-section="overview" type="button"><i class="fa-solid fa-grid-2"></i><span>Home</span></button>
+      <button data-section="tools" type="button"><i class="fa-solid fa-screwdriver-wrench"></i><span>Tools</span></button>
+      <button data-section="health" type="button"><i class="fa-solid fa-heart-pulse"></i><span>Health</span></button>
+      <button data-section="feedback" type="button"><i class="fa-regular fa-message"></i><span>Feedback</span></button>
+    </nav>
+  </div>
+
+  <div class="modal-backdrop" id="toolModal" hidden>
+    <section class="tool-editor" role="dialog" aria-modal="true" aria-labelledby="toolEditorTitle">
+      <header><div><p class="eyebrow">EDIT TOOL</p><h2 id="toolEditorTitle">Pengaturan Tool</h2></div><button id="closeToolModal" type="button" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button></header>
+      <form id="toolEditForm">
+        <input id="editToolId" type="hidden">
+        <div class="form-grid">
+          <label><span>Nama</span><input id="editToolName" maxlength="80" required></label>
+          <label><span>Kategori</span><select id="editToolCategory"><option value="downloader">Downloader</option><option value="maker">Maker</option><option value="tools">Tools</option><option value="vault">Vault</option><option value="external">External</option></select></label>
+          <label class="form-span"><span>Deskripsi</span><textarea id="editToolDescription" maxlength="240" rows="3"></textarea></label>
+          <label><span>Badge</span><input id="editToolBadge" maxlength="30" placeholder="PRO"></label>
+          <label><span>Icon Font Awesome</span><input id="editToolIcon" maxlength="100" placeholder="fa-solid fa-code"></label>
+          <label class="form-span"><span>URL eksternal</span><input id="editToolUrl" maxlength="500" type="url" placeholder="https://..."></label>
+          <label><span>Urutan</span><input id="editToolOrder" type="number" min="-10000" max="10000"></label>
+          <label class="toggle-field"><span>Status aktif</span><input id="editToolActive" type="checkbox"><b></b></label>
+        </div>
+        <div class="modal-message" id="toolModalMessage"></div>
+        <footer><button class="secondary-button" id="cancelToolEdit" type="button">Batal</button><button class="primary-button" id="saveToolButton" type="submit"><i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan</button></footer>
+      </form>
+    </section>
+  </div>
+
+  <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+  <script src="../assets/js/admin/dashboard.js" defer></script>
+</body>
+</html>

@@ -44,7 +44,7 @@ async function readJson(request) {
 
 async function runApi(modulePath, request, response) {
   try {
-    if (request.method === "POST") request.body = await readJson(request);
+    if (["POST", "PUT", "PATCH", "DELETE"].includes(request.method || "")) request.body = await readJson(request);
     const handler = require(modulePath);
     await handler(request, decorateResponse(response));
   } catch (error) {
@@ -82,13 +82,27 @@ http.createServer(async (request, response) => {
   if (pathname === "/api/tool-health" || pathname === "/api/tool-health.js") {
     return runApi(path.join(root, "api", "tool-health.js"), request, response);
   }
+  if (pathname === "/api/admin/auth" || pathname === "/api/admin/auth.js") {
+    return runApi(path.join(root, "api", "admin", "auth.js"), request, response);
+  }
+  if (pathname === "/api/admin/dashboard" || pathname === "/api/admin/dashboard.js") {
+    return runApi(path.join(root, "api", "admin", "dashboard.js"), request, response);
+  }
+  if (pathname === "/api/admin/tools" || pathname === "/api/admin/tools.js") {
+    return runApi(path.join(root, "api", "admin", "tools.js"), request, response);
+  }
 
   if (!["GET", "HEAD"].includes(request.method || "GET")) {
     response.writeHead(405, { Allow: "GET, HEAD" });
     return response.end("Method not allowed");
   }
 
-  const cleanRoutes = { "/about": "/about.html", "/feedback": "/feedback.html" };
+  const cleanRoutes = {
+    "/about": "/about.html",
+    "/feedback": "/feedback.html",
+    "/admin": "/admin/index.html",
+    "/admin/login": "/admin/login.html"
+  };
   const relative = cleanRoutes[pathname] || pathname;
   let file = existing(relative);
   const navigation = !assetExtension.test(pathname) && /text\/html/i.test(request.headers.accept || "");

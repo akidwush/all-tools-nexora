@@ -1,10 +1,12 @@
 {
-  "version": 2,
+  "version": 3,
   "fallback": "index.html",
   "routes": {
     "/": "index.html",
     "/about": "about.html",
-    "/feedback": "feedback.html"
+    "/feedback": "feedback.html",
+    "/admin": "admin/index.html",
+    "/admin/login": "admin/login.html"
   },
   "spaRoutes": [],
   "apiRoutes": [
@@ -12,6 +14,9 @@
     "/api/database",
     "/api/feedback",
     "/api/audit",
-    "/api/tool-health"
+    "/api/tool-health",
+    "/api/admin/auth",
+    "/api/admin/dashboard",
+    "/api/admin/tools"
   ]
 }

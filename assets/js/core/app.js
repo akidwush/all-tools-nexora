@@ -1261,7 +1261,7 @@ document.addEventListener('click', function(e) {
 });
 
 
-const toolsData = {
+let toolsData = {
     downloader: [
         
         { id: 'terabox', icon: 'fa-solid fa-box-open', name: 'Terabox Downloader', desc: 'Ambil file dari link share Terabox', badge: 'FILE' },{ id: 'instagram', icon: 'fa-brands fa-instagram', name: 'Instagram', desc: 'Download video & foto', badge: 'HD' },
@@ -1310,7 +1310,7 @@ const toolsData = {
     ]
 };
 
-const allTools = [
+let allTools = [
     toolsData.tools.find(item => item.id === 'comicreader'),
     ...toolsData.downloader,
     ...toolsData.maker,
@@ -1344,6 +1344,63 @@ function renderGrid(containerId, items, isExternal = false) {
             </div>
         `;
     }).join('');
+}
+
+function rebuildAllTools() {
+    allTools = [
+        toolsData.tools.find(item => item.id === 'comicreader'),
+        ...toolsData.downloader,
+        ...toolsData.maker,
+        ...toolsData.tools.filter(item => item.id !== 'comicreader'),
+        ...toolsData.vault,
+        ...toolsData.external
+    ].filter(Boolean);
+}
+
+async function applyDatabaseToolConfiguration() {
+    try {
+        const response = await fetch('/api/database?resource=tools', {
+            method: 'GET',
+            cache: 'no-store',
+            credentials: 'same-origin',
+            headers: { Accept: 'application/json' }
+        });
+        if (!response.ok) return false;
+        const payload = await response.json();
+        const rows = Array.isArray(payload.data) ? payload.data : [];
+        if (!rows.length) return false;
+
+        const allowedCategories = new Set(['downloader', 'maker', 'tools', 'vault', 'external']);
+        const baseById = new Map();
+        for (const [category, items] of Object.entries(toolsData)) {
+            for (const item of items) baseById.set(item.id, { ...item, category });
+        }
+        const nextTools = { downloader: [], maker: [], tools: [], vault: [], external: [] };
+        for (const row of rows) {
+            const base = baseById.get(String(row.id));
+            if (!base) continue;
+            const category = allowedCategories.has(row.category) ? row.category : base.category;
+            nextTools[category].push({
+                ...base,
+                category,
+                name: row.name || base.name,
+                desc: row.description || base.desc,
+                badge: row.badge || '',
+                icon: row.icon || base.icon,
+                link: row.external_url || base.link,
+                sortOrder: Number(row.sort_order || 0)
+            });
+        }
+        for (const category of Object.keys(nextTools)) {
+            nextTools[category].sort((left, right) => (left.sortOrder - right.sortOrder) || left.name.localeCompare(right.name, 'id'));
+        }
+        toolsData = nextTools;
+        rebuildAllTools();
+        return true;
+    } catch (error) {
+        console.warn('[Nexora tools] Konfigurasi database tidak tersedia:', error && error.message ? error.message : error);
+        return false;
+    }
 }
 
 function renderAll() {
@@ -2875,5 +2932,8 @@ function renderEnhancer(body) {
     };
 }
 
-renderAll();
+(async function bootToolCatalog(){
+    await applyDatabaseToolConfiguration();
+    renderAll();
+})();
 initDownloadHistory();
