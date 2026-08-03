@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "fallback": "index.html",
+  "routes": {
+    "/": "index.html",
+    "/about": "about.html",
+    "/feedback": "feedback.html"
+  },
+  "spaRoutes": []
+}

@@ -1,0 +1,5 @@
+.env
+.env.local
+.vercel
+node_modules
+npm-debug.log*

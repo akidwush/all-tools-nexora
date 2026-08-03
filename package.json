@@ -1,0 +1,15 @@
+{
+  "name": "all-tools-nexora-developer-dika",
+  "version": "2.0.0",
+  "private": true,
+  "description": "All Tools Nexora — Developer Dika",
+  "scripts": {
+    "dev": "node serve-local.js",
+    "start": "node serve-local.js",
+    "check": "node scripts/check-project.js",
+    "build": "node scripts/build.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
