@@ -33,3 +33,13 @@ const dashboard = fs.readFileSync(path.join(root, "assets/js/admin/dashboard.js"
 for (const token of ["renderSocials", "openSocialEditor", "saveSocial", "/api/admin/socials"]) assert.equal(dashboard.includes(token), true);
 
 console.log("Nexora v6.1 tests lulus: social links database-driven, admin-protected, dan tidak hard-coded di HTML/shell.");
+
+
+const publicDatabase = fs.readFileSync(path.join(root, "lib/public-database.js"), "utf8");
+const socialLinksClient = fs.readFileSync(path.join(root, "assets/js/core/social-links.js"), "utf8");
+assert.equal(publicDatabase.includes("accent_color,is_active,sort_order"), true, "API publik harus mengirim is_active");
+assert.equal(socialLinksClient.includes("row.is_active === false"), true, "loader sosial harus menerima respons aktif yang tidak menyertakan is_active");
+assert.equal(index.includes('id="nxPublicWhatsApp"'), true, "CTA WhatsApp publik harus tersedia");
+assert.equal(index.match(/data-social-key="whatsapp_channel"/g).length >= 3, true, "Saluran WhatsApp harus terlihat di beberapa lokasi publik");
+assert.equal(index.match(/data-social-key="whatsapp_access"/g).length >= 2, true, "Akses WhatsApp harus memiliki tombol publik permanen");
+console.log("Nexora v6.2.1 tests lulus: data sosial tampil dan CTA WhatsApp publik tersedia.");

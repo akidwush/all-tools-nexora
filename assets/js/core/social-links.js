@@ -23,7 +23,7 @@
 
   function normalize(row){
     const url = safeUrl(row && row.url);
-    if (!row || !row.is_active || !url) return null;
+    if (!row || row.is_active === false || !url) return null;
     return {
       key: String(row.key || ""),
       platform: String(row.platform || "link"),
@@ -65,9 +65,9 @@
       link.href = item ? item.url : "#";
       link.dataset.socialUrl = item ? item.url : "";
       if (!item) return;
-      const label = link.querySelector(".nx-access-channel-copy b");
-      const description = link.querySelector(".nx-access-channel-copy span");
-      const icon = link.querySelector(".nx-access-channel-icon i");
+      const label = link.querySelector("[data-social-label]") || link.querySelector(".nx-access-channel-copy b");
+      const description = link.querySelector("[data-social-description]") || link.querySelector(".nx-access-channel-copy span");
+      const icon = link.querySelector(".nx-access-channel-icon i") || link.querySelector(".nx-public-wa-icon i");
       if (label) label.textContent = item.label;
       if (description) description.textContent = item.description;
       if (icon) icon.className = item.icon;
@@ -87,15 +87,19 @@
   }
 
   function applyWhatsappAccess(item){
-    const link = document.getElementById("nxAccessLockWa");
-    if (!link) return;
-    link.hidden = !item;
-    link.href = item ? item.url : "#";
-    link.dataset.socialUrl = item ? item.url : "";
-    if (item){
+    const links = Array.from(document.querySelectorAll("[data-social-key='whatsapp_access']"));
+    links.forEach(link => {
+      link.hidden = !item;
+      link.href = item ? item.url : "#";
+      link.dataset.socialUrl = item ? item.url : "";
+      if (!item) return;
       const icon = link.querySelector("i");
+      const label = link.querySelector("[data-social-label]");
+      const description = link.querySelector("[data-social-description]");
       if (icon) icon.className = item.icon;
-    }
+      if (label) label.textContent = item.label;
+      if (description) description.textContent = item.description;
+    });
   }
 
   function renderAdditionalLinks(rows){
