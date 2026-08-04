@@ -93,6 +93,14 @@
     });
     return statusPromise;
   }
+  function consumeHealthPayload(payload){
+    healthMap=Object.create(null);
+    ((payload&&payload.data)||[]).forEach(function(row){healthMap[String(row.toolId||"")]=row;});
+    applyCardStatus();
+  }
+  document.addEventListener("nexora:tool-health-loaded",function(event){consumeHealthPayload(event.detail||{});});
+  document.addEventListener("nexora:tools-rendered",function(){applyCardStatus();});
+
   function handlerReady(meta,frameWindow){
     var scope=frameWindow||window;
     if(!meta||!meta.handler) return true;
@@ -169,8 +177,19 @@
   });
   document.addEventListener("nexora:module-loaded",function(){setTimeout(applyCardStatus,0);});
   document.addEventListener("DOMContentLoaded",function(){
-    applyCardStatus();loadHealth(false);
-    var observer=new MutationObserver(function(){applyCardStatus();});
+    if(window.__NEXORA_TOOL_HEALTH_PAYLOAD__) consumeHealthPayload(window.__NEXORA_TOOL_HEALTH_PAYLOAD__);
+    else applyCardStatus();
+    var queued=false;
+    var observer=new MutationObserver(function(records){
+      var relevant=records.some(function(record){
+        return Array.prototype.some.call(record.addedNodes||[],function(node){
+          return node&&node.nodeType===1&&(node.matches&&node.matches("[data-tool-id]")||node.querySelector&&node.querySelector("[data-tool-id]"));
+        });
+      });
+      if(!relevant||queued)return;
+      queued=true;
+      setTimeout(function(){queued=false;applyCardStatus();},120);
+    });
     observer.observe(document.body,{childList:true,subtree:true});
   });
 

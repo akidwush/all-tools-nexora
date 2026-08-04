@@ -1363,7 +1363,9 @@ async function applyDatabaseToolConfiguration() {
             method: 'GET',
             cache: 'no-store',
             credentials: 'same-origin',
-            headers: { Accept: 'application/json' }
+            headers: { Accept: 'application/json' },
+            nexoraTimeoutMs: 6500,
+            nexoraRetries: 0
         });
         if (!response.ok) return false;
         const payload = await response.json();
@@ -1410,6 +1412,7 @@ function renderAll() {
     renderGrid('toolsGrid', toolsData.tools);
     renderGrid('vaultGrid', toolsData.vault);
     renderGrid('externalGrid', toolsData.external, true);
+    document.dispatchEvent(new CustomEvent('nexora:tools-rendered', { detail: { count: allTools.length } }));
 }
 
 document.querySelectorAll('.nav-tab').forEach(tab => {
@@ -2932,8 +2935,13 @@ function renderEnhancer(body) {
     };
 }
 
-(async function bootToolCatalog(){
-    await applyDatabaseToolConfiguration();
+(function bootToolCatalog(){
+    // Render katalog lokal langsung agar halaman tidak menunggu Supabase/API.
     renderAll();
+    var schedule = window.NexoraScheduleIdle || function(task){ setTimeout(task, 320); };
+    schedule(async function(){
+        var changed = await applyDatabaseToolConfiguration();
+        if (changed) renderAll();
+    }, { timeout: 1800 });
 })();
 initDownloadHistory();

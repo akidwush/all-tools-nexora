@@ -64,7 +64,8 @@ const healthLib=fs.readFileSync(path.join(root,"lib/tool-health.js"),"utf8");
 const healthUi=fs.readFileSync(path.join(root,"assets/js/core/tool-health.js"),"utf8");
 for(const token of ["HEALTH_CHECK_TOKEN","refresh === \"force\"","executeRun","readCachedToolHealth"]){ if(!healthApi.includes(token.replaceAll('\\"','"'))) fail(`Tool health API belum lengkap: ${token}`); }
 for(const token of ["TOOL_CATALOG","runToolHealthChecks","persistHealthResults","classifyProbe","summarizeHealth"]){ if(!healthLib.includes(token)) fail(`Tool health library belum lengkap: ${token}`); }
-for(const token of ["nxToolHealth","/api/tool-health?refresh=auto","renderList","CACHE_KEY"]){ if(!healthUi.includes(token)) fail(`Tool health UI belum lengkap: ${token}`); }
+for(const token of ["nxToolHealth","renderList","CACHE_KEY"]){ if(!healthUi.includes(token)) fail(`Tool health UI belum lengkap: ${token}`); }
+if(!healthUi.includes("/api/tool-health?refresh=auto")&&!healthUi.includes("/api/tool-health?refresh=0")) fail("Tool health UI belum memiliki endpoint refresh yang valid.");
 const schema=fs.readFileSync(path.join(root,"database/schema.sql"),"utf8");
 for(const token of ["create table if not exists public.tool_health","consecutive_failures","success_rate"]){ if(!schema.includes(token)) fail(`Schema tool health belum lengkap: ${token}`); }
 if(!fs.existsSync(path.join(root,"database/migrations/002_tool_health.sql"))) fail("Migration tool health belum tersedia.");
@@ -200,4 +201,4 @@ for(const file of scanFiles){
   }
 }
 if(failed) process.exit(1);
-console.log(`Audit v6.2 lulus: index ${indexBytes.toLocaleString()} byte, ${jsFiles.length} file JS valid, social link control, lazy-load, live audit, tool health, runtime JS test, screenshot, visual validation, analytics, feedback management, audit log, login, dan dashboard admin lengkap.`);
+console.log(`Audit v6.3 lulus: index ${indexBytes.toLocaleString()} byte, ${jsFiles.length} file JS valid, social link control, lazy-load, live audit, tool health, runtime JS test, screenshot, visual validation, analytics, feedback management, audit log, login, dan dashboard admin lengkap.`);

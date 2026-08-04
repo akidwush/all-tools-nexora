@@ -21,7 +21,11 @@
   function cleanToolId(value){var id=String(value||"").trim().toLowerCase();return /^[a-z0-9][a-z0-9_-]{0,79}$/.test(id)?id:"";}
   function send(eventType,toolId,metadata){
     var payload={eventType:eventType,toolId:cleanToolId(toolId)||undefined,visitorId:visitorId,sessionId:sessionId,path:location.pathname,referrer:document.referrer,countryCode:countryCode(),deviceType:deviceType(),browser:browserName(),metadata:metadata||{}};
-    try{fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload),keepalive:true,credentials:"same-origin"}).catch(function(){});}catch{}
+    var body=JSON.stringify(payload);
+    try{
+      if(eventType==="page_view"&&navigator.sendBeacon){navigator.sendBeacon(ENDPOINT,new Blob([body],{type:"application/json"}));return;}
+      fetch(ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},body:body,keepalive:true,credentials:"same-origin"}).catch(function(){});
+    }catch{}
   }
   function toolFromCard(card){if(!card)return "";return cleanToolId(card.getAttribute("data-tool-id")||card.getAttribute("data-nx-room-tool")||"");}
   function trackCard(event){
@@ -33,6 +37,10 @@
   }
   document.addEventListener("click",trackCard,true);
   document.addEventListener("nexora:tool-error",function(event){var detail=event.detail||{};send("tool_error",detail.toolId,{module:detail.module||"",reason:String(detail.reason||"module_failed").slice(0,150)});});
-  try{if(!sessionStorage.getItem(PAGE_KEY)){sessionStorage.setItem(PAGE_KEY,"1");send("page_view",null,{source:"website"});}}catch{send("page_view",null,{source:"website"});}
+  function sendPageView(){
+    try{if(!sessionStorage.getItem(PAGE_KEY)){sessionStorage.setItem(PAGE_KEY,"1");send("page_view",null,{source:"website"});}}catch{send("page_view",null,{source:"website"});}
+  }
+  var schedule=window.NexoraScheduleIdle||function(task){setTimeout(task,1800);};
+  schedule(sendPageView,{timeout:3500});
   window.NexoraAnalytics={track:send};
 })();

@@ -1,0 +1,27 @@
+const fs=require("node:fs");
+const assert=require("node:assert/strict");
+function read(file){return fs.readFileSync(file,"utf8");}
+const pkg=JSON.parse(read("package.json"));
+const html=read("index.html");
+const css=read("assets/css/core.css");
+const app=read("assets/js/core/app.js");
+const perf=read("assets/js/core/performance.js");
+const health=read("assets/js/core/tool-health.js");
+const stability=read("assets/js/core/stability.js");
+assert.equal(pkg.version,"6.3.0");
+assert.match(html,/assets\/js\/core\/bootstrap\.js/);
+assert.match(html,/assets\/js\/core\/performance\.js/);
+assert.doesNotMatch(html,/data-nxgc-warm=/);
+assert.match(html,/font-awesome[^>]+media="print"/);
+assert.match(html,/fonts\.googleapis\.com[^>]+media="print"/);
+assert.doesNotMatch(html,/<video[^>]*autoplay/i);
+assert.match(html,/preload="none"/);
+assert.match(app,/Render katalog lokal langsung/);
+assert.match(app,/nexora:tools-rendered/);
+assert.match(perf,/NexoraScheduleIdle/);
+assert.match(perf,/nx-low-power/);
+assert.match(health,/refresh=0/);
+assert.match(stability,/nexora:tool-health-loaded/);
+assert.match(health,/__NEXORA_TOOL_HEALTH_PAYLOAD__/);
+assert.match(css,/animation:nxSplashOut \.22s ease \.62s forwards/);
+console.log("Nexora v6.3 performance tests lulus: instant catalog, deferred network, lightweight mobile mode, and lazy hero video.");

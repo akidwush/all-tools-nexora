@@ -3,7 +3,7 @@
   "use strict";
 
   const CACHE_KEY = "nexora_tool_health_v42";
-  const CACHE_AGE_MS = 5 * 60 * 1000;
+  const CACHE_AGE_MS = 15 * 60 * 1000;
   const labels = {
     operational: { short: "Operational", title: "Semua sistem normal", icon: "fa-circle-check" },
     degraded: { short: "Degraded", title: "Beberapa tools terganggu", icon: "fa-triangle-exclamation" },
@@ -59,6 +59,7 @@
     const icon = root.querySelector("[data-health-icon]");
 
     root.dataset.healthStatus = status;
+    window.__NEXORA_TOOL_HEALTH_PAYLOAD__ = payload;
     if (badge) badge.textContent = meta.short;
     if (title) title.textContent = meta.title;
     if (description) {
@@ -125,7 +126,7 @@
     if (forceVisual) root.classList.add("is-loading");
 
     try {
-      const response = await fetch("/api/tool-health?refresh=auto", {
+      const response = await fetch("/api/tool-health?refresh=0", {
         method: "GET",
         cache: "no-store",
         credentials: "same-origin",
@@ -136,6 +137,7 @@
       if (!payload || payload.ok !== true) throw new Error(payload && payload.error ? payload.error : "INVALID_RESPONSE");
       writeCache(payload);
       setState(root, payload);
+      document.dispatchEvent(new CustomEvent("nexora:tool-health-loaded",{detail:payload}));
     } catch (error) {
       const cached = readCache();
       if (cached) setState(root, cached);
@@ -176,7 +178,7 @@
     const cached = readCache();
     if (cached) setState(root, cached);
 
-    root.querySelector("[data-health-open]")?.addEventListener("click", () => openPanel(root));
+    root.querySelector("[data-health-open]")?.addEventListener("click", () => { openPanel(root); load(root, false); });
     root.querySelector("[data-health-close]")?.addEventListener("click", () => closePanel(root));
     root.querySelector("[data-health-refresh]")?.addEventListener("click", () => load(root, true));
     root.querySelector("[data-health-dialog]")?.addEventListener("click", (event) => {
@@ -186,8 +188,14 @@
       if (event.key === "Escape" && root.querySelector("[data-health-dialog]")?.classList.contains("is-open")) closePanel(root);
     });
 
-    load(root, !cached);
-    window.addEventListener("online", () => load(root, false));
+    if (!cached) {
+      const schedule=window.NexoraScheduleIdle||function(task){setTimeout(task,2200);};
+      schedule(() => load(root, true), { timeout: 4200 });
+    }
+    window.addEventListener("online", () => {
+      const schedule=window.NexoraScheduleIdle||function(task){setTimeout(task,800);};
+      schedule(() => load(root, false), { timeout: 2200 });
+    });
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
