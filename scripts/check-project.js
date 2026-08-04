@@ -127,6 +127,24 @@ for (const html of ["index.html","about.html","feedback.html","admin/index.html"
 }
 if(!(routeManifest.apiRoutes||[]).includes("/api/admin/visual")) fail("route-manifest belum mencantumkan /api/admin/visual");
 
+const socialV61Required = [
+  "api/admin/socials.js", "assets/js/core/social-links.js",
+  "database/migrations/006_social_links.sql", "V6_1_VALIDATION.md"
+];
+for (const file of socialV61Required) if(!fs.existsSync(path.join(root,file))) fail(`Social link v6.1 file hilang: ${file}`);
+const socialApiV61 = fs.readFileSync(path.join(root,"api/admin/socials.js"),"utf8");
+for (const token of ["requireAdmin","verifyMutationRequest","recordAdminAudit","ACTIVE_SOCIAL_REQUIRES_URL"]) if(!socialApiV61.includes(token)) fail(`Social API v6.1 belum lengkap: ${token}`);
+const socialUiV61 = fs.readFileSync(path.join(root,"assets/js/core/social-links.js"),"utf8");
+for (const token of ["/api/database?resource=socials","NexoraSocialLinks","nexora:social-links-ready"]) if(!socialUiV61.includes(token)) fail(`Social UI v6.1 belum lengkap: ${token}`);
+const migrationV61 = fs.readFileSync(path.join(root,"database/migrations/006_social_links.sql"),"utf8");
+for (const token of ["create table if not exists public.social_links","public read active social links","on conflict (key) do nothing"]) if(!migrationV61.includes(token)) fail(`Migration v6.1 belum lengkap: ${token}`);
+if(!index.includes("assets/js/core/social-links.js")) fail("index.html belum memuat social link loader v6.1");
+if(!(routeManifest.apiRoutes||[]).includes("/api/admin/socials")) fail("route-manifest belum mencantumkan /api/admin/socials");
+for (const destination of ["0029Vb7yYjE8PgsKrQ5ghQ3s", "6285196639720"]) {
+  if(index.includes(destination)) fail(`index.html masih memuat tujuan sosial hard-coded: ${destination}`);
+  if(fs.readFileSync(path.join(root,"assets/js/core/shell.js"),"utf8").includes(destination)) fail(`shell.js masih memuat tujuan sosial hard-coded: ${destination}`);
+}
+
 const healthCatalog=require(path.join(root,"lib/tool-health.js")).TOOL_CATALOG;
 if(!Array.isArray(healthCatalog)||healthCatalog.length!==22) fail(`Tool health catalog harus memuat 22 tools, ditemukan ${healthCatalog?.length||0}.`);
 
@@ -151,4 +169,4 @@ for(const file of scanFiles){
   }
 }
 if(failed) process.exit(1);
-console.log(`Audit v6.0 lulus: index ${indexBytes.toLocaleString()} byte, ${jsFiles.length} file JS valid, lazy-load, live audit, tool health, runtime JS test, screenshot, visual validation, analytics, feedback management, audit log, login, dan dashboard admin lengkap.`);
+console.log(`Audit v6.1 lulus: index ${indexBytes.toLocaleString()} byte, ${jsFiles.length} file JS valid, social link control, lazy-load, live audit, tool health, runtime JS test, screenshot, visual validation, analytics, feedback management, audit log, login, dan dashboard admin lengkap.`);

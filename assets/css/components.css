@@ -592,6 +592,12 @@ body.nx-about-dev-open{
     border-color .15s ease;
 }
 
+.nx-top-menu-social-links{display:contents}
+[data-social-key][hidden],.nx-top-menu-item[hidden],#nx-wa-notif[hidden]{display:none!important}
+.nx-social-menu-item{--nx-menu-color:#a855f7}
+.nx-social-menu-item .nx-top-menu-item-icon{color:var(--nx-menu-color);border-color:color-mix(in srgb,var(--nx-menu-color) 24%,transparent);background:color-mix(in srgb,var(--nx-menu-color) 9%,transparent)}
+.nx-social-menu-item .nx-top-menu-item-arrow{color:var(--nx-menu-color);background:color-mix(in srgb,var(--nx-menu-color) 8%,transparent)}
+
 .nx-top-menu-item:hover{
   border-color:rgba(255,255,255,.14);
   background:rgba(255,255,255,.048);

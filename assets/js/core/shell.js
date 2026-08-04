@@ -307,11 +307,8 @@
       "click",
       () => {
         closeMenu();
-        window.open(
-          "https://whatsapp.com/channel/0029Vb7yYjE8PgsKrQ5ghQ3s",
-          "_blank",
-          "noopener,noreferrer"
-        );
+        const target = whatsapp.dataset.socialUrl;
+        if(target) window.open(target,"_blank","noopener,noreferrer");
       }
     );
   }
@@ -494,8 +491,6 @@
     "upload tiktok hd":"tiktokhd",
     "web encryption":"webencryption"
   };
-  const PHONE="6285196639720";
-
   function normalize(v){return String(v||"").trim().toLowerCase().replace(/\s+/g," ")}
   function resolveLockedId(el){
     if(!el)return "";
@@ -526,7 +521,14 @@
     if(name)name.textContent=label;
     if(wa){
       const message="Halo Developer, saya ingin minta akses untuk tools "+label+".";
-      wa.href="https://wa.me/"+PHONE+"?text="+encodeURIComponent(message);
+      const target=String(wa.dataset.socialUrl||"");
+      if(target){
+        try{
+          const url=new URL(target,window.location.origin);
+          url.searchParams.set("text",message);
+          wa.href=url.toString();
+        }catch{wa.href=target}
+      }
     }
     if(ov){ov.classList.add("show");ov.setAttribute("aria-hidden","false")}
     return false;
@@ -598,15 +600,20 @@
 (function(){
   var notif = document.getElementById('nx-wa-notif');
   if(!notif) return;
-  setTimeout(function(){
-    notif.classList.add('show');
-  }, 5000);
-  setTimeout(function(){
-    if(!notif.classList.contains('hide')){
-      notif.classList.remove('show');
-      notif.classList.add('hide');
-    }
-  }, 20000);
+  var scheduled=false;
+  function schedule(){
+    if(scheduled||!notif.dataset.socialUrl)return;
+    scheduled=true;
+    setTimeout(function(){notif.classList.add('show');},5000);
+    setTimeout(function(){
+      if(!notif.classList.contains('hide')){
+        notif.classList.remove('show');
+        notif.classList.add('hide');
+      }
+    },20000);
+  }
+  document.addEventListener('nexora:social-links-ready',schedule,{once:true});
+  schedule();
 })();
 
 /* ===== original script 26: nxUniversalToolRoomsScript ===== */

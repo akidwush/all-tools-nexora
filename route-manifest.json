@@ -1,5 +1,5 @@
 {
-  "version": 5,
+  "version": 6,
   "fallback": "index.html",
   "routes": {
     "/": "index.html",
@@ -22,6 +22,7 @@
     "/api/admin/analytics",
     "/api/admin/feedback",
     "/api/admin/audit",
-    "/api/admin/visual"
+    "/api/admin/visual",
+    "/api/admin/socials"
   ]
 }

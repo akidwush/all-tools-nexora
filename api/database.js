@@ -8,6 +8,10 @@ const RESOURCES = {
   settings: {
     path: "app_settings?select=key,value,updated_at&is_public=eq.true&order=key.asc",
     cache: "public, max-age=60, stale-while-revalidate=300"
+  },
+  socials: {
+    path: "social_links?select=key,platform,label,description,url,icon,accent_color,sort_order,metadata&is_active=eq.true&url=neq.&order=sort_order.asc,label.asc",
+    cache: "public, max-age=30, stale-while-revalidate=120"
   }
 };
 

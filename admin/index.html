@@ -21,11 +21,12 @@
     <aside class="admin-sidebar">
       <a class="admin-logo" href="/admin">
         <span><i class="fa-solid fa-bolt"></i></span>
-        <div><b>NEXORA</b><small>CONTROL PANEL 6.0</small></div>
+        <div><b>NEXORA</b><small>CONTROL PANEL 6.1</small></div>
       </a>
       <nav class="admin-nav" aria-label="Navigasi admin">
         <button class="admin-nav-item is-active" data-section="overview" type="button"><i class="fa-solid fa-grid-2"></i><span>Ringkasan</span></button>
         <button class="admin-nav-item" data-section="tools" type="button"><i class="fa-solid fa-screwdriver-wrench"></i><span>Tools</span></button>
+        <button class="admin-nav-item" data-section="socials" type="button"><i class="fa-solid fa-share-nodes"></i><span>Sosial Media</span></button>
         <button class="admin-nav-item" data-section="analytics" type="button"><i class="fa-solid fa-chart-line"></i><span>Analytics</span></button>
         <button class="admin-nav-item" data-section="feedback" type="button"><i class="fa-regular fa-message"></i><span>Feedback</span></button>
         <button class="admin-nav-item" data-section="health" type="button"><i class="fa-solid fa-heart-pulse"></i><span>Health</span></button>
@@ -81,6 +82,15 @@
           </div>
           <div class="tool-admin-grid" id="toolAdminGrid"></div>
           <div class="empty-state" id="toolEmpty" hidden><i class="fa-solid fa-box-open"></i><b>Tools tidak ditemukan</b><span>Coba ubah pencarian atau filter.</span></div>
+        </section>
+
+        <section class="admin-section" data-panel="socials">
+          <div class="section-toolbar social-toolbar">
+            <div class="toolbar-title"><p class="eyebrow">PUBLIC LINKS</p><b>Kelola WhatsApp dan seluruh sosial media Nexora</b></div>
+            <span class="read-only-badge" id="socialPermissionBadge">Database-driven</span>
+          </div>
+          <div class="social-admin-grid tool-admin-grid" id="socialAdminGrid"></div>
+          <div class="empty-state" id="socialEmpty" hidden><i class="fa-solid fa-link-slash"></i><b>Data sosial belum tersedia</b><span>Jalankan migration 006_social_links.sql di Supabase.</span></div>
         </section>
 
         <section class="admin-section" data-panel="analytics">
@@ -155,7 +165,7 @@
         <section class="admin-section" data-panel="audit">
           <div class="section-toolbar audit-toolbar">
             <div class="toolbar-title"><p class="eyebrow">SECURITY TRAIL</p><b>Riwayat tindakan administrator</b></div>
-            <select id="auditEntityFilter" class="select-box"><option value="all">Semua entitas</option><option value="tool">Tool</option><option value="feedback">Feedback</option><option value="admin_session">Sesi admin</option></select>
+            <select id="auditEntityFilter" class="select-box"><option value="all">Semua entitas</option><option value="tool">Tool</option><option value="social_link">Social Link</option><option value="feedback">Feedback</option><option value="admin_session">Sesi admin</option></select>
             <button id="refreshAudit" class="secondary-button" type="button"><i class="fa-solid fa-rotate"></i> Refresh</button>
           </div>
           <article class="panel-card audit-card"><div class="audit-list" id="auditList"></div></article>
@@ -166,11 +176,34 @@
     <nav class="admin-bottom-nav" aria-label="Navigasi admin mobile">
       <button class="is-active" data-section="overview" type="button"><i class="fa-solid fa-grid-2"></i><span>Home</span></button>
       <button data-section="tools" type="button"><i class="fa-solid fa-screwdriver-wrench"></i><span>Tools</span></button>
+      <button data-section="socials" type="button"><i class="fa-solid fa-share-nodes"></i><span>Sosial</span></button>
       <button data-section="analytics" type="button"><i class="fa-solid fa-chart-line"></i><span>Insight</span></button>
       <button data-section="visual" type="button"><i class="fa-solid fa-camera-retro"></i><span>QA</span></button>
       <button data-section="feedback" type="button"><i class="fa-regular fa-message"></i><span>Inbox</span></button>
       <button data-section="audit" type="button"><i class="fa-solid fa-clock-rotate-left"></i><span>Audit</span></button>
     </nav>
+  </div>
+
+  <div class="modal-backdrop" id="socialModal" hidden>
+    <section class="tool-editor" role="dialog" aria-modal="true" aria-labelledby="socialEditorTitle">
+      <header><div><p class="eyebrow">EDIT SOCIAL LINK</p><h2 id="socialEditorTitle">Pengaturan Sosial Media</h2></div><button id="closeSocialModal" type="button" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button></header>
+      <form id="socialEditForm">
+        <input id="editSocialKey" type="hidden">
+        <div class="form-grid">
+          <label><span>Platform</span><input id="editSocialPlatform" maxlength="40" required placeholder="instagram"></label>
+          <label><span>Judul link</span><input id="editSocialLabel" maxlength="80" required placeholder="Instagram Nexora"></label>
+          <label class="form-span"><span>Deskripsi</span><textarea id="editSocialDescription" maxlength="240" rows="3"></textarea></label>
+          <label class="form-span"><span>URL tujuan</span><input id="editSocialUrl" maxlength="500" type="url" placeholder="https://..."></label>
+          <label><span>Icon Font Awesome</span><input id="editSocialIcon" maxlength="100" placeholder="fa-brands fa-instagram"></label>
+          <label><span>Warna aksen</span><input id="editSocialColor" type="color" value="#a855f7"></label>
+          <label><span>Urutan</span><input id="editSocialOrder" type="number" min="-10000" max="10000"></label>
+          <label class="toggle-field"><span>Status aktif</span><input id="editSocialActive" type="checkbox"><b></b></label>
+        </div>
+        <p class="form-help">Link yang nonaktif atau belum memiliki URL tidak akan tampil kepada pengunjung.</p>
+        <div class="modal-message" id="socialModalMessage"></div>
+        <footer><button class="secondary-button" id="cancelSocialEdit" type="button">Batal</button><button class="primary-button" id="saveSocialButton" type="submit"><i class="fa-solid fa-floppy-disk"></i> Simpan Link</button></footer>
+      </form>
+    </section>
   </div>
 
   <div class="modal-backdrop" id="toolModal" hidden>

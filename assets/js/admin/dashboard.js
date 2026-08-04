@@ -1,9 +1,9 @@
 (function(){
   "use strict";
-  const state={session:null,dashboard:null,tools:[],analytics:null,feedback:[],feedbackMeta:null,audit:[],activeSection:"overview",editingTool:null,editingFeedback:null};
+  const state={session:null,dashboard:null,tools:[],socials:[],analytics:null,feedback:[],feedbackMeta:null,audit:[],activeSection:"overview",editingTool:null,editingSocial:null,editingFeedback:null};
   const $=(selector,root=document)=>root.querySelector(selector);
   const $$=(selector,root=document)=>Array.from(root.querySelectorAll(selector));
-  const headings={overview:"Ringkasan Sistem",tools:"Manajemen Tools",analytics:"Analytics Penggunaan",health:"Tool Health Monitoring",feedback:"Feedback Pengguna",visual:"Runtime & Visual QA",audit:"Audit Log Admin"};
+  const headings={overview:"Ringkasan Sistem",tools:"Manajemen Tools",socials:"Sosial Media",analytics:"Analytics Penggunaan",health:"Tool Health Monitoring",feedback:"Feedback Pengguna",visual:"Runtime & Visual QA",audit:"Audit Log Admin"};
   let feedbackTimer=null;
 
   function escapeHtml(value){return String(value??"").replace(/[&<>'"]/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[char]));}
@@ -12,6 +12,7 @@
   function formatDate(value){if(!value)return "Belum ada";const date=new Date(value);if(Number.isNaN(date.getTime()))return "-";return new Intl.DateTimeFormat("id-ID",{dateStyle:"medium",timeStyle:"short",timeZone:"Asia/Jakarta"}).format(date);}
   function shortDate(value){const date=new Date(`${value}T00:00:00Z`);return new Intl.DateTimeFormat("id-ID",{day:"2-digit",month:"short",timeZone:"UTC"}).format(date);}
   function compactNumber(value){return new Intl.NumberFormat("id-ID",{notation:Number(value)>=10000?"compact":"standard",maximumFractionDigits:1}).format(Number(value)||0);}
+  function safeAccent(value){return /^#[0-9a-f]{6}$/i.test(String(value||""))?String(value):"#a855f7";}
   function toast(text,type="success"){const el=document.createElement("div");el.className=`toast ${type}`;el.textContent=text;$("#toastStack").appendChild(el);setTimeout(()=>el.remove(),3400);}
   async function api(url,options={}){const response=await fetch(url,{cache:"no-store",credentials:"same-origin",...options});const data=await response.json().catch(()=>({}));if(response.status===401){location.replace("/admin/login");throw new Error("Sesi berakhir.");}if(!response.ok||data.ok===false)throw new Error(data.message||data.error||"Permintaan gagal.");return data;}
   function canEdit(){return Boolean(state.session?.permissions?.editTools);}
@@ -24,6 +25,7 @@
     $$('[data-section]').forEach(button=>button.classList.toggle("is-active",button.dataset.section===section));
     $("#pageHeading").textContent=headings[section]||"Dashboard";
     if(section==="tools")renderTools();
+    if(section==="socials")renderSocials();
     if(section==="analytics"&&!state.analytics)await loadAnalytics();
     if(section==="feedback"&&!state.feedbackMeta)await loadFeedback(1);
     if(section==="audit"&&!state.audit.length)await loadAudit();
@@ -57,6 +59,14 @@
   function openToolEditor(id){if(!canEdit())return toast("Role ini hanya memiliki akses baca.","error");const item=state.tools.find(tool=>tool.id===id);if(!item)return;state.editingTool=item;$("#editToolId").value=item.id;$("#editToolName").value=item.name||"";$("#editToolCategory").value=item.category||"tools";$("#editToolDescription").value=item.description||"";$("#editToolBadge").value=item.badge||"";$("#editToolIcon").value=item.icon||"";$("#editToolUrl").value=item.external_url||"";$("#editToolOrder").value=item.sort_order??0;$("#editToolActive").checked=Boolean(item.is_active);$("#toolModalMessage").textContent="";openModal("#toolModal");}
   function closeToolEditor(){closeModal("#toolModal");state.editingTool=null;}
   async function saveTool(event){event.preventDefault();const button=$("#saveToolButton");button.disabled=true;button.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';const payload={id:$("#editToolId").value,name:$("#editToolName").value,category:$("#editToolCategory").value,description:$("#editToolDescription").value,badge:$("#editToolBadge").value,icon:$("#editToolIcon").value,externalUrl:$("#editToolUrl").value,sortOrder:Number($("#editToolOrder").value||0),isActive:$("#editToolActive").checked};try{const result=await api("/api/admin/tools",{method:"PATCH",headers:csrfHeaders(),body:JSON.stringify(payload)});const index=state.tools.findIndex(item=>item.id===payload.id);if(index>=0)state.tools[index]={...state.tools[index],...result.data};renderTools();toast("Perubahan tool berhasil disimpan.");closeToolEditor();await refreshDashboard();state.audit=[];}catch(error){const msg=$("#toolModalMessage");msg.textContent=error.message;msg.className="modal-message is-error";}finally{button.disabled=false;button.innerHTML='<i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan';}}
+
+  function renderSocials(){
+    const rows=state.socials||[];$("#socialEmpty").hidden=rows.length>0;$("#socialPermissionBadge").textContent=canEdit()?"Bisa diedit":"Read only";
+    $("#socialAdminGrid").innerHTML=rows.map(item=>`<article class="tool-admin-card social-admin-card" style="--social-accent:${safeAccent(item.accent_color)}"><div class="tool-card-top"><span class="tool-card-icon"><i class="${escapeHtml(item.icon||"fa-solid fa-link")}"></i></span><span class="tool-state ${item.is_active?"active":"inactive"}">${item.is_active?"Aktif":"Nonaktif"}</span></div><h3>${escapeHtml(item.label)}</h3><span class="tool-id">${escapeHtml(item.key)} · ${escapeHtml(item.platform)}</span><p>${escapeHtml(item.description||"Belum ada deskripsi.")}</p><div class="social-url">${item.url?escapeHtml(item.url):"URL belum diisi"}</div><div class="tool-card-meta"><span>Urutan ${Number(item.sort_order)||0}</span><span>${escapeHtml(safeAccent(item.accent_color))}</span></div><div class="tool-card-actions"><button data-edit-social="${escapeHtml(item.key)}" type="button" ${canEdit()?"":"disabled"}><i class="fa-solid fa-pen"></i> ${canEdit()?"Edit":"Read only"}</button></div></article>`).join("");
+  }
+  function openSocialEditor(key){if(!canEdit())return toast("Role ini hanya memiliki akses baca.","error");const item=state.socials.find(row=>row.key===key);if(!item)return;state.editingSocial=item;$("#editSocialKey").value=item.key;$("#editSocialPlatform").value=item.platform||"";$("#editSocialLabel").value=item.label||"";$("#editSocialDescription").value=item.description||"";$("#editSocialUrl").value=item.url||"";$("#editSocialIcon").value=item.icon||"fa-solid fa-link";$("#editSocialColor").value=safeAccent(item.accent_color);$("#editSocialOrder").value=item.sort_order??0;$("#editSocialActive").checked=Boolean(item.is_active);$("#socialModalMessage").textContent="";openModal("#socialModal");}
+  function closeSocialEditor(){closeModal("#socialModal");state.editingSocial=null;}
+  async function saveSocial(event){event.preventDefault();if(!canEdit())return;const button=$("#saveSocialButton");button.disabled=true;button.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';const payload={key:$("#editSocialKey").value,platform:$("#editSocialPlatform").value,label:$("#editSocialLabel").value,description:$("#editSocialDescription").value,url:$("#editSocialUrl").value,icon:$("#editSocialIcon").value,accentColor:$("#editSocialColor").value,sortOrder:Number($("#editSocialOrder").value||0),isActive:$("#editSocialActive").checked};try{const result=await api("/api/admin/socials",{method:"PATCH",headers:csrfHeaders(),body:JSON.stringify(payload)});const index=state.socials.findIndex(item=>item.key===payload.key);if(index>=0)state.socials[index]={...state.socials[index],...result.data};state.socials.sort((a,b)=>Number(a.sort_order)-Number(b.sort_order)||String(a.label).localeCompare(String(b.label)));renderSocials();toast("Link sosial berhasil disimpan.");closeSocialEditor();state.audit=[];}catch(error){const msg=$("#socialModalMessage");msg.textContent=error.message;msg.className="modal-message is-error";}finally{button.disabled=false;button.innerHTML='<i class="fa-solid fa-floppy-disk"></i> Simpan Link';}}
 
   async function loadAnalytics(days){
     const period=Number(days||$("#analyticsPeriod").value||30);$("#refreshAnalytics").disabled=true;
@@ -98,7 +108,7 @@
   async function saveFeedback(event){event.preventDefault();if(!canEdit())return;const button=$("#saveFeedbackButton");button.disabled=true;button.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';const payload={id:$("#editFeedbackId").value,status:$("#editFeedbackStatus").value,adminReply:$("#editFeedbackReply").value,internalNote:$("#editFeedbackNote").value};try{await api("/api/admin/feedback",{method:"PATCH",headers:csrfHeaders(),body:JSON.stringify(payload)});toast("Feedback berhasil diperbarui.");closeFeedbackEditor();await Promise.all([loadFeedback(state.feedbackMeta?.pagination?.page||1),refreshDashboard()]);state.audit=[];}catch(error){const msg=$("#feedbackModalMessage");msg.textContent=error.message;msg.className="modal-message is-error";}finally{button.disabled=false;button.innerHTML='<i class="fa-solid fa-floppy-disk"></i> Simpan Feedback';}}
 
   async function loadAudit(){try{const entity=$("#auditEntityFilter").value;const result=await api(`/api/admin/audit?limit=80&entityType=${encodeURIComponent(entity)}`);state.audit=result.data||[];renderAudit();}catch(error){toast(error.message,"error");}}
-  function auditIcon(item){if(item.entity_type==="tool")return "fa-solid fa-screwdriver-wrench";if(item.entity_type==="feedback")return "fa-regular fa-message";return "fa-solid fa-user-shield";}
+  function auditIcon(item){if(item.entity_type==="tool")return "fa-solid fa-screwdriver-wrench";if(item.entity_type==="social_link")return "fa-solid fa-share-nodes";if(item.entity_type==="feedback")return "fa-regular fa-message";return "fa-solid fa-user-shield";}
   function renderAudit(){const rows=state.audit||[];$("#auditList").innerHTML=rows.length?rows.map(item=>`<button class="audit-item" data-audit-id="${item.id}" type="button"><span class="audit-icon"><i class="${auditIcon(item)}"></i></span><div><b>${escapeHtml(item.summary||item.action)}</b><span>${escapeHtml(item.admin_email||"system")} · ${escapeHtml(item.action)}</span></div><time>${formatDate(item.created_at)}</time><i class="fa-solid fa-chevron-right"></i></button>`).join(""):'<div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><b>Audit log masih kosong</b><span>Tindakan admin berikutnya akan tercatat.</span></div>';}
   function openAuditDetail(id){const item=state.audit.find(row=>String(row.id)===String(id));if(!item)return;const format=value=>value?escapeHtml(JSON.stringify(value,null,2)):"Tidak ada";$("#auditDetailBody").innerHTML=`<div class="audit-detail-grid"><div><span>Aksi</span><b>${escapeHtml(item.action)}</b></div><div><span>Admin</span><b>${escapeHtml(item.admin_email||"system")}</b></div><div><span>Entitas</span><b>${escapeHtml(item.entity_type)} · ${escapeHtml(item.entity_id||"-")}</b></div><div><span>Waktu</span><b>${formatDate(item.created_at)}</b></div></div><p class="audit-summary">${escapeHtml(item.summary||"")}</p><div class="audit-diff"><section><b>Sebelum</b><pre>${format(item.before_data)}</pre></section><section><b>Sesudah</b><pre>${format(item.after_data)}</pre></section></div>`;openModal("#auditModal");}
 
@@ -113,6 +123,8 @@
     [$("#toolSearch"),$("#toolStatusFilter"),$("#toolCategoryFilter")].forEach(input=>input.addEventListener("input",renderTools));
     $("#toolAdminGrid").addEventListener("click",event=>{const button=event.target.closest("[data-edit-tool]");if(button)openToolEditor(button.dataset.editTool);});
     $("#toolEditForm").addEventListener("submit",saveTool);$("#closeToolModal").addEventListener("click",closeToolEditor);$("#cancelToolEdit").addEventListener("click",closeToolEditor);
+    $("#socialAdminGrid").addEventListener("click",event=>{const button=event.target.closest("[data-edit-social]");if(button)openSocialEditor(button.dataset.editSocial);});
+    $("#socialEditForm").addEventListener("submit",saveSocial);$("#closeSocialModal").addEventListener("click",closeSocialEditor);$("#cancelSocialEdit").addEventListener("click",closeSocialEditor);
     $("#analyticsPeriod").addEventListener("change",()=>loadAnalytics());$("#refreshAnalytics").addEventListener("click",()=>loadAnalytics());
     [$("#feedbackSearch"),$("#feedbackStatusFilter"),$("#feedbackCategoryFilter")].forEach(input=>input.addEventListener("input",()=>{clearTimeout(feedbackTimer);feedbackTimer=setTimeout(()=>loadFeedback(1),280);}));
     $("#feedbackGrid").addEventListener("click",event=>{const button=event.target.closest("[data-edit-feedback]");if(button)openFeedbackEditor(button.dataset.editFeedback);});
@@ -121,17 +133,17 @@
     $("#feedbackEditForm").addEventListener("submit",saveFeedback);$("#closeFeedbackModal").addEventListener("click",closeFeedbackEditor);$("#cancelFeedbackEdit").addEventListener("click",closeFeedbackEditor);
     $("#auditEntityFilter").addEventListener("change",loadAudit);$("#refreshAudit").addEventListener("click",loadAudit);$("#auditList").addEventListener("click",event=>{const button=event.target.closest("[data-audit-id]");if(button)openAuditDetail(button.dataset.auditId);});$("#closeAuditModal").addEventListener("click",()=>closeModal("#auditModal"));
     $("#recentFeedback").addEventListener("click",event=>{const button=event.target.closest("[data-overview-feedback]");if(button){const id=button.dataset.overviewFeedback;switchSection("feedback").then(()=>{const item=findFeedback(id);if(item)openFeedbackEditor(id);});}});
-    ["toolModal","feedbackModal","auditModal"].forEach(id=>$("#"+id).addEventListener("click",event=>{if(event.target.id===id)closeModal("#"+id);}));
+    ["toolModal","socialModal","feedbackModal","auditModal"].forEach(id=>$("#"+id).addEventListener("click",event=>{if(event.target.id===id)closeModal("#"+id);}));
     $("#logoutButton").addEventListener("click",logout);
-    document.addEventListener("keydown",event=>{if(event.key!=="Escape")return;["#toolModal","#feedbackModal","#auditModal"].forEach(selector=>{if(!$(selector).hidden)closeModal(selector);});});
+    document.addEventListener("keydown",event=>{if(event.key!=="Escape")return;["#toolModal","#socialModal","#feedbackModal","#auditModal"].forEach(selector=>{if(!$(selector).hidden)closeModal(selector);});});
   }
 
   async function boot(){
     try{
       const session=await api("/api/admin/auth");if(!session.authenticated){location.replace("/admin/login");return;}state.session=session;renderSession();
-      const [dashboard,tools,analytics]=await Promise.all([api("/api/admin/dashboard"),api("/api/admin/tools"),api("/api/admin/analytics?days=7").catch(()=>({data:null}))]);
-      state.dashboard=dashboard;state.tools=tools.data||[];state.analytics=analytics.data||null;
-      renderOverview();renderHealth();renderTools();if(state.analytics)renderAnalytics();bind();$("#adminApp").hidden=false;$("#adminLoader").hidden=true;
+      const [dashboard,tools,socials,analytics]=await Promise.all([api("/api/admin/dashboard"),api("/api/admin/tools"),api("/api/admin/socials").catch(()=>({data:[]})),api("/api/admin/analytics?days=7").catch(()=>({data:null}))]);
+      state.dashboard=dashboard;state.tools=tools.data||[];state.socials=socials.data||[];state.analytics=analytics.data||null;
+      renderOverview();renderHealth();renderTools();renderSocials();if(state.analytics)renderAnalytics();bind();$("#adminApp").hidden=false;$("#adminLoader").hidden=true;
     }catch(error){console.error(error);toast(error.message||"Dashboard gagal dimuat.","error");setTimeout(()=>location.replace("/admin/login"),1400);}
   }
   boot();
