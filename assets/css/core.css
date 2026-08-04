@@ -1393,7 +1393,7 @@ html.nx-low-power *{scroll-behavior:auto!important}
 }
 
 
-/* ===== Nexora v6.3.4: lightweight All Tools grid + adaptive anime banner ===== */
+/* ===== Nexora v6.3.5: lightweight All Tools grid + adaptive anime banner ===== */
 .tools-card{
   /* The public grid is small enough to render normally. Keeping layout
      containment here makes mobile row heights change when cards enter view. */
@@ -1444,7 +1444,7 @@ html.nx-low-power *{scroll-behavior:auto!important}
   html.nx-low-power .video-banner video{display:none!important}
 }
 
-/* v6.3.4 — stable public scrolling on touch devices */
+/* v6.3.5 — stable public scrolling on touch devices */
 @media (pointer: coarse), (max-width:768px){
   .tools-card,.nx-public-wa-card,.user-card,.nav-tabs,.nx-top-menu-panel{
     -webkit-backdrop-filter:none!important;

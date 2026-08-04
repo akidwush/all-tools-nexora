@@ -4,7 +4,8 @@
 #ttRoomOverlay .tt-room-scroll{padding:0!important;}
 #ttRoomOverlay .tt-room-content{
   width:100%!important;
-  max-width:none!important;
+  max-width:100%!important;
+  min-width:0!important;
   min-height:calc(100vh - 58px)!important;
   margin:0!important;
   border-radius:0!important;
@@ -15,8 +16,8 @@
   backdrop-filter:none!important;
   -webkit-backdrop-filter:none!important;
 }
-#ttRoomOverlay .tt-full-root{width:100%;min-height:100%;}
-#ttRoomOverlay .tt-full-wrap{width:min(1320px,100%);margin:0 auto;padding:22px clamp(12px,2vw,26px) 36px;}
+#ttRoomOverlay .tt-full-root{width:100%;max-width:100%;min-width:0;min-height:100%;}
+#ttRoomOverlay .tt-full-wrap{width:min(1320px,100%);max-width:100%;min-width:0;margin:0 auto;padding:22px clamp(12px,2vw,26px) 36px;overflow-x:hidden;}
 #ttRoomOverlay .tt-hero{
   display:grid;
   grid-template-columns:minmax(0,1.35fr) minmax(260px,.65fr);
@@ -49,11 +50,16 @@
 #ttRoomOverlay .tt-mini-row i{width:32px;height:32px;border-radius:12px;display:grid;place-items:center;background:rgba(168,85,247,.12);color:#c084fc;}
 #ttRoomOverlay .tt-mini-row b{display:block;font-size:12px;color:#eadfff;}
 #ttRoomOverlay .tt-mini-row span{display:block;font-size:11px;color:#7f6aaa;margin-top:1px;}
-#ttRoomOverlay .tt-result-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:16px;align-items:start;}
-#ttRoomOverlay .tt-panel{padding:16px;min-width:0;}
-#ttRoomOverlay .tt-preview-box{position:relative;overflow:hidden;border-radius:24px;background:#05000d;border:1px solid rgba(168,85,247,.18);min-height:420px;display:flex;align-items:center;justify-content:center;}
-#ttRoomOverlay .tt-preview-video{width:100%;height:min(68vh,640px);max-height:640px;object-fit:contain;background:#05000d;display:block;}
-#ttRoomOverlay .tt-preview-img{width:100%;height:min(68vh,640px);max-height:640px;object-fit:contain;display:block;background:#05000d;}
+#ttRoomOverlay #ttResult,
+#ttRoomOverlay .tt-result-grid,
+#ttRoomOverlay .tt-result-grid>*{width:100%;max-width:100%;min-width:0;}
+#ttRoomOverlay .tt-result-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);gap:16px;align-items:start;overflow:hidden;}
+#ttRoomOverlay .tt-panel{width:100%;max-width:100%;padding:16px;min-width:0;overflow:hidden;}
+#ttRoomOverlay img,
+#ttRoomOverlay video{max-width:100%;}
+#ttRoomOverlay .tt-preview-box{position:relative;width:100%;max-width:100%;min-width:0;overflow:hidden;border-radius:24px;background:#05000d;border:1px solid rgba(168,85,247,.18);min-height:420px;display:flex;align-items:center;justify-content:center;}
+#ttRoomOverlay .tt-preview-video,
+#ttRoomOverlay .tt-preview-img{display:block;width:100%;max-width:100%;min-width:0;height:min(68vh,640px);max-height:640px;object-fit:contain;object-position:center;background:#05000d;}
 #ttRoomOverlay .tt-preview-placeholder{min-height:420px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#76639d;gap:12px;padding:28px;}
 #ttRoomOverlay .tt-preview-placeholder i{font-size:54px;color:#a855f7;filter:drop-shadow(0 0 26px rgba(168,85,247,.35));}
 #ttRoomOverlay .tt-preview-label{position:absolute;top:12px;left:12px;display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:900;color:#e9ddff;border:1px solid rgba(255,255,255,.12);background:rgba(8,0,18,.72);backdrop-filter:blur(8px);border-radius:999px;padding:7px 11px;}
@@ -77,7 +83,7 @@
 #ttRoomOverlay .tt-room-history-actions button{border:1px solid rgba(168,85,247,.16);background:rgba(168,85,247,.08);color:#c084fc;border-radius:999px;padding:6px 8px;font-size:10px;font-weight:900;cursor:pointer;}
 #ttRoomOverlay .tt-room-history-empty{padding:12px;border-radius:14px;background:rgba(255,255,255,.035);color:#7f6aaa;font-size:12px;text-align:center;}
 
-#ttRoomOverlay .tt-photo-strip{display:flex;gap:8px;overflow-x:auto;padding:10px 2px 2px;margin-top:10px;scrollbar-width:none;}
+#ttRoomOverlay .tt-photo-strip{display:flex;width:100%;max-width:100%;min-width:0;gap:8px;overflow-x:auto;overscroll-behavior-inline:contain;padding:10px 2px 2px;margin-top:10px;scrollbar-width:none;}
 #ttRoomOverlay .tt-photo-strip::-webkit-scrollbar{display:none;}
 #ttRoomOverlay .tt-photo-thumb{width:76px;height:76px;border-radius:15px;border:2px solid rgba(168,85,247,.14);background:#130722;object-fit:cover;cursor:pointer;opacity:.72;transition:.2s;flex:0 0 auto;}
 #ttRoomOverlay .tt-photo-thumb.active,#ttRoomOverlay .tt-photo-thumb:hover{opacity:1;border-color:#c084fc;transform:translateY(-2px);}
@@ -111,8 +117,8 @@
 #ttRoomOverlay .tt-idle{border:1px dashed rgba(168,85,247,.20);background:rgba(255,255,255,.03);border-radius:24px;min-height:320px;display:flex;align-items:center;justify-content:center;text-align:center;color:#76639d;padding:30px;}
 #ttRoomOverlay .tt-idle i{font-size:48px;color:#a855f7;display:block;margin-bottom:12px;}
 @media(max-width:920px){
-  #ttRoomOverlay .tt-hero{grid-template-columns:1fr;}
-  #ttRoomOverlay .tt-result-grid{grid-template-columns:1fr;}
+  #ttRoomOverlay .tt-hero{grid-template-columns:minmax(0,1fr);}
+  #ttRoomOverlay .tt-result-grid{grid-template-columns:minmax(0,1fr);}
   #ttRoomOverlay .tt-preview-box{min-height:320px;}
   #ttRoomOverlay .tt-preview-video,#ttRoomOverlay .tt-preview-img{height:min(58vh,520px);}
 }
@@ -120,14 +126,14 @@
   #ttRoomOverlay .tt-full-wrap{padding:12px 10px 24px;}
   #ttRoomOverlay .tt-hero-card,#ttRoomOverlay .tt-side-card,#ttRoomOverlay .tt-panel{border-radius:20px;}
   #ttRoomOverlay .tt-hero-card{padding:17px;}
-  #ttRoomOverlay .tt-url-row{grid-template-columns:1fr;}
+  #ttRoomOverlay .tt-url-row{grid-template-columns:minmax(0,1fr);}
   #ttRoomOverlay .tt-side-card{display:none;}
   #ttRoomOverlay .tt-stats{grid-template-columns:repeat(2,1fr);}
   #ttRoomOverlay .tt-info-head{align-items:flex-start;}
   #ttRoomOverlay .tt-info-cover{width:58px;height:58px;border-radius:15px;}
   #ttRoomOverlay .tt-choice-list{max-height:none;}
   #ttRoomOverlay .tt-preview-box{min-height:280px;border-radius:20px;}
-  #ttRoomOverlay .tt-preview-video,#ttRoomOverlay .tt-preview-img{height:min(52vh,430px);}
+  #ttRoomOverlay .tt-preview-video,#ttRoomOverlay .tt-preview-img{height:min(52vh,430px);height:min(52svh,430px);}
   #ttRoomOverlay .tt-custom-play{width:62px;height:62px;font-size:21px;}
   #ttRoomOverlay .tt-room-history{border-radius:20px;padding:13px;}
   #ttRoomOverlay .tt-room-history-item{grid-template-columns:32px minmax(0,1fr);}
@@ -232,8 +238,12 @@
 }
 #ttRoomOverlay .tt-room-scroll{
   flex:1;
+  width:100%;
+  max-width:100%;
+  min-width:0;
   min-height:0;
-  overflow:auto;
+  overflow-y:auto;
+  overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
   padding:22px 14px 34px;
 }
@@ -299,7 +309,10 @@
 #ttRoomOverlay .dl-header{margin-top:18px}
 #ttRoomOverlay .dl-options{gap:10px}
 #ttRoomOverlay .dl-option{background:rgba(255,255,255,.045);border-color:rgba(168,85,247,.20)}
-#ttRoomOverlay .dl-media-grid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+#ttRoomOverlay .dl-media-grid{width:100%;max-width:100%;min-width:0;grid-template-columns:repeat(auto-fit,minmax(min(150px,100%),1fr));overflow:hidden}
+#ttRoomOverlay .dl-media-item{width:100%;max-width:100%;min-width:0}
+#ttRoomOverlay .dl-media-item img,
+#ttRoomOverlay .dl-media-item video{display:block;width:100%;max-width:100%;min-width:0;object-fit:contain;background:#05000d}
 #ttRoomOverlay .dl-media-item img{height:170px}
 body.tt-room-open{overflow:hidden!important}
 @media(max-width:720px){
@@ -318,13 +331,14 @@ body.tt-room-open{overflow:hidden!important}
   #ttRoomOverlay .dl-option-info{width:100%}
   #ttRoomOverlay .dl-dl-btn{width:100%;padding:10px 14px;border-radius:14px}
   #ttRoomOverlay .dl-media-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-  #ttRoomOverlay .dl-media-item img{height:130px}
+  #ttRoomOverlay .dl-media-item img{height:auto;max-height:220px}
+  #ttRoomOverlay .dl-media-item video{height:auto;max-height:52vh;max-height:52svh}
 }
 @media(max-width:380px){
   #ttRoomOverlay .tt-room-back span{display:none}
   #ttRoomOverlay .tt-room-content{padding:14px;border-radius:18px}
-  #ttRoomOverlay .dl-media-grid{grid-template-columns:1fr}
-  #ttRoomOverlay .dl-media-item img{height:180px}
+  #ttRoomOverlay .dl-media-grid{grid-template-columns:minmax(0,1fr)}
+  #ttRoomOverlay .dl-media-item img{height:auto;max-height:320px}
 }
 
 /* ===== original style block 22 ===== */

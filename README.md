@@ -1,6 +1,6 @@
-# All Tools Nexora v6.3.4
+# All Tools Nexora v6.3.5
 
-Rilis stabilisasi untuk website All Tools Nexora. Fokus utama v6.3.4 adalah menghilangkan scroll jank pada dashboard publik, membuat grid tool append-only, mencegah layout shift badge health, dan menonaktifkan popup berat pada perangkat touch.
+Rilis stabilisasi untuk website All Tools Nexora. Fokus utama v6.3.5 adalah menjaga foto, video, dan carousel TikTok tetap berada di dalam frame pada layar mobile, sambil mempertahankan seluruh perbaikan scroll v6.3.4.
 
 ## Perubahan utama
 
@@ -46,7 +46,7 @@ DATABASE_TIMEOUT_MS
 FEEDBACK_HASH_SALT
 ```
 
-Tidak ada environment variable baru untuk v6.3.4.
+Tidak ada environment variable baru untuk v6.3.5.
 
 ## Endpoint
 
@@ -59,6 +59,13 @@ Dashboard admin tersedia di:
 /admin/login
 ```
 
+## v6.3.5
+
+- Memutus intrinsic minimum width pada rantai grid/panel TikTok dengan `min-width:0` dan `minmax(0,1fr)`.
+- Membatasi semua foto dan video TikTok ke lebar panel dengan `max-width:100%`.
+- Mengunci scroll utama TikTok ke sumbu vertikal agar media tidak membuat halaman melebar.
+- Menjaga preview video/foto mobile di dalam tinggi viewport dan memperbaiki fallback galeri TikTok.
+- Menambah regression test `test-tiktok-media-layout-v635.js`.
 
 ## v6.3.4
 
