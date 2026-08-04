@@ -80,6 +80,7 @@
             <label class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input id="toolSearch" type="search" placeholder="Cari nama atau ID tools"></label>
             <select id="toolStatusFilter" class="select-box"><option value="all">Semua status</option><option value="active">Aktif</option><option value="inactive">Nonaktif</option></select>
             <select id="toolCategoryFilter" class="select-box"><option value="all">Semua kategori</option><option value="downloader">Downloader</option><option value="maker">Maker</option><option value="tools">Tools</option><option value="vault">Vault</option><option value="external">External</option></select>
+            <button id="addToolButton" class="primary-button" type="button"><i class="fa-solid fa-plus"></i> Tambah Tool</button>
           </div>
           <div class="tool-admin-grid" id="toolAdminGrid"></div>
           <div class="empty-state" id="toolEmpty" hidden><i class="fa-solid fa-box-open"></i><b>Tools tidak ditemukan</b><span>Coba ubah pencarian atau filter.</span></div>
@@ -237,10 +238,10 @@
 
   <div class="modal-backdrop" id="toolModal" hidden>
     <section class="tool-editor" role="dialog" aria-modal="true" aria-labelledby="toolEditorTitle">
-      <header><div><p class="eyebrow">EDIT TOOL</p><h2 id="toolEditorTitle">Pengaturan Tool</h2></div><button id="closeToolModal" type="button" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button></header>
+      <header><div><p class="eyebrow" id="toolEditorEyebrow">EDIT TOOL</p><h2 id="toolEditorTitle">Pengaturan Tool</h2></div><button id="closeToolModal" type="button" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button></header>
       <form id="toolEditForm">
-        <input id="editToolId" type="hidden">
         <div class="form-grid">
+          <label><span>ID unik</span><input id="editToolId" maxlength="80" pattern="[a-z0-9][a-z0-9_-]{1,79}" placeholder="contoh: my-tool" required></label>
           <label><span>Nama</span><input id="editToolName" maxlength="80" required></label>
           <label><span>Kategori</span><select id="editToolCategory"><option value="downloader">Downloader</option><option value="maker">Maker</option><option value="tools">Tools</option><option value="vault">Vault</option><option value="external">External</option></select></label>
           <label class="form-span"><span>Deskripsi</span><textarea id="editToolDescription" maxlength="240" rows="3"></textarea></label>
@@ -251,6 +252,7 @@
           <label class="toggle-field"><span>Status aktif</span><input id="editToolActive" type="checkbox"><b></b></label>
         </div>
         <div class="modal-message" id="toolModalMessage"></div>
+        <p class="form-help">Tool baru adalah tautan eksternal. Untuk tool bawaan, gunakan status nonaktif jika ingin menyembunyikannya dari katalog.</p>
         <footer><button class="secondary-button" id="cancelToolEdit" type="button">Batal</button><button class="primary-button" id="saveToolButton" type="submit"><i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan</button></footer>
       </form>
     </section>

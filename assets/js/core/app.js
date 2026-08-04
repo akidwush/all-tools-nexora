@@ -1334,6 +1334,10 @@ let allRenderedCount = 0;
 let allLoadPending = false;
 
 function toolCardMarkup(item, isExternal = false) {
+    const escapeToolHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
+    const safeId = escapeToolHtml(item.id);
+    const safeIcon = escapeToolHtml(item.icon || 'fa-solid fa-cube');
+    const safeLink = encodeURIComponent(String(item.link || '#')).replace(/'/g, '%27');
     const clickAttr = item.id === 'unbanwa' ?
         `onclick="window.openNexusUnban && window.openNexusUnban()"` :
         (item.id === 'vdeploy' ?
@@ -1343,14 +1347,14 @@ function toolCardMarkup(item, isExternal = false) {
         (item.id === 'tiktokhd' ?
             `onclick="window.openTikTokHdUpload && window.openTikTokHdUpload()"` :
             (isExternal || item.link ?
-                `onclick="window.open('${item.link || '#'}','_blank')"` :
-                `onclick="showTool('${item.id}')"`))));
+                `onclick="window.open(decodeURIComponent('${safeLink}'),'_blank','noopener,noreferrer')"` :
+                `onclick="showTool('${safeId}')"`))));
     return `
-        <div class="tools-card" data-tool-id="${item.id}" ${clickAttr}>
-            <div class="icon"><i class="${item.icon}"></i></div>
-            <h4>${item.name}</h4>
-            <p>${item.desc}</p>
-            ${item.badge ? `<span class="badge">${item.badge}</span>` : ''}
+        <div class="tools-card" data-tool-id="${safeId}" ${clickAttr}>
+            <div class="icon"><i class="${safeIcon}"></i></div>
+            <h4>${escapeToolHtml(item.name)}</h4>
+            <p>${escapeToolHtml(item.desc)}</p>
+            ${item.badge ? `<span class="badge">${escapeToolHtml(item.badge)}</span>` : ''}
             <span class="nx-card-readiness" data-nx-status-slot="true"></span>
             <div class="arrow"><i class="fas fa-arrow-right"></i></div>
         </div>
@@ -1491,17 +1495,19 @@ async function applyDatabaseToolConfiguration() {
         const nextTools = { downloader: [], maker: [], tools: [], vault: [], external: [] };
         for (const row of rows) {
             const base = baseById.get(String(row.id));
-            if (!base) continue;
-            const category = allowedCategories.has(row.category) ? row.category : base.category;
+            if (!base && !row.external_url) continue;
+            const category = allowedCategories.has(row.category) ? row.category : (base?.category || 'external');
             nextTools[category].push({
-                ...base,
+                ...(base || {}),
                 category,
-                name: row.name || base.name,
-                desc: row.description || base.desc,
+                id: String(row.id || base?.id || ''),
+                name: row.name || base?.name || row.id,
+                desc: row.description || base?.desc || '',
                 badge: row.badge || '',
-                icon: row.icon || base.icon,
-                link: row.external_url || base.link,
-                sortOrder: Number(row.sort_order || 0)
+                icon: row.icon || base?.icon || 'fa-solid fa-arrow-up-right-from-square',
+                link: row.external_url || base?.link,
+                sortOrder: Number(row.sort_order || 0),
+                custom: !base
             });
         }
         for (const category of Object.keys(nextTools)) {

@@ -80,3 +80,11 @@
 @media(max-width:370px){.admin-content{padding-inline:9px!important}.metric-card{padding:11px!important}.admin-more-grid{gap:7px}.admin-more-grid button,.admin-more-grid a{padding:9px;font-size:9px}}
 .panel-head-actions{display:flex;align-items:center;gap:9px}.compact-action{min-height:34px!important;padding:7px 10px!important;font-size:9px!important}
 @media(max-width:760px){.panel-head-actions{width:100%;justify-content:space-between}.compact-action{width:auto!important}}
+
+/* Nexora v6.3.6 — tool catalog CRUD */
+.admin-section[data-panel="tools"] .section-toolbar{grid-template-columns:minmax(220px,1fr) 180px 180px auto;align-items:center}
+.tool-card-actions button.danger{border-color:rgba(251,113,133,.25);background:rgba(251,113,133,.08);color:#fda4af}
+.tool-card-actions button.danger:hover{background:rgba(251,113,133,.16)}
+#editToolId[readonly]{opacity:.65;cursor:not-allowed}
+@media(max-width:1100px){.admin-section[data-panel="tools"] .section-toolbar{grid-template-columns:minmax(180px,1fr) 150px 150px auto}}
+@media(max-width:760px){.admin-section[data-panel="tools"] .section-toolbar{grid-template-columns:1fr!important}.admin-section[data-panel="tools"] .section-toolbar>*{grid-column:auto!important}}

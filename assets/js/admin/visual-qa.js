@@ -55,17 +55,38 @@
     });
     return output.join("\n");
   }
-  async function prepareClone(doc,width,height){
+  function sanitizeCanvasCss(value,removeAllUrls){
+    return String(value||"")
+      .replace(/@font-face\s*\{[^}]*\}/gi,"")
+      .replace(/(?:-webkit-)?image-set\([^;{}]*\)/gi,"none")
+      .replace(/url\(\s*(['"]?)([^)]*?)\1\s*\)/gi,function(match,quote,target){
+        var source=String(target||"").trim();
+        if(!removeAllUrls&&/^data:/i.test(source))return match;
+        return "none";
+      });
+  }
+  async function prepareClone(doc,width,height,strict){
     var clone=doc.documentElement.cloneNode(true);
     clone.setAttribute("xmlns","http://www.w3.org/1999/xhtml");
-    Array.prototype.forEach.call(clone.querySelectorAll("script,noscript,iframe,video,audio,source,link[rel=stylesheet],link[rel=preload],meta[http-equiv]"),function(node){node.remove();});
+    var removable="script,noscript,iframe,video,audio,source,object,embed,link[rel=stylesheet],link[rel=preload],meta[http-equiv],base"+(strict?",img,picture,svg,canvas":"");
+    Array.prototype.forEach.call(clone.querySelectorAll(removable),function(node){node.remove();});
     Array.prototype.forEach.call(clone.querySelectorAll("[data-nx-visual-ignore],.toast-stack,.modal-backdrop[hidden],#nxModuleToast"),function(node){node.remove();});
+    Array.prototype.forEach.call(clone.querySelectorAll("style"),function(node){node.textContent=sanitizeCanvasCss(node.textContent,Boolean(strict));});
+    Array.prototype.forEach.call(clone.querySelectorAll("[style]"),function(node){node.setAttribute("style",sanitizeCanvasCss(node.getAttribute("style"),Boolean(strict)));});
+    if(strict){
+      Array.prototype.forEach.call(clone.querySelectorAll("[src],[srcset],[href]"),function(node){
+        if(node.hasAttribute("src"))node.removeAttribute("src");
+        if(node.hasAttribute("srcset"))node.removeAttribute("srcset");
+        if(node.hasAttribute("href")&&/^(?:image|use)$/i.test(node.tagName))node.removeAttribute("href");
+      });
+    }
     var originals=Array.prototype.slice.call(doc.images||[]);
     var copies=Array.prototype.slice.call(clone.querySelectorAll("img"));
-    for(var i=0;i<Math.min(originals.length,copies.length,30);i++){
+    for(var i=0;i<Math.min(originals.length,copies.length);i++){
       var source=originals[i].currentSrc||originals[i].src||"";
       var data=source?await urlToDataUrl(source,doc.baseURI):"";
       if(data)copies[i].setAttribute("src",data);
+      else if(/^data:image\//i.test(source))copies[i].setAttribute("src",source);
       else{
         copies[i].removeAttribute("src");copies[i].removeAttribute("srcset");
         copies[i].setAttribute("style",(copies[i].getAttribute("style")||"")+";background:#21152d;min-width:20px;min-height:20px;");
@@ -73,34 +94,53 @@
     }
     var head=clone.querySelector("head")||clone.insertBefore(document.createElement("head"),clone.firstChild);
     var style=doc.createElement("style");
-    style.textContent=stylesheetText(doc)+"\nhtml,body{margin:0!important;width:"+width+"px!important;min-width:"+width+"px!important;height:"+height+"px!important;max-height:"+height+"px!important;overflow:hidden!important;}*{animation:none!important;transition:none!important;caret-color:transparent!important;}";
+    style.textContent=sanitizeCanvasCss(stylesheetText(doc),Boolean(strict))+"\nhtml,body{margin:0!important;width:"+width+"px!important;min-width:"+width+"px!important;height:"+height+"px!important;max-height:"+height+"px!important;overflow:hidden!important;}*{animation:none!important;transition:none!important;caret-color:transparent!important;}";
     head.appendChild(style);
     return clone;
   }
-  async function captureFrame(frame,width,height){
+  async function renderFrameCanvas(frame,width,height,strict){
     var doc=frame.contentDocument;
-    var win=frame.contentWindow;
-    win.scrollTo(0,0);
-    await wait(120);
-    var clone=await prepareClone(doc,width,height);
+    var clone=await prepareClone(doc,width,height,strict);
     var serialized=new XMLSerializer().serializeToString(clone);
     var svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+width+'" height="'+height+'"><foreignObject width="100%" height="100%">'+serialized+'</foreignObject></svg>';
     var svgBlob=new Blob([svg],{type:"image/svg+xml;charset=utf-8"});
     var objectUrl=URL.createObjectURL(svgBlob);
-    var image=new Image();
-    image.decoding="async";
-    await new Promise(function(resolve,reject){image.onload=resolve;image.onerror=function(){reject(new Error("Renderer screenshot browser gagal."));};image.src=objectUrl;});
-    var canvas=document.createElement("canvas");canvas.width=width;canvas.height=height;
-    var context=canvas.getContext("2d",{alpha:false});context.fillStyle="#09040f";context.fillRect(0,0,width,height);context.drawImage(image,0,0,width,height);URL.revokeObjectURL(objectUrl);
-    var blob=await new Promise(function(resolve){canvas.toBlob(resolve,"image/jpeg",0.82);});
-    if(!blob)throw new Error("Screenshot tidak dapat dikompresi.");
+    try{
+      var image=new Image();
+      image.decoding="async";
+      image.crossOrigin="anonymous";
+      await new Promise(function(resolve,reject){image.onload=resolve;image.onerror=function(){reject(new Error("Renderer screenshot browser gagal."));};image.src=objectUrl;});
+      var canvas=document.createElement("canvas");canvas.width=width;canvas.height=height;
+      var context=canvas.getContext("2d",{alpha:false});context.fillStyle="#09040f";context.fillRect(0,0,width,height);context.drawImage(image,0,0,width,height);
+      return canvas;
+    }finally{URL.revokeObjectURL(objectUrl);}
+  }
+  function canvasToBlob(canvas){
+    return new Promise(function(resolve,reject){
+      try{canvas.toBlob(function(blob){if(blob)resolve(blob);else reject(new Error("Screenshot tidak dapat dikompresi."));},"image/jpeg",0.82);}
+      catch(error){reject(error);}
+    });
+  }
+  async function captureFrame(frame,width,height){
+    var win=frame.contentWindow;
+    win.scrollTo(0,0);
+    await wait(120);
+    var canvas=null;var safeFallback=false;var blob=null;
+    try{
+      canvas=await renderFrameCanvas(frame,width,height,false);
+      blob=await canvasToBlob(canvas);
+    }catch(error){
+      safeFallback=true;
+      canvas=await renderFrameCanvas(frame,width,height,true);
+      blob=await canvasToBlob(canvas);
+    }
     var digest=await crypto.subtle.digest("SHA-256",await blob.arrayBuffer());
     var hash=Array.prototype.map.call(new Uint8Array(digest),function(byte){return byte.toString(16).padStart(2,"0");}).join("");
     var mini=document.createElement("canvas");mini.width=32;mini.height=32;var miniContext=mini.getContext("2d",{willReadFrequently:true});miniContext.drawImage(canvas,0,0,32,32);
     var pixels=miniContext.getImageData(0,0,32,32).data;var luminance=new Uint8Array(1024);
     for(var p=0,j=0;p<pixels.length;p+=4,j++)luminance[j]=Math.round((pixels[p]*0.299)+(pixels[p+1]*0.587)+(pixels[p+2]*0.114));
     var thumb=document.createElement("canvas");var ratio=Math.min(1,480/width);thumb.width=Math.max(1,Math.round(width*ratio));thumb.height=Math.max(1,Math.round(height*ratio));thumb.getContext("2d").drawImage(canvas,0,0,thumb.width,thumb.height);
-    return {dataUrl:URL.createObjectURL(blob),downloadBlob:blob,thumbnailDataUrl:thumb.toDataURL("image/jpeg",0.66),fingerprint:bytesToBase64(luminance),hash:hash,width:width,height:height};
+    return {dataUrl:URL.createObjectURL(blob),downloadBlob:blob,thumbnailDataUrl:thumb.toDataURL("image/jpeg",0.66),fingerprint:bytesToBase64(luminance),hash:hash,width:width,height:height,safeFallback:safeFallback};
   }
   function compareFingerprints(current,baseline){
     if(!current||!baseline)return null;

@@ -1,6 +1,6 @@
-# All Tools Nexora v6.3.5
+# All Tools Nexora v6.3.6
 
-Rilis stabilisasi untuk website All Tools Nexora. Fokus utama v6.3.5 adalah menjaga foto, video, dan carousel TikTok tetap berada di dalam frame pada layar mobile, sambil mempertahankan seluruh perbaikan scroll v6.3.4.
+Rilis stabilisasi untuk website All Tools Nexora. Fokus utama v6.3.6 adalah memperbaiki export screenshot Visual QA dan menyediakan CRUD katalog tool dari dashboard admin.
 
 ## Perubahan utama
 
@@ -46,7 +46,7 @@ DATABASE_TIMEOUT_MS
 FEEDBACK_HASH_SALT
 ```
 
-Tidak ada environment variable baru untuk v6.3.5.
+Tidak ada environment variable baru untuk v6.3.6.
 
 ## Endpoint
 
@@ -58,6 +58,15 @@ Dashboard admin tersedia di:
 /admin
 /admin/login
 ```
+
+## v6.3.6
+
+- Export screenshot Visual QA membersihkan URL aset lintas domain dari clone SVG dan memiliki fallback canvas aman saat browser menolak `toBlob()`.
+- Katalog publik menerima tool kustom baru dari database, bukan hanya 37 ID registry bawaan.
+- Dashboard admin menyediakan Tambah Tool, Edit, Nonaktifkan, dan Hapus untuk tool kustom.
+- Tool bawaan tidak dihapus karena masih terhubung ke handler/module internal; gunakan status nonaktif untuk menyembunyikannya.
+- Tool kustom wajib berupa tautan `http`/`https` dan dibersihkan dari markup HTML sebelum dirender.
+- Tambah regression test `test-canvas-tool-crud-v636.js`.
 
 ## v6.3.5
 

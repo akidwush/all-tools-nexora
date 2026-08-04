@@ -1,4 +1,4 @@
-/* Nexora v6.3.5 — adaptive hero video without mobile scroll decode jank. */
+/* Nexora v6.3.6 — adaptive hero video without mobile scroll decode jank. */
 (function(){
   "use strict";
   if(window.__NEXORA_PERFORMANCE__) return;
@@ -173,7 +173,7 @@
   },{once:true});
 
   window.__NEXORA_PERFORMANCE__={
-    version:"6.3.5",
+    version:"6.3.6",
     lowPower:lowPower,
     mobileLike:mobileLike,
     heroMode:heroMode,

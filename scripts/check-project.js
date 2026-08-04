@@ -41,7 +41,7 @@ for(const token of ["assets/css/core.css","assets/js/core/app.js","assets/js/cor
 }
 if(!index.includes('id="nxToolHealth"')) fail("index.html belum memiliki panel tool health.");
 const app=fs.readFileSync(path.join(root,"assets/js/core/app.js"),"utf8");
-if(!app.includes('data-tool-id="${item.id}"')) fail("app.js belum memberi data-tool-id stabil pada kartu.");
+if(!app.includes('data-tool-id="${safeId}"')) fail("app.js belum memberi data-tool-id stabil pada kartu.");
 const loader=fs.readFileSync(path.join(root,"assets/js/core/lazy-loader.js"),"utf8");
 for(const token of ["ensureModule","toolModules","NexoraModules","get-code","nexus-ai"]){
   if(!loader.includes(token)) fail(`lazy-loader belum lengkap: ${token}`);
@@ -170,7 +170,7 @@ const registryV62 = fs.readFileSync(path.join(root,"assets/js/core/tool-registry
 const stabilityV62 = fs.readFileSync(path.join(root,"assets/js/core/stability.js"),"utf8");
 const functionalV62 = fs.readFileSync(path.join(root,"assets/js/admin/functional-audit.js"),"utf8");
 for (const token of ["NexoraFetch","REQUEST_TIMEOUT","nexora:network-error"]) if(!networkV62.includes(token)) fail(`Network layer v6.2 belum lengkap: ${token}`);
-for (const token of ["NexoraToolRegistry",'version:"6.3.5"',"count:rows.length"]) if(!registryV62.includes(token)) fail(`Tool registry v6.2 belum lengkap: ${token}`);
+for (const token of ["NexoraToolRegistry",'version:"6.3.6"',"count:rows.length"]) if(!registryV62.includes(token)) fail(`Tool registry v6.2 belum lengkap: ${token}`);
 for (const token of ["NexoraStability","functional-audit-complete","applyCardStatus","loadHealth"]) if(!stabilityV62.includes(token)) fail(`Stability layer v6.2 belum lengkap: ${token}`);
 for (const token of ["runFunctionalAudit","functionalAuditFrame","nexora:functional-section-open"]) if(!functionalV62.includes(token)) fail(`Functional audit admin v6.2 belum lengkap: ${token}`);
 if(!index.includes("assets/js/core/tool-registry.js")||!index.includes("assets/js/core/stability.js")) fail("index.html belum memuat stability layer v6.2");
@@ -201,4 +201,4 @@ for(const file of scanFiles){
   }
 }
 if(failed) process.exit(1);
-console.log(`Audit v6.3.5 lulus: index ${indexBytes.toLocaleString()} byte, ${jsFiles.length} file JS valid, social link control, lazy-load, live audit, tool health, runtime JS test, screenshot, visual validation, analytics, feedback management, audit log, login, dan dashboard admin lengkap.`);
+console.log(`Audit v6.3.6 lulus: index ${indexBytes.toLocaleString()} byte, ${jsFiles.length} file JS valid, social link control, lazy-load, live audit, tool health, runtime JS test, screenshot, visual validation, analytics, feedback management, audit log, login, dan dashboard admin lengkap.`);

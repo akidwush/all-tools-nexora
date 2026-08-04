@@ -8,7 +8,7 @@ const css = read("assets/css/core.css");
 const perf = read("assets/js/core/performance.js");
 const html = read("index.html");
 
-assert.equal(pkg.version, "6.3.5");
+assert.equal(pkg.version, "6.3.6");
 assert.match(app, /const ALL_PAGE_SIZE = 12/);
 assert.doesNotMatch(app, /allLoadObserver|rootMargin:\s*['"]320px/);
 assert.match(app, /allLoadPending/);
