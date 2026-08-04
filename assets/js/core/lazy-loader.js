@@ -1,4 +1,4 @@
-/* Nexora v6.3.1 stable lazy module loader */
+/* Nexora v6.3.2 stable lazy module loader */
 (function(){
   'use strict';
 

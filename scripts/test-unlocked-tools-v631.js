@@ -14,7 +14,7 @@ const sandbox = {
 vm.runInNewContext(read('assets/js/core/tool-registry.js'), sandbox, { filename: 'tool-registry.js' });
 const registry = sandbox.window.NexoraToolRegistry;
 
-assert.equal(registry.version, '6.3.1');
+assert.equal(registry.version, '6.3.2');
 assert.equal(registry.get('tiktokhd').restricted, false);
 assert.equal(registry.get('tiktokhd').mode, 'external');
 assert.equal(registry.get('tiktokhd').handler, 'openTikTokHdUpload');
@@ -53,4 +53,4 @@ const health = read('lib/tool-health.js');
 assert.ok(health.includes('module-web-encryption'));
 assert.ok(!health.includes('name: "Web Encryption", category: "external", target: { key: "core-shell", type: "restricted"'));
 
-console.log('Nexora v6.3.1 tests lulus: Upload TikTok HD dan Web Encryption sudah terbuka tanpa access lock.');
+console.log('Nexora v6.3.2 compatibility tests lulus: Upload TikTok HD dan Web Encryption sudah terbuka tanpa access lock.');

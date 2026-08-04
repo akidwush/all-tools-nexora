@@ -13,7 +13,7 @@ const required = [
   "api/admin/auth.js", "api/admin/dashboard.js", "api/admin/tools.js", "api/admin/visual.js", "api/admin/socials.js",
   "lib/database.js", "lib/audit.js", "lib/tool-health.js", "lib/admin-auth.js",
   "admin/index.html", "admin/login.html", "assets/css/admin.css", "assets/css/visual-qa.css", "assets/js/admin/login.js", "assets/js/admin/dashboard.js", "assets/js/admin/visual-qa.js", "assets/js/admin/functional-audit.js", "assets/js/core/runtime-observer.js",
-  "database/schema.sql", "database/migrations/002_tool_health.sql", "database/migrations/003_admin_dashboard.sql", "database/migrations/004_analytics_feedback_audit.sql", "database/migrations/005_visual_runtime_validation.sql", "database/migrations/006_social_links.sql", "database/setup-first-admin.sql", "V6_1_VALIDATION.md", "V6_1_1_VALIDATION.md", "V6_2_VALIDATION.md", "V6_3_VALIDATION.md", "V6_3_1_VALIDATION.md"
+  "database/schema.sql", "database/migrations/002_tool_health.sql", "database/migrations/003_admin_dashboard.sql", "database/migrations/004_analytics_feedback_audit.sql", "database/migrations/005_visual_runtime_validation.sql", "database/migrations/006_social_links.sql", "database/setup-first-admin.sql", "V6_1_VALIDATION.md", "V6_1_1_VALIDATION.md", "V6_2_VALIDATION.md", "V6_3_VALIDATION.md", "V6_3_1_VALIDATION.md", "V6_3_2_VALIDATION.md"
 ];
 const missing = required.filter((file) => !fs.existsSync(path.join(root, file)));
 if (missing.length) {
@@ -42,4 +42,4 @@ if (failed.length) { console.error(`Build gagal membuat output: ${failed.join(",
 const before = 3917113;
 const after = fs.statSync(path.join(root, "index.html")).size;
 console.log(`Build selesai: public/ dibuat. index.html ${after.toLocaleString()} byte (turun ${Math.max(0, Math.round((1-after/before)*100))}%).`);
-console.log("Feature payload besar dimuat saat tool dibuka; social link control, Runtime JS test, screenshot, visual baseline, analytics, feedback, audit log, login, dan dashboard admin v6.3 tersedia di /admin.");
+console.log("Feature payload besar dimuat saat tool dibuka; social link control, Runtime JS test, screenshot, visual baseline, analytics, feedback, audit log, login, dan dashboard admin v6.3.2 tersedia di /admin.");

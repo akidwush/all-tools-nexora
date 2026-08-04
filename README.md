@@ -1,6 +1,6 @@
-# All Tools Nexora v6.3.1
+# All Tools Nexora v6.3.2
 
-Rilis stabilisasi untuk website All Tools Nexora. Fokus utama v6.3.1 adalah memperbaiki dispatcher lazy-load, memberi audit fungsional pada 37 tools, memperluas health monitoring, membatasi request yang menggantung, dan merapikan dashboard admin pada HP.
+Rilis stabilisasi untuk website All Tools Nexora. Fokus utama v6.3.2 adalah memperbaiki dispatcher lazy-load, memberi audit fungsional pada 37 tools, memperluas health monitoring, membatasi request yang menggantung, dan merapikan dashboard admin pada HP.
 
 ## Perubahan utama
 
@@ -46,7 +46,7 @@ DATABASE_TIMEOUT_MS
 FEEDBACK_HASH_SALT
 ```
 
-Tidak ada environment variable baru untuk v6.3.1.
+Tidak ada environment variable baru untuk v6.3.2.
 
 ## Endpoint
 
@@ -58,3 +58,11 @@ Dashboard admin tersedia di:
 /admin
 /admin/login
 ```
+
+
+## v6.3.2
+
+- All Tools dirender bertahap 12 kartu per batch.
+- Hanya tab aktif yang dipertahankan di DOM.
+- Blur kartu dimatikan pada HP dan off-screen card memakai content-visibility.
+- Banner anime kembali aktif pada perangkat yang cukup kuat; Data Saver, 2G, reduced motion, dan perangkat rendah tetap memakai fallback ringan.

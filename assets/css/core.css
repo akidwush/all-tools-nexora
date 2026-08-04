@@ -1370,7 +1370,7 @@ body {
 .video-banner{background:radial-gradient(circle at 72% 20%,rgba(192,132,252,.22),transparent 38%),linear-gradient(135deg,#150525,#09010f 58%,#1a0730);min-height:180px}
 .video-banner video{opacity:0;transition:opacity .35s ease;background:#09010f}
 .video-banner.is-video-ready video{opacity:1}
-.tool-card,.nx-public-wa-card,.user-card,.nx-tool-health{contain:layout paint style}
+.tools-card,.nx-public-wa-card,.user-card,.nx-tool-health{contain:layout paint style}
 .tab-content:not(.active){content-visibility:hidden}
 .tab-content.active{content-visibility:auto;contain-intrinsic-size:900px}
 html.nx-low-power .bg-glow{animation:none;opacity:.72}
@@ -1384,10 +1384,59 @@ html.nx-low-power *{scroll-behavior:auto!important}
   .video-banner{width:100%;min-height:148px;max-height:190px;border-radius:0 0 20px 20px}
   .video-banner video{display:none}
   .container{padding-top:8px}
-  .user-card,.nx-health-summary,.nx-public-wa-card,.tool-card,.nav-tabs,.nx-top-menu-panel{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
-  .tool-card{box-shadow:0 8px 24px rgba(0,0,0,.18)}
+  .user-card,.nx-health-summary,.nx-public-wa-card,.tools-card,.nav-tabs,.nx-top-menu-panel{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  .tools-card{box-shadow:0 8px 24px rgba(0,0,0,.18)}
 }
 @media (prefers-reduced-motion:reduce){
   .splash-screen{animation:nxSplashOut .01s linear .05s forwards}
   .bg-glow,.nx-orb,.nx-bar-fill{animation:none!important}
+}
+
+
+/* ===== Nexora v6.3.2: lightweight All Tools grid + adaptive anime banner ===== */
+.tools-card{
+  contain:layout paint style;
+  content-visibility:auto;
+  contain-intrinsic-size:168px;
+}
+.nx-all-tools-more{
+  width:min(100%,420px);
+  min-height:48px;
+  margin:18px auto 4px;
+  padding:11px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  border:1px solid rgba(168,85,247,.22);
+  border-radius:16px;
+  background:rgba(17,7,31,.78);
+  color:#dfc9ff;
+  font:700 12px/1.2 'Poppins',sans-serif;
+  cursor:pointer;
+}
+.nx-all-tools-more small{
+  margin-left:auto;
+  color:#8f7aa8;
+  font-size:10px;
+}
+.nx-all-tools-more:active{transform:scale(.985)}
+html.nx-anime-banner-enabled .video-banner video{display:block}
+@media (max-width:768px){
+  .tools-card{
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+    box-shadow:0 6px 16px rgba(0,0,0,.16)!important;
+    transition:transform .12s ease,border-color .12s ease!important;
+  }
+  .tools-card:hover{
+    transform:none;
+    box-shadow:0 6px 16px rgba(0,0,0,.16)!important;
+  }
+  .tools-card .icon,.tools-card .arrow{transition:none!important}
+  html.nx-anime-banner-enabled .video-banner video{
+    display:block!important;
+    object-fit:cover;
+  }
+  html.nx-low-power .video-banner video{display:none!important}
 }

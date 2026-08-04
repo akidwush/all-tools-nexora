@@ -1319,31 +1319,46 @@ let allTools = [
     ...toolsData.external
 ].filter(Boolean);
 
+const ALL_PAGE_SIZE = 12;
+const catalogGrids = {
+    all: 'allGrid',
+    downloader: 'downloaderGrid',
+    maker: 'makerGrid',
+    tools: 'toolsGrid',
+    vault: 'vaultGrid',
+    external: 'externalGrid'
+};
+let activeCatalogTab = 'all';
+let allVisibleCount = ALL_PAGE_SIZE;
+let allLoadObserver = null;
+
+function toolCardMarkup(item, isExternal = false) {
+    const clickAttr = item.id === 'unbanwa' ?
+        `onclick="window.openNexusUnban && window.openNexusUnban()"` :
+        (item.id === 'vdeploy' ?
+        `onclick="window.openDeploy && window.openDeploy()"` :
+        (item.id === 'webencryption' ?
+        `onclick="showTool('webencryption')"` :
+        (item.id === 'tiktokhd' ?
+            `onclick="window.openTikTokHdUpload && window.openTikTokHdUpload()"` :
+            (isExternal || item.link ?
+                `onclick="window.open('${item.link || '#'}','_blank')"` :
+                `onclick="showTool('${item.id}')"`))));
+    return `
+        <div class="tools-card" data-tool-id="${item.id}" ${clickAttr}>
+            <div class="icon"><i class="${item.icon}"></i></div>
+            <h4>${item.name}</h4>
+            <p>${item.desc}</p>
+            ${item.badge ? `<span class="badge">${item.badge}</span>` : ''}
+            <div class="arrow"><i class="fas fa-arrow-right"></i></div>
+        </div>
+    `;
+}
+
 function renderGrid(containerId, items, isExternal = false) {
     const container = document.getElementById(containerId);
     if (!container) return;
-    container.innerHTML = items.map(item => {
-        const clickAttr = item.id === 'unbanwa' ?
-            `onclick="window.openNexusUnban && window.openNexusUnban()"` :
-            (item.id === 'vdeploy' ?
-            `onclick="window.openDeploy && window.openDeploy()"` :
-            (item.id === 'webencryption' ?
-            `onclick="showTool('webencryption')"` :
-            (item.id === 'tiktokhd' ?
-                `onclick="window.openTikTokHdUpload && window.openTikTokHdUpload()"` :
-                (isExternal || item.link ?
-                    `onclick="window.open('${item.link || '#'}','_blank')"` :
-                    `onclick="showTool('${item.id}')"`))));
-        return `
-            <div class="tools-card" data-tool-id="${item.id}" ${clickAttr}>
-                <div class="icon"><i class="${item.icon}"></i></div>
-                <h4>${item.name}</h4>
-                <p>${item.desc}</p>
-                ${item.badge ? `<span class="badge">${item.badge}</span>` : ''}
-                <div class="arrow"><i class="fas fa-arrow-right"></i></div>
-            </div>
-        `;
-    }).join('');
+    container.innerHTML = items.map(item => toolCardMarkup(item, isExternal)).join('');
 }
 
 function rebuildAllTools() {
@@ -1355,6 +1370,86 @@ function rebuildAllTools() {
         ...toolsData.vault,
         ...toolsData.external
     ].filter(Boolean);
+}
+
+function removeAllLoadMore() {
+    const current = document.getElementById('nxAllToolsMore');
+    if (allLoadObserver && current) allLoadObserver.unobserve(current);
+    if (current) current.remove();
+}
+
+function loadMoreAllTools() {
+    if (allVisibleCount >= allTools.length) return;
+    allVisibleCount = Math.min(allTools.length, allVisibleCount + ALL_PAGE_SIZE);
+    renderAllToolsGrid(false);
+}
+
+function ensureAllLoadMore() {
+    const grid = document.getElementById('allGrid');
+    if (!grid) return;
+    let button = document.getElementById('nxAllToolsMore');
+    const remaining = Math.max(0, allTools.length - allVisibleCount);
+    if (!remaining) {
+        removeAllLoadMore();
+        return;
+    }
+    if (!button) {
+        button = document.createElement('button');
+        button.id = 'nxAllToolsMore';
+        button.type = 'button';
+        button.className = 'nx-all-tools-more';
+        button.addEventListener('click', loadMoreAllTools);
+        grid.insertAdjacentElement('afterend', button);
+    }
+    const nextCount = Math.min(ALL_PAGE_SIZE, remaining);
+    button.innerHTML = `<i class="fas fa-plus"></i><span>Tampilkan ${nextCount} tool lagi</span><small>${allVisibleCount}/${allTools.length}</small>`;
+
+    if (!allLoadObserver && 'IntersectionObserver' in window) {
+        allLoadObserver = new IntersectionObserver((entries) => {
+            if (entries.some(entry => entry.isIntersecting)) {
+                window.requestAnimationFrame(loadMoreAllTools);
+            }
+        }, { rootMargin: '320px 0px', threshold: 0.01 });
+    }
+    if (allLoadObserver) {
+        allLoadObserver.disconnect();
+        allLoadObserver.observe(button);
+    }
+}
+
+function renderAllToolsGrid(reset = false) {
+    if (reset) allVisibleCount = Math.min(ALL_PAGE_SIZE, allTools.length);
+    const visible = allTools.slice(0, allVisibleCount);
+    renderGrid('allGrid', visible);
+    ensureAllLoadMore();
+    document.dispatchEvent(new CustomEvent('nexora:tools-rendered', {
+        detail: { count: visible.length, total: allTools.length, tab: 'all', progressive: true }
+    }));
+}
+
+function clearInactiveGrids(activeTab) {
+    Object.entries(catalogGrids).forEach(([tab, gridId]) => {
+        if (tab === activeTab) return;
+        const grid = document.getElementById(gridId);
+        if (grid && grid.childElementCount) grid.replaceChildren();
+    });
+}
+
+function renderActiveTab(target, reset = false) {
+    activeCatalogTab = Object.hasOwn(catalogGrids, target) ? target : 'all';
+    clearInactiveGrids(activeCatalogTab);
+
+    if (activeCatalogTab === 'all') {
+        renderAllToolsGrid(reset);
+        return;
+    }
+
+    removeAllLoadMore();
+    const rows = Array.isArray(toolsData[activeCatalogTab]) ? toolsData[activeCatalogTab] : [];
+    renderGrid(catalogGrids[activeCatalogTab], rows, activeCatalogTab === 'external');
+    document.dispatchEvent(new CustomEvent('nexora:tools-rendered', {
+        detail: { count: rows.length, total: rows.length, tab: activeCatalogTab, progressive: false }
+    }));
 }
 
 async function applyDatabaseToolConfiguration() {
@@ -1406,13 +1501,7 @@ async function applyDatabaseToolConfiguration() {
 }
 
 function renderAll() {
-    renderGrid('allGrid', allTools);
-    renderGrid('downloaderGrid', toolsData.downloader);
-    renderGrid('makerGrid', toolsData.maker);
-    renderGrid('toolsGrid', toolsData.tools);
-    renderGrid('vaultGrid', toolsData.vault);
-    renderGrid('externalGrid', toolsData.external, true);
-    document.dispatchEvent(new CustomEvent('nexora:tools-rendered', { detail: { count: allTools.length } }));
+    renderActiveTab(activeCatalogTab, true);
 }
 
 document.querySelectorAll('.nav-tab').forEach(tab => {
@@ -1423,6 +1512,7 @@ document.querySelectorAll('.nav-tab').forEach(tab => {
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         const targetEl = document.getElementById('tab-' + target);
         if (targetEl) targetEl.classList.add('active');
+        renderActiveTab(target, true);
     });
 });
 

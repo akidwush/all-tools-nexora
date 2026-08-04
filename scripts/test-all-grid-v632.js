@@ -1,0 +1,27 @@
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+
+const read = (file) => fs.readFileSync(file, "utf8");
+const pkg = JSON.parse(read("package.json"));
+const app = read("assets/js/core/app.js");
+const css = read("assets/css/core.css");
+const perf = read("assets/js/core/performance.js");
+const html = read("index.html");
+
+assert.equal(pkg.version, "6.3.2");
+assert.match(app, /const ALL_PAGE_SIZE = 12/);
+assert.match(app, /IntersectionObserver/);
+assert.match(app, /clearInactiveGrids/);
+assert.match(app, /renderActiveTab/);
+assert.match(app, /allTools\.slice\(0, allVisibleCount\)/);
+assert.match(css, /\.tools-card\{\s*contain:layout paint style;/);
+assert.match(css, /content-visibility:auto/);
+assert.match(css, /@media \(max-width:768px\)[\s\S]*\.tools-card\{[\s\S]*backdrop-filter:none!important/);
+assert.match(css, /html\.nx-anime-banner-enabled \.video-banner video/);
+assert.match(perf, /animeBannerEnabled:!lowPower/);
+assert.match(perf, /video\.preload="metadata"/);
+assert.doesNotMatch(perf, /Android\/i/);
+assert.match(html, /data-nx-hero/);
+assert.match(html, /HCYk\.mp4/);
+
+console.log("Nexora v6.3.2 tests lulus: All Tools progressive rendering, active-tab DOM, mobile blur fix, dan adaptive anime banner.");
