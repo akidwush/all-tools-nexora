@@ -57,6 +57,6 @@
     return ({ready:"Siap",degraded:"Terbatas",offline:"Gangguan",restricted:"Terbatas",missing:"Tidak lengkap",unknown:"Belum dicek"})[status] || status;
   }
 
-  window.NexoraToolRegistry = Object.freeze({version:"6.3.3",count:rows.length,get:get,list:list,statusLabel:statusLabel});
+  window.NexoraToolRegistry = Object.freeze({version:"6.3.4",count:rows.length,get:get,list:list,statusLabel:statusLabel});
   window.dispatchEvent(new CustomEvent("nexora:tool-registry-ready"));
 })();

@@ -1330,7 +1330,8 @@ const catalogGrids = {
 };
 let activeCatalogTab = 'all';
 let allVisibleCount = ALL_PAGE_SIZE;
-let allLoadObserver = null;
+let allRenderedCount = 0;
+let allLoadPending = false;
 
 function toolCardMarkup(item, isExternal = false) {
     const clickAttr = item.id === 'unbanwa' ?
@@ -1350,15 +1351,24 @@ function toolCardMarkup(item, isExternal = false) {
             <h4>${item.name}</h4>
             <p>${item.desc}</p>
             ${item.badge ? `<span class="badge">${item.badge}</span>` : ''}
+            <span class="nx-card-readiness" data-nx-status-slot="true"></span>
             <div class="arrow"><i class="fas fa-arrow-right"></i></div>
         </div>
     `;
 }
 
-function renderGrid(containerId, items, isExternal = false) {
+function renderGrid(containerId, items, isExternal = false, options = {}) {
     const container = document.getElementById(containerId);
     if (!container) return;
-    container.innerHTML = items.map(item => toolCardMarkup(item, isExternal)).join('');
+    const template = document.createElement('template');
+    template.innerHTML = items.map(item => toolCardMarkup(item, isExternal)).join('');
+    const fragment = template.content.cloneNode(true);
+    if (options.append) {
+        container.appendChild(fragment);
+    } else {
+        container.replaceChildren(fragment);
+    }
+    container.setAttribute('aria-busy', 'false');
 }
 
 function rebuildAllTools() {
@@ -1370,18 +1380,28 @@ function rebuildAllTools() {
         ...toolsData.vault,
         ...toolsData.external
     ].filter(Boolean);
+    allRenderedCount = 0;
 }
 
 function removeAllLoadMore() {
     const current = document.getElementById('nxAllToolsMore');
-    if (allLoadObserver && current) allLoadObserver.unobserve(current);
     if (current) current.remove();
 }
 
 function loadMoreAllTools() {
-    if (allVisibleCount >= allTools.length) return;
-    allVisibleCount = Math.min(allTools.length, allVisibleCount + ALL_PAGE_SIZE);
-    renderAllToolsGrid(false);
+    if (allLoadPending || allVisibleCount >= allTools.length) return;
+    allLoadPending = true;
+    const commit = () => {
+        try {
+            if (allVisibleCount >= allTools.length) return;
+            allVisibleCount = Math.min(allTools.length, allVisibleCount + ALL_PAGE_SIZE);
+            renderAllToolsGrid(false);
+        } finally {
+            allLoadPending = false;
+        }
+    };
+    if (typeof window.requestAnimationFrame === 'function') window.requestAnimationFrame(commit);
+    else setTimeout(commit, 0);
 }
 
 function ensureAllLoadMore() {
@@ -1398,29 +1418,25 @@ function ensureAllLoadMore() {
         button.id = 'nxAllToolsMore';
         button.type = 'button';
         button.className = 'nx-all-tools-more';
+        button.setAttribute('aria-controls', 'allGrid');
         button.addEventListener('click', loadMoreAllTools);
         grid.insertAdjacentElement('afterend', button);
     }
     const nextCount = Math.min(ALL_PAGE_SIZE, remaining);
     button.innerHTML = `<i class="fas fa-plus"></i><span>Tampilkan ${nextCount} tool lagi</span><small>${allVisibleCount}/${allTools.length}</small>`;
-
-    if (!allLoadObserver && 'IntersectionObserver' in window) {
-        allLoadObserver = new IntersectionObserver((entries) => {
-            if (entries.some(entry => entry.isIntersecting)) {
-                window.requestAnimationFrame(loadMoreAllTools);
-            }
-        }, { rootMargin: '320px 0px', threshold: 0.01 });
-    }
-    if (allLoadObserver) {
-        allLoadObserver.disconnect();
-        allLoadObserver.observe(button);
-    }
+    button.setAttribute('aria-label', `Tampilkan ${nextCount} tool lagi`);
 }
 
 function renderAllToolsGrid(reset = false) {
-    if (reset) allVisibleCount = Math.min(ALL_PAGE_SIZE, allTools.length);
+    if (reset) {
+        allVisibleCount = Math.min(ALL_PAGE_SIZE, allTools.length);
+        allRenderedCount = 0;
+    }
     const visible = allTools.slice(0, allVisibleCount);
-    renderGrid('allGrid', visible);
+    const appendOnly = !reset && allRenderedCount > 0 && visible.length >= allRenderedCount;
+    const nextItems = appendOnly ? visible.slice(allRenderedCount) : visible;
+    renderGrid('allGrid', nextItems, false, { append: appendOnly });
+    allRenderedCount = visible.length;
     ensureAllLoadMore();
     document.dispatchEvent(new CustomEvent('nexora:tools-rendered', {
         detail: { count: visible.length, total: allTools.length, tab: 'all', progressive: true }

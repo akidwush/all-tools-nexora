@@ -478,7 +478,7 @@
     };
 })();
 
-/* ===== Nexora v6.3.3: unlocked external tools ===== */
+/* ===== Nexora v6.3.4: unlocked external tools ===== */
 (function(){
   "use strict";
   const TIKTOK_STUDIO_URL="https://www.tiktok.com/tiktokstudio";
@@ -496,8 +496,21 @@
   var notif = document.getElementById('nx-wa-notif');
   if(!notif) return;
   var scheduled=false;
+  function shouldSuppress(){
+    var reduced=false;
+    var touchLike=Boolean(typeof navigator!=="undefined"&&navigator.maxTouchPoints>0);
+    try{
+      reduced=Boolean(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+      touchLike=touchLike||Boolean(window.matchMedia&&window.matchMedia('(max-width: 768px), (pointer: coarse)').matches);
+    }catch(_){touchLike=touchLike||window.innerWidth<=768;}
+    return reduced||touchLike;
+  }
   function schedule(){
     if(scheduled||!notif.dataset.socialUrl)return;
+    if(shouldSuppress()){
+      notif.classList.remove('show','hide');
+      return;
+    }
     scheduled=true;
     setTimeout(function(){notif.classList.add('show');},5000);
     setTimeout(function(){

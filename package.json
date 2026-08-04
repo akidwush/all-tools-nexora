@@ -1,14 +1,14 @@
 {
   "name": "all-tools-nexora-developer-dika",
-  "version": "6.3.3",
+  "version": "6.3.4",
   "private": true,
-  "description": "All Tools Nexora v6.3.3 — fix fatal mobile H.264 hero video decode jank while preserving the anime banner",
+  "description": "All Tools Nexora v6.3.4 — stabilize public mobile scrolling and progressive tool rendering",
   "scripts": {
     "dev": "node serve-local.js",
     "start": "node serve-local.js",
     "check": "node scripts/check-project.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test-api.js && node scripts/test-audit.js && node scripts/test-tool-health.js && node scripts/test-admin.js && node scripts/test-admin-v51.js && node scripts/test-visual-v60.js && node scripts/test-social-links.js && node scripts/test-serverless-limit.js && node scripts/test-network-v62.js && node scripts/test-functional-v62.js && node scripts/test-performance-v63.js && node scripts/test-unlocked-tools-v631.js && node scripts/test-all-grid-v632.js && node scripts/test-hero-video-v633.js"
+    "test": "node scripts/test-api.js && node scripts/test-audit.js && node scripts/test-tool-health.js && node scripts/test-admin.js && node scripts/test-admin-v51.js && node scripts/test-visual-v60.js && node scripts/test-social-links.js && node scripts/test-serverless-limit.js && node scripts/test-network-v62.js && node scripts/test-functional-v62.js && node scripts/test-performance-v63.js && node scripts/test-unlocked-tools-v631.js && node scripts/test-all-grid-v632.js && node scripts/test-hero-video-v633.js && node scripts/test-scroll-stability-v634.js"
   },
   "engines": {
     "node": ">=18"

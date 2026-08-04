@@ -1,6 +1,6 @@
-# All Tools Nexora v6.3.3
+# All Tools Nexora v6.3.4
 
-Rilis stabilisasi untuk website All Tools Nexora. Fokus utama v6.3.3 adalah memperbaiki dispatcher lazy-load, memberi audit fungsional pada 37 tools, memperluas health monitoring, membatasi request yang menggantung, dan merapikan dashboard admin pada HP.
+Rilis stabilisasi untuk website All Tools Nexora. Fokus utama v6.3.4 adalah menghilangkan scroll jank pada dashboard publik, membuat grid tool append-only, mencegah layout shift badge health, dan menonaktifkan popup berat pada perangkat touch.
 
 ## Perubahan utama
 
@@ -46,7 +46,7 @@ DATABASE_TIMEOUT_MS
 FEEDBACK_HASH_SALT
 ```
 
-Tidak ada environment variable baru untuk v6.3.3.
+Tidak ada environment variable baru untuk v6.3.4.
 
 ## Endpoint
 
@@ -59,6 +59,15 @@ Dashboard admin tersedia di:
 /admin/login
 ```
 
+
+## v6.3.4
+
+- Kartu publik tidak lagi memakai `content-visibility:auto` atau containment layout/paint yang membuat tinggi baris berubah saat scroll.
+- All Tools tidak lagi melakukan auto-load melalui `IntersectionObserver` 320px; batch berikutnya dimuat melalui tombol dan di-append tanpa mengganti seluruh grid.
+- Slot readiness badge dibuat saat kartu dirender; `MutationObserver` global di stability layer dihapus.
+- Popup WhatsApp otomatis dan animasi compositor berat dinonaktifkan pada perangkat touch/reduced-motion.
+- Kartu katalog statis di `index.html` dihapus; seluruh katalog berasal dari data registry/app.
+- Tambah regression test `test-scroll-stability-v634.js`.
 
 ## v6.3.3
 

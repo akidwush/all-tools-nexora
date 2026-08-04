@@ -1553,7 +1553,7 @@ body.nx-health-lock{overflow:hidden}
    NEXORA v6.2 — STABILITY STATUS + MOBILE CLEANUP
    ========================================================= */
 .tools-card{position:relative;overflow:hidden;isolation:isolate}
-.nx-card-readiness{position:absolute;top:8px;right:8px;z-index:3;display:inline-flex;align-items:center;min-height:20px;padding:4px 7px;border:1px solid rgba(148,163,184,.22);border-radius:999px;background:rgba(8,3,16,.82);color:#a89bb7;font-size:7px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;backdrop-filter:blur(12px)}
+.nx-card-readiness{position:absolute;top:8px;right:8px;z-index:3;display:inline-flex;align-items:center;min-height:20px;padding:4px 7px;border:1px solid rgba(148,163,184,.22);border-radius:999px;background:rgba(8,3,16,.92);color:#a89bb7;font-size:7px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
 .tools-card[data-nx-tool-status="ready"] .nx-card-readiness{border-color:rgba(52,211,153,.28);color:#6ee7b7;background:rgba(6,35,29,.78)}
 .tools-card[data-nx-tool-status="degraded"] .nx-card-readiness,.tools-card[data-nx-tool-status="restricted"] .nx-card-readiness{border-color:rgba(251,191,36,.30);color:#fde68a;background:rgba(47,31,5,.82)}
 .tools-card[data-nx-tool-status="offline"]{opacity:.66;filter:saturate(.55)}
@@ -1635,3 +1635,15 @@ body.nx-health-lock{overflow:hidden}
 /* v6.3 low-power compositing overrides */
 html.nx-low-power .nx-wa-notif-glow,html.nx-low-power .nx-public-wa-icon,html.nx-low-power .nx-health-dot{animation:none!important;box-shadow:none!important}
 @media (max-width:768px){.nx-health-dialog,.nx-room-backdrop,.nx-access-backdrop,#nxStabilityNotice,#nxModuleToast{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}.nx-public-wa-card::before{display:none}.nx-public-wa-icon{animation:none!important}}
+
+/* v6.3.4 — do not promote the transient WhatsApp popup on touch screens. */
+@media (pointer: coarse), (max-width:768px), (prefers-reduced-motion:reduce){
+  #nx-wa-notif{
+    display:none!important;
+    animation:none!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+  }
+  #nx-wa-notif::before,#nx-wa-notif::after{display:none!important;animation:none!important}
+  #nx-wa-notif-icon,#nx-wa-notif-badge-dot{animation:none!important;box-shadow:none!important}
+}

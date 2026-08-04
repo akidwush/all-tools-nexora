@@ -1370,9 +1370,9 @@ body {
 .video-banner{background:radial-gradient(circle at 72% 20%,rgba(192,132,252,.22),transparent 38%),linear-gradient(135deg,#150525,#09010f 58%,#1a0730);min-height:180px}
 .video-banner video{opacity:0;transition:opacity .35s ease;background:#09010f}
 .video-banner.is-video-ready video{opacity:1}
-.tools-card,.nx-public-wa-card,.user-card,.nx-tool-health{contain:layout paint style}
+.nx-public-wa-card,.user-card,.nx-tool-health{contain:layout paint style}
 .tab-content:not(.active){content-visibility:hidden}
-.tab-content.active{content-visibility:auto;contain-intrinsic-size:900px}
+.tab-content.active{content-visibility:visible;contain-intrinsic-size:none}
 html.nx-low-power .bg-glow{animation:none;opacity:.72}
 html.nx-low-power .video-banner video{display:none}
 html.nx-low-power .video-banner{min-height:150px}
@@ -1393,11 +1393,13 @@ html.nx-low-power *{scroll-behavior:auto!important}
 }
 
 
-/* ===== Nexora v6.3.3: lightweight All Tools grid + adaptive anime banner ===== */
+/* ===== Nexora v6.3.4: lightweight All Tools grid + adaptive anime banner ===== */
 .tools-card{
-  contain:layout paint style;
-  content-visibility:auto;
-  contain-intrinsic-size:168px;
+  /* The public grid is small enough to render normally. Keeping layout
+     containment here makes mobile row heights change when cards enter view. */
+  contain:none;
+  content-visibility:visible;
+  contain-intrinsic-size:none;
 }
 .nx-all-tools-more{
   width:min(100%,420px);
@@ -1440,6 +1442,15 @@ html.nx-low-power *{scroll-behavior:auto!important}
   }
   html.nx-hero-video-disabled .video-banner video,
   html.nx-low-power .video-banner video{display:none!important}
+}
+
+/* v6.3.4 — stable public scrolling on touch devices */
+@media (pointer: coarse), (max-width:768px){
+  .tools-card,.nx-public-wa-card,.user-card,.nav-tabs,.nx-top-menu-panel{
+    -webkit-backdrop-filter:none!important;
+    backdrop-filter:none!important;
+  }
+  .bg-glow{animation:none!important}
 }
 
 

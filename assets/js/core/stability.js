@@ -72,10 +72,13 @@
       card.dataset.nxToolMode=meta?meta.mode:"unknown";
       card.dataset.nxToolStatus=status;
       var badge=card.querySelector(".nx-card-readiness");
-      if(!badge){badge=document.createElement("span");badge.className="nx-card-readiness";card.appendChild(badge);}
-      var badgeText=registry?registry.statusLabel(status):status;
-      if(badge.textContent!==badgeText) badge.textContent=badgeText;
-      badge.setAttribute("aria-label","Status fitur: "+badgeText);
+      // Status slots are rendered with the card. Do not append nodes after paint:
+      // appending a badge here changes card geometry and can shift the scroll anchor.
+      if(badge){
+        var badgeText=registry?registry.statusLabel(status):status;
+        if(badge.textContent!==badgeText) badge.textContent=badgeText;
+        badge.setAttribute("aria-label","Status fitur: "+badgeText);
+      }
       if(status==="offline") card.setAttribute("aria-disabled","true"); else card.removeAttribute("aria-disabled");
     });
   }
@@ -149,7 +152,7 @@
     }
     var counts={ready:0,degraded:0,offline:0,restricted:0,missing:0};
     results.forEach(function(item){counts[item.status]=(counts[item.status]||0)+1;});
-    lastAudit={version:"6.3.3",startedAt:new Date(started).toISOString(),completedAt:new Date().toISOString(),durationMs:Date.now()-started,counts:counts,total:results.length,results:results};
+    lastAudit={version:"6.3.4",startedAt:new Date(started).toISOString(),completedAt:new Date().toISOString(),durationMs:Date.now()-started,counts:counts,total:results.length,results:results};
     try{localStorage.setItem("nexora-functional-audit-v62",JSON.stringify(lastAudit));}catch(_){ }
     window.dispatchEvent(new CustomEvent("nexora:functional-audit-complete",{detail:lastAudit}));
     return lastAudit;
@@ -179,20 +182,8 @@
   document.addEventListener("DOMContentLoaded",function(){
     if(window.__NEXORA_TOOL_HEALTH_PAYLOAD__) consumeHealthPayload(window.__NEXORA_TOOL_HEALTH_PAYLOAD__);
     else applyCardStatus();
-    var queued=false;
-    var observer=new MutationObserver(function(records){
-      var relevant=records.some(function(record){
-        return Array.prototype.some.call(record.addedNodes||[],function(node){
-          return node&&node.nodeType===1&&(node.matches&&node.matches("[data-tool-id]")||node.querySelector&&node.querySelector("[data-tool-id]"));
-        });
-      });
-      if(!relevant||queued)return;
-      queued=true;
-      setTimeout(function(){queued=false;applyCardStatus();},120);
-    });
-    observer.observe(document.body,{childList:true,subtree:true});
   });
 
-  window.NexoraStability={version:"6.3.3",audit:audit,loadHealth:loadHealth,applyCardStatus:applyCardStatus,notify:notify,fetchJson:fetchJson,getLastAudit:function(){return lastAudit;},getHealth:function(id){return healthMap[id]||null;}};
+  window.NexoraStability={version:"6.3.4",audit:audit,loadHealth:loadHealth,applyCardStatus:applyCardStatus,notify:notify,fetchJson:fetchJson,getLastAudit:function(){return lastAudit;},getHealth:function(id){return healthMap[id]||null;}};
   window.dispatchEvent(new CustomEvent("nexora:stability-ready"));
 })();

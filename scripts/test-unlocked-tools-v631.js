@@ -14,7 +14,7 @@ const sandbox = {
 vm.runInNewContext(read('assets/js/core/tool-registry.js'), sandbox, { filename: 'tool-registry.js' });
 const registry = sandbox.window.NexoraToolRegistry;
 
-assert.equal(registry.version, '6.3.3');
+assert.equal(registry.version, '6.3.4');
 assert.equal(registry.get('tiktokhd').restricted, false);
 assert.equal(registry.get('tiktokhd').mode, 'external');
 assert.equal(registry.get('tiktokhd').handler, 'openTikTokHdUpload');
@@ -36,8 +36,10 @@ assert.ok(app.includes('window.openTikTokHdUpload && window.openTikTokHdUpload()
 
 const index = read('index.html');
 assert.ok(!index.includes('data-nexus-access-locked'));
-assert.ok(index.includes('data-tool-id="tiktokhd"'));
-assert.ok(index.includes('data-tool-id="webencryption"'));
+// Catalog cards are intentionally rendered from app.js; index.html keeps only
+// empty grid containers to avoid parsing a duplicate static catalog.
+assert.ok(app.includes("id: 'tiktokhd'"));
+assert.ok(app.includes("id: 'webencryption'"));
 
 const manifest = JSON.parse(read('assets/module-manifest.json'));
 assert.equal(manifest.tools.webencryption, 'web-encryption');
@@ -53,4 +55,4 @@ const health = read('lib/tool-health.js');
 assert.ok(health.includes('module-web-encryption'));
 assert.ok(!health.includes('name: "Web Encryption", category: "external", target: { key: "core-shell", type: "restricted"'));
 
-console.log('Nexora v6.3.3 compatibility tests lulus: Upload TikTok HD dan Web Encryption sudah terbuka tanpa access lock.');
+console.log('Nexora compatibility tests lulus: Upload TikTok HD dan Web Encryption sudah terbuka tanpa access lock.');
