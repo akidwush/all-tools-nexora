@@ -223,7 +223,7 @@
           "https://api.nexray.eu.cc/downloader/terabox?url=" +
           encodeURIComponent(url);
 
-        const response = await fetch(endpoint,{
+        const response = await window.NexoraFetch(endpoint,{
           method:"GET",
           headers:{
             "Accept":"application/json,text/plain,*/*"
@@ -728,7 +728,7 @@
             "https://api.nexray.eu.cc/search/spotify?q=" +
             encodeURIComponent(query);
 
-          const response = await fetch(
+          const response = await window.NexoraFetch(
             endpoint,
             {
               method:"GET",

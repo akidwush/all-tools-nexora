@@ -1,71 +1,60 @@
-# All Tools Nexora v6.1.1
+# All Tools Nexora v6.2
 
-Website tools modular dengan lazy loading, Get Code live audit, tool health monitoring, Supabase database, login admin, pengelolaan seluruh link sosial dari dashboard, analytics anonim, feedback management, dan audit log.
+Rilis stabilisasi untuk website All Tools Nexora. Fokus utama v6.2 adalah memperbaiki dispatcher lazy-load, memberi audit fungsional pada 37 tools, memperluas health monitoring, membatasi request yang menggantung, dan merapikan dashboard admin pada HP.
 
-## Fitur v6.1.1
+## Perubahan utama
 
-- Dashboard analytics periode 7, 30, dan 90 hari.
-- Metrik page view, tool open, pengunjung unik, error, tren harian, dan ranking tools.
-- Visitor ID, session ID, dan IP diproses sebagai hash; alamat IP mentah tidak disimpan.
-- Feedback dapat dicari, difilter, diubah statusnya, diberi balasan publik, dan diberi catatan internal.
-- Pengguna dapat melihat status serta balasan admin untuk laporan yang dibuat dari perangkatnya.
-- Audit log mencatat login, logout, perubahan tool, dan perubahan feedback.
-- Role `viewer` tetap read-only; `admin` dan `super_admin` dapat melakukan mutasi.
-- Cookie sesi HttpOnly, CSRF, origin validation, rate limit login, dan validasi payload tetap aktif.
-- WhatsApp, Instagram, TikTok, YouTube, Facebook, Telegram, Discord, dan GitHub disimpan di `social_links` dan dapat diedit dari menu **Sosial Media**.
+- Registry konsisten untuk 37 tools.
+- Functional Audit pada Admin Dashboard.
+- Tool Health mencakup 37/37 tools.
+- Timeout dan retry terbatas untuk request API eksternal.
+- Pesan gangguan yang jelas ketika API atau modul gagal.
+- Lazy dispatcher tidak lagi berisiko rekursi.
+- Bottom navigation admin menjadi 5 menu tanpa horizontal scroll.
+- Menu Sosial, Health, Functional Audit, Visual QA, dan Audit Log dipindahkan ke panel Lainnya pada HP.
+- Modal admin menjadi bottom sheet mobile.
+- Tetap kompatibel dengan limit 12 Serverless Functions Vercel Hobby.
 
-## Setup database
+## Upgrade
 
-Untuk upgrade dari v5.0:
-
-1. Jalankan `database/migrations/004_analytics_feedback_audit.sql` melalui Supabase SQL Editor.
-2. Jalankan `database/migrations/005_visual_runtime_validation.sql`.
-3. Jalankan `database/migrations/006_social_links.sql`.
-4. Tunggu deployment Vercel v6.1 selesai.
-5. Buka `/admin`, lalu periksa menu Sosial Media, Analytics, Feedback, dan Audit Log.
-
-Untuk instalasi baru, `database/schema.sql` memuat seluruh schema sampai v6.1.
-
-## Environment Vercel
-
-Minimal:
-
-```env
-SUPABASE_URL=https://PROJECT_ID.supabase.co
-SUPABASE_SECRET_KEY=sb_secret_...
-DATABASE_TIMEOUT_MS=8000
-FEEDBACK_HASH_SALT=random_long_value
-HEALTH_CHECK_TOKEN=random_long_value
-```
-
-Legacy `SUPABASE_SERVICE_ROLE_KEY=eyJ...` tetap didukung. Tidak ada environment variable wajib baru pada v6.1.
-
-## Endpoint v6.1.1
+Tidak ada migration SQL baru. Pastikan migration berikut sebelumnya sudah dijalankan:
 
 ```text
-POST /api/analytics (compatibility rewrite)
-POST /api/feedback?mode=analytics (canonical)
-GET  /api/admin/analytics
-GET  /api/admin/feedback
-PATCH /api/admin/feedback
-GET  /api/admin/audit
-GET  /api/admin/socials
-PATCH /api/admin/socials
+database/migrations/002_tool_health.sql
+database/migrations/003_admin_dashboard.sql
+database/migrations/004_analytics_feedback_audit.sql
+database/migrations/005_visual_runtime_validation.sql
+database/migrations/006_social_links.sql
 ```
 
 ## Validasi
 
 ```bash
+npm install
 npm run check
 npm test
 npm run build
 ```
 
-Build statis dibuat pada `public/`, sedangkan API Vercel tetap berada di folder `api/`.
+## Environment Vercel
 
-v6.1.1 menggabungkan endpoint analytics ke function feedback dan endpoint database publik ke function health. Jumlah Serverless Functions menjadi tepat 12 sehingga kompatibel dengan Vercel Hobby. Alias `/api/analytics` dan `/api/database` tetap tersedia melalui rewrite.
+```text
+SUPABASE_URL
+SUPABASE_SERVICE_ROLE_KEY atau SUPABASE_SECRET_KEY
+HEALTH_CHECK_TOKEN
+DATABASE_TIMEOUT_MS
+FEEDBACK_HASH_SALT
+```
 
+Tidak ada environment variable baru untuk v6.2.
 
-## Visual QA v6.0
+## Endpoint
 
-Dashboard admin menyediakan runtime JavaScript observer, smoke test seluruh modul lazy-load, screenshot browser, visual baseline, fingerprint comparison, dan riwayat validasi. Jalankan `database/migrations/005_visual_runtime_validation.sql` setelah deployment.
+Jumlah function fisik tetap 12. Alias `/api/analytics` dan `/api/database` tetap menggunakan rewrite di `vercel.json`.
+
+Dashboard admin tersedia di:
+
+```text
+/admin
+/admin/login
+```

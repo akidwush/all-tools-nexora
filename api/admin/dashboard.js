@@ -1,6 +1,6 @@
 const { databaseRequest } = require("../../lib/database");
 const { publicSession, requireAdmin } = require("../../lib/admin-auth");
-const { normalizeCachedRows, summarizeHealth } = require("../../lib/tool-health");
+const { TOOL_CATALOG, normalizeCachedRows, summarizeHealth } = require("../../lib/tool-health");
 
 function send(response, status, payload) {
   response.setHeader("Cache-Control", "no-store, max-age=0");
@@ -30,7 +30,25 @@ module.exports = async function handler(request, response) {
       if (Object.hasOwn(feedbackCounts, item.status)) feedbackCounts[item.status] += 1;
     }
     const toolRows = Array.isArray(tools) ? tools : [];
-    const normalizedHealth = normalizeCachedRows(healthRows);
+    const cachedHealth = normalizeCachedRows(healthRows);
+    const healthById = new Map(cachedHealth.map((item) => [item.toolId, item]));
+    const normalizedHealth = TOOL_CATALOG.map((tool) => healthById.get(tool.id) || ({
+      toolId: tool.id,
+      name: tool.name,
+      category: tool.category,
+      status: "unknown",
+      targetType: tool.target.type,
+      httpStatus: null,
+      latencyMs: null,
+      successRate: 0,
+      totalChecks: 0,
+      successfulChecks: 0,
+      consecutiveFailures: 0,
+      lastError: null,
+      lastCheckedAt: null,
+      lastSuccessAt: null,
+      metadata: {}
+    }));
 
     return send(response, 200, {
       ok: true,

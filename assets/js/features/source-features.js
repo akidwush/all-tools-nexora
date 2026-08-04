@@ -33,7 +33,7 @@
   }
 
   async function nxFetchBlobSource(url,signal){
-    const response=await fetch(url,{
+    const response=await window.NexoraFetch(url,{
       method:"GET",
       headers:{"Accept":"image/*,*/*"},
       signal:signal || undefined
@@ -46,7 +46,7 @@
 
   async function nxDownloadSource(url,filename){
     try{
-      const response=await fetch(url,{headers:{"Accept":"*/*"}});
+      const response=await window.NexoraFetch(url,{headers:{"Accept":"*/*"}});
       if(!response.ok) throw new Error("HTTP "+response.status);
       const blob=await response.blob();
       const objectUrl=URL.createObjectURL(blob);
@@ -234,7 +234,7 @@
       button.disabled=true;loader.classList.add("show");result.classList.remove("show");clearSpotifyStatus();
       try{
         const apiUrl=`https://api.ikyyxd.my.id/download/spotifydl?url=${encodeURIComponent(url)}`;
-        const response=await fetch(apiUrl,{method:"GET",headers:{"Accept":"application/json"}});
+        const response=await window.NexoraFetch(apiUrl,{method:"GET",headers:{"Accept":"application/json"}});
         if(!response.ok){
           const raw=await response.text();
           let message="HTTP "+response.status;

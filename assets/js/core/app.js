@@ -78,7 +78,7 @@ async function getUserInfo() {
         const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
         const timer = controller ? setTimeout(() => controller.abort(), timeoutMs) : null;
         try {
-            const response = await fetch(url, {
+            const response = await window.NexoraFetch(url, {
                 method: 'GET',
                 mode: 'cors',
                 cache: 'no-store',
@@ -689,7 +689,7 @@ async function nxFetchJsonWithBackup(apiId, sources, options) {
     let lastError = null;
     for (const source of sources) {
         try {
-            const res = await fetch(source.url, options || {});
+            const res = await window.NexoraFetch(source.url, options || {});
             if (!res.ok) throw new Error('HTTP ' + res.status);
             const data = await res.json();
             if (api) setApiStatus(api, 'ok', 'Online via ' + source.name);
@@ -707,7 +707,7 @@ async function nxFetchBlobWithBackup(apiId, sources, options) {
     let lastError = null;
     for (const source of sources) {
         try {
-            const res = await fetch(source.url, options || {});
+            const res = await window.NexoraFetch(source.url, options || {});
             if (!res.ok) throw new Error('HTTP ' + res.status);
             const blob = await res.blob();
             if (api) setApiStatus(api, 'ok', 'Online via ' + source.name);
@@ -786,7 +786,7 @@ async function nxFetchImageWithBackup(apiId, sources, options) {
     let lastError = null;
     for (const source of sources) {
         try {
-            const res = await fetch(source.url, options || {});
+            const res = await window.NexoraFetch(source.url, options || {});
             const img = await nxImageFromResponse(res);
             if (api) setApiStatus(api, 'ok', 'Online via ' + source.name);
             return { img, source };
@@ -806,7 +806,7 @@ async function nxPostImageFile(apiId, endpoints, file) {
             try {
                 const form = new FormData();
                 form.append(field, file, file.name || 'image.png');
-                const res = await fetch(endpoint, { method: 'POST', body: form });
+                const res = await window.NexoraFetch(endpoint, { method: 'POST', body: form });
                 const img = await nxImageFromResponse(res);
                 const api = getApiById(apiId);
                 if (api) setApiStatus(api, 'ok', 'Online via Upload');
@@ -878,7 +878,7 @@ async function nxRemoteImageBlob(imageUrl) {
     let lastError = null;
     for (const u of candidates) {
         try {
-            const res = await fetch(u);
+            const res = await window.NexoraFetch(u);
             if (!res.ok) throw new Error('HTTP ' + res.status);
             const blob = await res.blob();
             if (blob && blob.size > 20 && (!blob.type || blob.type.startsWith('image/') || blob.type === 'application/octet-stream')) return blob;
@@ -1359,7 +1359,7 @@ function rebuildAllTools() {
 
 async function applyDatabaseToolConfiguration() {
     try {
-        const response = await fetch('/api/health?mode=database&resource=tools', {
+        const response = await window.NexoraFetch('/api/health?mode=database&resource=tools', {
             method: 'GET',
             cache: 'no-store',
             credentials: 'same-origin',

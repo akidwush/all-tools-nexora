@@ -137,7 +137,7 @@
     resources=performanceResources();
     var inspection=inspectDocument();
     return {
-      version:"6.0.0",
+      version:"6.2.0",
       url:location.href,
       path:location.pathname,
       startedAt:new Date(startedAt).toISOString(),

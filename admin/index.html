@@ -21,7 +21,7 @@
     <aside class="admin-sidebar">
       <a class="admin-logo" href="/admin">
         <span><i class="fa-solid fa-bolt"></i></span>
-        <div><b>NEXORA</b><small>CONTROL PANEL 6.1</small></div>
+        <div><b>NEXORA</b><small>CONTROL PANEL 6.2</small></div>
       </a>
       <nav class="admin-nav" aria-label="Navigasi admin">
         <button class="admin-nav-item is-active" data-section="overview" type="button"><i class="fa-solid fa-grid-2"></i><span>Ringkasan</span></button>
@@ -30,6 +30,7 @@
         <button class="admin-nav-item" data-section="analytics" type="button"><i class="fa-solid fa-chart-line"></i><span>Analytics</span></button>
         <button class="admin-nav-item" data-section="feedback" type="button"><i class="fa-regular fa-message"></i><span>Feedback</span></button>
         <button class="admin-nav-item" data-section="health" type="button"><i class="fa-solid fa-heart-pulse"></i><span>Health</span></button>
+        <button class="admin-nav-item" data-section="functional" type="button"><i class="fa-solid fa-list-check"></i><span>Functional Audit</span></button>
         <button class="admin-nav-item" data-section="visual" type="button"><i class="fa-solid fa-camera-retro"></i><span>Visual QA</span></button>
         <button class="admin-nav-item" data-section="audit" type="button"><i class="fa-solid fa-clock-rotate-left"></i><span>Audit Log</span></button>
       </nav>
@@ -115,9 +116,25 @@
 
         <section class="admin-section" data-panel="health">
           <article class="panel-card">
-            <div class="panel-head"><div><p class="eyebrow">MONITORING</p><h2>Detail Kesehatan Tools</h2></div><span class="panel-time" id="healthTime">Belum diperiksa</span></div>
+            <div class="panel-head"><div><p class="eyebrow">MONITORING</p><h2>Detail Kesehatan Tools</h2></div><div class="panel-head-actions"><span class="panel-time" id="healthTime">Belum diperiksa</span><button id="refreshAdminHealth" class="secondary-button compact-action" type="button"><i class="fa-solid fa-rotate"></i> Periksa</button></div></div>
             <div class="health-table-wrap"><table class="health-table"><thead><tr><th>Tool</th><th>Status</th><th>HTTP</th><th>Latency</th><th>Success</th><th>Terakhir</th></tr></thead><tbody id="healthTableBody"></tbody></table></div>
           </article>
+        </section>
+
+        <section class="admin-section" data-panel="functional">
+          <div class="section-toolbar functional-toolbar">
+            <div class="toolbar-title"><p class="eyebrow">FUNCTIONAL READINESS</p><b>Audit 37 tools: kartu, modul, handler, dan dependensi</b></div>
+            <select id="functionalStatusFilter" class="select-box" aria-label="Filter hasil functional audit"><option value="all">Semua hasil</option><option value="ready">Siap</option><option value="degraded">Terbatas</option><option value="offline">Gangguan</option><option value="restricted">Akses khusus</option><option value="missing">Tidak lengkap</option></select>
+            <button id="runFunctionalAudit" class="primary-button" type="button"><i class="fa-solid fa-play"></i> Jalankan Audit</button>
+          </div>
+          <div class="functional-note"><i class="fa-solid fa-shield-halved"></i><span>Audit hanya memuat modul dan memeriksa kesiapan handler. Form, upload, download, kamera, serta tindakan mutasi tidak dijalankan.</span></div>
+          <div class="metric-grid functional-metrics" id="functionalMetrics"></div>
+          <article class="panel-card functional-panel">
+            <div class="panel-head"><div><p class="eyebrow">37 TOOL CHECK</p><h2>Hasil Functional Audit</h2></div><span class="panel-time" id="functionalAuditTime">Belum dijalankan</span></div>
+            <div class="functional-progress" id="functionalProgress" hidden><i></i><span>Menyiapkan halaman audit...</span></div>
+            <div class="functional-audit-list" id="functionalAuditList"><div class="empty-state"><i class="fa-solid fa-list-check"></i><b>Belum ada hasil audit</b><span>Tekan Jalankan Audit untuk memeriksa seluruh tools.</span></div></div>
+          </article>
+          <iframe id="functionalAuditFrame" title="Functional audit sandbox" hidden></iframe>
         </section>
 
         <section class="admin-section" data-panel="feedback">
@@ -176,12 +193,24 @@
     <nav class="admin-bottom-nav" aria-label="Navigasi admin mobile">
       <button class="is-active" data-section="overview" type="button"><i class="fa-solid fa-grid-2"></i><span>Home</span></button>
       <button data-section="tools" type="button"><i class="fa-solid fa-screwdriver-wrench"></i><span>Tools</span></button>
-      <button data-section="socials" type="button"><i class="fa-solid fa-share-nodes"></i><span>Sosial</span></button>
       <button data-section="analytics" type="button"><i class="fa-solid fa-chart-line"></i><span>Insight</span></button>
-      <button data-section="visual" type="button"><i class="fa-solid fa-camera-retro"></i><span>QA</span></button>
       <button data-section="feedback" type="button"><i class="fa-regular fa-message"></i><span>Inbox</span></button>
-      <button data-section="audit" type="button"><i class="fa-solid fa-clock-rotate-left"></i><span>Audit</span></button>
+      <button data-admin-more type="button" aria-expanded="false"><i class="fa-solid fa-ellipsis"></i><span>Lainnya</span></button>
     </nav>
+
+    <div class="admin-more-backdrop" id="adminMoreBackdrop" hidden></div>
+    <aside class="admin-more-sheet" id="adminMoreSheet" aria-hidden="true" aria-label="Menu admin lainnya">
+      <header><div><p class="eyebrow">MENU LAINNYA</p><h2>Administrasi</h2></div><button id="closeAdminMore" type="button" aria-label="Tutup menu"><i class="fa-solid fa-xmark"></i></button></header>
+      <div class="admin-more-grid">
+        <button data-section="socials" type="button"><i class="fa-solid fa-share-nodes"></i><span>Sosial Media</span></button>
+        <button data-section="health" type="button"><i class="fa-solid fa-heart-pulse"></i><span>Tool Health</span></button>
+        <button data-section="functional" type="button"><i class="fa-solid fa-list-check"></i><span>Functional Audit</span></button>
+        <button data-section="visual" type="button"><i class="fa-solid fa-camera-retro"></i><span>Visual QA</span></button>
+        <button data-section="audit" type="button"><i class="fa-solid fa-clock-rotate-left"></i><span>Audit Log</span></button>
+        <a href="/" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i><span>Lihat Website</span></a>
+      </div>
+      <button class="admin-more-logout" id="mobileLogoutButton" type="button"><i class="fa-solid fa-right-from-bracket"></i> Keluar dari dashboard</button>
+    </aside>
   </div>
 
   <div class="modal-backdrop" id="socialModal" hidden>
@@ -254,5 +283,6 @@
   <div class="toast-stack" id="toastStack" aria-live="polite"></div>
   <script src="../assets/js/admin/dashboard.js" defer></script>
   <script src="../assets/js/admin/visual-qa.js" defer></script>
+  <script src="../assets/js/admin/functional-audit.js" defer></script>
 </body>
 </html>

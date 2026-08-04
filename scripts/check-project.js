@@ -156,7 +156,28 @@ for(const source of ["/api/analytics", "/api/database"]) {
 }
 
 const healthCatalog=require(path.join(root,"lib/tool-health.js")).TOOL_CATALOG;
-if(!Array.isArray(healthCatalog)||healthCatalog.length!==22) fail(`Tool health catalog harus memuat 22 tools, ditemukan ${healthCatalog?.length||0}.`);
+if(!Array.isArray(healthCatalog)||healthCatalog.length!==37) fail(`Tool health catalog harus memuat 37 tools, ditemukan ${healthCatalog?.length||0}.`);
+
+
+const v62Required = [
+  "assets/js/core/network.js", "assets/js/core/tool-registry.js", "assets/js/core/stability.js", "assets/js/admin/functional-audit.js",
+  "scripts/test-network-v62.js", "scripts/test-functional-v62.js", "V6_2_VALIDATION.md"
+];
+for (const file of v62Required) if(!fs.existsSync(path.join(root,file))) fail(`v6.2 file hilang: ${file}`);
+const networkV62 = fs.readFileSync(path.join(root,"assets/js/core/network.js"),"utf8");
+const registryV62 = fs.readFileSync(path.join(root,"assets/js/core/tool-registry.js"),"utf8");
+const stabilityV62 = fs.readFileSync(path.join(root,"assets/js/core/stability.js"),"utf8");
+const functionalV62 = fs.readFileSync(path.join(root,"assets/js/admin/functional-audit.js"),"utf8");
+for (const token of ["NexoraFetch","REQUEST_TIMEOUT","nexora:network-error"]) if(!networkV62.includes(token)) fail(`Network layer v6.2 belum lengkap: ${token}`);
+for (const token of ["NexoraToolRegistry",'version:"6.2.0"',"count:rows.length"]) if(!registryV62.includes(token)) fail(`Tool registry v6.2 belum lengkap: ${token}`);
+for (const token of ["NexoraStability","functional-audit-complete","applyCardStatus","loadHealth"]) if(!stabilityV62.includes(token)) fail(`Stability layer v6.2 belum lengkap: ${token}`);
+for (const token of ["runFunctionalAudit","functionalAuditFrame","nexora:functional-section-open"]) if(!functionalV62.includes(token)) fail(`Functional audit admin v6.2 belum lengkap: ${token}`);
+if(!index.includes("assets/js/core/tool-registry.js")||!index.includes("assets/js/core/stability.js")) fail("index.html belum memuat stability layer v6.2");
+const adminHtmlV62=fs.readFileSync(path.join(root,"admin/index.html"),"utf8");
+if(!adminHtmlV62.includes('data-panel="functional"')||!adminHtmlV62.includes('id="adminMoreSheet"')) fail("Dashboard admin belum memiliki Functional Audit dan menu Lainnya.");
+const bottomNavV62=(adminHtmlV62.match(/<nav class="admin-bottom-nav"[\s\S]*?<\/nav>/)||[""])[0];
+if((bottomNavV62.match(/<button/g)||[]).length!==5) fail("Bottom navigation v6.2 harus berisi tepat 5 tombol.");
+if(fs.readFileSync(path.join(root,"assets/js/core/lazy-loader.js"),"utf8").includes("current!==lazyShowTool")) fail("Lazy loader masih berisiko rekursi dispatcher.");
 
 const manifest=JSON.parse(fs.readFileSync(path.join(root,"assets/module-manifest.json"),"utf8"));
 for(const [name,spec] of Object.entries(manifest.modules||{})){
@@ -179,4 +200,4 @@ for(const file of scanFiles){
   }
 }
 if(failed) process.exit(1);
-console.log(`Audit v6.1.1 lulus: index ${indexBytes.toLocaleString()} byte, ${jsFiles.length} file JS valid, social link control, lazy-load, live audit, tool health, runtime JS test, screenshot, visual validation, analytics, feedback management, audit log, login, dan dashboard admin lengkap.`);
+console.log(`Audit v6.2 lulus: index ${indexBytes.toLocaleString()} byte, ${jsFiles.length} file JS valid, social link control, lazy-load, live audit, tool health, runtime JS test, screenshot, visual validation, analytics, feedback management, audit log, login, dan dashboard admin lengkap.`);

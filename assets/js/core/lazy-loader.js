@@ -1,4 +1,4 @@
-/* Nexora v4 lazy module loader */
+/* Nexora v6.2 stable lazy module loader */
 (function(){
   'use strict';
 
@@ -141,8 +141,9 @@
       await ensureModule(moduleName);
       var special=invokeSpecial(toolId,event);
       if(special!==null) return special;
-      var current=window.showTool;
-      if(typeof current==='function' && current!==lazyShowTool) return current.call(window,toolId);
+      /* Selalu kembali ke dispatcher yang ditangkap sebelum lazy-loader.
+         Memanggil window.showTool di sini dapat membuat rekursi bila modul stabilitas
+         atau script lain membungkus dispatcher setelah halaman siap. */
       if(typeof baseShowTool==='function') return baseShowTool.call(window,toolId);
       throw new Error('Pembuka fitur tidak tersedia: '+toolId);
     }catch(error){

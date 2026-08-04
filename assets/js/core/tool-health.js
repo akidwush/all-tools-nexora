@@ -1,4 +1,4 @@
-/* Nexora v4.2 — public tool health status panel. */
+/* Nexora v6.2 — public tool health status panel. */
 (function () {
   "use strict";
 

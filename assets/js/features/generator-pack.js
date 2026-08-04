@@ -23,7 +23,7 @@ function nxGenShow(prefix, url) {
 async function nxGenDownload(url, name) {
     if (!url) return;
     try {
-        var res = await fetch(url);
+        var res = await window.NexoraFetch(url);
         if (!res.ok) throw new Error('HTTP ' + res.status);
         var blob = await res.blob();
         var a = document.createElement('a');
@@ -199,7 +199,7 @@ function renderIqc2(body) {
         try {
             var fd = new FormData();
             fd.append('files[]', file);
-            var res = await fetch('https://api.nexadev.my.id/uploder/', { method: 'POST', body: fd });
+            var res = await window.NexoraFetch('https://api.nexadev.my.id/uploder/', { method: 'POST', body: fd });
             var data = await res.json();
             if (data.success && data.files && data.files[0] && data.files[0].url) {
                 uploadedUrl = data.files[0].url;

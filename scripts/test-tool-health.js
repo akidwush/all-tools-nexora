@@ -52,6 +52,8 @@ async function main() {
 
   const slowProbe = await fetchProbe(`${origin}/slow`, "HEAD", 1_000);
   assert.equal(classifyProbe(slowProbe, { strict: true }, { degradedLatencyMs: 20 }).status, "degraded");
+  assert.equal(classifyProbe({ statusCode: 403, latencyMs: 10 }, { strict: false }, { degradedLatencyMs: 500 }).status, "degraded");
+  assert.equal(classifyProbe({ statusCode: 405, latencyMs: 10 }, { strict: false }, { degradedLatencyMs: 500 }).status, "degraded");
 
   const run = await runToolHealthChecks({
     origin,
@@ -83,7 +85,7 @@ async function main() {
   await handler({ method: "GET", url: "/api/tool-health?refresh=0", headers: { host: `127.0.0.1:${port}` }, socket: {} }, apiResponse);
   assert.equal(captured.status, 200);
   assert.equal(captured.payload.source, "catalog");
-  assert.equal(captured.payload.data.length, 22);
+  assert.equal(captured.payload.data.length, 37);
 
   const protectedResponse = {
     setHeader() {}, status(code) { captured.protectedStatus = code; return this; },

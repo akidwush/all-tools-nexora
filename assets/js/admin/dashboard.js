@@ -3,7 +3,7 @@
   const state={session:null,dashboard:null,tools:[],socials:[],analytics:null,feedback:[],feedbackMeta:null,audit:[],activeSection:"overview",editingTool:null,editingSocial:null,editingFeedback:null};
   const $=(selector,root=document)=>root.querySelector(selector);
   const $$=(selector,root=document)=>Array.from(root.querySelectorAll(selector));
-  const headings={overview:"Ringkasan Sistem",tools:"Manajemen Tools",socials:"Sosial Media",analytics:"Analytics Penggunaan",health:"Tool Health Monitoring",feedback:"Feedback Pengguna",visual:"Runtime & Visual QA",audit:"Audit Log Admin"};
+  const headings={overview:"Ringkasan Sistem",tools:"Manajemen Tools",socials:"Sosial Media",analytics:"Analytics Penggunaan",health:"Tool Health Monitoring",feedback:"Feedback Pengguna",visual:"Runtime & Visual QA",functional:"Functional Audit",audit:"Audit Log Admin"};
   let feedbackTimer=null;
 
   function escapeHtml(value){return String(value??"").replace(/[&<>'"]/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[char]));}
@@ -20,9 +20,11 @@
   function metricCard(icon,label,value,caption,tone){return `<article class="metric-card" style="--accent:${tone.bg};--accent-text:${tone.text}"><span class="metric-icon"><i class="${icon}"></i></span><span>${escapeHtml(label)}</span><strong>${escapeHtml(compactNumber(value))}</strong><small>${escapeHtml(caption)}</small></article>`;}
 
   async function switchSection(section){
+    closeAdminMore();
     state.activeSection=section;
     $$('[data-panel]').forEach(panel=>panel.classList.toggle("is-active",panel.dataset.panel===section));
     $$('[data-section]').forEach(button=>button.classList.toggle("is-active",button.dataset.section===section));
+    const moreButton=$("[data-admin-more]");if(moreButton)moreButton.classList.toggle("is-active",["socials","health","functional","visual","audit"].includes(section));
     $("#pageHeading").textContent=headings[section]||"Dashboard";
     if(section==="tools")renderTools();
     if(section==="socials")renderSocials();
@@ -30,7 +32,8 @@
     if(section==="feedback"&&!state.feedbackMeta)await loadFeedback(1);
     if(section==="audit"&&!state.audit.length)await loadAudit();
     if(section==="visual")document.dispatchEvent(new CustomEvent("nexora:visual-section-open"));
-    window.scrollTo({top:0,behavior:"smooth"});
+    if(section==="functional")document.dispatchEvent(new CustomEvent("nexora:functional-section-open"));
+    window.scrollTo({top:0,behavior:window.matchMedia("(max-width:760px)").matches?"auto":"smooth"});
   }
 
   function renderSession(){const info=state.session.admin;const name=info.displayName||"Admin";$("#adminName").textContent=name;$("#adminRole").textContent=info.role;$("#adminAvatar").textContent=name.charAt(0).toUpperCase();}
@@ -53,6 +56,7 @@
   }
 
   function renderHealth(){const rows=state.dashboard.health||[];$("#healthTime").textContent=`Terakhir: ${formatDate(state.dashboard.summary.health.lastCheckedAt)}`;$("#healthTableBody").innerHTML=rows.length?rows.map(item=>`<tr><td class="health-tool"><b>${escapeHtml(item.name)}</b><span>${escapeHtml(item.toolId)}</span></td><td><span class="health-badge ${escapeHtml(item.status)}">${escapeHtml(item.status)}</span></td><td>${item.httpStatus??"-"}</td><td>${item.latencyMs==null?"-":`${item.latencyMs} ms`}</td><td>${Number(item.successRate||0).toFixed(1)}%</td><td>${formatDate(item.lastCheckedAt)}</td></tr>`).join(""):'<tr><td colspan="6">Belum ada data health.</td></tr>';}
+  async function refreshAdminHealth(silent=false){const button=$("#refreshAdminHealth");if(button&&!silent){button.disabled=true;button.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Memeriksa';}try{const result=await api("/api/tool-health?refresh=auto");state.dashboard.health=result.data||[];state.dashboard.summary.health=result.summary||state.dashboard.summary.health;renderHealth();renderOverview();if(!silent)toast("Status 37 tools berhasil diperbarui.");}catch(error){if(!silent)toast(error.message,"error");}finally{if(button){button.disabled=false;button.innerHTML='<i class="fa-solid fa-rotate"></i> Periksa';}}}
 
   function filteredTools(){const query=$("#toolSearch").value.trim().toLowerCase();const status=$("#toolStatusFilter").value;const category=$("#toolCategoryFilter").value;return state.tools.filter(item=>(!query||`${item.name} ${item.id} ${item.description}`.toLowerCase().includes(query))&&(status==="all"||(status==="active"?item.is_active:!item.is_active))&&(category==="all"||item.category===category));}
   function renderTools(){const rows=filteredTools();$("#toolEmpty").hidden=rows.length>0;$("#toolAdminGrid").innerHTML=rows.map(item=>`<article class="tool-admin-card"><div class="tool-card-top"><span class="tool-card-icon"><i class="${escapeHtml(item.icon||"fa-solid fa-cube")}"></i></span><span class="tool-state ${item.is_active?"active":"inactive"}">${item.is_active?"Aktif":"Nonaktif"}</span></div><h3>${escapeHtml(item.name)}</h3><span class="tool-id">${escapeHtml(item.id)}</span><p>${escapeHtml(item.description||"Belum ada deskripsi.")}</p><div class="tool-card-meta"><span>${escapeHtml(item.category)}</span><span>Urutan ${item.sort_order}</span>${item.badge?`<span>${escapeHtml(item.badge)}</span>`:""}</div><div class="tool-card-actions"><button data-edit-tool="${escapeHtml(item.id)}" type="button" ${canEdit()?"":"disabled"}><i class="fa-solid fa-pen"></i> ${canEdit()?"Edit":"Read only"}</button></div></article>`).join("");}
@@ -116,6 +120,8 @@
   function closeModal(selector){$(selector).hidden=true;if($$(".modal-backdrop:not([hidden])").length===0)document.body.style.overflow="";}
   async function refreshDashboard(){const dashboard=await api("/api/admin/dashboard");state.dashboard=dashboard;renderOverview();renderHealth();}
   async function logout(){try{await api("/api/admin/auth",{method:"DELETE",headers:csrfHeaders()});}catch{}location.replace("/admin/login");}
+  function openAdminMore(){const sheet=$("#adminMoreSheet"),backdrop=$("#adminMoreBackdrop"),button=$("[data-admin-more]");if(!sheet||!backdrop)return;backdrop.hidden=false;sheet.classList.add("is-open");sheet.setAttribute("aria-hidden","false");if(button)button.setAttribute("aria-expanded","true");document.body.classList.add("admin-more-open");}
+  function closeAdminMore(){const sheet=$("#adminMoreSheet"),backdrop=$("#adminMoreBackdrop"),button=$("[data-admin-more]");if(!sheet||!backdrop)return;sheet.classList.remove("is-open");sheet.setAttribute("aria-hidden","true");backdrop.hidden=true;if(button)button.setAttribute("aria-expanded","false");document.body.classList.remove("admin-more-open");}
 
   function bind(){
     $$('[data-section]').forEach(button=>button.addEventListener("click",()=>switchSection(button.dataset.section)));
@@ -126,6 +132,7 @@
     $("#socialAdminGrid").addEventListener("click",event=>{const button=event.target.closest("[data-edit-social]");if(button)openSocialEditor(button.dataset.editSocial);});
     $("#socialEditForm").addEventListener("submit",saveSocial);$("#closeSocialModal").addEventListener("click",closeSocialEditor);$("#cancelSocialEdit").addEventListener("click",closeSocialEditor);
     $("#analyticsPeriod").addEventListener("change",()=>loadAnalytics());$("#refreshAnalytics").addEventListener("click",()=>loadAnalytics());
+    const healthRefresh=$("#refreshAdminHealth");if(healthRefresh)healthRefresh.addEventListener("click",()=>refreshAdminHealth(false));
     [$("#feedbackSearch"),$("#feedbackStatusFilter"),$("#feedbackCategoryFilter")].forEach(input=>input.addEventListener("input",()=>{clearTimeout(feedbackTimer);feedbackTimer=setTimeout(()=>loadFeedback(1),280);}));
     $("#feedbackGrid").addEventListener("click",event=>{const button=event.target.closest("[data-edit-feedback]");if(button)openFeedbackEditor(button.dataset.editFeedback);});
     $("#feedbackCounts").addEventListener("click",event=>{const button=event.target.closest("[data-feedback-status]");if(button){$("#feedbackStatusFilter").value=button.dataset.feedbackStatus;loadFeedback(1);}});
@@ -135,7 +142,11 @@
     $("#recentFeedback").addEventListener("click",event=>{const button=event.target.closest("[data-overview-feedback]");if(button){const id=button.dataset.overviewFeedback;switchSection("feedback").then(()=>{const item=findFeedback(id);if(item)openFeedbackEditor(id);});}});
     ["toolModal","socialModal","feedbackModal","auditModal"].forEach(id=>$("#"+id).addEventListener("click",event=>{if(event.target.id===id)closeModal("#"+id);}));
     $("#logoutButton").addEventListener("click",logout);
-    document.addEventListener("keydown",event=>{if(event.key!=="Escape")return;["#toolModal","#socialModal","#feedbackModal","#auditModal"].forEach(selector=>{if(!$(selector).hidden)closeModal(selector);});});
+    const moreButton=$("[data-admin-more]");if(moreButton)moreButton.addEventListener("click",openAdminMore);
+    const moreClose=$("#closeAdminMore");if(moreClose)moreClose.addEventListener("click",closeAdminMore);
+    const moreBackdrop=$("#adminMoreBackdrop");if(moreBackdrop)moreBackdrop.addEventListener("click",closeAdminMore);
+    const mobileLogout=$("#mobileLogoutButton");if(mobileLogout)mobileLogout.addEventListener("click",logout);
+    document.addEventListener("keydown",event=>{if(event.key!=="Escape")return;closeAdminMore();["#toolModal","#socialModal","#feedbackModal","#auditModal"].forEach(selector=>{if(!$(selector).hidden)closeModal(selector);});});
   }
 
   async function boot(){
@@ -143,7 +154,7 @@
       const session=await api("/api/admin/auth");if(!session.authenticated){location.replace("/admin/login");return;}state.session=session;renderSession();
       const [dashboard,tools,socials,analytics]=await Promise.all([api("/api/admin/dashboard"),api("/api/admin/tools"),api("/api/admin/socials").catch(()=>({data:[]})),api("/api/admin/analytics?days=7").catch(()=>({data:null}))]);
       state.dashboard=dashboard;state.tools=tools.data||[];state.socials=socials.data||[];state.analytics=analytics.data||null;
-      renderOverview();renderHealth();renderTools();renderSocials();if(state.analytics)renderAnalytics();bind();$("#adminApp").hidden=false;$("#adminLoader").hidden=true;
+      renderOverview();renderHealth();renderTools();renderSocials();if(state.analytics)renderAnalytics();bind();$("#adminApp").hidden=false;$("#adminLoader").hidden=true;refreshAdminHealth(true);
     }catch(error){console.error(error);toast(error.message||"Dashboard gagal dimuat.","error");setTimeout(()=>location.replace("/admin/login"),1400);}
   }
   boot();

@@ -17,7 +17,7 @@
     var last=null;
     for(var i=0;i<sources.length;i++){
       try{
-        var res=await fetch(sources[i],{cache:'no-store'});
+        var res=await window.NexoraFetch(sources[i],{cache:'no-store'});
         if(!res.ok) throw new Error('HTTP '+res.status);
         var blob=await res.blob();
         if(isBadBlob(blob)) throw new Error('Response bukan media');
