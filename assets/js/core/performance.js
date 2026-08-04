@@ -1,15 +1,21 @@
-/* Nexora v6.3.2 — public performance coordinator and adaptive anime hero. */
+/* Nexora v6.3.3 — adaptive hero video without mobile scroll decode jank. */
 (function(){
   "use strict";
   if(window.__NEXORA_PERFORMANCE__) return;
 
   var connection=navigator.connection||navigator.mozConnection||navigator.webkitConnection;
   var reduced=false;
-  try{reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;}catch(_){ }
+  try{reduced=Boolean(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);}catch(_){ }
+
   var memory=Number(navigator.deviceMemory||0);
   var cores=Number(navigator.hardwareConcurrency||0);
   var effectiveType=String(connection&&connection.effectiveType||"").toLowerCase();
   var verySlowNetwork=/^(slow-2g|2g)$/.test(effectiveType);
+  var mobileLike=false;
+  try{
+    mobileLike=Boolean(window.matchMedia&&window.matchMedia("(max-width: 900px), (pointer: coarse)").matches);
+  }catch(_){mobileLike=window.innerWidth<=900;}
+
   var lowPower=Boolean(
     (connection&&connection.saveData) ||
     (memory>0&&memory<=3) ||
@@ -17,8 +23,10 @@
     verySlowNetwork ||
     reduced
   );
+
+  var heroMode=lowPower?"disabled":(mobileLike?"manual":"auto");
+  document.documentElement.classList.add("nx-hero-video-"+heroMode);
   if(lowPower) document.documentElement.classList.add("nx-low-power");
-  else document.documentElement.classList.add("nx-anime-banner-enabled");
 
   function schedule(task,options){
     options=options||{};
@@ -37,26 +45,124 @@
   function initHeroVideo(){
     var hero=document.querySelector("[data-nx-hero]");
     var video=hero&&hero.querySelector("video[data-src]");
-    if(!hero||!video||lowPower||document.visibilityState==="hidden")return;
+    var toggle=hero&&hero.querySelector("[data-nx-hero-toggle]");
+    if(!hero||!video||heroMode==="disabled")return;
+
     var source=String(video.dataset.src||"");
     if(!source)return;
 
-    video.preload="metadata";
-    video.src=source;
-    video.addEventListener("canplay",function(){
-      hero.classList.add("is-video-ready");
-      video.play().catch(function(){});
-    },{once:true});
-    video.addEventListener("error",function(){
-      video.removeAttribute("src");
-      hero.classList.remove("is-video-ready");
-    },{once:true});
-    video.load();
+    var loaded=false;
+    var ready=false;
+    var visible=false;
+    var manualPlaying=false;
+    var scrollLocked=false;
 
-    document.addEventListener("visibilitychange",function(){
-      if(document.hidden)video.pause();
-      else if(hero.classList.contains("is-video-ready"))video.play().catch(function(){});
-    });
+    function updateToggle(){
+      if(!toggle)return;
+      var playing=!video.paused&&!video.ended;
+      toggle.classList.toggle("is-playing",playing);
+      toggle.setAttribute("aria-label",playing?"Jeda banner anime":"Putar banner anime");
+      toggle.setAttribute("aria-pressed",playing?"true":"false");
+      var icon=toggle.querySelector("i");
+      if(icon)icon.className=playing?"fas fa-pause":"fas fa-play";
+    }
+
+    function ensureLoaded(){
+      if(loaded)return;
+      loaded=true;
+      video.preload="metadata";
+      video.src=source;
+      video.load();
+    }
+
+    function pauseVideo(){
+      if(!video.paused)video.pause();
+      manualPlaying=false;
+      updateToggle();
+    }
+
+    function canAutoPlay(){
+      return heroMode==="auto"&&visible&&!document.hidden&&ready;
+    }
+
+    function syncPlayback(){
+      if(canAutoPlay()){
+        video.play().then(updateToggle).catch(updateToggle);
+      }else if(heroMode==="auto"){
+        pauseVideo();
+      }else if(heroMode==="manual"&&(!visible||document.hidden||scrollLocked)){
+        pauseVideo();
+      }
+    }
+
+    video.addEventListener("loadeddata",function(){
+      ready=true;
+      hero.classList.add("is-video-ready");
+      updateToggle();
+      syncPlayback();
+    },{once:true});
+
+    video.addEventListener("play",updateToggle);
+    video.addEventListener("pause",updateToggle);
+    video.addEventListener("error",function(){
+      pauseVideo();
+      video.removeAttribute("src");
+      video.load();
+      hero.classList.remove("is-video-ready");
+      hero.classList.add("is-video-error");
+      if(toggle)toggle.hidden=true;
+    },{once:true});
+
+    if(toggle){
+      toggle.hidden=false;
+      toggle.addEventListener("click",function(){
+        if(heroMode!=="manual")return;
+        ensureLoaded();
+        scrollLocked=false;
+        if(!video.paused){
+          pauseVideo();
+          return;
+        }
+        manualPlaying=true;
+        video.play().then(updateToggle).catch(function(){
+          manualPlaying=false;
+          updateToggle();
+        });
+      });
+    }
+
+    function onVisibility(entry){
+      visible=Boolean(entry&&entry.isIntersecting&&entry.intersectionRatio>=0.35);
+      if(visible)ensureLoaded();
+      syncPlayback();
+    }
+
+    if("IntersectionObserver" in window){
+      var observer=new IntersectionObserver(function(entries){onVisibility(entries[0]);},{threshold:[0,0.35,0.7]});
+      observer.observe(hero);
+    }else{
+      visible=true;
+      ensureLoaded();
+      syncPlayback();
+    }
+
+    document.addEventListener("visibilitychange",syncPlayback);
+    window.addEventListener("pagehide",pauseVideo);
+
+    if(heroMode==="manual"){
+      var scrollTicking=false;
+      window.addEventListener("scroll",function(){
+        if(scrollTicking)return;
+        scrollTicking=true;
+        requestAnimationFrame(function(){
+          scrollTicking=false;
+          if(window.scrollY>24){
+            scrollLocked=true;
+            if(manualPlaying||!video.paused)pauseVideo();
+          }
+        });
+      },{passive:true});
+    }
   }
 
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",removeSplash,{once:true});
@@ -67,9 +173,10 @@
   },{once:true});
 
   window.__NEXORA_PERFORMANCE__={
-    version:"6.3.2",
+    version:"6.3.3",
     lowPower:lowPower,
-    animeBannerEnabled:!lowPower,
+    mobileLike:mobileLike,
+    heroMode:heroMode,
     schedule:schedule
   };
 })();

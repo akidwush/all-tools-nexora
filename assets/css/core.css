@@ -1393,7 +1393,7 @@ html.nx-low-power *{scroll-behavior:auto!important}
 }
 
 
-/* ===== Nexora v6.3.2: lightweight All Tools grid + adaptive anime banner ===== */
+/* ===== Nexora v6.3.3: lightweight All Tools grid + adaptive anime banner ===== */
 .tools-card{
   contain:layout paint style;
   content-visibility:auto;
@@ -1421,7 +1421,6 @@ html.nx-low-power *{scroll-behavior:auto!important}
   font-size:10px;
 }
 .nx-all-tools-more:active{transform:scale(.985)}
-html.nx-anime-banner-enabled .video-banner video{display:block}
 @media (max-width:768px){
   .tools-card{
     backdrop-filter:none!important;
@@ -1434,9 +1433,41 @@ html.nx-anime-banner-enabled .video-banner video{display:block}
     box-shadow:0 6px 16px rgba(0,0,0,.16)!important;
   }
   .tools-card .icon,.tools-card .arrow{transition:none!important}
-  html.nx-anime-banner-enabled .video-banner video{
+  html.nx-hero-video-manual .video-banner video,
+  html.nx-hero-video-auto .video-banner video{
     display:block!important;
     object-fit:cover;
   }
+  html.nx-hero-video-disabled .video-banner video,
   html.nx-low-power .video-banner video{display:none!important}
+}
+
+
+/* ===== Nexora v6.3.3: mobile hero video decode-jank fix ===== */
+html.nx-hero-video-auto .video-banner video,
+html.nx-hero-video-manual .video-banner video{display:block}
+html.nx-hero-video-disabled .video-banner video{display:none!important}
+.nx-hero-video-toggle{
+  position:absolute;
+  right:14px;
+  bottom:14px;
+  z-index:4;
+  width:42px;
+  height:42px;
+  border:1px solid rgba(255,255,255,.2);
+  border-radius:50%;
+  background:rgba(8,3,18,.78);
+  color:#fff;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 8px 24px rgba(0,0,0,.28);
+  cursor:pointer;
+}
+html.nx-hero-video-manual .nx-hero-video-toggle{display:flex}
+html.nx-hero-video-disabled .nx-hero-video-toggle{display:none!important}
+.nx-hero-video-toggle:active{transform:scale(.94)}
+@media (max-width:900px),(pointer:coarse){
+  .video-banner video{will-change:auto!important}
+  .nx-hero-video-toggle{display:flex}
 }
