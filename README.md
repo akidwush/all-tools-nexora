@@ -1,8 +1,8 @@
-# All Tools Nexora v5.1
+# All Tools Nexora v6.0
 
 Website tools modular dengan lazy loading, Get Code live audit, tool health monitoring, Supabase database, login admin, analytics anonim, feedback management, dan audit log.
 
-## Fitur v5.1
+## Fitur v6.0
 
 - Dashboard analytics periode 7, 30, dan 90 hari.
 - Metrik page view, tool open, pengunjung unik, error, tren harian, dan ranking tools.
@@ -18,10 +18,10 @@ Website tools modular dengan lazy loading, Get Code live audit, tool health moni
 Untuk upgrade dari v5.0:
 
 1. Jalankan `database/migrations/004_analytics_feedback_audit.sql` melalui Supabase SQL Editor.
-2. Tunggu deployment Vercel v5.1 selesai.
+2. Tunggu deployment Vercel v6.0 selesai.
 3. Buka `/admin`, lalu periksa menu Analytics, Feedback, dan Audit Log.
 
-Untuk instalasi baru, `database/schema.sql` memuat seluruh schema sampai v5.1.
+Untuk instalasi baru, `database/schema.sql` memuat seluruh schema sampai v6.0.
 
 ## Environment Vercel
 
@@ -35,9 +35,9 @@ FEEDBACK_HASH_SALT=random_long_value
 HEALTH_CHECK_TOKEN=random_long_value
 ```
 
-Legacy `SUPABASE_SERVICE_ROLE_KEY=eyJ...` tetap didukung. Tidak ada environment variable wajib baru pada v5.1.
+Legacy `SUPABASE_SERVICE_ROLE_KEY=eyJ...` tetap didukung. Tidak ada environment variable wajib baru pada v6.0.
 
-## Endpoint v5.1
+## Endpoint v6.0
 
 ```text
 POST /api/analytics
@@ -56,3 +56,8 @@ npm run build
 ```
 
 Build statis dibuat pada `public/`, sedangkan API Vercel tetap berada di folder `api/`.
+
+
+## Visual QA v6.0
+
+Dashboard admin menyediakan runtime JavaScript observer, smoke test seluruh modul lazy-load, screenshot browser, visual baseline, fingerprint comparison, dan riwayat validasi. Jalankan `database/migrations/005_visual_runtime_validation.sql` setelah deployment.

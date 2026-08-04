@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="../assets/js/core/runtime-observer.js"></script>
   <meta name="robots" content="noindex,nofollow">
   <meta name="theme-color" content="#090312">
   <title>Dashboard Admin — Nexora</title>
@@ -12,6 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <link href="../assets/css/admin.css" rel="stylesheet">
+  <link href="../assets/css/visual-qa.css" rel="stylesheet">
 </head>
 <body class="admin-dashboard-page">
   <div class="admin-loader" id="adminLoader"><span></span><p>Memverifikasi sesi admin...</p></div>
@@ -19,7 +21,7 @@
     <aside class="admin-sidebar">
       <a class="admin-logo" href="/admin">
         <span><i class="fa-solid fa-bolt"></i></span>
-        <div><b>NEXORA</b><small>CONTROL PANEL 5.1</small></div>
+        <div><b>NEXORA</b><small>CONTROL PANEL 6.0</small></div>
       </a>
       <nav class="admin-nav" aria-label="Navigasi admin">
         <button class="admin-nav-item is-active" data-section="overview" type="button"><i class="fa-solid fa-grid-2"></i><span>Ringkasan</span></button>
@@ -27,6 +29,7 @@
         <button class="admin-nav-item" data-section="analytics" type="button"><i class="fa-solid fa-chart-line"></i><span>Analytics</span></button>
         <button class="admin-nav-item" data-section="feedback" type="button"><i class="fa-regular fa-message"></i><span>Feedback</span></button>
         <button class="admin-nav-item" data-section="health" type="button"><i class="fa-solid fa-heart-pulse"></i><span>Health</span></button>
+        <button class="admin-nav-item" data-section="visual" type="button"><i class="fa-solid fa-camera-retro"></i><span>Visual QA</span></button>
         <button class="admin-nav-item" data-section="audit" type="button"><i class="fa-solid fa-clock-rotate-left"></i><span>Audit Log</span></button>
       </nav>
       <div class="sidebar-bottom">
@@ -118,6 +121,37 @@
           <div class="pagination-bar" id="feedbackPagination"></div>
         </section>
 
+        <section class="admin-section" data-panel="visual" id="visualQaPanel">
+          <div class="section-toolbar visual-toolbar">
+            <div class="toolbar-title"><p class="eyebrow">RUNTIME &amp; VISUAL QA</p><b>Uji JavaScript, resource, screenshot, dan perubahan tampilan</b></div>
+            <select id="visualRoute" class="select-box" aria-label="Halaman yang diuji">
+              <option value="/">Beranda + tools</option><option value="/about">Tentang</option><option value="/feedback">Feedback</option><option value="/admin/login">Login admin</option><option value="/admin">Dashboard admin</option>
+            </select>
+            <select id="visualViewport" class="select-box" aria-label="Viewport uji"><option value="mobile">Mobile 390×844</option><option value="tablet">Tablet 768×1024</option><option value="desktop">Desktop 1440×900</option></select>
+            <label class="visual-module-option"><input id="visualRunModules" type="checkbox" checked><span>Uji 13 modul lazy-load</span></label>
+            <button id="runVisualTest" class="primary-button" type="button"><i class="fa-solid fa-play"></i> Jalankan Validasi</button>
+          </div>
+          <div class="visual-layout">
+            <article class="panel-card visual-stage-card">
+              <div class="panel-head"><div><p class="eyebrow">LIVE BROWSER</p><h2>Viewport Pengujian</h2></div><span class="panel-time">Same-origin sandbox</span></div>
+              <div class="visual-stage-shell"><iframe id="visualTestFrame" class="visual-test-frame" title="Halaman visual yang diuji" loading="eager"></iframe></div>
+              <div class="visual-stage-note"><i class="fa-solid fa-circle-info"></i><span>Screenshot dirender oleh browser admin. API, kamera, mikrofon, dan tindakan mutasi tidak dijalankan otomatis.</span></div>
+              <div class="visual-progress"><div class="visual-progress-track"><i id="visualProgressBar"></i></div><span id="visualProgressText">Siap menjalankan validasi.</span></div>
+            </article>
+            <div class="visual-side-stack">
+              <article class="panel-card">
+                <div class="visual-result-head"><div><p class="eyebrow">RESULT</p><h2>Hasil Terakhir</h2></div><span class="visual-result-badge" id="visualResultBadge">BELUM DIUJI</span></div>
+                <div class="visual-actions"><button id="downloadVisualScreenshot" class="secondary-button" type="button" disabled><i class="fa-solid fa-download"></i> Screenshot</button><button id="setVisualBaseline" class="secondary-button" type="button" disabled><i class="fa-solid fa-camera-retro"></i> Jadikan Baseline</button><label><span>Toleransi visual (%)</span><input id="visualThreshold" type="number" min="0.5" max="40" step="0.5" value="8"></label></div>
+                <div class="visual-metrics" id="visualMetrics"><div><span>Status</span><b>Belum diuji</b></div></div>
+                <div class="visual-screenshot-wrap"><img id="visualScreenshot" alt="Screenshot hasil visual validation" hidden></div>
+                <div class="visual-issues" id="visualIssues"><div class="visual-empty"><i class="fa-solid fa-vial"></i><b>Belum ada hasil</b><span>Pilih route dan viewport, lalu jalankan validasi.</span></div></div>
+              </article>
+              <article class="panel-card"><div class="panel-head"><div><p class="eyebrow">BASELINE</p><h2>Referensi Visual</h2></div></div><div id="visualBaselineInfo"></div></article>
+              <article class="panel-card"><div class="panel-head"><div><p class="eyebrow">HISTORY</p><h2>Riwayat Validasi</h2></div></div><div class="visual-history" id="visualHistory"></div></article>
+            </div>
+          </div>
+        </section>
+
         <section class="admin-section" data-panel="audit">
           <div class="section-toolbar audit-toolbar">
             <div class="toolbar-title"><p class="eyebrow">SECURITY TRAIL</p><b>Riwayat tindakan administrator</b></div>
@@ -133,6 +167,7 @@
       <button class="is-active" data-section="overview" type="button"><i class="fa-solid fa-grid-2"></i><span>Home</span></button>
       <button data-section="tools" type="button"><i class="fa-solid fa-screwdriver-wrench"></i><span>Tools</span></button>
       <button data-section="analytics" type="button"><i class="fa-solid fa-chart-line"></i><span>Insight</span></button>
+      <button data-section="visual" type="button"><i class="fa-solid fa-camera-retro"></i><span>QA</span></button>
       <button data-section="feedback" type="button"><i class="fa-regular fa-message"></i><span>Inbox</span></button>
       <button data-section="audit" type="button"><i class="fa-solid fa-clock-rotate-left"></i><span>Audit</span></button>
     </nav>
@@ -185,5 +220,6 @@
 
   <div class="toast-stack" id="toastStack" aria-live="polite"></div>
   <script src="../assets/js/admin/dashboard.js" defer></script>
+  <script src="../assets/js/admin/visual-qa.js" defer></script>
 </body>
 </html>

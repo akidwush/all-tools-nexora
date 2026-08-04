@@ -107,6 +107,26 @@ const migrationV51 = fs.readFileSync(path.join(root,"database/migrations/004_ana
 for (const token of ["create table if not exists public.tool_usage_events","create table if not exists public.admin_audit_logs","admin_analytics_summary","admin_updated_by","grant execute"]) if(!migrationV51.includes(token)) fail(`Migration v5.1 belum lengkap: ${token}`);
 for (const route of ["/api/analytics","/api/admin/analytics","/api/admin/feedback","/api/admin/audit"]) if(!(routeManifest.apiRoutes||[]).includes(route)) fail(`route-manifest belum mencantumkan ${route}`);
 
+
+const visualV60Required = [
+  "api/admin/visual.js", "assets/js/core/runtime-observer.js", "assets/js/admin/visual-qa.js",
+  "assets/css/visual-qa.css", "database/migrations/005_visual_runtime_validation.sql", "V6_VALIDATION.md"
+];
+for (const file of visualV60Required) if (!fs.existsSync(path.join(root, file))) fail(`Visual QA v6.0 file hilang: ${file}`);
+const runtimeObserverV60 = fs.readFileSync(path.join(root,"assets/js/core/runtime-observer.js"),"utf8");
+for (const token of ["__NEXORA_RUNTIME_OBSERVER__","unhandledrejection","runModules","horizontalOverflowPx"]) if(!runtimeObserverV60.includes(token)) fail(`Runtime observer v6.0 belum lengkap: ${token}`);
+const visualUiV60 = fs.readFileSync(path.join(root,"assets/js/admin/visual-qa.js"),"utf8");
+for (const token of ["captureFrame","foreignObject","compareFingerprints","set_baseline","save_run"]) if(!visualUiV60.includes(token)) fail(`Visual QA UI v6.0 belum lengkap: ${token}`);
+const visualApiV60 = fs.readFileSync(path.join(root,"api/admin/visual.js"),"utf8");
+for (const token of ["visual_baselines","visual_test_runs","verifyMutationRequest","recordAdminAudit"]) if(!visualApiV60.includes(token)) fail(`Visual QA API v6.0 belum lengkap: ${token}`);
+const migrationV60 = fs.readFileSync(path.join(root,"database/migrations/005_visual_runtime_validation.sql"),"utf8");
+for (const token of ["create table if not exists public.visual_baselines","create table if not exists public.visual_test_runs","threshold_percent","thumbnail_data_url"]) if(!migrationV60.includes(token)) fail(`Migration v6.0 belum lengkap: ${token}`);
+for (const html of ["index.html","about.html","feedback.html","admin/index.html","admin/login.html"]) {
+  const source = fs.readFileSync(path.join(root,html),"utf8");
+  if(!source.includes("runtime-observer.js")) fail(`${html} belum memuat runtime observer v6.0`);
+}
+if(!(routeManifest.apiRoutes||[]).includes("/api/admin/visual")) fail("route-manifest belum mencantumkan /api/admin/visual");
+
 const healthCatalog=require(path.join(root,"lib/tool-health.js")).TOOL_CATALOG;
 if(!Array.isArray(healthCatalog)||healthCatalog.length!==22) fail(`Tool health catalog harus memuat 22 tools, ditemukan ${healthCatalog?.length||0}.`);
 
@@ -131,4 +151,4 @@ for(const file of scanFiles){
   }
 }
 if(failed) process.exit(1);
-console.log(`Audit v5.1 lulus: index ${indexBytes.toLocaleString()} byte, ${jsFiles.length} file JS valid, lazy-load, live audit, tool health, analytics, feedback management, audit log, login, dan dashboard admin lengkap.`);
+console.log(`Audit v6.0 lulus: index ${indexBytes.toLocaleString()} byte, ${jsFiles.length} file JS valid, lazy-load, live audit, tool health, runtime JS test, screenshot, visual validation, analytics, feedback management, audit log, login, dan dashboard admin lengkap.`);

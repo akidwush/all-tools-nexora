@@ -3,7 +3,7 @@
   const state={session:null,dashboard:null,tools:[],analytics:null,feedback:[],feedbackMeta:null,audit:[],activeSection:"overview",editingTool:null,editingFeedback:null};
   const $=(selector,root=document)=>root.querySelector(selector);
   const $$=(selector,root=document)=>Array.from(root.querySelectorAll(selector));
-  const headings={overview:"Ringkasan Sistem",tools:"Manajemen Tools",analytics:"Analytics Penggunaan",health:"Tool Health Monitoring",feedback:"Feedback Pengguna",audit:"Audit Log Admin"};
+  const headings={overview:"Ringkasan Sistem",tools:"Manajemen Tools",analytics:"Analytics Penggunaan",health:"Tool Health Monitoring",feedback:"Feedback Pengguna",visual:"Runtime & Visual QA",audit:"Audit Log Admin"};
   let feedbackTimer=null;
 
   function escapeHtml(value){return String(value??"").replace(/[&<>'"]/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[char]));}
@@ -27,6 +27,7 @@
     if(section==="analytics"&&!state.analytics)await loadAnalytics();
     if(section==="feedback"&&!state.feedbackMeta)await loadFeedback(1);
     if(section==="audit"&&!state.audit.length)await loadAudit();
+    if(section==="visual")document.dispatchEvent(new CustomEvent("nexora:visual-section-open"));
     window.scrollTo({top:0,behavior:"smooth"});
   }
 

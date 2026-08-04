@@ -1,14 +1,14 @@
 {
   "name": "all-tools-nexora-developer-dika",
-  "version": "5.1.0",
+  "version": "6.0.0",
   "private": true,
-  "description": "All Tools Nexora v5.1 — admin analytics, feedback management, audit log, secure login, live audit, and health monitoring",
+  "description": "All Tools Nexora v6.0 — runtime JavaScript testing, browser screenshots, visual baselines, analytics, feedback management, audit log, admin, live audit, and health monitoring",
   "scripts": {
     "dev": "node serve-local.js",
     "start": "node serve-local.js",
     "check": "node scripts/check-project.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test-api.js && node scripts/test-audit.js && node scripts/test-tool-health.js && node scripts/test-admin.js && node scripts/test-admin-v51.js"
+    "test": "node scripts/test-api.js && node scripts/test-audit.js && node scripts/test-tool-health.js && node scripts/test-admin.js && node scripts/test-admin-v51.js && node scripts/test-visual-v60.js"
   },
   "engines": {
     "node": ">=18"
