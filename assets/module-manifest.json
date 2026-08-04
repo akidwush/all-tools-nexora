@@ -101,6 +101,14 @@
       "js": [
         "assets/js/features/deploy-center.js"
       ]
+    },
+    "web-encryption": {
+      "css": [
+        "assets/css/features/web-encryption.css"
+      ],
+      "js": [
+        "assets/js/features/web-encryption.js"
+      ]
     }
   },
   "tools": {
@@ -125,6 +133,7 @@
     "unbanwa": "unban-whatsapp",
     "zxvai": "nexus-ai",
     "fotolink": "pix-vault",
-    "vdeploy": "deploy-center"
+    "vdeploy": "deploy-center",
+    "webencryption": "web-encryption"
   }
 }

@@ -1,4 +1,4 @@
-/* Nexora v6.2 stable lazy module loader */
+/* Nexora v6.3.1 stable lazy module loader */
 (function(){
   'use strict';
 
@@ -15,7 +15,8 @@
     'unban-whatsapp': {css:[],js:['assets/js/features/unban-whatsapp.js']},
     'nexus-ai': {css:['assets/css/features/nexus-ai.css'],js:['assets/js/features/nexus-ai.js']},
     'pix-vault': {css:['assets/css/features/pix-vault.css'],js:['assets/js/features/pix-vault.js']},
-    'deploy-center': {css:['assets/css/features/deploy-center.css'],js:['assets/js/features/deploy-center.js']}
+    'deploy-center': {css:['assets/css/features/deploy-center.css'],js:['assets/js/features/deploy-center.js']},
+    'web-encryption': {css:['assets/css/features/web-encryption.css'],js:['assets/js/features/web-encryption.js']}
   };
 
   var toolModules = {
@@ -24,7 +25,7 @@
     promptgenerate:'imported-tools',fakeovo:'imported-tools',quotegenerator:'imported-tools',carifakta:'imported-tools',mltools:'imported-tools',
     iqc:'generator-pack',winquotes:'generator-pack',nokiamsg:'generator-pack',
     terabox:'download-pack',fakebankjago:'download-pack',spotify:'download-pack',
-    unbanwa:'unban-whatsapp',zxvai:'nexus-ai',fotolink:'pix-vault',vdeploy:'deploy-center'
+    unbanwa:'unban-whatsapp',zxvai:'nexus-ai',fotolink:'pix-vault',vdeploy:'deploy-center',webencryption:'web-encryption'
   };
 
   var labels = {
@@ -33,7 +34,7 @@
     'quote generator':'quotegenerator','carifakta':'carifakta','ml tools':'mltools','iqc generator':'iqc',
     'windows quotes':'winquotes','nokia message':'nokiamsg','terabox downloader':'terabox','fake bank jago':'fakebankjago',
     'spotify downloader':'spotify','unban whatsapp':'unbanwa','zxvai':'zxvai','nexus ai':'zxvai','foto to link':'fotolink',
-    'deploy & update web':'vdeploy','deploy website':'vdeploy'
+    'deploy & update web':'vdeploy','deploy website':'vdeploy','web encryption':'webencryption'
   };
 
   var modulePromises = new Map();

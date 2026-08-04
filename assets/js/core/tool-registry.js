@@ -33,12 +33,12 @@
     ["enhancer","Image Enhancer","local",null,"renderEnhancer",null],
     ["ttquote","Quote TikTok Nexus","module","tiktok-quote","renderTiktokQuote",null],
     ["qrgen","QR Generator","local",null,"renderQrGenerator",null],
-    ["tiktokhd","Upload TikTok HD","restricted",null,"renderTikTokHdUpload","https://www.tiktok.com/tiktokstudio"],
+    ["tiktokhd","Upload TikTok HD","external",null,"openTikTokHdUpload","https://www.tiktok.com/tiktokstudio"],
     ["getcode","Get Code HTML","module","get-code","openGetCodeRoom",null],
     ["vdeploy","Deploy & Update Web","module","deploy-center","openDeploy",null],
     ["zxvai","ZxVAI","module","nexus-ai","openNexusAI","https://zxvaiapk.netlify.app/"],
     ["fotolink","Foto To Link","module","pix-vault","openPix","https://pixvault-bykz.netlify.app/"],
-    ["webencryption","Web Encryption","restricted",null,"openWebEncryption",null],
+    ["webencryption","Web Encryption","module","web-encryption","renderWebEncryption",null],
     ["unbanwa","Unban WhatsApp","module","unban-whatsapp","openNexusUnban",null]
   ];
 
@@ -57,6 +57,6 @@
     return ({ready:"Siap",degraded:"Terbatas",offline:"Gangguan",restricted:"Terbatas",missing:"Tidak lengkap",unknown:"Belum dicek"})[status] || status;
   }
 
-  window.NexoraToolRegistry = Object.freeze({version:"6.2.0",count:rows.length,get:get,list:list,statusLabel:statusLabel});
+  window.NexoraToolRegistry = Object.freeze({version:"6.3.1",count:rows.length,get:get,list:list,statusLabel:statusLabel});
   window.dispatchEvent(new CustomEvent("nexora:tool-registry-ready"));
 })();

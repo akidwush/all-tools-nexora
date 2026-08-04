@@ -478,122 +478,17 @@
     };
 })();
 
-/* ===== original script 19: nxDeveloperAccessHardLockScript ===== */
+/* ===== Nexora v6.3.1: unlocked external tools ===== */
 (function(){
   "use strict";
-  const LOCKED_IDS=new Set(["tiktokhd","webencryption"]);
-  const LABELS={
-    getcode:"Get Code HTML",
-    tiktokhd:"Upload TikTok HD",
-    webencryption:"Web Encryption"
-  };
-  const LABEL_TO_ID={
-    "upload tiktok hd":"tiktokhd",
-    "web encryption":"webencryption"
-  };
-  function normalize(v){return String(v||"").trim().toLowerCase().replace(/\s+/g," ")}
-  function resolveLockedId(el){
-    if(!el)return "";
-    const direct=String((el.dataset&&(el.dataset.toolId||el.dataset.projectId||el.dataset.tool||el.dataset.externalWorkspace))||"");
-    if(LOCKED_IDS.has(direct))return direct;
-    const titleNode=el.querySelector&&el.querySelector("h4,h3,.featured-info h3,.tool-name");
-    return LABEL_TO_ID[normalize(titleNode&&titleNode.textContent)]||"";
-  }
-  function findLockedCard(target){
-    if(!target||!target.closest)return null;
-    const card=target.closest(".tools-card,.tool-card,.featured-card,[data-tool-id],[data-project-id]");
-    if(!card)return null;
-    const id=resolveLockedId(card);
-    return id?{card,id}:null;
-  }
-  function closePopup(){
-    const ov=document.getElementById("nxDeveloperAccessLock");
-    if(!ov)return;
-    ov.classList.remove("show");
-    ov.setAttribute("aria-hidden","true");
-  }
-  window.requestDeveloperAccess=function(toolId){
-    const id=LOCKED_IDS.has(String(toolId||""))?String(toolId):"getcode";
-    const label=LABELS[id]||"Tools Nexus";
-    const ov=document.getElementById("nxDeveloperAccessLock");
-    const name=document.getElementById("nxAccessLockToolName");
-    const wa=document.getElementById("nxAccessLockWa");
-    if(name)name.textContent=label;
-    if(wa){
-      const message="Halo Developer, saya ingin minta akses untuk tools "+label+".";
-      const target=String(wa.dataset.socialUrl||"");
-      if(target){
-        try{
-          const url=new URL(target,window.location.origin);
-          url.searchParams.set("text",message);
-          wa.href=url.toString();
-        }catch{wa.href=target}
-      }
-    }
-    if(ov){ov.classList.add("show");ov.setAttribute("aria-hidden","false")}
+  const TIKTOK_STUDIO_URL="https://www.tiktok.com/tiktokstudio";
+  window.openTikTokHdUpload=function(){
+    const opened=window.open(TIKTOK_STUDIO_URL,"_blank","noopener,noreferrer");
+    if(!opened) window.location.href=TIKTOK_STUDIO_URL;
     return false;
   };
-  window.isNexusLockedTool=id=>LOCKED_IDS.has(String(id||""));
-  // Get Code HTML tersedia dan dikelola oleh nxGetCodeV2RoomScript.
-  window.renderTikTokHdUpload=()=>window.requestDeveloperAccess("tiktokhd");
-  window.openWebEncryption=()=>window.requestDeveloperAccess("webencryption");
-  window.closeWebEncryption=function(){};
-
-  function patch(root){
-    const host=root&&root.querySelectorAll?root:document;
-    host.querySelectorAll(".tools-card,.tool-card,.featured-card,[data-tool-id],[data-project-id]").forEach(card=>{
-      const id=resolveLockedId(card);
-      if(!id)return;
-      card.dataset.nexusAccessLocked="1";
-      card.removeAttribute("onclick");
-      card.removeAttribute("data-external-workspace");
-      card.onclick=e=>{
-        if(e){e.preventDefault();e.stopPropagation()}
-        return window.requestDeveloperAccess(id);
-      };
-      card.onkeydown=e=>{
-        if(e.key==="Enter"||e.key===" "){
-          e.preventDefault();e.stopPropagation();window.requestDeveloperAccess(id);
-        }
-      };
-    });
-  }
-
-  document.addEventListener("click",e=>{
-    const locked=findLockedCard(e.target);
-    if(!locked)return;
-    e.preventDefault();e.stopPropagation();
-    if(typeof e.stopImmediatePropagation==="function")e.stopImmediatePropagation();
-    window.requestDeveloperAccess(locked.id);
-  },true);
-
-  document.addEventListener("keydown",e=>{
-    if(e.key==="Escape"){closePopup();return}
-    if(e.key!=="Enter"&&e.key!==" ")return;
-    const locked=findLockedCard(e.target);
-    if(!locked)return;
-    e.preventDefault();e.stopPropagation();window.requestDeveloperAccess(locked.id);
-  },true);
-
-  document.addEventListener("click",e=>{
-    if(e.target.closest("#nxAccessLockClose")){e.preventDefault();closePopup();return}
-    const ov=e.target.closest("#nxDeveloperAccessLock");
-    if(ov&&e.target===ov)closePopup();
-  });
-
-  function init(){
-    patch(document);
-    const observer=new MutationObserver(records=>{
-      records.forEach(record=>record.addedNodes.forEach(node=>{
-        if(node&&node.nodeType===1)patch(node);
-      }));
-    });
-    observer.observe(document.documentElement,{childList:true,subtree:true});
-    setTimeout(()=>patch(document),250);
-    setTimeout(()=>patch(document),1000);
-  }
-  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});
-  else init();
+  window.renderTikTokHdUpload=window.openTikTokHdUpload;
+  window.isNexusLockedTool=function(){return false;};
 })();
 
 /* ===== original script 20: inline-20 ===== */

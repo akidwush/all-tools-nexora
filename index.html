@@ -460,7 +460,7 @@
 <span class="badge">QR</span>
 <div class="arrow"><i class="fas fa-arrow-right"></i></div>
 </div>
-<div class="tools-card" data-nexus-access-locked="1">
+<div class="tools-card" data-tool-id="tiktokhd" role="button" tabindex="0" onclick="window.openTikTokHdUpload &amp;&amp; window.openTikTokHdUpload()">
 <div class="icon"><i class="fa-brands fa-tiktok"></i></div>
 <h4>Upload TikTok HD</h4>
 <p>Proses MP4 HD + TikTok Studio</p>
@@ -493,7 +493,7 @@
 <p>Upload &amp; share</p>
 <div class="arrow"><i class="fas fa-arrow-right"></i></div>
 </div>
-<div class="tools-card" data-nexus-access-locked="1">
+<div class="tools-card" data-tool-id="webencryption" role="button" tabindex="0" onclick="showTool('webencryption')">
 <div class="icon"><i class="fa-solid fa-shield-halved"></i></div>
 <h4>Web Encryption</h4>
 <p>Encrypt &amp; protect HTML</p>
@@ -770,7 +770,7 @@
                 <span class="line"></span>
 </div>
 <div class="tools-grid" id="externalGrid">
-<div class="tools-card" data-nexus-access-locked="1">
+<div class="tools-card" data-tool-id="tiktokhd" role="button" tabindex="0" onclick="window.openTikTokHdUpload &amp;&amp; window.openTikTokHdUpload()">
 <div class="icon"><i class="fa-brands fa-tiktok"></i></div>
 <h4>Upload TikTok HD</h4>
 <p>Proses MP4 HD + TikTok Studio</p>
@@ -803,7 +803,7 @@
 <p>Upload &amp; share</p>
 <div class="arrow"><i class="fas fa-arrow-right"></i></div>
 </div>
-<div class="tools-card" data-nexus-access-locked="1">
+<div class="tools-card" data-tool-id="webencryption" role="button" tabindex="0" onclick="showTool('webencryption')">
 <div class="icon"><i class="fa-solid fa-shield-halved"></i></div>
 <h4>Web Encryption</h4>
 <p>Encrypt &amp; protect HTML</p>
@@ -910,31 +910,20 @@
 <div aria-hidden="true" class="nx-access-lock-overlay" id="nxDeveloperAccessLock">
 <div aria-labelledby="nxAccessLockTitle" aria-modal="true" class="nx-access-lock-card" role="dialog">
 <div class="nx-access-lock-icon"><i class="fa-solid fa-lock"></i></div>
-<h3 id="nxAccessLockTitle">Minta Akses developer untuk tools ini</h3>
-<p>Fitur tools ini sudah dihapus dari file dan tidak dapat dibuka. Hubungi developer untuk meminta akses.</p>
+<h3 id="nxAccessLockTitle">Akses khusus Nexora</h3>
+<p>Panel ini disimpan untuk kompatibilitas fitur lama. Upload TikTok HD dan Web Encryption sekarang sudah terbuka.</p>
 <div class="nx-access-lock-tool">
 <i class="fa-solid fa-toolbox"></i>
 <span id="nxAccessLockToolName">Tools Nexus</span>
 </div>
 <a aria-label="Gabung Saluran WhatsApp All Tools Nexora" class="nx-access-channel" data-social-key="whatsapp_channel" hidden href="#" rel="noopener noreferrer" target="_blank">
-<span class="nx-access-channel-icon">
-<i class="fa-brands fa-whatsapp"></i>
-</span>
-<span class="nx-access-channel-copy">
-<b>Gabung Saluran WhatsApp</b>
-<span>Update akses tools, fitur baru, dan informasi Nexus.</span>
-</span>
-<span class="nx-access-channel-arrow">
-<i class="fa-solid fa-arrow-up-right-from-square"></i>
-</span>
+<span class="nx-access-channel-icon"><i class="fa-brands fa-whatsapp"></i></span>
+<span class="nx-access-channel-copy"><b>Gabung Saluran WhatsApp</b><span>Update fitur baru dan informasi Nexus.</span></span>
+<span class="nx-access-channel-arrow"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
 </a>
 <div class="nx-access-lock-actions">
-<button class="nx-access-lock-btn nx-access-lock-close" id="nxAccessLockClose" type="button">
-<i class="fa-solid fa-xmark"></i>Tutup
-      </button>
-<a class="nx-access-lock-btn nx-access-lock-wa" data-social-key="whatsapp_access" hidden href="#" id="nxAccessLockWa" rel="noopener noreferrer" target="_blank">
-<i class="fa-brands fa-whatsapp"></i>Minta Akses
-      </a>
+<button class="nx-access-lock-btn nx-access-lock-close" id="nxAccessLockClose" type="button"><i class="fa-solid fa-xmark"></i>Tutup</button>
+<a class="nx-access-lock-btn nx-access-lock-wa" data-social-key="whatsapp_access" hidden href="#" id="nxAccessLockWa" rel="noopener noreferrer" target="_blank"><i class="fa-brands fa-whatsapp"></i>Hubungi Developer</a>
 </div>
 </div>
 </div>

@@ -1328,9 +1328,9 @@ function renderGrid(containerId, items, isExternal = false) {
             (item.id === 'vdeploy' ?
             `onclick="window.openDeploy && window.openDeploy()"` :
             (item.id === 'webencryption' ?
-            `onclick="window.openWebEncryption && window.openWebEncryption()"` :
+            `onclick="showTool('webencryption')"` :
             (item.id === 'tiktokhd' ?
-                `onclick="showTool('tiktokhd')"` :
+                `onclick="window.openTikTokHdUpload && window.openTikTokHdUpload()"` :
                 (isExternal || item.link ?
                     `onclick="window.open('${item.link || '#'}','_blank')"` :
                     `onclick="showTool('${item.id}')"`))));
@@ -1433,7 +1433,7 @@ function showTool(toolId) {
     document.body.style.overflow = 'hidden';
 
     let tool = null;
-    for (let cat of ['downloader', 'maker', 'tools', 'vault']) {
+    for (let cat of ['downloader', 'maker', 'tools', 'vault', 'external']) {
         const found = toolsData[cat].find(t => t.id === toolId);
         if (found) { tool = found; break; }
     }
@@ -1472,6 +1472,7 @@ case 'calc': renderCalc(body); break;
         case 'enhancer': renderEnhancer(body); break;
         case 'ttquote': renderTiktokQuote(body); break;
         case 'qrgen': renderQrGenerator(body); break;
+        case 'webencryption': renderWebEncryption(body); break;
         default: closeTool();
     }
     mountToolApiStatus(body, toolId);

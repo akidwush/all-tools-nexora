@@ -1,14 +1,14 @@
 {
   "name": "all-tools-nexora-developer-dika",
-  "version": "6.3.0",
+  "version": "6.3.1",
   "private": true,
-  "description": "All Tools Nexora v6.3 — public performance optimization, instant catalog rendering, deferred diagnostics, and low-power mobile mode",
+  "description": "All Tools Nexora v6.3.1 — unlock TikTok Studio upload and local Web Encryption while preserving public performance optimizations",
   "scripts": {
     "dev": "node serve-local.js",
     "start": "node serve-local.js",
     "check": "node scripts/check-project.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test-api.js && node scripts/test-audit.js && node scripts/test-tool-health.js && node scripts/test-admin.js && node scripts/test-admin-v51.js && node scripts/test-visual-v60.js && node scripts/test-social-links.js && node scripts/test-serverless-limit.js && node scripts/test-network-v62.js && node scripts/test-functional-v62.js && node scripts/test-performance-v63.js"
+    "test": "node scripts/test-api.js && node scripts/test-audit.js && node scripts/test-tool-health.js && node scripts/test-admin.js && node scripts/test-admin-v51.js && node scripts/test-visual-v60.js && node scripts/test-social-links.js && node scripts/test-serverless-limit.js && node scripts/test-network-v62.js && node scripts/test-functional-v62.js && node scripts/test-performance-v63.js && node scripts/test-unlocked-tools-v631.js"
   },
   "engines": {
     "node": ">=18"
