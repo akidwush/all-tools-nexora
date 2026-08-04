@@ -1,4 +1,4 @@
-/* Nexora v6.3.6 stable lazy module loader */
+/* Nexora v6.3.7 stable lazy module loader */
 (function(){
   'use strict';
 
@@ -39,21 +39,29 @@
 
   var modulePromises = new Map();
   var assetPromises = new Map();
+  /* Vercel serves /assets with a one-hour browser cache.  A module can
+     therefore otherwise keep the previous CSS/JS after a successful deploy. */
+  var ASSET_VERSION = '6.3.7';
   var baseShowTool = typeof window.showTool === 'function' ? window.showTool : null;
   var activeCard = null;
 
   function absolute(url){ return new URL(url, document.baseURI).href; }
+  function versioned(url){
+    var separator = String(url).indexOf('?')===-1 ? '?' : '&';
+    return String(url)+separator+'v='+encodeURIComponent(ASSET_VERSION);
+  }
 
   function loadStyle(url){
-    var href = absolute(url);
+    var requestUrl = versioned(url);
+    var href = absolute(requestUrl);
     if(assetPromises.has(href)) return assetPromises.get(href);
     var existing = Array.prototype.find.call(document.styleSheets || [], function(sheet){ return sheet.href === href; });
     if(existing){ var done = Promise.resolve(); assetPromises.set(href,done); return done; }
     var promise = new Promise(function(resolve,reject){
       var link=document.createElement('link');
-      link.rel='stylesheet'; link.href=url; link.dataset.nxLazyAsset='style';
+      link.rel='stylesheet'; link.href=requestUrl; link.dataset.nxLazyAsset='style';
       link.onload=function(){resolve();};
-      link.onerror=function(){reject(new Error('Gagal memuat stylesheet '+url));};
+      link.onerror=function(){reject(new Error('Gagal memuat stylesheet '+requestUrl));};
       document.head.appendChild(link);
     });
     assetPromises.set(href,promise);
@@ -61,7 +69,8 @@
   }
 
   function loadScript(url){
-    var src = absolute(url);
+    var requestUrl = versioned(url);
+    var src = absolute(requestUrl);
     if(assetPromises.has(src)) return assetPromises.get(src);
     var existing = Array.prototype.find.call(document.scripts || [], function(item){ return item.src === src; });
     if(existing && existing.dataset.nxLoaded === '1'){
@@ -69,9 +78,9 @@
     }
     var promise = new Promise(function(resolve,reject){
       var script=document.createElement('script');
-      script.src=url; script.async=false; script.dataset.nxLazyAsset='script';
+      script.src=requestUrl; script.async=false; script.dataset.nxLazyAsset='script';
       script.onload=function(){script.dataset.nxLoaded='1';resolve();};
-      script.onerror=function(){reject(new Error('Gagal memuat modul '+url));};
+      script.onerror=function(){reject(new Error('Gagal memuat modul '+requestUrl));};
       document.body.appendChild(script);
     });
     assetPromises.set(src,promise);

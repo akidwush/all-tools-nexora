@@ -152,7 +152,7 @@
     }
     var counts={ready:0,degraded:0,offline:0,restricted:0,missing:0};
     results.forEach(function(item){counts[item.status]=(counts[item.status]||0)+1;});
-    lastAudit={version:"6.3.6",startedAt:new Date(started).toISOString(),completedAt:new Date().toISOString(),durationMs:Date.now()-started,counts:counts,total:results.length,results:results};
+    lastAudit={version:"6.3.7",startedAt:new Date(started).toISOString(),completedAt:new Date().toISOString(),durationMs:Date.now()-started,counts:counts,total:results.length,results:results};
     try{localStorage.setItem("nexora-functional-audit-v62",JSON.stringify(lastAudit));}catch(_){ }
     window.dispatchEvent(new CustomEvent("nexora:functional-audit-complete",{detail:lastAudit}));
     return lastAudit;
@@ -184,6 +184,6 @@
     else applyCardStatus();
   });
 
-  window.NexoraStability={version:"6.3.6",audit:audit,loadHealth:loadHealth,applyCardStatus:applyCardStatus,notify:notify,fetchJson:fetchJson,getLastAudit:function(){return lastAudit;},getHealth:function(id){return healthMap[id]||null;}};
+  window.NexoraStability={version:"6.3.7",audit:audit,loadHealth:loadHealth,applyCardStatus:applyCardStatus,notify:notify,fetchJson:fetchJson,getLastAudit:function(){return lastAudit;},getHealth:function(id){return healthMap[id]||null;}};
   window.dispatchEvent(new CustomEvent("nexora:stability-ready"));
 })();

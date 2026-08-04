@@ -11,7 +11,7 @@ const dashboard = read('assets/js/admin/dashboard.js');
 const app = read('assets/js/core/app.js');
 const html = read('admin/index.html');
 
-assert.equal(pkg.version, '6.3.6');
+assert.equal(pkg.version, '6.3.7');
 for (const token of ['sanitizeCanvasCss', 'renderFrameCanvas', 'canvasToBlob', 'safeFallback']) assert.ok(visual.includes(token), `Visual QA harus memuat ${token}`);
 assert.match(visual, /removeAllUrls/);
 assert.match(visual, /@font-face/);

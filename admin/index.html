@@ -12,8 +12,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-  <link href="../assets/css/admin.css" rel="stylesheet">
-  <link href="../assets/css/visual-qa.css" rel="stylesheet">
+  <link href="../assets/css/admin.css?v=6.3.7" rel="stylesheet">
+  <link href="../assets/css/visual-qa.css?v=6.3.7" rel="stylesheet">
 </head>
 <body class="admin-dashboard-page">
   <div class="admin-loader" id="adminLoader"><span></span><p>Memverifikasi sesi admin...</p></div>
@@ -80,7 +80,7 @@
             <label class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input id="toolSearch" type="search" placeholder="Cari nama atau ID tools"></label>
             <select id="toolStatusFilter" class="select-box"><option value="all">Semua status</option><option value="active">Aktif</option><option value="inactive">Nonaktif</option></select>
             <select id="toolCategoryFilter" class="select-box"><option value="all">Semua kategori</option><option value="downloader">Downloader</option><option value="maker">Maker</option><option value="tools">Tools</option><option value="vault">Vault</option><option value="external">External</option></select>
-            <button id="addToolButton" class="primary-button" type="button"><i class="fa-solid fa-plus"></i> Tambah Tool</button>
+            <button id="addToolButton" data-add-tool="true" class="primary-button" type="button"><i class="fa-solid fa-plus"></i> Tambah Tool</button>
           </div>
           <div class="tool-admin-grid" id="toolAdminGrid"></div>
           <div class="empty-state" id="toolEmpty" hidden><i class="fa-solid fa-box-open"></i><b>Tools tidak ditemukan</b><span>Coba ubah pencarian atau filter.</span></div>
@@ -283,8 +283,8 @@
   </div>
 
   <div class="toast-stack" id="toastStack" aria-live="polite"></div>
-  <script src="../assets/js/admin/dashboard.js" defer></script>
-  <script src="../assets/js/admin/visual-qa.js" defer></script>
-  <script src="../assets/js/admin/functional-audit.js" defer></script>
+  <script src="../assets/js/admin/dashboard.js?v=6.3.7" defer></script>
+  <script src="../assets/js/admin/visual-qa.js?v=6.3.7" defer></script>
+  <script src="../assets/js/admin/functional-audit.js?v=6.3.7" defer></script>
 </body>
 </html>

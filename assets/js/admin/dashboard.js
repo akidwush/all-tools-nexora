@@ -129,8 +129,12 @@
   function bind(){
     $$('[data-section]').forEach(button=>button.addEventListener("click",()=>switchSection(button.dataset.section)));
     $$('[data-go-section]').forEach(button=>button.addEventListener("click",()=>switchSection(button.dataset.goSection)));
-    [$("#toolSearch"),$("#toolStatusFilter"),$("#toolCategoryFilter")].forEach(input=>input.addEventListener("input",renderTools));
-    $("#addToolButton").addEventListener("click",openNewToolEditor);$("#toolAdminGrid").addEventListener("click",event=>{const deleteButton=event.target.closest("[data-delete-tool]");if(deleteButton){deleteTool(deleteButton.dataset.deleteTool);return;}const button=event.target.closest("[data-edit-tool]");if(button)openToolEditor(button.dataset.editTool);});
+    [$("#toolSearch"),$("#toolStatusFilter"),$("#toolCategoryFilter")].filter(Boolean).forEach(input=>input.addEventListener("input",renderTools));
+    const addToolButton=$("#addToolButton");if(addToolButton){addToolButton.addEventListener("click",openNewToolEditor);addToolButton.dataset.nxAddToolBound="1";}
+    const toolAdminGrid=$("#toolAdminGrid");if(toolAdminGrid)toolAdminGrid.addEventListener("click",event=>{const deleteButton=event.target.closest("[data-delete-tool]");if(deleteButton){deleteTool(deleteButton.dataset.deleteTool);return;}const button=event.target.closest("[data-edit-tool]");if(button)openToolEditor(button.dataset.editTool);});
+    /* Delegated fallback keeps the action alive when a cached/partial admin
+       shell omitted the button during the initial bind. */
+    document.addEventListener("click",event=>{const button=event.target.closest("#addToolButton,[data-add-tool]");if(button&&button.dataset.nxAddToolBound!=="1"){event.preventDefault();openNewToolEditor();}});
     $("#toolEditForm").addEventListener("submit",saveTool);$("#closeToolModal").addEventListener("click",closeToolEditor);$("#cancelToolEdit").addEventListener("click",closeToolEditor);
     $("#socialAdminGrid").addEventListener("click",event=>{const button=event.target.closest("[data-edit-social]");if(button)openSocialEditor(button.dataset.editSocial);});
     $("#socialEditForm").addEventListener("submit",saveSocial);$("#closeSocialModal").addEventListener("click",closeSocialEditor);$("#cancelSocialEdit").addEventListener("click",closeSocialEditor);

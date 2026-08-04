@@ -1482,3 +1482,41 @@ html.nx-hero-video-disabled .nx-hero-video-toggle{display:none!important}
   .video-banner video{will-change:auto!important}
   .nx-hero-video-toggle{display:flex}
 }
+
+/* Nexora v6.3.7 — always-on TikTok media containment.  The TikTok feature
+   stylesheet is lazy-loaded; these low-cost guards keep a stale/missing
+   feature stylesheet from letting remote media widen the mobile viewport. */
+#ttRoomOverlay,
+#ttRoomOverlay .tt-room-shell,
+#ttRoomOverlay .tt-room-scroll,
+#ttRoomOverlay .tt-room-content,
+#ttRoomOverlay .tt-full-root,
+#ttRoomOverlay .tt-full-wrap,
+#ttRoomOverlay #ttResult,
+#ttRoomOverlay .tt-result-grid,
+#ttRoomOverlay .tt-result-grid>*,
+#ttRoomOverlay .tt-panel,
+#ttRoomOverlay .tt-preview-box,
+#ttRoomOverlay .dl-media-grid,
+#ttRoomOverlay .dl-media-item{
+  box-sizing:border-box;
+  min-width:0;
+  max-width:100%;
+}
+#ttRoomOverlay .tt-room-scroll,
+#ttRoomOverlay .tt-full-wrap,
+#ttRoomOverlay .tt-panel,
+#ttRoomOverlay .tt-preview-box,
+#ttRoomOverlay .dl-media-grid{overflow-x:hidden;}
+#ttRoomOverlay .tt-result-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;overflow:hidden;}
+#ttRoomOverlay .tt-preview-box{position:relative;width:100%;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+#ttRoomOverlay img,
+#ttRoomOverlay video{display:block;max-width:100%!important;min-width:0;}
+#ttRoomOverlay .tt-preview-video,
+#ttRoomOverlay .tt-preview-img,
+#ttRoomOverlay .dl-media-item img,
+#ttRoomOverlay .dl-media-item video{width:100%!important;max-width:100%!important;min-width:0!important;height:auto;object-fit:contain;}
+#ttRoomOverlay .dl-media-grid{width:100%;grid-template-columns:repeat(2,minmax(0,1fr));}
+#ttRoomOverlay .dl-media-item img,
+#ttRoomOverlay .dl-media-item video{max-height:52svh;}
+@media (max-width:380px){#ttRoomOverlay .dl-media-grid{grid-template-columns:minmax(0,1fr);}}

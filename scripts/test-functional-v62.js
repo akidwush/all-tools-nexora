@@ -16,7 +16,7 @@ sandbox.window.dispatchEvent = (event) => events.push(event.type);
 vm.runInNewContext(read("assets/js/core/tool-registry.js"), sandbox, { filename: "tool-registry.js" });
 const registry = sandbox.window.NexoraToolRegistry;
 assert.ok(registry, "Tool registry tidak terpasang");
-assert.equal(registry.version, "6.3.6");
+assert.equal(registry.version, "6.3.7");
 assert.equal(registry.count, 37);
 assert.equal(registry.list().length, 37);
 assert.equal(new Set(registry.list().map((item) => item.id)).size, 37);
@@ -46,7 +46,7 @@ const index = read("index.html");
 for (const asset of ["assets/js/core/network.js", "assets/js/core/tool-registry.js", "assets/js/core/stability.js", "assets/js/core/lazy-loader.js"]) {
   assert.ok(index.includes(asset), `index belum memuat ${asset}`);
 }
-assert.ok(index.indexOf('src="assets/js/core/network.js"') < index.indexOf('src="assets/js/core/app.js"'));
+assert.ok(index.indexOf('src="assets/js/core/network.js?v=') < index.indexOf('src="assets/js/core/app.js?v='));
 assert.ok(index.indexOf("tool-registry.js") < index.indexOf("stability.js"));
 assert.ok(index.indexOf("stability.js") < index.indexOf("lazy-loader.js"));
 
