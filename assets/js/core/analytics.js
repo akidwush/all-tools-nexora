@@ -1,6 +1,6 @@
 (function(){
   "use strict";
-  var ENDPOINT="/api/analytics";
+  var ENDPOINT="/api/feedback?mode=analytics";
   var VISITOR_KEY="nx_analytics_visitor_v1";
   var SESSION_KEY="nx_analytics_session_v1";
   var PAGE_KEY="nx_analytics_page_sent_v1";

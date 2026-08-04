@@ -1359,7 +1359,7 @@ function rebuildAllTools() {
 
 async function applyDatabaseToolConfiguration() {
     try {
-        const response = await fetch('/api/database?resource=tools', {
+        const response = await fetch('/api/health?mode=database&resource=tools', {
             method: 'GET',
             cache: 'no-store',
             credentials: 'same-origin',

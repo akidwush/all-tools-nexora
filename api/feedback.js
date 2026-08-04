@@ -1,3 +1,4 @@
+const publicAnalyticsHandler = require("../lib/public-analytics");
 const { anonymousHash, databaseRequest, getDatabaseConfig } = require("../lib/database");
 
 const recentRequests = new Map();
@@ -19,6 +20,10 @@ function clean(value, maxLength) {
 }
 
 module.exports = async function handler(request, response) {
+  const requestUrl = new URL(request.url || "/api/feedback", `http://${request.headers.host || "localhost"}`);
+  if (requestUrl.searchParams.get("mode") === "analytics") {
+    return publicAnalyticsHandler(request, response);
+  }
   if (request.method === "OPTIONS") {
     response.setHeader("Allow", "GET, POST, OPTIONS");
     return response.status(204).end();

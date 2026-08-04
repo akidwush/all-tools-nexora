@@ -87,15 +87,15 @@ for (const route of ["/admin","/admin/login"]) if(!routeManifest.routes?.[route]
 for (const route of ["/api/admin/auth","/api/admin/dashboard","/api/admin/tools"]) if(!(routeManifest.apiRoutes||[]).includes(route)) fail(`route-manifest belum mencantumkan ${route}`);
 
 const adminV51Required = [
-  "api/analytics.js", "api/admin/analytics.js", "api/admin/feedback.js", "api/admin/audit.js",
+  "lib/public-analytics.js", "api/admin/analytics.js", "api/admin/feedback.js", "api/admin/audit.js",
   "lib/admin-audit.js", "assets/js/core/analytics.js", "database/migrations/004_analytics_feedback_audit.sql",
   "V5_1_VALIDATION.md"
 ];
 for (const file of adminV51Required) if (!fs.existsSync(path.join(root, file))) fail(`Admin v5.1 file hilang: ${file}`);
-const analyticsApiV51 = fs.readFileSync(path.join(root,"api/analytics.js"),"utf8");
+const analyticsApiV51 = fs.readFileSync(path.join(root,"lib/public-analytics.js"),"utf8");
 for (const token of ["ALLOWED_EVENTS","visitor_hash","MAX_BODY_BYTES","tool_usage_events"]) if(!analyticsApiV51.includes(token)) fail(`Analytics API belum lengkap: ${token}`);
 const analyticsUiV51 = fs.readFileSync(path.join(root,"assets/js/core/analytics.js"),"utf8");
-for (const token of ["/api/analytics","page_view","tool_open","NexoraAnalytics"]) if(!analyticsUiV51.includes(token)) fail(`Analytics UI belum lengkap: ${token}`);
+for (const token of ["/api/feedback?mode=analytics","page_view","tool_open","NexoraAnalytics"]) if(!analyticsUiV51.includes(token)) fail(`Analytics UI belum lengkap: ${token}`);
 if(!index.includes('assets/js/core/analytics.js')) fail("index.html belum memuat analytics tracker.");
 const feedbackAdminV51 = fs.readFileSync(path.join(root,"api/admin/feedback.js"),"utf8");
 for (const token of ["verifyMutationRequest","admin_reply","internal_note","recordAdminAudit"]) if(!feedbackAdminV51.includes(token)) fail(`Feedback admin belum lengkap: ${token}`);
@@ -135,7 +135,7 @@ for (const file of socialV61Required) if(!fs.existsSync(path.join(root,file))) f
 const socialApiV61 = fs.readFileSync(path.join(root,"api/admin/socials.js"),"utf8");
 for (const token of ["requireAdmin","verifyMutationRequest","recordAdminAudit","ACTIVE_SOCIAL_REQUIRES_URL"]) if(!socialApiV61.includes(token)) fail(`Social API v6.1 belum lengkap: ${token}`);
 const socialUiV61 = fs.readFileSync(path.join(root,"assets/js/core/social-links.js"),"utf8");
-for (const token of ["/api/database?resource=socials","NexoraSocialLinks","nexora:social-links-ready"]) if(!socialUiV61.includes(token)) fail(`Social UI v6.1 belum lengkap: ${token}`);
+for (const token of ["/api/health?mode=database&resource=socials","NexoraSocialLinks","nexora:social-links-ready"]) if(!socialUiV61.includes(token)) fail(`Social UI v6.1 belum lengkap: ${token}`);
 const migrationV61 = fs.readFileSync(path.join(root,"database/migrations/006_social_links.sql"),"utf8");
 for (const token of ["create table if not exists public.social_links","public read active social links","on conflict (key) do nothing"]) if(!migrationV61.includes(token)) fail(`Migration v6.1 belum lengkap: ${token}`);
 if(!index.includes("assets/js/core/social-links.js")) fail("index.html belum memuat social link loader v6.1");
@@ -143,6 +143,16 @@ if(!(routeManifest.apiRoutes||[]).includes("/api/admin/socials")) fail("route-ma
 for (const destination of ["0029Vb7yYjE8PgsKrQ5ghQ3s", "6285196639720"]) {
   if(index.includes(destination)) fail(`index.html masih memuat tujuan sosial hard-coded: ${destination}`);
   if(fs.readFileSync(path.join(root,"assets/js/core/shell.js"),"utf8").includes(destination)) fail(`shell.js masih memuat tujuan sosial hard-coded: ${destination}`);
+}
+
+const serverlessFunctions = walk(path.join(root, "api")).filter((file) => file.endsWith(".js"));
+if(serverlessFunctions.length > 12) fail(`Vercel Hobby hanya mendukung 12 Serverless Functions; ditemukan ${serverlessFunctions.length}.`);
+for(const removedRouteFile of ["api/analytics.js", "api/database.js"]) {
+  if(fs.existsSync(path.join(root, removedRouteFile))) fail(`${removedRouteFile} harus digabung agar tidak melewati limit Vercel Hobby.`);
+}
+const vercelConfigV611 = JSON.parse(fs.readFileSync(path.join(root,"vercel.json"),"utf8"));
+for(const source of ["/api/analytics", "/api/database"]) {
+  if(!(vercelConfigV611.rewrites||[]).some((item)=>item.source===source)) fail(`Compatibility rewrite belum tersedia: ${source}`);
 }
 
 const healthCatalog=require(path.join(root,"lib/tool-health.js")).TOOL_CATALOG;
@@ -169,4 +179,4 @@ for(const file of scanFiles){
   }
 }
 if(failed) process.exit(1);
-console.log(`Audit v6.1 lulus: index ${indexBytes.toLocaleString()} byte, ${jsFiles.length} file JS valid, social link control, lazy-load, live audit, tool health, runtime JS test, screenshot, visual validation, analytics, feedback management, audit log, login, dan dashboard admin lengkap.`);
+console.log(`Audit v6.1.1 lulus: index ${indexBytes.toLocaleString()} byte, ${jsFiles.length} file JS valid, social link control, lazy-load, live audit, tool health, runtime JS test, screenshot, visual validation, analytics, feedback management, audit log, login, dan dashboard admin lengkap.`);

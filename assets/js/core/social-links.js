@@ -128,7 +128,7 @@
 
   async function load(){
     try{
-      const response = await fetch("/api/database?resource=socials", { cache: "no-store", credentials: "same-origin", headers: { Accept: "application/json" } });
+      const response = await fetch("/api/health?mode=database&resource=socials", { cache: "no-store", credentials: "same-origin", headers: { Accept: "application/json" } });
       const payload = await response.json().catch(() => ({}));
       apply(response.ok && Array.isArray(payload.data) ? payload.data : []);
     }catch{

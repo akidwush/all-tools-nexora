@@ -1,3 +1,4 @@
+const publicDatabaseHandler = require("../lib/public-database");
 const { getDatabaseConfig, pingDatabase } = require("../lib/database");
 const { readCachedToolHealth, normalizeCachedRows, summarizeHealth } = require("../lib/tool-health");
 
@@ -10,6 +11,10 @@ function send(response, status, payload, headOnly) {
 }
 
 module.exports = async function handler(request, response) {
+  const requestUrl = new URL(request.url || "/api/health", `http://${request.headers.host || "localhost"}`);
+  if (requestUrl.searchParams.get("mode") === "database") {
+    return publicDatabaseHandler(request, response);
+  }
   if (request.method !== "GET" && request.method !== "HEAD") {
     response.setHeader("Allow", "GET, HEAD");
     return send(response, 405, { ok: false, error: "METHOD_NOT_ALLOWED" }, false);
@@ -40,7 +45,7 @@ module.exports = async function handler(request, response) {
     status: serviceStatus,
     app: "All Tools Nexora",
     developer: "Dika",
-    version: "5.0.0",
+    version: "6.1.1",
     database: {
       configured: database.configured,
       connected: database.connected,

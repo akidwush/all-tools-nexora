@@ -73,8 +73,17 @@ http.createServer(async (request, response) => {
   if (pathname === "/api/feedback" || pathname === "/api/feedback.js") {
     return runApi(path.join(root, "api", "feedback.js"), request, response);
   }
+  if (pathname === "/api/analytics" || pathname === "/api/analytics.js") {
+    const url = new URL(request.url || "/api/analytics", `http://${request.headers.host || "localhost"}`);
+    url.searchParams.set("mode", "analytics");
+    request.url = `${url.pathname}?${url.searchParams.toString()}`;
+    return runApi(path.join(root, "api", "feedback.js"), request, response);
+  }
   if (pathname === "/api/database" || pathname === "/api/database.js") {
-    return runApi(path.join(root, "api", "database.js"), request, response);
+    const url = new URL(request.url || "/api/database", `http://${request.headers.host || "localhost"}`);
+    url.searchParams.set("mode", "database");
+    request.url = `${url.pathname}?${url.searchParams.toString()}`;
+    return runApi(path.join(root, "api", "health.js"), request, response);
   }
   if (pathname === "/api/audit" || pathname === "/api/audit.js") {
     return runApi(path.join(root, "api", "audit.js"), request, response);
@@ -90,6 +99,21 @@ http.createServer(async (request, response) => {
   }
   if (pathname === "/api/admin/tools" || pathname === "/api/admin/tools.js") {
     return runApi(path.join(root, "api", "admin", "tools.js"), request, response);
+  }
+  if (pathname === "/api/admin/analytics" || pathname === "/api/admin/analytics.js") {
+    return runApi(path.join(root, "api", "admin", "analytics.js"), request, response);
+  }
+  if (pathname === "/api/admin/feedback" || pathname === "/api/admin/feedback.js") {
+    return runApi(path.join(root, "api", "admin", "feedback.js"), request, response);
+  }
+  if (pathname === "/api/admin/audit" || pathname === "/api/admin/audit.js") {
+    return runApi(path.join(root, "api", "admin", "audit.js"), request, response);
+  }
+  if (pathname === "/api/admin/visual" || pathname === "/api/admin/visual.js") {
+    return runApi(path.join(root, "api", "admin", "visual.js"), request, response);
+  }
+  if (pathname === "/api/admin/socials" || pathname === "/api/admin/socials.js") {
+    return runApi(path.join(root, "api", "admin", "socials.js"), request, response);
   }
 
   if (!["GET", "HEAD"].includes(request.method || "GET")) {
