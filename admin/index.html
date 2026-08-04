@@ -19,13 +19,15 @@
     <aside class="admin-sidebar">
       <a class="admin-logo" href="/admin">
         <span><i class="fa-solid fa-bolt"></i></span>
-        <div><b>NEXORA</b><small>CONTROL PANEL</small></div>
+        <div><b>NEXORA</b><small>CONTROL PANEL 5.1</small></div>
       </a>
       <nav class="admin-nav" aria-label="Navigasi admin">
         <button class="admin-nav-item is-active" data-section="overview" type="button"><i class="fa-solid fa-grid-2"></i><span>Ringkasan</span></button>
         <button class="admin-nav-item" data-section="tools" type="button"><i class="fa-solid fa-screwdriver-wrench"></i><span>Tools</span></button>
-        <button class="admin-nav-item" data-section="health" type="button"><i class="fa-solid fa-heart-pulse"></i><span>Health</span></button>
+        <button class="admin-nav-item" data-section="analytics" type="button"><i class="fa-solid fa-chart-line"></i><span>Analytics</span></button>
         <button class="admin-nav-item" data-section="feedback" type="button"><i class="fa-regular fa-message"></i><span>Feedback</span></button>
+        <button class="admin-nav-item" data-section="health" type="button"><i class="fa-solid fa-heart-pulse"></i><span>Health</span></button>
+        <button class="admin-nav-item" data-section="audit" type="button"><i class="fa-solid fa-clock-rotate-left"></i><span>Audit Log</span></button>
       </nav>
       <div class="sidebar-bottom">
         <a href="/" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Lihat website</a>
@@ -54,7 +56,11 @@
               <div class="health-summary" id="healthSummary"></div>
             </article>
             <article class="panel-card">
-              <div class="panel-head"><div><p class="eyebrow">FEEDBACK</p><h2>Terbaru</h2></div><button class="ghost-button" data-go-section="feedback" type="button">Semua</button></div>
+              <div class="panel-head"><div><p class="eyebrow">ANALYTICS</p><h2>Aktivitas 7 Hari</h2></div><button class="ghost-button" data-go-section="analytics" type="button">Detail</button></div>
+              <div class="overview-analytics" id="overviewAnalytics"></div>
+            </article>
+            <article class="panel-card">
+              <div class="panel-head"><div><p class="eyebrow">FEEDBACK</p><h2>Terbaru</h2></div><button class="ghost-button" data-go-section="feedback" type="button">Kelola</button></div>
               <div class="compact-list" id="recentFeedback"></div>
             </article>
             <article class="panel-card">
@@ -74,6 +80,26 @@
           <div class="empty-state" id="toolEmpty" hidden><i class="fa-solid fa-box-open"></i><b>Tools tidak ditemukan</b><span>Coba ubah pencarian atau filter.</span></div>
         </section>
 
+        <section class="admin-section" data-panel="analytics">
+          <div class="section-toolbar analytics-toolbar">
+            <div class="toolbar-title"><p class="eyebrow">USAGE INSIGHT</p><b>Statistik penggunaan website dan tools</b></div>
+            <select id="analyticsPeriod" class="select-box"><option value="7">7 hari</option><option value="30" selected>30 hari</option><option value="90">90 hari</option></select>
+            <button id="refreshAnalytics" class="secondary-button" type="button"><i class="fa-solid fa-rotate"></i> Refresh</button>
+          </div>
+          <div class="metric-grid analytics-metrics" id="analyticsMetrics"></div>
+          <div class="analytics-layout">
+            <article class="panel-card analytics-chart-card">
+              <div class="panel-head"><div><p class="eyebrow">TREND</p><h2>Aktivitas Harian</h2></div><span class="panel-time" id="analyticsGeneratedAt">-</span></div>
+              <div class="analytics-chart" id="analyticsChart"></div>
+              <div class="chart-legend"><span><i class="legend-open"></i> Tool dibuka</span><span><i class="legend-view"></i> Page view</span></div>
+            </article>
+            <article class="panel-card">
+              <div class="panel-head"><div><p class="eyebrow">RANKING</p><h2>Tools Terpopuler</h2></div></div>
+              <div class="ranking-list" id="topToolsList"></div>
+            </article>
+          </div>
+        </section>
+
         <section class="admin-section" data-panel="health">
           <article class="panel-card">
             <div class="panel-head"><div><p class="eyebrow">MONITORING</p><h2>Detail Kesehatan Tools</h2></div><span class="panel-time" id="healthTime">Belum diperiksa</span></div>
@@ -82,10 +108,23 @@
         </section>
 
         <section class="admin-section" data-panel="feedback">
-          <article class="panel-card">
-            <div class="panel-head"><div><p class="eyebrow">INBOX</p><h2>Feedback Terbaru</h2></div><span class="read-only-badge">Read-only v5.0</span></div>
-            <div class="feedback-grid" id="feedbackGrid"></div>
-          </article>
+          <div class="section-toolbar feedback-toolbar">
+            <label class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input id="feedbackSearch" type="search" placeholder="Cari nama, pesan, atau balasan"></label>
+            <select id="feedbackStatusFilter" class="select-box"><option value="all">Semua status</option><option value="new">Baru</option><option value="reviewing">Ditinjau</option><option value="resolved">Selesai</option><option value="rejected">Ditolak</option></select>
+            <select id="feedbackCategoryFilter" class="select-box"><option value="all">Semua kategori</option><option value="bug">Bug</option><option value="suggestion">Saran</option><option value="idea">Ide</option><option value="other">Lainnya</option></select>
+          </div>
+          <div class="feedback-counts" id="feedbackCounts"></div>
+          <div class="feedback-grid managed-feedback-grid" id="feedbackGrid"></div>
+          <div class="pagination-bar" id="feedbackPagination"></div>
+        </section>
+
+        <section class="admin-section" data-panel="audit">
+          <div class="section-toolbar audit-toolbar">
+            <div class="toolbar-title"><p class="eyebrow">SECURITY TRAIL</p><b>Riwayat tindakan administrator</b></div>
+            <select id="auditEntityFilter" class="select-box"><option value="all">Semua entitas</option><option value="tool">Tool</option><option value="feedback">Feedback</option><option value="admin_session">Sesi admin</option></select>
+            <button id="refreshAudit" class="secondary-button" type="button"><i class="fa-solid fa-rotate"></i> Refresh</button>
+          </div>
+          <article class="panel-card audit-card"><div class="audit-list" id="auditList"></div></article>
         </section>
       </main>
     </div>
@@ -93,8 +132,9 @@
     <nav class="admin-bottom-nav" aria-label="Navigasi admin mobile">
       <button class="is-active" data-section="overview" type="button"><i class="fa-solid fa-grid-2"></i><span>Home</span></button>
       <button data-section="tools" type="button"><i class="fa-solid fa-screwdriver-wrench"></i><span>Tools</span></button>
-      <button data-section="health" type="button"><i class="fa-solid fa-heart-pulse"></i><span>Health</span></button>
-      <button data-section="feedback" type="button"><i class="fa-regular fa-message"></i><span>Feedback</span></button>
+      <button data-section="analytics" type="button"><i class="fa-solid fa-chart-line"></i><span>Insight</span></button>
+      <button data-section="feedback" type="button"><i class="fa-regular fa-message"></i><span>Inbox</span></button>
+      <button data-section="audit" type="button"><i class="fa-solid fa-clock-rotate-left"></i><span>Audit</span></button>
     </nav>
   </div>
 
@@ -116,6 +156,30 @@
         <div class="modal-message" id="toolModalMessage"></div>
         <footer><button class="secondary-button" id="cancelToolEdit" type="button">Batal</button><button class="primary-button" id="saveToolButton" type="submit"><i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan</button></footer>
       </form>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="feedbackModal" hidden>
+    <section class="tool-editor feedback-editor" role="dialog" aria-modal="true" aria-labelledby="feedbackEditorTitle">
+      <header><div><p class="eyebrow">FEEDBACK MANAGEMENT</p><h2 id="feedbackEditorTitle">Detail Feedback</h2></div><button id="closeFeedbackModal" type="button" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button></header>
+      <form id="feedbackEditForm">
+        <input id="editFeedbackId" type="hidden">
+        <div class="feedback-detail" id="feedbackDetail"></div>
+        <div class="form-grid">
+          <label><span>Status</span><select id="editFeedbackStatus"><option value="new">Baru</option><option value="reviewing">Ditinjau</option><option value="resolved">Selesai</option><option value="rejected">Ditolak</option></select></label>
+          <label class="form-span"><span>Balasan untuk pengguna</span><textarea id="editFeedbackReply" maxlength="1500" rows="4" placeholder="Balasan publik atau tindak lanjut..."></textarea></label>
+          <label class="form-span"><span>Catatan internal</span><textarea id="editFeedbackNote" maxlength="1500" rows="3" placeholder="Hanya terlihat oleh admin."></textarea></label>
+        </div>
+        <div class="modal-message" id="feedbackModalMessage"></div>
+        <footer><button class="secondary-button" id="cancelFeedbackEdit" type="button">Batal</button><button class="primary-button" id="saveFeedbackButton" type="submit"><i class="fa-solid fa-floppy-disk"></i> Simpan Feedback</button></footer>
+      </form>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="auditModal" hidden>
+    <section class="tool-editor audit-editor" role="dialog" aria-modal="true" aria-labelledby="auditModalTitle">
+      <header><div><p class="eyebrow">AUDIT DETAIL</p><h2 id="auditModalTitle">Perubahan Data</h2></div><button id="closeAuditModal" type="button" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button></header>
+      <div class="audit-detail-body" id="auditDetailBody"></div>
     </section>
   </div>
 

@@ -1,25 +1,27 @@
-# All Tools Nexora v5.0
+# All Tools Nexora v5.1
 
-Website tools modular dengan lazy loading, Get Code live audit, tool health monitoring, Supabase database, serta login dan dashboard admin.
+Website tools modular dengan lazy loading, Get Code live audit, tool health monitoring, Supabase database, login admin, analytics anonim, feedback management, dan audit log.
 
-## Fitur v5.0
+## Fitur v5.1
 
-- Login admin menggunakan Supabase Auth email/password.
-- Allowlist admin melalui tabel `admin_users` dengan role `super_admin`, `admin`, dan `viewer`.
-- Cookie sesi HttpOnly, refresh token server-side, SameSite, CSRF token, origin validation, dan rate limit login.
-- Dashboard `/admin` dengan ringkasan tools, feedback, database, dan tool health.
-- Manajemen tools: nama, deskripsi, kategori, badge, icon, URL eksternal, status aktif, dan urutan.
-- Perubahan tools aktif diterapkan ke halaman publik melalui `/api/database?resource=tools`.
-- Elevated key modern `SUPABASE_SECRET_KEY` dan legacy `SUPABASE_SERVICE_ROLE_KEY` sama-sama didukung.
+- Dashboard analytics periode 7, 30, dan 90 hari.
+- Metrik page view, tool open, pengunjung unik, error, tren harian, dan ranking tools.
+- Visitor ID, session ID, dan IP diproses sebagai hash; alamat IP mentah tidak disimpan.
+- Feedback dapat dicari, difilter, diubah statusnya, diberi balasan publik, dan diberi catatan internal.
+- Pengguna dapat melihat status serta balasan admin untuk laporan yang dibuat dari perangkatnya.
+- Audit log mencatat login, logout, perubahan tool, dan perubahan feedback.
+- Role `viewer` tetap read-only; `admin` dan `super_admin` dapat melakukan mutasi.
+- Cookie sesi HttpOnly, CSRF, origin validation, rate limit login, dan validasi payload tetap aktif.
 
-## Setup database v5.0
+## Setup database
 
-1. Jalankan `database/migrations/003_admin_dashboard.sql` melalui Supabase SQL Editor.
-2. Buka Supabase **Authentication → Users → Add user**, lalu buat email dan password admin.
-3. Buka `database/setup-first-admin.sql`, ganti `GANTI_EMAIL_ADMIN`, lalu jalankan melalui SQL Editor.
-4. Login melalui `/admin/login`.
+Untuk upgrade dari v5.0:
 
-Untuk instalasi baru, `database/schema.sql` sudah memuat seluruh schema sampai v5.0.
+1. Jalankan `database/migrations/004_analytics_feedback_audit.sql` melalui Supabase SQL Editor.
+2. Tunggu deployment Vercel v5.1 selesai.
+3. Buka `/admin`, lalu periksa menu Analytics, Feedback, dan Audit Log.
+
+Untuk instalasi baru, `database/schema.sql` memuat seluruh schema sampai v5.1.
 
 ## Environment Vercel
 
@@ -33,7 +35,17 @@ FEEDBACK_HASH_SALT=random_long_value
 HEALTH_CHECK_TOKEN=random_long_value
 ```
 
-Legacy `SUPABASE_SERVICE_ROLE_KEY=eyJ...` tetap didukung. `SUPABASE_PUBLISHABLE_KEY` opsional; backend dapat memakai elevated key untuk berkomunikasi dengan Supabase Auth tanpa mengeksposnya ke browser.
+Legacy `SUPABASE_SERVICE_ROLE_KEY=eyJ...` tetap didukung. Tidak ada environment variable wajib baru pada v5.1.
+
+## Endpoint v5.1
+
+```text
+POST /api/analytics
+GET  /api/admin/analytics
+GET  /api/admin/feedback
+PATCH /api/admin/feedback
+GET  /api/admin/audit
+```
 
 ## Validasi
 

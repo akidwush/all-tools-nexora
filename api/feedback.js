@@ -20,11 +20,26 @@ function clean(value, maxLength) {
 
 module.exports = async function handler(request, response) {
   if (request.method === "OPTIONS") {
-    response.setHeader("Allow", "POST, OPTIONS");
+    response.setHeader("Allow", "GET, POST, OPTIONS");
     return response.status(204).end();
   }
+
+  if (request.method === "GET") {
+    const id = clean(request.query?.id, 80);
+    if (!/^[0-9a-f-]{36}$/i.test(id)) return send(response, 400, { ok: false, error: "INVALID_FEEDBACK_ID" });
+    try {
+      const rows = await databaseRequest(`feedback?select=id,name,category,message,status,admin_reply,replied_at,resolved_at,created_at,updated_at&id=eq.${encodeURIComponent(id)}&limit=1`, { method: "GET" });
+      const item = Array.isArray(rows) ? rows[0] : null;
+      if (!item) return send(response, 404, { ok: false, error: "FEEDBACK_NOT_FOUND" });
+      return send(response, 200, { ok: true, data: item });
+    } catch (error) {
+      console.error("[feedback-status]", error.code || "UNKNOWN_ERROR");
+      return send(response, 503, { ok: false, error: "FEEDBACK_STATUS_FAILED", message: "Status laporan belum dapat diperiksa." });
+    }
+  }
+
   if (request.method !== "POST") {
-    response.setHeader("Allow", "POST, OPTIONS");
+    response.setHeader("Allow", "GET, POST, OPTIONS");
     return send(response, 405, { ok: false, error: "METHOD_NOT_ALLOWED" });
   }
 
@@ -70,7 +85,7 @@ module.exports = async function handler(request, response) {
       body: JSON.stringify([{ name, message, category, ip_hash: ipHash, source: "website" }])
     });
     const item = Array.isArray(rows) ? rows[0] : null;
-    return send(response, 201, { ok: true, id: item?.id || null });
+    return send(response, 201, { ok: true, id: item?.id || null, status: item?.status || "new" });
   } catch (error) {
     console.error("[feedback]", error.code || "UNKNOWN_ERROR");
     return send(response, 500, {

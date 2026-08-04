@@ -6,21 +6,12 @@
   <meta name="theme-color" content="#080312">
   <title>Feedback — All Tools Nexora</title>
   <style>
-    :root{color-scheme:dark;--bg:#080312;--panel:#120922;--line:#321a50;--text:#f5edff;--muted:#ad99c7;--accent:#ad5cff;--green:#55db91;--red:#ff7d9c}
-    *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);font-family:Inter,Poppins,system-ui,sans-serif;color:var(--text)}
-    body{background:radial-gradient(circle at 20% 0,rgba(173,92,255,.18),transparent 32%),var(--bg)}
-    main{width:min(760px,100%);margin:auto;padding:clamp(16px,5vw,48px)}
-    .hero,.panel{border:1px solid var(--line);background:rgba(18,9,34,.94);box-shadow:0 22px 75px rgba(0,0,0,.3)}
-    .hero{padding:24px;border-radius:24px;margin-bottom:14px}.eyebrow{margin:0 0 7px;color:#ce9cff;font-size:.7rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase}
-    h1{font-size:clamp(1.45rem,6vw,2.5rem);margin:0}.hero p:last-child{margin:10px 0 0;color:var(--muted);line-height:1.6;font-size:.88rem}
-    .panel{padding:clamp(18px,4vw,28px);border-radius:24px}form{display:grid;gap:15px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    label{display:grid;gap:7px;color:#d9c8ed;font-size:.78rem;font-weight:750}input,select,textarea,button{font:inherit}
-    input,select,textarea{width:100%;border:1px solid #3b225b;border-radius:13px;background:#0b0613;color:#fff;outline:0;padding:13px 14px}textarea{min-height:140px;resize:vertical;line-height:1.55}
-    input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(173,92,255,.13)}
-    button{min-height:48px;border:0;border-radius:14px;background:linear-gradient(135deg,#bb6cff,#7437e8);color:#fff;font-weight:900;cursor:pointer;box-shadow:0 14px 35px rgba(116,55,232,.3)}button:disabled{opacity:.6;cursor:wait}
-    .trap{position:absolute!important;left:-9999px!important}.message{display:none;padding:12px 13px;border-radius:12px;font-size:.8rem;font-weight:750;line-height:1.5}.message.show{display:block}.message.ok{border:1px solid #2b6d49;background:#0e2b1c;color:#8ef3b7}.message.warn{border:1px solid #705a2b;background:#2b220e;color:#f3d88e}.message.error{border:1px solid #71334a;background:#2d101b;color:#ffadc0}
-    .queue{margin-top:12px;color:#88749e;font-size:.72rem;text-align:center}
-    @media(max-width:560px){.row{grid-template-columns:1fr}.hero,.panel{border-radius:19px}}
+    :root{color-scheme:dark;--bg:#080312;--panel:#120922;--line:#321a50;--text:#f5edff;--muted:#ad99c7;--accent:#ad5cff;--green:#55db91;--yellow:#f0c85f;--red:#ff7d9c}
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);font-family:Inter,Poppins,system-ui,sans-serif;color:var(--text)}body{background:radial-gradient(circle at 20% 0,rgba(173,92,255,.18),transparent 32%),var(--bg)}main{width:min(820px,100%);margin:auto;padding:clamp(16px,5vw,48px)}
+    .hero,.panel{border:1px solid var(--line);background:rgba(18,9,34,.94);box-shadow:0 22px 75px rgba(0,0,0,.3)}.hero{padding:24px;border-radius:24px;margin-bottom:14px}.eyebrow{margin:0 0 7px;color:#ce9cff;font-size:.7rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase}h1{font-size:clamp(1.45rem,6vw,2.5rem);margin:0}.hero p:last-child{margin:10px 0 0;color:var(--muted);line-height:1.6;font-size:.88rem}.panel{padding:clamp(18px,4vw,28px);border-radius:24px;margin-bottom:14px}form{display:grid;gap:15px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    label{display:grid;gap:7px;color:#d9c8ed;font-size:.78rem;font-weight:750}input,select,textarea,button{font:inherit}input,select,textarea{width:100%;border:1px solid #3b225b;border-radius:13px;background:#0b0613;color:#fff;outline:0;padding:13px 14px}textarea{min-height:140px;resize:vertical;line-height:1.55}input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(173,92,255,.13)}button{min-height:48px;border:0;border-radius:14px;background:linear-gradient(135deg,#bb6cff,#7437e8);color:#fff;font-weight:900;cursor:pointer;box-shadow:0 14px 35px rgba(116,55,232,.3)}button:disabled{opacity:.6;cursor:wait}.trap{position:absolute!important;left:-9999px!important}.message{display:none;padding:12px 13px;border-radius:12px;font-size:.8rem;font-weight:750;line-height:1.5}.message.show{display:block}.message.ok{border:1px solid #2b6d49;background:#0e2b1c;color:#8ef3b7}.message.warn{border:1px solid #705a2b;background:#2b220e;color:#f3d88e}.message.error{border:1px solid #71334a;background:#2d101b;color:#ffadc0}.queue{margin-top:12px;color:#88749e;font-size:.72rem;text-align:center}
+    .panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.panel-head h2{margin:0;font-size:1rem}.refresh{min-height:38px;padding:8px 12px;border:1px solid #432660;background:#1a0d2b;box-shadow:none;font-size:.72rem}.my-reports{display:grid;gap:10px}.report-card{padding:14px;border:1px solid #2b1745;border-radius:16px;background:#0d0717}.report-card header,.report-card footer{display:flex;align-items:center;justify-content:space-between;gap:10px}.report-card b{font-size:.82rem}.report-card time{color:#7e6a93;font-size:.65rem}.report-card p{margin:11px 0;color:#b9a8ca;font-size:.76rem;line-height:1.55}.status{padding:5px 8px;border-radius:9px;font-size:.62rem;font-weight:900;text-transform:uppercase}.status-new{background:rgba(87,211,255,.09);color:#82ddff}.status-reviewing{background:rgba(240,200,95,.09);color:#f4d98b}.status-resolved{background:rgba(85,219,145,.09);color:#95efbd}.status-rejected{background:rgba(255,125,156,.09);color:#ffb0c3}.reply{margin-top:11px;padding:11px;border-radius:12px;background:rgba(85,219,145,.06);border:1px solid rgba(85,219,145,.18)}.reply span{display:block;color:#77dba3;font-size:.64rem;font-weight:900;text-transform:uppercase}.reply p{margin:6px 0 0;color:#c7f4d8}.empty{padding:24px;text-align:center;color:#8f7aa4;font-size:.76rem}
+    @media(max-width:560px){.row{grid-template-columns:1fr}.hero,.panel{border-radius:19px}.panel-head{align-items:flex-start}.refresh{min-height:36px}}
   </style>
 </head>
 <body>
@@ -28,7 +19,7 @@
     <section class="hero">
       <p class="eyebrow">Developer Dika</p>
       <h1>Report Bug, Saran &amp; Ide</h1>
-      <p>Kirim detail yang jelas supaya masalah lebih mudah dilacak. Jika database belum diaktifkan, laporan diamankan sementara di perangkat ini dan dapat dikirim ulang nanti.</p>
+      <p>Kirim detail yang jelas supaya masalah lebih mudah dilacak. Status dan balasan admin untuk laporan yang dikirim dari perangkat ini akan muncul di bawah.</p>
     </section>
     <section class="panel">
       <form id="feedbackForm" novalidate>
@@ -43,6 +34,10 @@
       </form>
       <div id="queue" class="queue"></div>
     </section>
+    <section class="panel">
+      <div class="panel-head"><div><p class="eyebrow">TRACKING</p><h2>Laporan dari perangkat ini</h2></div><button class="refresh" id="refreshReports" type="button">Perbarui</button></div>
+      <div class="my-reports" id="myReports"><div class="empty">Belum ada laporan tersimpan di perangkat ini.</div></div>
+    </section>
   </main>
   <script>
     (() => {
@@ -51,72 +46,62 @@
       const result = document.getElementById("result");
       const submit = document.getElementById("submit");
       const queue = document.getElementById("queue");
+      const reports = document.getElementById("myReports");
+      const refresh = document.getElementById("refreshReports");
       const storageKey = "all_tools_nexora_feedback_queue_v1";
+      const sentKey = "all_tools_nexora_feedback_sent_v1";
+      const escapeHtml = value => String(value ?? "").replace(/[&<>'"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));
+      const statusLabel = value => ({new:"Baru",reviewing:"Ditinjau",resolved:"Selesai",rejected:"Ditolak"})[value] || value;
+      const formatDate = value => value ? new Intl.DateTimeFormat("id-ID",{dateStyle:"medium",timeStyle:"short",timeZone:"Asia/Jakarta"}).format(new Date(value)) : "-";
 
-      function readQueue() {
-        try { const value = JSON.parse(localStorage.getItem(storageKey) || "[]"); return Array.isArray(value) ? value : []; }
-        catch { return []; }
-      }
-      function writeQueue(items) {
-        try { localStorage.setItem(storageKey, JSON.stringify(items.slice(-10))); } catch {}
-        renderQueue();
-      }
-      function renderQueue() {
-        const count = readQueue().length;
-        queue.textContent = count ? `${count} laporan tersimpan sementara di perangkat.` : "";
-      }
-      function notice(text, type) {
-        result.textContent = text;
-        result.className = `message show ${type}`;
-      }
+      function readList(key) { try { const value = JSON.parse(localStorage.getItem(key) || "[]"); return Array.isArray(value) ? value : []; } catch { return []; } }
+      function writeList(key, items, max) { try { localStorage.setItem(key, JSON.stringify(items.slice(-max))); } catch {} }
+      function readQueue() { return readList(storageKey); }
+      function writeQueue(items) { writeList(storageKey, items, 10); renderQueue(); }
+      function readSent() { return readList(sentKey); }
+      function rememberSent(id) { if (!id) return; const items = readSent().filter(item => item.id !== id); items.push({id, savedAt:new Date().toISOString()}); writeList(sentKey, items, 20); }
+      function renderQueue() { const count = readQueue().length; queue.textContent = count ? `${count} laporan tersimpan sementara di perangkat.` : ""; }
+      function notice(text, type) { result.textContent = text; result.className = `message show ${type}`; }
       async function send(payload) {
-        const response = await fetch("/api/feedback", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Accept: "application/json" },
-          body: JSON.stringify(payload)
-        });
+        const response = await fetch("/api/feedback", {method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},body:JSON.stringify(payload)});
         const data = await response.json().catch(() => ({}));
         if (!response.ok) { const error = new Error(data.message || "Pengiriman gagal."); error.code = data.error; throw error; }
         return data;
       }
-      async function flushQueue() {
-        const items = readQueue();
-        if (!items.length) return;
-        const pending = [];
-        for (const item of items) {
-          try { await send(item); } catch { pending.push(item); }
-        }
-        writeQueue(pending);
+      async function readStatus(id) {
+        const response = await fetch(`/api/feedback?id=${encodeURIComponent(id)}`, {cache:"no-store"});
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data.ok) throw new Error(data.error || "STATUS_FAILED");
+        return data.data;
       }
-      form.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        if (!form.reportValidity()) return;
-        const payload = {
-          name: form.name.value.trim(),
-          category: form.category.value,
-          message: form.message.value.trim(),
-          website: form.website.value,
-          clientTime: new Date().toISOString()
-        };
-        submit.disabled = true;
-        result.className = "message";
-        try {
-          await send(payload);
-          form.message.value = "";
-          notice("Laporan berhasil dikirim. Terima kasih!", "ok");
-        } catch (error) {
-          if (error.code === "DATABASE_NOT_CONFIGURED" || !navigator.onLine) {
-            writeQueue([...readQueue(), payload]);
-            form.message.value = "";
-            notice("Database belum aktif. Laporan sudah disimpan sementara di perangkat ini.", "warn");
-          } else {
-            notice(error.message || "Laporan belum dapat dikirim.", "error");
-          }
+      async function renderReports() {
+        const ids = readSent();
+        if (!ids.length) { reports.innerHTML = '<div class="empty">Belum ada laporan tersimpan di perangkat ini.</div>'; return; }
+        refresh.disabled = true; refresh.textContent = "Memuat...";
+        const rows = [];
+        for (const entry of [...ids].reverse()) { try { rows.push(await readStatus(entry.id)); } catch {} }
+        reports.innerHTML = rows.length ? rows.map(item => `<article class="report-card"><header><b>${escapeHtml(item.name)} · ${escapeHtml(item.category)}</b><time>${formatDate(item.created_at)}</time></header><p>${escapeHtml(item.message)}</p>${item.admin_reply ? `<div class="reply"><span>Balasan admin</span><p>${escapeHtml(item.admin_reply)}</p></div>` : ""}<footer><span class="status status-${escapeHtml(item.status)}">${escapeHtml(statusLabel(item.status))}</span><time>Diperbarui ${formatDate(item.updated_at)}</time></footer></article>`).join("") : '<div class="empty">Status laporan belum dapat dimuat.</div>';
+        refresh.disabled = false; refresh.textContent = "Perbarui";
+      }
+      async function flushQueue() {
+        const items = readQueue(); if (!items.length) return;
+        const pending = [];
+        for (const item of items) { try { const data = await send(item); rememberSent(data.id); } catch { pending.push(item); } }
+        writeQueue(pending); renderReports();
+      }
+      form.addEventListener("submit", async event => {
+        event.preventDefault(); if (!form.reportValidity()) return;
+        const payload = {name:form.name.value.trim(),category:form.category.value,message:form.message.value.trim(),website:form.website.value,clientTime:new Date().toISOString()};
+        submit.disabled = true; result.className = "message";
+        try { const data = await send(payload); rememberSent(data.id); form.message.value = ""; notice("Laporan berhasil dikirim. Statusnya dapat dipantau di bawah.", "ok"); renderReports(); }
+        catch (error) {
+          if (error.code === "DATABASE_NOT_CONFIGURED" || !navigator.onLine) { writeQueue([...readQueue(), payload]); form.message.value = ""; notice("Database belum aktif. Laporan disimpan sementara di perangkat ini.", "warn"); }
+          else notice(error.message || "Laporan belum dapat dikirim.", "error");
         } finally { submit.disabled = false; }
       });
+      refresh.addEventListener("click", renderReports);
       window.addEventListener("online", flushQueue);
-      renderQueue();
-      if (navigator.onLine) flushQueue();
+      renderQueue(); renderReports(); if (navigator.onLine) flushQueue();
     })();
   </script>
 </body>

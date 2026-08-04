@@ -147,6 +147,7 @@
       throw new Error('Pembuka fitur tidak tersedia: '+toolId);
     }catch(error){
       console.error('[Nexora lazy module]',toolId,error);
+      document.dispatchEvent(new CustomEvent('nexora:tool-error',{detail:{toolId:toolId,module:moduleName,reason:error&&error.message?error.message:'module_failed'}}));
       return false;
     }finally{
       setCardBusy(card,false); activeCard=null;

@@ -85,6 +85,28 @@ const adminMigration = fs.readFileSync(path.join(root,"database/migrations/003_a
 for (const token of ["create table if not exists public.admin_users","references auth.users","grant select, insert, update, delete","on conflict (id) do nothing"]) if(!adminMigration.includes(token)) fail(`Migration admin belum lengkap: ${token}`);
 for (const route of ["/admin","/admin/login"]) if(!routeManifest.routes?.[route]) fail(`route-manifest belum mencantumkan ${route}`);
 for (const route of ["/api/admin/auth","/api/admin/dashboard","/api/admin/tools"]) if(!(routeManifest.apiRoutes||[]).includes(route)) fail(`route-manifest belum mencantumkan ${route}`);
+
+const adminV51Required = [
+  "api/analytics.js", "api/admin/analytics.js", "api/admin/feedback.js", "api/admin/audit.js",
+  "lib/admin-audit.js", "assets/js/core/analytics.js", "database/migrations/004_analytics_feedback_audit.sql",
+  "V5_1_VALIDATION.md"
+];
+for (const file of adminV51Required) if (!fs.existsSync(path.join(root, file))) fail(`Admin v5.1 file hilang: ${file}`);
+const analyticsApiV51 = fs.readFileSync(path.join(root,"api/analytics.js"),"utf8");
+for (const token of ["ALLOWED_EVENTS","visitor_hash","MAX_BODY_BYTES","tool_usage_events"]) if(!analyticsApiV51.includes(token)) fail(`Analytics API belum lengkap: ${token}`);
+const analyticsUiV51 = fs.readFileSync(path.join(root,"assets/js/core/analytics.js"),"utf8");
+for (const token of ["/api/analytics","page_view","tool_open","NexoraAnalytics"]) if(!analyticsUiV51.includes(token)) fail(`Analytics UI belum lengkap: ${token}`);
+if(!index.includes('assets/js/core/analytics.js')) fail("index.html belum memuat analytics tracker.");
+const feedbackAdminV51 = fs.readFileSync(path.join(root,"api/admin/feedback.js"),"utf8");
+for (const token of ["verifyMutationRequest","admin_reply","internal_note","recordAdminAudit"]) if(!feedbackAdminV51.includes(token)) fail(`Feedback admin belum lengkap: ${token}`);
+const auditAdminV51 = fs.readFileSync(path.join(root,"api/admin/audit.js"),"utf8");
+for (const token of ["admin_audit_logs","requireAdmin"]) if(!auditAdminV51.includes(token)) fail(`Audit API belum lengkap: ${token}`);
+const adminDashboardV51 = fs.readFileSync(path.join(root,"assets/js/admin/dashboard.js"),"utf8");
+for (const token of ["loadAnalytics","loadFeedback","loadAudit","saveFeedback","openAuditDetail"]) if(!adminDashboardV51.includes(token)) fail(`Dashboard v5.1 belum lengkap: ${token}`);
+const migrationV51 = fs.readFileSync(path.join(root,"database/migrations/004_analytics_feedback_audit.sql"),"utf8");
+for (const token of ["create table if not exists public.tool_usage_events","create table if not exists public.admin_audit_logs","admin_analytics_summary","admin_updated_by","grant execute"]) if(!migrationV51.includes(token)) fail(`Migration v5.1 belum lengkap: ${token}`);
+for (const route of ["/api/analytics","/api/admin/analytics","/api/admin/feedback","/api/admin/audit"]) if(!(routeManifest.apiRoutes||[]).includes(route)) fail(`route-manifest belum mencantumkan ${route}`);
+
 const healthCatalog=require(path.join(root,"lib/tool-health.js")).TOOL_CATALOG;
 if(!Array.isArray(healthCatalog)||healthCatalog.length!==22) fail(`Tool health catalog harus memuat 22 tools, ditemukan ${healthCatalog?.length||0}.`);
 
@@ -109,4 +131,4 @@ for(const file of scanFiles){
   }
 }
 if(failed) process.exit(1);
-console.log(`Audit v5.0 lulus: index ${indexBytes.toLocaleString()} byte, ${jsFiles.length} file JS valid, lazy-load, live audit, tool health, login, dan dashboard admin lengkap.`);
+console.log(`Audit v5.1 lulus: index ${indexBytes.toLocaleString()} byte, ${jsFiles.length} file JS valid, lazy-load, live audit, tool health, analytics, feedback management, audit log, login, dan dashboard admin lengkap.`);

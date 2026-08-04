@@ -11,6 +11,7 @@ const {
   verifyMutationRequest
 } = require("../../lib/admin-auth");
 const { databaseRequest } = require("../../lib/database");
+const { recordAdminAudit } = require("../../lib/admin-audit");
 
 const attempts = new Map();
 const WINDOW_MS = 15 * 60 * 1000;
@@ -95,9 +96,21 @@ module.exports = async function handler(request, response) {
         admin.last_login_at = now;
       } catch {}
 
+      const session = { user: authSession.user, admin };
+      const auditLogged = await recordAdminAudit({
+        request,
+        session,
+        action: "auth.login",
+        entityType: "admin_session",
+        entityId: authSession.user.id,
+        summary: `${authSession.user.email || email} login ke dashboard`,
+        after: { role: admin.role, lastLoginAt: now }
+      });
+
       return send(response, 200, {
         ok: true,
-        ...publicSession({ user: authSession.user, admin })
+        auditLogged,
+        ...publicSession(session)
       });
     } catch (error) {
       const authRejected = [400, 401, 403, 422].includes(Number(error.status));
@@ -113,6 +126,18 @@ module.exports = async function handler(request, response) {
   if (request.method === "DELETE") {
     if (!verifyMutationRequest(request)) {
       return send(response, 403, { ok: false, error: "CSRF_REJECTED" });
+    }
+    let session = null;
+    try { session = await resolveSession(request, response); } catch {}
+    if (session) {
+      await recordAdminAudit({
+        request,
+        session,
+        action: "auth.logout",
+        entityType: "admin_session",
+        entityId: session.user.id,
+        summary: `${session.user.email || session.user.id} keluar dari dashboard`
+      });
     }
     const cookies = parseCookies(request);
     await signOutRemote(cookies.nx_admin_access);

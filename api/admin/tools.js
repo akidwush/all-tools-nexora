@@ -1,5 +1,6 @@
 const { databaseRequest } = require("../../lib/database");
 const { requireAdmin, verifyMutationRequest } = require("../../lib/admin-auth");
+const { recordAdminAudit } = require("../../lib/admin-audit");
 
 const ALLOWED_CATEGORIES = new Set(["downloader", "maker", "tools", "vault", "external"]);
 
@@ -19,6 +20,20 @@ function externalUrl(value) {
   const parsed = new URL(text);
   if (!["http:", "https:"].includes(parsed.protocol)) throw new Error("INVALID_EXTERNAL_URL");
   return parsed.toString();
+}
+
+function auditShape(item) {
+  if (!item) return null;
+  return {
+    name: item.name,
+    description: item.description,
+    category: item.category,
+    badge: item.badge,
+    icon: item.icon,
+    externalUrl: item.external_url,
+    isActive: item.is_active,
+    sortOrder: item.sort_order
+  };
 }
 
 module.exports = async function handler(request, response) {
@@ -63,6 +78,10 @@ module.exports = async function handler(request, response) {
       };
       if (payload.name.length < 2) return send(response, 400, { ok: false, error: "INVALID_NAME" });
 
+      const currentRows = await databaseRequest(`tools?select=id,name,description,category,badge,icon,external_url,is_active,sort_order&id=eq.${encodeURIComponent(id)}&limit=1`, { method: "GET" });
+      const current = Array.isArray(currentRows) ? currentRows[0] : null;
+      if (!current) return send(response, 404, { ok: false, error: "TOOL_NOT_FOUND" });
+
       const rows = await databaseRequest(`tools?id=eq.${encodeURIComponent(id)}`, {
         method: "PATCH",
         headers: { Prefer: "return=representation" },
@@ -71,9 +90,21 @@ module.exports = async function handler(request, response) {
       const item = Array.isArray(rows) ? rows[0] : null;
       if (!item) return send(response, 404, { ok: false, error: "TOOL_NOT_FOUND" });
 
+      const auditLogged = await recordAdminAudit({
+        request,
+        session,
+        action: "tool.update",
+        entityType: "tool",
+        entityId: id,
+        summary: `Tool ${item.name} diperbarui`,
+        before: auditShape(current),
+        after: auditShape(item)
+      });
+
       return send(response, 200, {
         ok: true,
         data: item,
+        auditLogged,
         updatedBy: session.user.email || session.user.id
       });
     }
