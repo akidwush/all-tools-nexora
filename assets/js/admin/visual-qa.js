@@ -115,6 +115,61 @@
       return canvas;
     }finally{URL.revokeObjectURL(objectUrl);}
   }
+  function safeCanvasColor(value,fallback){
+    var color=String(value||"").trim();
+    if(!color||color==="transparent"||/^rgba\([^)]*,\s*0(?:\.0+)?\)$/i.test(color))return fallback||"";
+    return color;
+  }
+  function clampNumber(value,min,max){return Math.max(min,Math.min(max,Number(value)||0));}
+  function directNodeText(node){
+    var text="";
+    Array.prototype.forEach.call(node.childNodes||[],function(child){if(child.nodeType===3)text+=" "+child.nodeValue;});
+    if(!text.trim()&&/^(?:INPUT|TEXTAREA|SELECT)$/i.test(node.tagName||""))text=node.value||node.getAttribute("placeholder")||node.getAttribute("aria-label")||"";
+    if(!text.trim()&&/^(?:BUTTON|A)$/i.test(node.tagName||""))text=node.getAttribute("aria-label")||node.getAttribute("title")||"";
+    return text.replace(/\s+/g," ").trim().slice(0,120);
+  }
+  function fitCanvasText(context,text,maxWidth){
+    var output=String(text||"");
+    if(context.measureText(output).width<=maxWidth)return output;
+    while(output.length>2&&context.measureText(output+"…").width>maxWidth)output=output.slice(0,-1);
+    return output?output+"…":"";
+  }
+  function renderSafeLayoutCanvas(frame,width,height){
+    var doc=frame.contentDocument,win=frame.contentWindow;
+    if(!doc||!win)throw new Error("Dokumen iframe tidak dapat dibaca.");
+    var canvas=document.createElement("canvas");canvas.width=width;canvas.height=height;
+    var context=canvas.getContext("2d",{alpha:false});
+    var rootStyle=win.getComputedStyle(doc.body||doc.documentElement);
+    context.fillStyle=safeCanvasColor(rootStyle.backgroundColor,"#09040f");context.fillRect(0,0,width,height);
+    var nodes=Array.prototype.slice.call((doc.body||doc.documentElement).querySelectorAll("*"));
+    var painted=0;
+    for(var i=0;i<nodes.length&&painted<1000;i++){
+      var node=nodes[i],style,rect;
+      try{style=win.getComputedStyle(node);rect=node.getBoundingClientRect();}catch(_){continue;}
+      if(!style||style.display==="none"||style.visibility==="hidden"||Number(style.opacity)===0)continue;
+      if(rect.width<1||rect.height<1||rect.right<=0||rect.bottom<=0||rect.left>=width||rect.top>=height)continue;
+      var x=clampNumber(rect.left,0,width),y=clampNumber(rect.top,0,height);
+      var right=clampNumber(rect.right,0,width),bottom=clampNumber(rect.bottom,0,height);
+      var w=right-x,h=bottom-y;if(w<1||h<1)continue;
+      var background=safeCanvasColor(style.backgroundColor,"");
+      var border=safeCanvasColor(style.borderTopColor,"");
+      if(background){context.globalAlpha=clampNumber(style.opacity||1,0.08,1);context.fillStyle=background;context.fillRect(x,y,w,h);context.globalAlpha=1;painted++;}
+      if(border&&parseFloat(style.borderTopWidth||0)>0&&w>3&&h>3){context.strokeStyle=border;context.lineWidth=Math.min(2,Math.max(1,parseFloat(style.borderTopWidth)||1));context.strokeRect(x+0.5,y+0.5,Math.max(0,w-1),Math.max(0,h-1));painted++;}
+      if(/^(?:IMG|VIDEO|CANVAS|SVG|PICTURE)$/i.test(node.tagName||"")){
+        context.fillStyle="rgba(168,85,247,.16)";context.fillRect(x,y,w,h);
+        context.strokeStyle="rgba(192,132,252,.45)";context.strokeRect(x+1,y+1,Math.max(0,w-2),Math.max(0,h-2));painted++;
+      }
+      var label=directNodeText(node);
+      if(label&&w>20&&h>9){
+        var fontSize=clampNumber(parseFloat(style.fontSize)||12,9,16);
+        context.font=(/^(?:BUTTON|B|STRONG|H1|H2|H3|H4)$/i.test(node.tagName||"")?"600 ":"400 ")+fontSize+"px sans-serif";
+        context.fillStyle=safeCanvasColor(style.color,"#e9ddff");context.textBaseline="top";
+        var fitted=fitCanvasText(context,label,Math.max(8,w-8));
+        if(fitted){context.fillText(fitted,x+4,y+Math.min(4,Math.max(1,(h-fontSize)/2)),Math.max(8,w-8));painted++;}
+      }
+    }
+    return canvas;
+  }
   function canvasToBlob(canvas){
     return new Promise(function(resolve,reject){
       try{canvas.toBlob(function(blob){if(blob)resolve(blob);else reject(new Error("Screenshot tidak dapat dikompresi."));},"image/jpeg",0.82);}
@@ -125,14 +180,22 @@
     var win=frame.contentWindow;
     win.scrollTo(0,0);
     await wait(120);
-    var canvas=null;var safeFallback=false;var blob=null;
+    var canvas=null,blob=null,renderer="dom",fallbackErrors=[];
     try{
       canvas=await renderFrameCanvas(frame,width,height,false);
       blob=await canvasToBlob(canvas);
     }catch(error){
-      safeFallback=true;
-      canvas=await renderFrameCanvas(frame,width,height,true);
-      blob=await canvasToBlob(canvas);
+      fallbackErrors.push(error&&error.message?error.message:String(error));
+      renderer="strict-dom";
+      try{
+        canvas=await renderFrameCanvas(frame,width,height,true);
+        blob=await canvasToBlob(canvas);
+      }catch(strictError){
+        fallbackErrors.push(strictError&&strictError.message?strictError.message:String(strictError));
+        renderer="safe-layout";
+        canvas=renderSafeLayoutCanvas(frame,width,height);
+        blob=await canvasToBlob(canvas);
+      }
     }
     var digest=await crypto.subtle.digest("SHA-256",await blob.arrayBuffer());
     var hash=Array.prototype.map.call(new Uint8Array(digest),function(byte){return byte.toString(16).padStart(2,"0");}).join("");
@@ -140,7 +203,7 @@
     var pixels=miniContext.getImageData(0,0,32,32).data;var luminance=new Uint8Array(1024);
     for(var p=0,j=0;p<pixels.length;p+=4,j++)luminance[j]=Math.round((pixels[p]*0.299)+(pixels[p+1]*0.587)+(pixels[p+2]*0.114));
     var thumb=document.createElement("canvas");var ratio=Math.min(1,480/width);thumb.width=Math.max(1,Math.round(width*ratio));thumb.height=Math.max(1,Math.round(height*ratio));thumb.getContext("2d").drawImage(canvas,0,0,thumb.width,thumb.height);
-    return {dataUrl:URL.createObjectURL(blob),downloadBlob:blob,thumbnailDataUrl:thumb.toDataURL("image/jpeg",0.66),fingerprint:bytesToBase64(luminance),hash:hash,width:width,height:height,safeFallback:safeFallback};
+    return {dataUrl:URL.createObjectURL(blob),downloadBlob:blob,thumbnailDataUrl:thumb.toDataURL("image/jpeg",0.66),fingerprint:bytesToBase64(luminance),hash:hash,width:width,height:height,safeFallback:renderer!=="dom",renderer:renderer,fallbackReason:fallbackErrors.join(" | ")};
   }
   function compareFingerprints(current,baseline){
     if(!current||!baseline)return null;
@@ -164,6 +227,7 @@
       ["Runtime error",errors.filter(function(item){return item.kind!=="resource";}).length],
       ["Resource error",errors.filter(function(item){return item.kind==="resource";}).length],
       ["Modul",modules&&modules.available?(modules.passed+" lulus / "+modules.failed+" gagal"):"Tidak diuji"],
+      ["Renderer",capture.screenshot.renderer==="safe-layout"?"Safe Layout":(capture.screenshot.renderer==="strict-dom"?"DOM ketat":"DOM penuh")],
       ["Visual diff",capture.differencePercent==null?"Belum ada baseline":capture.differencePercent+"%"],
       ["Overflow",(inspection.horizontalOverflowPx||0)+" px"]
     ];
@@ -217,6 +281,11 @@
       setBusy(true,"Mengambil screenshot...");setProgress(70,"Merender screenshot viewport...");
       var screenshot=await captureFrame(frame,viewport.width,viewport.height);
       var report=observer.snapshot({modules:modules,userAgent:navigator.userAgent,viewportName:current.viewport});
+      report.extra=Object.assign({},report.extra||{},{screenshotRenderer:screenshot.renderer,screenshotFallbackReason:screenshot.fallbackReason||null});
+      if(screenshot.renderer==="safe-layout"){
+        report.warnings=Array.isArray(report.warnings)?report.warnings.slice():[];
+        report.warnings.push("Browser memblokir ekspor canvas DOM; screenshot memakai Safe Layout renderer tanpa aset eksternal.");
+      }
       var difference=state.baseline?compareFingerprints(screenshot.fingerprint,state.baseline.fingerprint):null;
       var threshold=state.baseline?Number(state.baseline.threshold_percent||8):8;
       var status=classify(report,difference,threshold);

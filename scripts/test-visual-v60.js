@@ -22,7 +22,7 @@ for (const token of ["unhandledrejection", "console-error", "runModules", "horiz
   assert.equal(observer.includes(token), true, `runtime observer harus memuat ${token}`);
 }
 const visual = fs.readFileSync(path.join(root, "assets/js/admin/visual-qa.js"), "utf8");
-for (const token of ["captureFrame", "foreignObject", "crypto.subtle.digest", "compareFingerprints", "set_baseline", "save_run", "runModules"]) {
+for (const token of ["captureFrame", "foreignObject", "renderSafeLayoutCanvas", "safe-layout", "screenshotRenderer", "crypto.subtle.digest", "compareFingerprints", "set_baseline", "save_run", "runModules"]) {
   assert.equal(visual.includes(token), true, `visual QA harus memuat ${token}`);
 }
 const api = fs.readFileSync(path.join(root, "api/admin/visual.js"), "utf8");

@@ -1,8 +1,8 @@
 {
   "name": "all-tools-nexora-developer-dika",
-  "version": "6.3.9",
+  "version": "6.3.10",
   "private": true,
-  "description": "All Tools Nexora v6.3.9 \u2014 TikTok streaming download, truthful history, single preview controller, dan SSRF guard",
+  "description": "All Tools Nexora v6.3.10 \u2014 TikTok streaming download, truthful history, single preview controller, dan SSRF guard",
   "scripts": {
     "dev": "node serve-local.js",
     "start": "node serve-local.js",

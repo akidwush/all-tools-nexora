@@ -65,7 +65,7 @@
     return normalizedHealth(healthMap[id]);
   }
   function applyCardStatus(){
-    Array.prototype.forEach.call(document.querySelectorAll("[data-tool-id]"),function(card){
+    Array.prototype.forEach.call(document.querySelectorAll("[data-tool-id],[data-nx-room-tool]"),function(card){
       var id=toolIdFromCard(card); if(!id) return;
       var meta=registry&&registry.get(id);
       var status=cardStatus(id);
@@ -109,6 +109,14 @@
     if(!meta||!meta.handler) return true;
     return typeof scope[meta.handler]==="function";
   }
+  function findRenderedCard(id){
+    return Array.prototype.find.call(document.querySelectorAll("[data-tool-id],[data-nx-room-tool]"),function(node){return toolIdFromCard(node)===id;})||null;
+  }
+  function catalogHas(id){
+    var catalog=window.NexoraToolCatalog;
+    try{return Boolean(catalog&&typeof catalog.has==="function"&&catalog.has(id));}
+    catch(_){return false;}
+  }
   async function audit(options){
     options=options||{};
     var started=Date.now();
@@ -146,20 +154,24 @@
       var healthStatus=normalizedHealth(health);
       if(status==="ready"&&healthStatus==="offline"){status="offline";issues.push(health.lastError||"Dependensi tidak dapat dijangkau.");}
       else if(status==="ready"&&healthStatus==="degraded"){status="degraded";issues.push(health.lastError||"Dependensi merespons terbatas.");}
-      var card=Array.prototype.find.call(document.querySelectorAll("[data-tool-id]"),function(node){return toolIdFromCard(node)===meta.id;});
-      if(!card){if(status==="ready")status="missing";issues.push("Kartu tool tidak ditemukan di DOM.");}
-      results.push({id:meta.id,name:meta.name,mode:meta.mode,module:meta.module,status:status,handler:meta.handler,moduleLoaded:moduleLoaded,healthStatus:healthStatus,httpStatus:health&&health.httpStatus!=null?health.httpStatus:null,latencyMs:health&&health.latencyMs!=null?health.latencyMs:null,issues:issues});
+      var card=findRenderedCard(meta.id);
+      var catalogPresent=Boolean(card)||catalogHas(meta.id);
+      if(!catalogPresent){
+        if(status==="ready")status="missing";
+        issues.push("Tool tidak ditemukan di katalog publik.");
+      }
+      results.push({id:meta.id,name:meta.name,mode:meta.mode,module:meta.module,status:status,handler:meta.handler,moduleLoaded:moduleLoaded,healthStatus:healthStatus,httpStatus:health&&health.httpStatus!=null?health.httpStatus:null,latencyMs:health&&health.latencyMs!=null?health.latencyMs:null,cardRendered:Boolean(card),catalogPresent:catalogPresent,issues:issues});
     }
     var counts={ready:0,degraded:0,offline:0,restricted:0,missing:0};
     results.forEach(function(item){counts[item.status]=(counts[item.status]||0)+1;});
-    lastAudit={version:"6.3.9",startedAt:new Date(started).toISOString(),completedAt:new Date().toISOString(),durationMs:Date.now()-started,counts:counts,total:results.length,results:results};
+    lastAudit={version:"6.3.10",startedAt:new Date(started).toISOString(),completedAt:new Date().toISOString(),durationMs:Date.now()-started,counts:counts,total:results.length,results:results};
     try{localStorage.setItem("nexora-functional-audit-v62",JSON.stringify(lastAudit));}catch(_){ }
     window.dispatchEvent(new CustomEvent("nexora:functional-audit-complete",{detail:lastAudit}));
     return lastAudit;
   }
 
   document.addEventListener("click",function(event){
-    var card=event.target&&event.target.closest?event.target.closest("[data-tool-id]"):null;
+    var card=event.target&&event.target.closest?event.target.closest("[data-tool-id],[data-nx-room-tool]"):null;
     var id=toolIdFromCard(card); if(!id) return;
     var meta=registry&&registry.get(id);
     var status=cardStatus(id);
@@ -184,6 +196,6 @@
     else applyCardStatus();
   });
 
-  window.NexoraStability={version:"6.3.9",audit:audit,loadHealth:loadHealth,applyCardStatus:applyCardStatus,notify:notify,fetchJson:fetchJson,getLastAudit:function(){return lastAudit;},getHealth:function(id){return healthMap[id]||null;}};
+  window.NexoraStability={version:"6.3.10",audit:audit,loadHealth:loadHealth,applyCardStatus:applyCardStatus,notify:notify,fetchJson:fetchJson,getLastAudit:function(){return lastAudit;},getHealth:function(id){return healthMap[id]||null;}};
   window.dispatchEvent(new CustomEvent("nexora:stability-ready"));
 })();

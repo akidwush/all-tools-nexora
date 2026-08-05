@@ -412,7 +412,7 @@
   else patchCards();
 })();
 
-/* ===== Nexora v6.3.9: single TikTok preview controller (no global observer) ===== */
+/* ===== Nexora v6.3.10: single TikTok preview controller (no global observer) ===== */
 (function(){
   function fmtTime(sec){
     sec=Number(sec||0);

@@ -1387,6 +1387,31 @@ function rebuildAllTools() {
     allRenderedCount = 0;
 }
 
+function normalizeCatalogToolId(value) {
+    return String(value == null ? '' : value).trim().toLowerCase();
+}
+
+function catalogHasTool(toolId) {
+    const targetId = normalizeCatalogToolId(toolId);
+    if (!targetId) return false;
+    return Object.values(toolsData).some(items =>
+        Array.isArray(items) && items.some(item => normalizeCatalogToolId(item && item.id) === targetId)
+    );
+}
+
+function catalogListTools() {
+    return Object.entries(toolsData).flatMap(([category, items]) =>
+        (Array.isArray(items) ? items : []).map(item => ({ ...item, category }))
+    );
+}
+
+window.NexoraToolCatalog = Object.freeze({
+    version: '6.3.10',
+    has: catalogHasTool,
+    list: catalogListTools
+});
+window.dispatchEvent(new CustomEvent('nexora:tool-catalog-ready'));
+
 function removeAllLoadMore() {
     const current = document.getElementById('nxAllToolsMore');
     if (current) current.remove();

@@ -16,7 +16,7 @@ sandbox.window.dispatchEvent = (event) => events.push(event.type);
 vm.runInNewContext(read("assets/js/core/tool-registry.js"), sandbox, { filename: "tool-registry.js" });
 const registry = sandbox.window.NexoraToolRegistry;
 assert.ok(registry, "Tool registry tidak terpasang");
-assert.equal(registry.version, "6.3.9");
+assert.equal(registry.version, "6.3.10");
 assert.equal(registry.count, 37);
 assert.equal(registry.list().length, 37);
 assert.equal(new Set(registry.list().map((item) => item.id)).size, 37);
@@ -68,7 +68,10 @@ assert.ok(adminCss.includes("admin-more-sheet"));
 const network = read("assets/js/core/network.js");
 for (const token of ["NexoraFetch", "REQUEST_TIMEOUT", "nexora:network-error"]) assert.ok(network.includes(token));
 const stability = read("assets/js/core/stability.js");
-for (const token of ["NexoraStability", "functional-audit-complete", "applyCardStatus", "fetchJson", "loadHealth"]) assert.ok(stability.includes(token));
+for (const token of ["NexoraStability", "functional-audit-complete", "applyCardStatus", "fetchJson", "loadHealth", "catalogPresent", "Tool tidak ditemukan di katalog publik."]) assert.ok(stability.includes(token));
+assert.ok(!stability.includes("Kartu tool tidak ditemukan di DOM."), "Audit tidak boleh menandai kartu progresif sebagai tool hilang");
+const app = read("assets/js/core/app.js");
+for (const token of ["NexoraToolCatalog", "catalogHasTool", "tool-catalog-ready"]) assert.ok(app.includes(token), `Katalog runtime harus memuat ${token}`);
 
 const serverless = [];
 (function walk(dir) {

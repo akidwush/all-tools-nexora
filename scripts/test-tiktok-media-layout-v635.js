@@ -9,7 +9,7 @@ const pkg = JSON.parse(read('package.json'));
 const css = read('assets/css/features/tiktok.css');
 const js = read('assets/js/features/tiktok.js');
 
-assert.equal(pkg.version, '6.3.9');
+assert.equal(pkg.version, '6.3.10');
 assert.match(css, /\.tt-room-content\{[\s\S]*?max-width:100%!important;[\s\S]*?min-width:0!important;/);
 assert.match(css, /\.tt-room-scroll\{[\s\S]*?overflow-y:auto;[\s\S]*?overflow-x:hidden;/);
 assert.match(css, /\.tt-result-grid>\*\{width:100%;max-width:100%;min-width:0;/);

@@ -1,6 +1,6 @@
-# All Tools Nexora v6.3.9
+# All Tools Nexora v6.3.10
 
-Rilis stabilisasi untuk website All Tools Nexora. Fokus utama v6.3.9 adalah mengalirkan download TikTok melalui server tanpa membuat Blob besar di RAM browser, memvalidasi media sebelum history dicatat, dan memakai satu controller preview tanpa MutationObserver permanen.
+Rilis hotfix untuk dashboard All Tools Nexora. Fokus utama v6.3.10 adalah menghapus false positive “Kartu tool tidak ditemukan di DOM” pada katalog progresif serta memberi Visual QA fallback Safe Layout ketika Chrome memblokir ekspor canvas karena CORS.
 
 ## Perubahan utama
 
@@ -46,7 +46,7 @@ DATABASE_TIMEOUT_MS
 FEEDBACK_HASH_SALT
 ```
 
-Tidak ada environment variable baru untuk v6.3.9.
+Tidak ada environment variable baru untuk v6.3.10.
 
 ## Endpoint
 
