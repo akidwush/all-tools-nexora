@@ -798,15 +798,26 @@ async function nxFetchImageWithBackup(apiId, sources, options) {
     throw lastError || new Error('Semua API gagal');
 }
 
-async function nxPostImageFile(apiId, endpoints, file) {
+async function nxPostImageFile(apiId, endpoints, file, options) {
     const fields = ['file', 'image', 'image_file', 'img'];
+    const config = options || {};
+    const timeoutMs = Math.max(3000, Math.min(20000, Number(config.timeoutMs) || 10000));
+    const maxAttempts = Math.max(1, Math.min(endpoints.length * fields.length, Number(config.maxAttempts) || 8));
+    let attempts = 0;
     let lastError = null;
     for (const endpoint of endpoints) {
         for (const field of fields) {
+            if (attempts >= maxAttempts) break;
+            attempts++;
             try {
                 const form = new FormData();
                 form.append(field, file, file.name || 'image.png');
-                const res = await window.NexoraFetch(endpoint, { method: 'POST', body: form });
+                const res = await window.NexoraFetch(endpoint, {
+                    method: 'POST',
+                    body: form,
+                    nexoraTimeoutMs: timeoutMs,
+                    nexoraRetries: 0
+                });
                 const img = await nxImageFromResponse(res);
                 const api = getApiById(apiId);
                 if (api) setApiStatus(api, 'ok', 'Online via Upload');
@@ -815,9 +826,10 @@ async function nxPostImageFile(apiId, endpoints, file) {
                 lastError = e;
             }
         }
+        if (attempts >= maxAttempts) break;
     }
     const api = getApiById(apiId);
-    if (api) setApiStatus(api, 'err', 'API gagal, pakai fallback');
+    if (api) setApiStatus(api, 'err', 'API gagal, fallback lokal diperlukan');
     throw lastError || new Error('Upload API gagal');
 }
 
@@ -1031,6 +1043,40 @@ async function nxLocalRemoveBg(file, imageUrl) {
     ctx.putImageData(imageData, 0, 0);
     URL.revokeObjectURL(loaded.url);
     return nxCanvasToUrl(canvas);
+}
+
+
+async function nxRemoveBackgroundLocalFirst(file, imageUrl, onStatus) {
+    const report = typeof onStatus === 'function' ? onStatus : () => {};
+    let aiError = null;
+    try {
+        report('Menyiapkan model AI lokal…');
+        const img = await nxAiRemoveBackground(file, imageUrl, (percent, key) => {
+            report(`AI lokal ${percent}%${key ? ' · ' + key : ''}`);
+        });
+        return { img, engine: 'AI lokal', degraded: false };
+    } catch (error) {
+        aiError = error;
+    }
+
+    try {
+        report('Model AI tidak tersedia. Menjalankan fallback lokal…');
+        const img = await nxLocalRemoveBg(file, imageUrl);
+        return {
+            img,
+            engine: 'Fallback lokal',
+            degraded: true,
+            warning: aiError && aiError.message ? aiError.message : ''
+        };
+    } catch (localError) {
+        const error = new Error(
+            'Pemrosesan lokal gagal' +
+            (localError && localError.message ? ': ' + localError.message : '')
+        );
+        error.aiError = aiError;
+        error.localError = localError;
+        throw error;
+    }
 }
 
 function nxRenderImageResult(target, imgUrl, filename, note) {
@@ -1406,7 +1452,7 @@ function catalogListTools() {
 }
 
 window.NexoraToolCatalog = Object.freeze({
-    version: '6.3.10',
+    version: '6.3.11',
     has: catalogHasTool,
     list: catalogListTools
 });
@@ -2985,46 +3031,82 @@ function renderMorse(body) {
 function renderRemovebg(body) {
     body.innerHTML = `
         <h2><i class="fas fa-eraser"></i> Remove Background</h2>
-        <p style="color:#8b7ab8;font-size:13px;margin-bottom:12px;">Masukkan URL atau upload gambar. Proses utama memakai API Nanzz, dengan backup endpoint/proxy otomatis.</p>
+        <p style="color:#8b7ab8;font-size:13px;margin-bottom:12px;">Upload gambar untuk diproses di browser. AI lokal menjadi mesin utama; API eksternal hanya dipakai sebagai cadangan terakhir.</p>
         <input type="url" id="removebgUrl" class="v-input" placeholder="URL gambar (opsional)">
         <input type="file" id="removebgFile" accept="image/png,image/jpeg,image/webp,image/jpg" style="display:none">
         <label for="removebgFile" style="display:flex;justify-content:center;align-items:center;gap:8px;width:100%;padding:13px;margin:10px 0;background:rgba(168,85,247,.06);border:1px dashed rgba(168,85,247,.28);border-radius:14px;cursor:pointer;font-size:13px;color:#b9a0e9;">
             <i class="fas fa-cloud-arrow-up"></i> <span id="uploadText">Pilih Gambar</span>
         </label>
         <div id="fileName" style="text-align:center;color:#6a5a8a;font-size:12px;margin-bottom:12px;">Belum ada file</div>
-        <button class="v-btn" id="removebgBtn"><i class="fas fa-magic"></i> Remove BG</button>
+        <button class="v-btn" id="removebgBtn"><i class="fas fa-wand-magic-sparkles"></i> Hapus Background</button>
         <div id="removebgResult"></div>`;
     const fileInput = document.getElementById('removebgFile');
     fileInput.onchange = () => {
         const file = fileInput.files[0];
-        if (file && file.size > 12 * 1024 * 1024) { alert('Ukuran gambar maksimal 12 MB.'); fileInput.value=''; }
+        if (file && file.size > 12 * 1024 * 1024) {
+            alert('Ukuran gambar maksimal 12 MB.');
+            fileInput.value = '';
+        }
         document.getElementById('uploadText').textContent = fileInput.files[0] ? 'Ganti Gambar' : 'Pilih Gambar';
         document.getElementById('fileName').textContent = fileInput.files[0] ? fileInput.files[0].name : 'Belum ada file';
     };
+
     document.getElementById('removebgBtn').onclick = async () => {
         const url = document.getElementById('removebgUrl').value.trim();
         const file = fileInput.files[0];
         const btn = document.getElementById('removebgBtn');
         const result = document.getElementById('removebgResult');
         if (!url && !file) return alert('Masukkan URL atau pilih gambar!');
+
         btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses API...';
-        result.innerHTML = '<div class="result-box"><i class="fas fa-spinner spin"></i><br>Menghapus background lewat API...</div>';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses AI…';
+        const updateStatus = message => {
+            result.innerHTML = `<div class="result-box"><i class="fas fa-spinner spin"></i><br>${nxEscape(message)}</div>`;
+        };
+        updateStatus('Menyiapkan gambar…');
+
+        let localFailure = null;
+        try {
+            const output = await nxRemoveBackgroundLocalFirst(file, url, updateStatus);
+            const api = getApiById('nanzz');
+            if (api) setApiStatus(api, 'warn', 'AI lokal aktif · API hanya cadangan');
+            nxRenderImageResult(
+                result,
+                output.img,
+                `removebg_${Date.now()}.png`,
+                output.degraded
+                    ? 'Selesai memakai fallback lokal. Hasil terbaik diperoleh pada background yang cukup seragam.'
+                    : 'Selesai memakai AI lokal di perangkat. Gambar tidak dikirim ke API Nanzz.'
+            );
+            return;
+        } catch (error) {
+            localFailure = error;
+        }
+
+        updateStatus('AI lokal gagal. Mencoba API cadangan…');
         try {
             let img, sourceName = 'Upload API';
             if (url) {
-                const response = await nxFetchImageWithBackup('nanzz', nxImageUrlSources('removebg', url));
+                const response = await nxFetchImageWithBackup('nanzz', nxImageUrlSources('removebg', url), {
+                    nexoraTimeoutMs: 10000,
+                    nexoraRetries: 0
+                });
                 img = response.img;
                 sourceName = response.source && response.source.name ? response.source.name : 'URL API';
             } else {
-                img = await nxPostImageFile('nanzz', nxImageEndpoints('removebg'), file);
+                img = await nxPostImageFile('nanzz', nxImageEndpoints('removebg'), file, {
+                    timeoutMs: 10000,
+                    maxAttempts: 6
+                });
             }
-            nxRenderImageResult(result, img, `removebg_${Date.now()}.png`, 'Background diproses lewat API Nanzz · ' + sourceName + '.');
-        } catch (e) {
-            result.innerHTML = `<div class="result-box" style="color:#ef4444;">Gagal memproses lewat API: ${nxEscape(e.message)}</div>`;
+            nxRenderImageResult(result, img, `removebg_${Date.now()}.png`, 'AI lokal tidak tersedia; hasil dibuat lewat ' + sourceName + '.');
+        } catch (apiError) {
+            const localMessage = localFailure && localFailure.message ? localFailure.message : 'AI lokal gagal';
+            const apiMessage = apiError && apiError.message ? apiError.message : 'API gagal';
+            result.innerHTML = `<div class="result-box" style="color:#fda4af;"><b>Remove Background gagal.</b><br>${nxEscape(localMessage)}<br>Cadangan API: ${nxEscape(apiMessage)}<br><small>Coba gambar JPG/PNG yang lebih kecil atau gunakan file upload, bukan URL.</small></div>`;
         } finally {
             btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-magic"></i> Remove BG';
+            btn.innerHTML = '<i class="fas fa-wand-magic-sparkles"></i> Hapus Background';
         }
     };
 }

@@ -478,7 +478,7 @@
     };
 })();
 
-/* ===== Nexora v6.3.10: unlocked external tools ===== */
+/* ===== Nexora v6.3.11: unlocked external tools ===== */
 (function(){
   "use strict";
   const TIKTOK_STUDIO_URL="https://www.tiktok.com/tiktokstudio";

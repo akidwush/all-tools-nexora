@@ -157,9 +157,9 @@ for(const source of ["/api/analytics", "/api/database"]) {
 }
 
 const tiktokV639=fs.readFileSync(path.join(root,"assets/js/features/tiktok.js"),"utf8");
-for(const token of ["/api/media-download?","probeDownload(choice)","triggerStreamDownload(choice)","nxEnhanceTiktokPreviewControls"]) if(!tiktokV639.includes(token)) fail(`TikTok v6.3.10 belum lengkap: ${token}`);
-for(const forbiddenToken of ["response.blob()","URL.createObjectURL","document.createElement('iframe')","new MutationObserver"]) if(tiktokV639.includes(forbiddenToken)) fail(`TikTok v6.3.10 masih memuat pola berat/palsu: ${forbiddenToken}`);
-if(!fs.existsSync(path.join(root,"lib/media-download.js"))) fail("Streaming media handler v6.3.10 hilang.");
+for(const token of ["/api/media-download?","probeDownload(choice)","triggerStreamDownload(choice)","nxEnhanceTiktokPreviewControls"]) if(!tiktokV639.includes(token)) fail(`TikTok v6.3.11 belum lengkap: ${token}`);
+for(const forbiddenToken of ["response.blob()","URL.createObjectURL","document.createElement('iframe')","new MutationObserver"]) if(tiktokV639.includes(forbiddenToken)) fail(`TikTok v6.3.11 masih memuat pola berat/palsu: ${forbiddenToken}`);
+if(!fs.existsSync(path.join(root,"lib/media-download.js"))) fail("Streaming media handler v6.3.11 hilang.");
 if(!(routeManifest.apiRoutes||[]).includes("/api/media-download")) fail("Route manifest belum mencantumkan /api/media-download.");
 if(!(vercelConfigV611.rewrites||[]).some((item)=>item.source==="/api/media-download"&&String(item.destination||"").includes("mode=media-download"))) fail("Rewrite streaming media belum tersedia.");
 
@@ -177,13 +177,13 @@ const registryV62 = fs.readFileSync(path.join(root,"assets/js/core/tool-registry
 const stabilityV62 = fs.readFileSync(path.join(root,"assets/js/core/stability.js"),"utf8");
 const functionalV62 = fs.readFileSync(path.join(root,"assets/js/admin/functional-audit.js"),"utf8");
 for (const token of ["NexoraFetch","REQUEST_TIMEOUT","nexora:network-error"]) if(!networkV62.includes(token)) fail(`Network layer v6.2 belum lengkap: ${token}`);
-for (const token of ["NexoraToolRegistry",'version:"6.3.10"',"count:rows.length"]) if(!registryV62.includes(token)) fail(`Tool registry v6.2 belum lengkap: ${token}`);
+for (const token of ["NexoraToolRegistry",'version:"6.3.11"',"count:rows.length"]) if(!registryV62.includes(token)) fail(`Tool registry v6.2 belum lengkap: ${token}`);
 for (const token of ["NexoraStability","functional-audit-complete","applyCardStatus","loadHealth","catalogPresent","Tool tidak ditemukan di katalog publik."]) if(!stabilityV62.includes(token)) fail(`Stability layer v6.2 belum lengkap: ${token}`);
 if(stabilityV62.includes("Kartu tool tidak ditemukan di DOM.")) fail("Functional audit masih memberi false positive pada katalog progresif.");
 const appV6310=fs.readFileSync(path.join(root,"assets/js/core/app.js"),"utf8");
-for(const token of ["NexoraToolCatalog","catalogHasTool","tool-catalog-ready"]) if(!appV6310.includes(token)) fail(`Runtime catalog v6.3.10 belum lengkap: ${token}`);
+for(const token of ["NexoraToolCatalog","catalogHasTool","tool-catalog-ready"]) if(!appV6310.includes(token)) fail(`Runtime catalog v6.3.11 belum lengkap: ${token}`);
 const visualV6310=fs.readFileSync(path.join(root,"assets/js/admin/visual-qa.js"),"utf8");
-for(const token of ["renderSafeLayoutCanvas","safe-layout","screenshotRenderer"]) if(!visualV6310.includes(token)) fail(`Visual QA fallback v6.3.10 belum lengkap: ${token}`);
+for(const token of ["renderSafeLayoutCanvas","safe-layout","screenshotRenderer"]) if(!visualV6310.includes(token)) fail(`Visual QA fallback v6.3.11 belum lengkap: ${token}`);
 for (const token of ["runFunctionalAudit","functionalAuditFrame","nexora:functional-section-open"]) if(!functionalV62.includes(token)) fail(`Functional audit admin v6.2 belum lengkap: ${token}`);
 if(!index.includes("assets/js/core/tool-registry.js")||!index.includes("assets/js/core/stability.js")) fail("index.html belum memuat stability layer v6.2");
 const adminHtmlV62=fs.readFileSync(path.join(root,"admin/index.html"),"utf8");
@@ -213,4 +213,4 @@ for(const file of scanFiles){
   }
 }
 if(failed) process.exit(1);
-console.log(`Audit v6.3.10 lulus: index ${indexBytes.toLocaleString()} byte, ${jsFiles.length} file JS valid, functional audit katalog progresif, Safe Layout screenshot fallback, deploy cache guards, TikTok streaming download, truthful history, media containment, social link control, lazy-load, live audit, tool health, runtime JS test, visual validation, analytics, feedback management, audit log, login, dan dashboard admin lengkap.`);
+console.log(`Audit v6.3.11 lulus: index ${indexBytes.toLocaleString()} byte, ${jsFiles.length} file JS valid, functional audit katalog progresif, Safe Layout screenshot fallback, deploy cache guards, TikTok streaming download, truthful history, media containment, social link control, lazy-load, live audit, tool health, runtime JS test, visual validation, analytics, feedback management, audit log, login, dan dashboard admin lengkap.`);

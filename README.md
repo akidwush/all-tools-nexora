@@ -1,6 +1,6 @@
-# All Tools Nexora v6.3.10
+# All Tools Nexora v6.3.11
 
-Rilis hotfix untuk dashboard All Tools Nexora. Fokus utama v6.3.10 adalah menghapus false positive “Kartu tool tidak ditemukan di DOM” pada katalog progresif serta memberi Visual QA fallback Safe Layout ketika Chrome memblokir ekspor canvas karena CORS.
+Rilis hotfix untuk dashboard All Tools Nexora. Fokus utama v6.3.11 adalah menghapus false positive “Kartu tool tidak ditemukan di DOM” pada katalog progresif serta memberi Visual QA fallback Safe Layout ketika Chrome memblokir ekspor canvas karena CORS.
 
 ## Perubahan utama
 
@@ -46,7 +46,7 @@ DATABASE_TIMEOUT_MS
 FEEDBACK_HASH_SALT
 ```
 
-Tidak ada environment variable baru untuk v6.3.10.
+Tidak ada environment variable baru untuk v6.3.11.
 
 ## Endpoint
 

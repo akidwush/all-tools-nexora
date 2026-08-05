@@ -18,6 +18,137 @@
     return clean || fallback || "file";
   }
 
+  function nxRoundRect(ctx,x,y,w,h,r){
+    const radius=Math.max(0,Math.min(r,Math.min(w,h)/2));
+    ctx.beginPath();
+    ctx.moveTo(x+radius,y);
+    ctx.arcTo(x+w,y,x+w,y+h,radius);
+    ctx.arcTo(x+w,y+h,x,y+h,radius);
+    ctx.arcTo(x,y+h,x,y,radius);
+    ctx.arcTo(x,y,x+w,y,radius);
+    ctx.closePath();
+  }
+
+  function nxWrapCanvasText(ctx,text,x,y,maxWidth,lineHeight,maxLines){
+    const words=String(text||"").trim().split(/\s+/).filter(Boolean);
+    const lines=[];
+    let line="";
+    for(const word of words){
+      const test=line?line+" "+word:word;
+      if(ctx.measureText(test).width>maxWidth&&line){lines.push(line);line=word;}
+      else line=test;
+    }
+    if(line)lines.push(line);
+    const visible=lines.slice(0,maxLines||lines.length);
+    if(lines.length>visible.length&&visible.length){
+      let last=visible[visible.length-1];
+      while(last&&ctx.measureText(last+"…").width>maxWidth)last=last.slice(0,-1);
+      visible[visible.length-1]=last+"…";
+    }
+    visible.forEach((value,index)=>ctx.fillText(value,x,y+index*lineHeight));
+  }
+
+  function nxCanvasBlob(canvas){
+    return new Promise((resolve,reject)=>{
+      canvas.toBlob(blob=>blob&&blob.size?resolve(blob):reject(new Error("Gagal membuat gambar lokal")),"image/png",0.96);
+    });
+  }
+
+  async function nxOptionalAvatar(url){
+    const clean=String(url||"").trim();
+    if(!clean)return null;
+    let objectUrl="";
+    try{
+      const response=await window.NexoraFetch(clean,{nexoraTimeoutMs:8000,nexoraRetries:0});
+      if(!response.ok)throw new Error("HTTP "+response.status);
+      const blob=await response.blob();
+      if(!blob||!blob.size||blob.type&&!blob.type.startsWith("image/"))throw new Error("Bukan gambar");
+      objectUrl=URL.createObjectURL(blob);
+      const image=await new Promise((resolve,reject)=>{
+        const img=new Image();
+        img.onload=()=>resolve(img);
+        img.onerror=()=>reject(new Error("Foto profil tidak dapat dibaca"));
+        img.src=objectUrl;
+      });
+      return {image,objectUrl};
+    }catch(error){
+      if(objectUrl)URL.revokeObjectURL(objectUrl);
+      return null;
+    }
+  }
+
+  async function nxBuildFakeDevFallback(nama,bio,imageUrl){
+    const canvas=document.createElement("canvas");
+    canvas.width=1200;canvas.height=720;
+    const ctx=canvas.getContext("2d");
+    const gradient=ctx.createLinearGradient(0,0,1200,720);
+    gradient.addColorStop(0,"#070313");
+    gradient.addColorStop(.55,"#16072b");
+    gradient.addColorStop(1,"#30105e");
+    ctx.fillStyle=gradient;ctx.fillRect(0,0,1200,720);
+
+    ctx.globalAlpha=.18;ctx.strokeStyle="#a78bfa";ctx.lineWidth=1;
+    for(let x=0;x<=1200;x+=48){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,720);ctx.stroke();}
+    for(let y=0;y<=720;y+=48){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(1200,y);ctx.stroke();}
+    ctx.globalAlpha=1;
+
+    nxRoundRect(ctx,70,70,1060,580,44);
+    ctx.fillStyle="rgba(10,4,24,.88)";ctx.fill();
+    ctx.strokeStyle="rgba(196,181,253,.38)";ctx.lineWidth=3;ctx.stroke();
+
+    ctx.fillStyle="#c4b5fd";ctx.font="900 26px Orbitron,Arial,sans-serif";
+    ctx.fillText("FAKEDEV // LOCAL RESILIENT MODE",120,135);
+    ctx.fillStyle="#6ee7b7";ctx.font="800 17px Inter,Arial,sans-serif";
+    ctx.fillText("GENERATED ON DEVICE · NO SOURCE API REQUIRED",120,171);
+
+    const avatar=await nxOptionalAvatar(imageUrl);
+    ctx.save();
+    ctx.beginPath();ctx.arc(260,340,112,0,Math.PI*2);ctx.clip();
+    if(avatar){
+      const img=avatar.image;
+      const sw=img.naturalWidth||img.width,sh=img.naturalHeight||img.height;
+      const size=Math.min(sw,sh),sx=(sw-size)/2,sy=(sh-size)/2;
+      ctx.drawImage(img,sx,sy,size,size,148,228,224,224);
+    }else{
+      const avatarGradient=ctx.createLinearGradient(148,228,372,452);
+      avatarGradient.addColorStop(0,"#7c3aed");avatarGradient.addColorStop(1,"#22d3ee");
+      ctx.fillStyle=avatarGradient;ctx.fillRect(148,228,224,224);
+      const initials=String(nama||"Developer").split(/\s+/).slice(0,2).map(v=>v.charAt(0)).join("").toUpperCase()||"FD";
+      ctx.fillStyle="#fff";ctx.textAlign="center";ctx.textBaseline="middle";
+      ctx.font="900 72px Orbitron,Arial,sans-serif";ctx.fillText(initials,260,340);
+    }
+    ctx.restore();
+    if(avatar&&avatar.objectUrl)URL.revokeObjectURL(avatar.objectUrl);
+    ctx.beginPath();ctx.arc(260,340,116,0,Math.PI*2);ctx.strokeStyle="#c4b5fd";ctx.lineWidth=8;ctx.stroke();
+
+    ctx.textAlign="left";ctx.textBaseline="alphabetic";
+    ctx.fillStyle="#fff";ctx.font="900 58px Poppins,Arial,sans-serif";
+    nxWrapCanvasText(ctx,nama||"Developer",430,286,610,68,2);
+    ctx.fillStyle="#a78bfa";ctx.font="800 24px Poppins,Arial,sans-serif";
+    ctx.fillText("FULL STACK DEVELOPER PROFILE",432,378);
+    ctx.fillStyle="#ddd6fe";ctx.font="500 27px Poppins,Arial,sans-serif";
+    nxWrapCanvasText(ctx,bio||"Full Stack Developer",432,430,610,42,4);
+
+    const chips=["HTML","CSS","JAVASCRIPT","NODE.JS"];
+    chips.forEach((chip,index)=>{
+      const x=120+index*245;
+      nxRoundRect(ctx,x,540,210,62,18);
+      ctx.fillStyle="rgba(167,139,250,.12)";ctx.fill();
+      ctx.strokeStyle="rgba(167,139,250,.30)";ctx.lineWidth=2;ctx.stroke();
+      ctx.fillStyle="#ddd6fe";ctx.textAlign="center";ctx.font="800 19px Inter,Arial,sans-serif";
+      ctx.fillText(chip,x+105,579);
+    });
+    return nxCanvasBlob(canvas);
+  }
+
+  function nxMarkFallback(apiId,detail){
+    try{
+      if(typeof window.getApiById==="function"&&typeof window.setApiStatus==="function"){
+        window.setApiStatus(window.getApiById(apiId),"warn",detail);
+      }
+    }catch(error){}
+  }
+
   function nxSetSourceStatus(id,message,type){
     const element=document.getElementById(id);
     if(!element) return;
@@ -36,7 +167,9 @@
     const response=await window.NexoraFetch(url,{
       method:"GET",
       headers:{"Accept":"image/*,*/*"},
-      signal:signal || undefined
+      signal:signal || undefined,
+      nexoraTimeoutMs:10000,
+      nexoraRetries:0
     });
     if(!response.ok) throw new Error("HTTP "+response.status);
     const blob=await response.blob();
@@ -109,6 +242,7 @@
 
       if(controller) controller.abort();
       controller=new AbortController();
+      loader.textContent="Mengambil gambar FakeDev";
       button.disabled=true;loader.classList.add("show");nxClearSourceStatus("nxFdStatus");
       try{
         let endpoint=`https://api.ikyyxd.my.id/canvas/fakedev?nama=${encodeURIComponent(nama)}&bio=${encodeURIComponent(bio)}`;
@@ -122,7 +256,20 @@
         nxSetSourceStatus("nxFdStatus",`Profile ${nama} berhasil dibuat oleh API sumber.`,"success");
       }catch(error){
         if(error && error.name==="AbortError") return;
-        nxSetSourceStatus("nxFdStatus","Gagal mengambil FakeDev: "+error.message,"error");
+        try{
+          loader.textContent="API sumber gagal · membuat hasil lokal";
+          const blob=await nxBuildFakeDevFallback(nama,bio,image);
+          if(currentUrl) URL.revokeObjectURL(currentUrl);
+          currentUrl=URL.createObjectURL(blob);
+          result.src=currentUrl;result.classList.add("show");empty.style.display="none";
+          download.disabled=false;
+          download.onclick=()=>nxDownloadSource(currentUrl,`fakedev_${nxFilename(nama,"Developer")}.png`);
+          const reason=error&&error.message?error.message:"API tidak tersedia";
+          nxMarkFallback("ikyyxd","API "+reason+" · generator lokal aktif");
+          nxSetSourceStatus("nxFdStatus",`API sumber gagal (${reason}), tetapi profile ${nama} berhasil dibuat secara lokal.`,"warning");
+        }catch(localError){
+          nxSetSourceStatus("nxFdStatus","API dan generator lokal gagal: "+localError.message,"error");
+        }
       }finally{
         loader.classList.remove("show");button.disabled=false;
       }

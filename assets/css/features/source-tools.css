@@ -104,6 +104,7 @@
 .nx-source-status.show{display:block}
 .nx-source-status.error{border-color:rgba(251,113,133,.28);background:rgba(251,113,133,.08);color:#fecdd3}
 .nx-source-status.success{border-color:rgba(74,222,128,.25);background:rgba(74,222,128,.07);color:#bbf7d0}
+.nx-source-status.warning{border-color:rgba(250,204,21,.28);background:rgba(250,204,21,.075);color:#fde68a}
 .nx-source-loader{
   display:none;align-items:center;justify-content:center;gap:9px;min-height:52px;
   color:#d8b4fe;font-size:10px;font-weight:900;letter-spacing:.05em;text-transform:uppercase;
