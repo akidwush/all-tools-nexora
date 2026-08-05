@@ -156,6 +156,13 @@ for(const source of ["/api/analytics", "/api/database"]) {
   if(!(vercelConfigV611.rewrites||[]).some((item)=>item.source===source)) fail(`Compatibility rewrite belum tersedia: ${source}`);
 }
 
+const tiktokV639=fs.readFileSync(path.join(root,"assets/js/features/tiktok.js"),"utf8");
+for(const token of ["/api/media-download?","probeDownload(choice)","triggerStreamDownload(choice)","nxEnhanceTiktokPreviewControls"]) if(!tiktokV639.includes(token)) fail(`TikTok v6.3.9 belum lengkap: ${token}`);
+for(const forbiddenToken of ["response.blob()","URL.createObjectURL","document.createElement('iframe')","new MutationObserver"]) if(tiktokV639.includes(forbiddenToken)) fail(`TikTok v6.3.9 masih memuat pola berat/palsu: ${forbiddenToken}`);
+if(!fs.existsSync(path.join(root,"lib/media-download.js"))) fail("Streaming media handler v6.3.9 hilang.");
+if(!(routeManifest.apiRoutes||[]).includes("/api/media-download")) fail("Route manifest belum mencantumkan /api/media-download.");
+if(!(vercelConfigV611.rewrites||[]).some((item)=>item.source==="/api/media-download"&&String(item.destination||"").includes("mode=media-download"))) fail("Rewrite streaming media belum tersedia.");
+
 const healthCatalog=require(path.join(root,"lib/tool-health.js")).TOOL_CATALOG;
 if(!Array.isArray(healthCatalog)||healthCatalog.length!==37) fail(`Tool health catalog harus memuat 37 tools, ditemukan ${healthCatalog?.length||0}.`);
 
@@ -170,7 +177,7 @@ const registryV62 = fs.readFileSync(path.join(root,"assets/js/core/tool-registry
 const stabilityV62 = fs.readFileSync(path.join(root,"assets/js/core/stability.js"),"utf8");
 const functionalV62 = fs.readFileSync(path.join(root,"assets/js/admin/functional-audit.js"),"utf8");
 for (const token of ["NexoraFetch","REQUEST_TIMEOUT","nexora:network-error"]) if(!networkV62.includes(token)) fail(`Network layer v6.2 belum lengkap: ${token}`);
-for (const token of ["NexoraToolRegistry",'version:"6.3.8"',"count:rows.length"]) if(!registryV62.includes(token)) fail(`Tool registry v6.2 belum lengkap: ${token}`);
+for (const token of ["NexoraToolRegistry",'version:"6.3.9"',"count:rows.length"]) if(!registryV62.includes(token)) fail(`Tool registry v6.2 belum lengkap: ${token}`);
 for (const token of ["NexoraStability","functional-audit-complete","applyCardStatus","loadHealth"]) if(!stabilityV62.includes(token)) fail(`Stability layer v6.2 belum lengkap: ${token}`);
 for (const token of ["runFunctionalAudit","functionalAuditFrame","nexora:functional-section-open"]) if(!functionalV62.includes(token)) fail(`Functional audit admin v6.2 belum lengkap: ${token}`);
 if(!index.includes("assets/js/core/tool-registry.js")||!index.includes("assets/js/core/stability.js")) fail("index.html belum memuat stability layer v6.2");
@@ -201,4 +208,4 @@ for(const file of scanFiles){
   }
 }
 if(failed) process.exit(1);
-console.log(`Audit v6.3.8 lulus: index ${indexBytes.toLocaleString()} byte, ${jsFiles.length} file JS valid, deploy cache guards, TikTok media containment, social link control, lazy-load, live audit, tool health, runtime JS test, screenshot, visual validation, analytics, feedback management, audit log, login, dan dashboard admin lengkap.`);
+console.log(`Audit v6.3.9 lulus: index ${indexBytes.toLocaleString()} byte, ${jsFiles.length} file JS valid, deploy cache guards, TikTok streaming download, truthful history, media containment, social link control, lazy-load, live audit, tool health, runtime JS test, screenshot, visual validation, analytics, feedback management, audit log, login, dan dashboard admin lengkap.`);

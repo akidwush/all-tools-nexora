@@ -15,6 +15,7 @@
     "/api/feedback",
     "/api/audit",
     "/api/tool-health",
+    "/api/media-download",
     "/api/admin/auth",
     "/api/admin/dashboard",
     "/api/admin/tools",

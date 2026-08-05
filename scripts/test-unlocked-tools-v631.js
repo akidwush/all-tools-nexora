@@ -14,7 +14,7 @@ const sandbox = {
 vm.runInNewContext(read('assets/js/core/tool-registry.js'), sandbox, { filename: 'tool-registry.js' });
 const registry = sandbox.window.NexoraToolRegistry;
 
-assert.equal(registry.version, '6.3.8');
+assert.equal(registry.version, '6.3.9');
 assert.equal(registry.get('tiktokhd').restricted, false);
 assert.equal(registry.get('tiktokhd').mode, 'external');
 assert.equal(registry.get('tiktokhd').handler, 'openTikTokHdUpload');

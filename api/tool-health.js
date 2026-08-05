@@ -1,4 +1,5 @@
 const crypto = require("node:crypto");
+const { handleMediaDownload } = require("../lib/media-download");
 const {
   TOOL_CATALOG,
   getHealthConfig,
@@ -51,20 +52,25 @@ async function executeRun(origin, persist = true) {
 
 module.exports = async function handler(request, response) {
   if (request.method === "OPTIONS") {
-    response.setHeader("Allow", "GET, POST, OPTIONS");
+    response.setHeader("Allow", "GET, HEAD, POST, OPTIONS");
     return response.status(204).end();
-  }
-  if (request.method !== "GET" && request.method !== "POST") {
-    response.setHeader("Allow", "GET, POST, OPTIONS");
-    return send(response, 405, { ok: false, error: "METHOD_NOT_ALLOWED" });
   }
 
   let origin;
   try { origin = requestOrigin(request); }
   catch { return send(response, 400, { ok: false, error: "INVALID_REQUEST_HOST" }); }
 
-  const config = getHealthConfig();
   const url = new URL(request.url || "/api/tool-health", origin);
+  if (url.searchParams.get("mode") === "media-download") {
+    return handleMediaDownload(request, response, url);
+  }
+
+  if (request.method !== "GET" && request.method !== "POST") {
+    response.setHeader("Allow", "GET, POST, OPTIONS");
+    return send(response, 405, { ok: false, error: "METHOD_NOT_ALLOWED" });
+  }
+
+  const config = getHealthConfig();
   const refresh = String(url.searchParams.get("refresh") || "auto").toLowerCase();
 
   if (request.method === "POST" || refresh === "force" || refresh === "1") {

@@ -1,6 +1,6 @@
-# All Tools Nexora v6.3.8
+# All Tools Nexora v6.3.9
 
-Rilis stabilisasi untuk website All Tools Nexora. Fokus utama v6.3.8 adalah memastikan asset deploy terbaru dipakai browser, media TikTok tetap di dalam frame mobile, dan CRUD katalog tool selalu dapat dibuka dari dashboard admin.
+Rilis stabilisasi untuk website All Tools Nexora. Fokus utama v6.3.9 adalah mengalirkan download TikTok melalui server tanpa membuat Blob besar di RAM browser, memvalidasi media sebelum history dicatat, dan memakai satu controller preview tanpa MutationObserver permanen.
 
 ## Perubahan utama
 
@@ -46,11 +46,11 @@ DATABASE_TIMEOUT_MS
 FEEDBACK_HASH_SALT
 ```
 
-Tidak ada environment variable baru untuk v6.3.6.
+Tidak ada environment variable baru untuk v6.3.9.
 
 ## Endpoint
 
-Jumlah function fisik tetap 12. Alias `/api/analytics` dan `/api/database` tetap menggunakan rewrite di `vercel.json`.
+Jumlah function fisik tetap 12. Alias `/api/analytics`, `/api/database`, dan `/api/media-download` menggunakan rewrite di `vercel.json`; media download digabung ke handler tool-health agar tidak menambah function fisik.
 
 Dashboard admin tersedia di:
 
@@ -91,3 +91,13 @@ Dashboard admin tersedia di:
 - Hanya tab aktif yang dipertahankan di DOM.
 - Blur kartu dimatikan pada HP dan off-screen card memakai content-visibility.
 - Banner anime kembali aktif pada perangkat yang cukup kuat; Data Saver, 2G, reduced motion, dan perangkat rendah tetap memakai fallback ringan.
+
+
+## TikTok Runtime Fix Tahap 2
+
+- `/api/media-download` digabung ke fungsi `/api/tool-health` melalui rewrite agar jumlah Serverless Function tetap 12/12.
+- Media di-stream dari sumber TikTok ke browser; browser tidak lagi menampung seluruh video sebagai Blob.
+- Endpoint memvalidasi protokol, host, redirect, content type, timeout, filename, dan rate limit.
+- History baru dicatat setelah probe server menyatakan media siap.
+- Fallback iframe palsu dan MutationObserver preview dihapus.
+- Pergantian format melepaskan decoder dan sumber video lama terlebih dahulu.

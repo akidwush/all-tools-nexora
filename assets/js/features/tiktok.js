@@ -15,12 +15,7 @@
     abortPreviewRequest();
     var scope=root || document.getElementById('ttRoomOverlay');
     if(!scope || !scope.querySelectorAll) return;
-    scope.querySelectorAll('video,audio').forEach(function(media){
-      try{ media.pause(); }catch(e){}
-      try{ media.removeAttribute('src'); }catch(e){}
-      try{ media.querySelectorAll('source').forEach(function(source){ source.removeAttribute('src'); }); }catch(e){}
-      try{ media.load(); }catch(e){}
-    });
+    releaseMedia(scope);
   }
 
   window.cleanupTiktokRuntime=cleanupTiktokRuntime;
@@ -33,55 +28,60 @@
   function fmtSz(b){ b=Number(b)||0; return b>=1e6?(b/1e6).toFixed(1)+' MB':b>=1e3?(b/1e3).toFixed(0)+' KB':(b?b+' B':''); }
   function fmtDur(s){ s=Number(s)||0; var m=Math.floor(s/60), ss=s%60; return m+'m '+(ss<10?'0':'')+ss+'s'; }
   function guessExt(type){ return type==='MP3'?'mp3':(type==='JPG'?'jpg':'mp4'); }
-  function isBadBlob(blob){ return !blob || blob.size<20 || (/text\/html|application\/json|text\/plain/i.test(blob.type||'') && blob.size<5000); }
-  async function fetchBlobDirect(url){
-    var sources=[url];
-    if(/^https?:\/\//i.test(url) && typeof window.nxProxyUrl==='function') sources.push(window.nxProxyUrl(url));
-    var last=null;
-    for(var i=0;i<sources.length;i++){
-      try{
-        var res=await window.NexoraFetch(sources[i],{cache:'no-store'});
-        if(!res.ok) throw new Error('HTTP '+res.status);
-        var blob=await res.blob();
-        if(isBadBlob(blob)) throw new Error('Response bukan media');
-        return blob;
-      }catch(e){ last=e; }
+  function releaseMedia(root){
+    if(!root || !root.querySelectorAll) return;
+    root.querySelectorAll('video,audio').forEach(function(media){
+      try{ media.pause(); }catch(e){}
+      try{ media.removeAttribute('src'); }catch(e){}
+      try{ media.querySelectorAll('source').forEach(function(source){ source.removeAttribute('src'); }); }catch(e){}
+      try{ media.load(); }catch(e){}
+    });
+  }
+  function mediaEndpoint(choice, probe){
+    var params=new URLSearchParams();
+    params.set('url',choice.url);
+    params.set('filename',choice.filename || ('tiktok_media.'+guessExt(choice.type)));
+    params.set('type',choice.type || 'MP4');
+    if(probe) params.set('probe','1');
+    return '/api/media-download?'+params.toString();
+  }
+  async function probeDownload(choice){
+    var response=await window.NexoraFetch(mediaEndpoint(choice,true),{
+      cache:'no-store',
+      nexoraTimeoutMs:22000,
+      nexoraRetries:0
+    });
+    var payload=await response.json().catch(function(){ return {}; });
+    if(!response.ok || !payload.ok || !payload.ready){
+      throw new Error(payload.message || ('Download server HTTP '+response.status));
     }
-    throw last || new Error('Download gagal');
+    return payload;
+  }
+  function triggerStreamDownload(choice){
+    var a=document.createElement('a');
+    a.href=mediaEndpoint(choice,false);
+    a.download=choice.filename || ('tiktok_media.'+guessExt(choice.type));
+    a.dataset.historyRecorded='1';
+    a.style.display='none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){ try{ a.remove(); }catch(e){} },1000);
   }
   async function downloadSelected(choice, button, note){
-    if(!choice || !choice.url) return;
+    if(!choice || !choice.url || !button || button.disabled) return;
     var old=button.innerHTML;
     button.disabled=true;
-    button.innerHTML='<i class="fas fa-spinner fa-spin"></i> Menyiapkan download...';
-    if(note) note.textContent='Mengambil file tanpa membuka halaman baru...';
+    button.innerHTML='<i class="fas fa-spinner fa-spin"></i> Memvalidasi media...';
+    if(note) note.textContent='Memeriksa file melalui server download aman...';
     try{
-      var blob=await fetchBlobDirect(choice.url);
-      var objectUrl=URL.createObjectURL(blob);
-      var a=document.createElement('a');
-      a.href=objectUrl;
-      a.download=choice.filename;
-      a.dataset.historyRecorded='1';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(function(){ URL.revokeObjectURL(objectUrl); },5000);
-      if(typeof window.recordDownload==='function') window.recordDownload('TikTok', choice.type, choice.url, choice.filename, choice.title || 'TikTok Media');
+      var metadata=await probeDownload(choice);
+      button.innerHTML='<i class="fas fa-download"></i> Memulai download...';
+      triggerStreamDownload(choice);
+      if(typeof window.recordDownload==='function') window.recordDownload('TikTok', choice.type, choice.url, metadata.filename || choice.filename, choice.title || 'TikTok Media');
       ttRenderRoomHistory();
-      if(note) note.textContent='Download dimulai. Halaman tetap di ruang TikTok.';
+      if(note) note.textContent='File tervalidasi dan sedang dialirkan langsung ke penyimpanan. Video tidak ditampung penuh di RAM browser.';
     }catch(err){
-      try{
-        var iframe=document.createElement('iframe');
-        iframe.style.display='none';
-        iframe.src=choice.url;
-        document.body.appendChild(iframe);
-        setTimeout(function(){ try{ iframe.remove(); }catch(e){} },60000);
-        if(typeof window.recordDownload==='function') window.recordDownload('TikTok', choice.type, choice.url, choice.filename, choice.title || 'TikTok Media');
-        ttRenderRoomHistory();
-        if(note) note.textContent='Mode fallback aktif. Download dipanggil tanpa pindah halaman.';
-      }catch(e2){
-        if(note) note.textContent='Gagal download: '+(err && err.message ? err.message : 'unknown');
-      }
+      if(note) note.textContent='Download gagal diverifikasi: '+(err && err.message ? err.message : 'unknown')+'. Tidak ada history palsu yang dibuat.';
     }finally{
       button.disabled=false;
       button.innerHTML=old;
@@ -141,27 +141,21 @@
   function wirePreviewControls(){
     var box=document.getElementById('ttPreviewBox');
     if(!box) return;
+    if(typeof window.nxEnhanceTiktokPreviewControls==='function'){
+      window.nxEnhanceTiktokPreviewControls(box);
+      return;
+    }
     var video=box.querySelector('video.tt-preview-video');
     var play=box.querySelector('.tt-custom-play');
-    if(!video) return;
-    video.controls=false;
-    video.removeAttribute('controls');
-    function sync(){
-      var playing=!video.paused && !video.ended;
-      box.classList.toggle('is-playing', playing);
-      if(play) play.innerHTML=playing?'<i class="fas fa-pause"></i>':'<i class="fas fa-play"></i>';
-    }
+    if(!video || video.dataset.nxPreviewFallbackReady==='1') return;
+    video.dataset.nxPreviewFallbackReady='1';
     function toggle(ev){
-      if(ev) ev.preventDefault();
-      if(video.paused || video.ended){ video.play().catch(function(){ if(play) play.innerHTML='<i class="fas fa-play"></i>'; }); }
+      if(ev){ ev.preventDefault(); ev.stopPropagation(); }
+      if(video.paused || video.ended) video.play().catch(function(){});
       else video.pause();
     }
     video.addEventListener('click',toggle);
     if(play) play.addEventListener('click',toggle);
-    video.addEventListener('play',sync);
-    video.addEventListener('pause',sync);
-    video.addEventListener('ended',sync);
-    sync();
   }
 
   window.renderTiktok=function(body){
@@ -200,6 +194,7 @@
       activePreviewRequest=requestController;
       btn.disabled=true;
       btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Mengambil...';
+      releaseMedia(target);
       target.className='';
       target.innerHTML='<div class="tt-panel"><div class="dl-loading"><div class="dl-spin"></div><p>Mengambil data dan membuat preview...</p></div></div>';
       try{
@@ -253,7 +248,7 @@
         function previewHTML(choice){
           if(!choice) return '<div class="tt-preview-placeholder"><i class="fa-brands fa-tiktok"></i><b>Preview tidak tersedia</b></div>';
           var label='<div class="tt-preview-label"><i class="fas '+ttSafe(choice.icon)+'"></i> '+ttSafe(choice.label)+'</div>';
-          if(choice.preview==='image') return label+'<img class="tt-preview-img" src="'+ttSafe(choice.previewUrl||cover||choice.url)+'" alt="Preview TikTok" crossorigin="anonymous">';
+          if(choice.preview==='image') return label+'<img class="tt-preview-img" src="'+ttSafe(choice.previewUrl||cover||choice.url)+'" alt="Preview TikTok" loading="eager" decoding="async">';
           if(choice.preview==='video' && choice.previewUrl) return label+'<video class="tt-preview-video no-native-controls" src="'+ttSafe(choice.previewUrl)+'" poster="'+ttSafe(cover)+'" playsinline preload="metadata"></video><button class="tt-custom-play" type="button" aria-label="Play preview"><i class="fas fa-play"></i></button>';
           return label+'<div class="tt-preview-placeholder"><i class="fas fa-music"></i><b>Preview audio</b><span>Pilih download untuk menyimpan MP3.</span></div>';
         }
@@ -293,7 +288,7 @@
           selected=id;
           var ch=choiceById(selected);
           var pb=document.getElementById('ttPreviewBox');
-          if(pb) pb.innerHTML=previewHTML(ch);
+          if(pb){ releaseMedia(pb); pb.innerHTML=previewHTML(ch); }
           wirePreviewControls();
           var sl=document.getElementById('ttSelectedLabel');
           if(sl) sl.textContent=ch.label;
@@ -417,76 +412,66 @@
   else patchCards();
 })();
 
-/* ===== original script 25: nxTiktokPreviewControlsPatchScript ===== */
+/* ===== Nexora v6.3.9: single TikTok preview controller (no global observer) ===== */
 (function(){
   function fmtTime(sec){
-    sec = Number(sec || 0);
-    if(!isFinite(sec) || sec < 0) sec = 0;
-    var h = Math.floor(sec / 3600);
-    var m = Math.floor((sec % 3600) / 60);
-    var s = Math.floor(sec % 60);
-    if(h) return h + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
-    return m + ':' + String(s).padStart(2,'0');
+    sec=Number(sec||0);
+    if(!isFinite(sec)||sec<0) sec=0;
+    var h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),ss=Math.floor(sec%60);
+    return h ? h+':'+String(m).padStart(2,'0')+':'+String(ss).padStart(2,'0') : m+':'+String(ss).padStart(2,'0');
   }
   function enhanceOne(box){
     if(!box || !box.querySelector) return;
-    var video = box.querySelector('video.tt-preview-video');
-    if(!video || video.dataset.nxPreviewControlReady === '1') return;
-    video.dataset.nxPreviewControlReady = '1';
-    video.controls = false;
+    var video=box.querySelector('video.tt-preview-video');
+    if(!video || video.dataset.nxPreviewControlReady==='1') return;
+    video.dataset.nxPreviewControlReady='1';
+    video.controls=false;
     video.removeAttribute('controls');
     video.setAttribute('playsinline','');
     video.setAttribute('webkit-playsinline','');
 
-    var controls = box.querySelector('.tt-preview-controls');
+    var controls=box.querySelector('.tt-preview-controls');
     if(!controls){
-      controls = document.createElement('div');
-      controls.className = 'tt-preview-controls';
-      controls.innerHTML = '<span class="tt-preview-time" data-tt-current>0:00</span><input class="tt-preview-range" data-tt-seek type="range" min="0" max="100" step="0.01" value="0" aria-label="Atur durasi preview"><span class="tt-preview-time" data-tt-duration>0:00</span>';
+      controls=document.createElement('div');
+      controls.className='tt-preview-controls';
+      controls.innerHTML='<span class="tt-preview-time" data-tt-current>0:00</span><input class="tt-preview-range" data-tt-seek type="range" min="0" max="100" step="0.01" value="0" aria-label="Atur durasi preview"><span class="tt-preview-time" data-tt-duration>0:00</span>';
       box.appendChild(controls);
     }
-    var label = box.querySelector('.tt-preview-controls-label');
+    var label=box.querySelector('.tt-preview-controls-label');
     if(!label){
-      label = document.createElement('div');
-      label.className = 'tt-preview-controls-label';
-      label.innerHTML = '<i class="fas fa-sliders"></i> Atur Durasi Preview';
+      label=document.createElement('div');
+      label.className='tt-preview-controls-label';
+      label.innerHTML='<i class="fas fa-sliders"></i> Atur Durasi Preview';
       box.appendChild(label);
     }
-    var seek = controls.querySelector('[data-tt-seek]');
-    var cur = controls.querySelector('[data-tt-current]');
-    var dur = controls.querySelector('[data-tt-duration]');
-    var play = box.querySelector('.tt-custom-play');
-    var idleTimer = null;
-    var seeking = false;
+    var seek=controls.querySelector('[data-tt-seek]');
+    var cur=controls.querySelector('[data-tt-current]');
+    var dur=controls.querySelector('[data-tt-duration]');
+    var play=box.querySelector('.tt-custom-play');
+    var idleTimer=null,seeking=false,lastRenderedSecond=-1;
 
     function getDuration(){
-      var d = video.duration;
-      if(!isFinite(d) || d <= 0) d = Number(video.getAttribute('data-preview-duration') || 0);
-      return (isFinite(d) && d > 0) ? d : 0;
+      var value=video.duration;
+      if(!isFinite(value)||value<=0) value=Number(video.getAttribute('data-preview-duration')||0);
+      return isFinite(value)&&value>0 ? value : 0;
     }
     function updateDuration(){
-      var d = getDuration();
-      if(d > 0){
-        seek.max = String(d);
-        dur.textContent = fmtTime(d);
-      }else{
-        seek.max = '100';
-        dur.textContent = '0:00';
-      }
+      var value=getDuration();
+      seek.max=value>0 ? String(value) : '100';
+      dur.textContent=value>0 ? fmtTime(value) : '0:00';
     }
-    function updateTime(){
-      updateDuration();
-      var t = video.currentTime || 0;
-      if(!seeking) seek.value = String(t);
-      cur.textContent = fmtTime(t);
+    function updateTime(force){
+      var value=video.currentTime||0;
+      var whole=Math.floor(value);
+      if(!force && whole===lastRenderedSecond && !seeking) return;
+      lastRenderedSecond=whole;
+      if(!seeking) seek.value=String(value);
+      cur.textContent=fmtTime(value);
     }
     function hideSoon(){
       clearTimeout(idleTimer);
-      if(!video.paused && !video.ended){
-        idleTimer = setTimeout(function(){
-          box.classList.add('controls-idle');
-          box.classList.remove('controls-visible');
-        }, 1000);
+      if(!video.paused&&!video.ended){
+        idleTimer=setTimeout(function(){ box.classList.add('controls-idle'); box.classList.remove('controls-visible'); },1200);
       }
     }
     function showControls(){
@@ -495,69 +480,45 @@
       hideSoon();
     }
     function syncState(){
-      var playing = !video.paused && !video.ended;
-      box.classList.toggle('is-playing', playing);
-      if(play) play.innerHTML = playing ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
+      var playing=!video.paused&&!video.ended;
+      box.classList.toggle('is-playing',playing);
+      if(play) play.innerHTML=playing?'<i class="fas fa-pause"></i>':'<i class="fas fa-play"></i>';
       if(playing) showControls();
-      else{
-        clearTimeout(idleTimer);
-        box.classList.remove('controls-idle');
-        box.classList.add('controls-visible');
-      }
-      updateTime();
+      else{ clearTimeout(idleTimer); box.classList.remove('controls-idle'); box.classList.add('controls-visible'); }
+      updateDuration();
+      updateTime(true);
+    }
+    function toggle(ev){
+      if(ev){ ev.preventDefault(); ev.stopPropagation(); }
+      if(video.paused||video.ended) video.play().catch(function(){ syncState(); });
+      else video.pause();
     }
 
-    ['mousemove','pointermove','touchstart','click'].forEach(function(evt){
-      box.addEventListener(evt, function(){ showControls(); }, {passive:true});
-    });
-    controls.addEventListener('click', function(e){ e.stopPropagation(); });
-    controls.addEventListener('pointerdown', function(e){ e.stopPropagation(); });
-    controls.addEventListener('touchstart', function(e){ e.stopPropagation(); }, {passive:true});
-    seek.addEventListener('input', function(){
-      seeking = true;
-      var d = getDuration();
-      var v = Number(seek.value || 0);
-      if(d > 0){
-        v = Math.max(0, Math.min(v, d));
-        try{ video.currentTime = v; }catch(e){}
-      }
-      cur.textContent = fmtTime(v);
+    video.addEventListener('click',toggle);
+    if(play) play.addEventListener('click',toggle);
+    ['pointermove','touchstart'].forEach(function(eventName){ box.addEventListener(eventName,showControls,{passive:true}); });
+    controls.addEventListener('click',function(e){ e.stopPropagation(); });
+    controls.addEventListener('pointerdown',function(e){ e.stopPropagation(); });
+    controls.addEventListener('touchstart',function(e){ e.stopPropagation(); },{passive:true});
+    seek.addEventListener('input',function(){
+      seeking=true;
+      var duration=getDuration(),value=Number(seek.value||0);
+      if(duration>0){ value=Math.max(0,Math.min(value,duration)); try{ video.currentTime=value; }catch(e){} }
+      cur.textContent=fmtTime(value);
       showControls();
     });
-    seek.addEventListener('change', function(){
-      seeking = false;
-      updateTime();
-      showControls();
-    });
-    video.addEventListener('loadedmetadata', updateDuration);
-    video.addEventListener('durationchange', updateDuration);
-    video.addEventListener('timeupdate', updateTime);
-    video.addEventListener('play', syncState);
-    video.addEventListener('pause', syncState);
-    video.addEventListener('ended', syncState);
-    updateDuration();
-    updateTime();
+    seek.addEventListener('change',function(){ seeking=false; updateTime(true); showControls(); });
+    video.addEventListener('loadedmetadata',syncState);
+    video.addEventListener('durationchange',updateDuration);
+    video.addEventListener('timeupdate',function(){ updateTime(false); });
+    video.addEventListener('play',syncState);
+    video.addEventListener('pause',syncState);
+    video.addEventListener('ended',syncState);
     syncState();
   }
-  var observedRoot=null;
-  function enhanceAll(root){
-    var scope=root || observedRoot || document.getElementById('ttRoomOverlay');
-    if(!scope || !scope.querySelectorAll) return;
-    scope.querySelectorAll('#ttPreviewBox').forEach(enhanceOne);
-  }
-  var mo = new MutationObserver(function(){ enhanceAll(observedRoot); });
-  function observeRoom(root){
-    root=root || document.getElementById('ttRoomOverlay');
-    if(!root || root===observedRoot) return;
-    mo.disconnect();
-    observedRoot=root;
-    enhanceAll(root);
-    mo.observe(root, {childList:true, subtree:true});
-  }
-  document.addEventListener('nexora:tiktok-room-built',function(event){
-    observeRoom(event && event.detail ? event.detail.overlay : null);
-  });
-  function start(){ observeRoom(document.getElementById('ttRoomOverlay')); }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
-  else start();
+  window.nxEnhanceTiktokPreviewControls=function(root){
+    if(!root) return;
+    if(root.matches && root.matches('#ttPreviewBox')) enhanceOne(root);
+    else if(root.querySelectorAll) root.querySelectorAll('#ttPreviewBox').forEach(enhanceOne);
+  };
 })();

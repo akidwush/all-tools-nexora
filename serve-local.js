@@ -91,6 +91,12 @@ http.createServer(async (request, response) => {
   if (pathname === "/api/tool-health" || pathname === "/api/tool-health.js") {
     return runApi(path.join(root, "api", "tool-health.js"), request, response);
   }
+  if (pathname === "/api/media-download" || pathname === "/api/media-download.js") {
+    const url = new URL(request.url || "/api/media-download", `http://${request.headers.host || "localhost"}`);
+    url.searchParams.set("mode", "media-download");
+    request.url = `${url.pathname}?${url.searchParams.toString()}`;
+    return runApi(path.join(root, "api", "tool-health.js"), request, response);
+  }
   if (pathname === "/api/admin/auth" || pathname === "/api/admin/auth.js") {
     return runApi(path.join(root, "api", "admin", "auth.js"), request, response);
   }
