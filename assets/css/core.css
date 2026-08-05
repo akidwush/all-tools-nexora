@@ -1483,7 +1483,7 @@ html.nx-hero-video-disabled .nx-hero-video-toggle{display:none!important}
   .nx-hero-video-toggle{display:flex}
 }
 
-/* Nexora v6.3.7 — always-on TikTok media containment.  The TikTok feature
+/* Nexora v6.3.8 — always-on TikTok media containment.  The TikTok feature
    stylesheet is lazy-loaded; these low-cost guards keep a stale/missing
    feature stylesheet from letting remote media widen the mobile viewport. */
 #ttRoomOverlay,

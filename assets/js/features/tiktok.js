@@ -2,6 +2,29 @@
 
 /* ===== original script 2: nxTiktokPreviewScript ===== */
 (function(){
+  var activePreviewRequest=null;
+
+  function abortPreviewRequest(){
+    if(activePreviewRequest && typeof activePreviewRequest.abort==='function'){
+      try{ activePreviewRequest.abort(); }catch(e){}
+    }
+    activePreviewRequest=null;
+  }
+
+  function cleanupTiktokRuntime(root){
+    abortPreviewRequest();
+    var scope=root || document.getElementById('ttRoomOverlay');
+    if(!scope || !scope.querySelectorAll) return;
+    scope.querySelectorAll('video,audio').forEach(function(media){
+      try{ media.pause(); }catch(e){}
+      try{ media.removeAttribute('src'); }catch(e){}
+      try{ media.querySelectorAll('source').forEach(function(source){ source.removeAttribute('src'); }); }catch(e){}
+      try{ media.load(); }catch(e){}
+    });
+  }
+
+  window.cleanupTiktokRuntime=cleanupTiktokRuntime;
+
   function ttSafe(v){
     if(typeof window.nxEscape==='function') return window.nxEscape(v==null?'':String(v));
     return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});
@@ -172,6 +195,9 @@
     async function run(){
       var url=(input.value||'').trim();
       if(!url){ input.focus(); return; }
+      abortPreviewRequest();
+      var requestController=typeof AbortController==='function' ? new AbortController() : null;
+      activePreviewRequest=requestController;
       btn.disabled=true;
       btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Mengambil...';
       target.className='';
@@ -179,7 +205,11 @@
       try{
         var tikApi='https://www.tikwm.com/api/?url='+encodeURIComponent(url)+'&hd=1';
         var tikBackup='https://tikwm.com/api/?url='+encodeURIComponent(url)+'&hd=1';
-        var fetched=await window.nxFetchJsonWithBackup('tikwm', window.nxBackupSources('TikWM', tikApi, [{name:'TikWM Backup',url:tikBackup}]));
+        var fetched=await window.nxFetchJsonWithBackup(
+          'tikwm',
+          window.nxBackupSources('TikWM', tikApi, [{name:'TikWM Backup',url:tikBackup}]),
+          requestController ? {signal:requestController.signal} : undefined
+        );
         var json=fetched.data;
         var d=json && json.data;
         if(!d) throw new Error('Data TikTok tidak ditemukan');
@@ -211,13 +241,14 @@
         addPhoto(d.image_post_info && d.image_post_info.images);
         var photos=Array.from(new Set(photoList));
         var choices=[];
-        if(hdUrl) choices.push({id:'hd',type:'MP4',url:hdUrl,filename:'tiktok_hd.mp4',label:'MP4 HD',desc:'Tanpa watermark, kualitas terbaik'+(hdSize?' • '+fmtSz(hdSize):''),icon:'fa-crown',preview:'video',previewUrl:hdUrl,title:'TikTok MP4 HD'});
+        var lightVideoUrl=stdUrl||wmUrl||hdUrl;
+        if(hdUrl) choices.push({id:'hd',type:'MP4',url:hdUrl,filename:'tiktok_hd.mp4',label:'MP4 HD',desc:'Tanpa watermark, kualitas terbaik'+(hdSize?' • '+fmtSz(hdSize):''),icon:'fa-crown',preview:'video',previewUrl:lightVideoUrl,title:'TikTok MP4 HD'});
         if(stdUrl && stdUrl!==hdUrl) choices.push({id:'std',type:'MP4',url:stdUrl,filename:'tiktok_standard.mp4',label:'MP4 Standar',desc:'Tanpa watermark, ukuran lebih ringan',icon:'fa-video',preview:'video',previewUrl:stdUrl,title:'TikTok MP4 Standar'});
         if(wmUrl) choices.push({id:'wm',type:'MP4',url:wmUrl,filename:'tiktok_watermark.mp4',label:'MP4 Watermark',desc:'Versi asli TikTok'+(wmSize?' • '+fmtSz(wmSize):''),icon:'fa-droplet',preview:'video',previewUrl:wmUrl,title:'TikTok MP4 Watermark'});
-        if(musicUrl) choices.push({id:'music',type:'MP3',url:musicUrl,filename:'tiktok_music.mp3',label:'MP3 Audio',desc:(d.music_info&&d.music_info.title)||'Soundtrack / audio TikTok',icon:'fa-music',preview:(hdUrl||stdUrl||wmUrl)?'video':'image',previewUrl:(hdUrl||stdUrl||wmUrl||cover),title:'TikTok MP3 Audio'});
+        if(musicUrl) choices.push({id:'music',type:'MP3',url:musicUrl,filename:'tiktok_music.mp3',label:'MP3 Audio',desc:(d.music_info&&d.music_info.title)||'Soundtrack / audio TikTok',icon:'fa-music',preview:(hdUrl||stdUrl||wmUrl)?'video':'image',previewUrl:(lightVideoUrl||cover),title:'TikTok MP3 Audio'});
         photos.slice(0,12).forEach(function(img,i){ choices.push({id:'photo'+i,type:'JPG',url:img,filename:'tiktok_foto_'+(i+1)+'.jpg',label:'JPG Foto #'+(i+1),desc:'Foto / slide TikTok',icon:'fa-image',preview:'image',previewUrl:img,title:'TikTok Foto #'+(i+1)}); });
         if(!choices.length) throw new Error('Tidak ada link download yang valid');
-        var selected=choices[0].id;
+        var selected=choices.some(function(choice){ return choice.id==='std'; }) ? 'std' : choices[0].id;
         function choiceById(id){ return choices.find(function(c){ return c.id===id; }) || choices[0]; }
         function previewHTML(choice){
           if(!choice) return '<div class="tt-preview-placeholder"><i class="fa-brands fa-tiktok"></i><b>Preview tidak tersedia</b></div>';
@@ -280,10 +311,15 @@
         var note=document.getElementById('ttDownloadNote');
         if(mainBtn) mainBtn.onclick=function(){ downloadSelected(choiceById(selected), mainBtn, note); };
       }catch(e){
+        if(e && e.name==='AbortError') return;
         target.innerHTML='<div class="tt-panel"><div class="dl-error"><i class="fas fa-triangle-exclamation"></i><br><br>Gagal mengambil media.<br><span style="font-size:11px;opacity:.7;">'+ttSafe(e.message||e)+'</span></div></div>';
       }finally{
-        btn.disabled=false;
-        btn.innerHTML='<i class="fas fa-magnifying-glass"></i> Preview';
+        var ownsRequest=!requestController || activePreviewRequest===requestController;
+        if(activePreviewRequest===requestController) activePreviewRequest=null;
+        if(ownsRequest){
+          btn.disabled=false;
+          btn.innerHTML='<i class="fas fa-magnifying-glass"></i> Preview';
+        }
       }
     }
     ttRenderRoomHistory();
@@ -299,6 +335,7 @@
 (function(){
   var overlay=null, content=null;
   var oldShowTool=window.showTool;
+  var previousBodyOverflow='';
 
   function closeAnyModal(){
     var viewer=document.getElementById('toolViewer');
@@ -321,6 +358,7 @@
     document.body.appendChild(overlay);
     content=document.getElementById('ttRoomContent');
     document.getElementById('ttRoomBack').addEventListener('click', closeTiktokRoom);
+    document.dispatchEvent(new CustomEvent('nexora:tiktok-room-built',{detail:{overlay:overlay}}));
   }
 
   function openTiktokRoom(){
@@ -330,6 +368,7 @@
     else if(typeof renderTiktok==='function') renderTiktok(content);
     if(typeof window.mountToolApiStatus==='function') window.mountToolApiStatus(content,'tiktok');
     else if(typeof mountToolApiStatus==='function') mountToolApiStatus(content,'tiktok');
+    if(overlay.style.display!=='block') previousBodyOverflow=document.body.style.overflow||'';
     overlay.style.display='block';
     document.body.classList.add('tt-room-open');
     document.body.style.overflow='hidden';
@@ -340,11 +379,13 @@
 
   function closeTiktokRoom(){
     if(!overlay) return;
+    if(typeof window.cleanupTiktokRuntime==='function') window.cleanupTiktokRuntime(overlay);
     overlay.classList.remove('on');
     setTimeout(function(){
       overlay.style.display='none';
+      if(content) content.innerHTML='';
       document.body.classList.remove('tt-room-open');
-      document.body.style.overflow='auto';
+      document.body.style.overflow=previousBodyOverflow;
     },280);
   }
 
@@ -498,14 +539,25 @@
     updateTime();
     syncState();
   }
-  function enhanceAll(){
-    document.querySelectorAll('#ttRoomOverlay #ttPreviewBox').forEach(enhanceOne);
+  var observedRoot=null;
+  function enhanceAll(root){
+    var scope=root || observedRoot || document.getElementById('ttRoomOverlay');
+    if(!scope || !scope.querySelectorAll) return;
+    scope.querySelectorAll('#ttPreviewBox').forEach(enhanceOne);
   }
-  var mo = new MutationObserver(function(){ enhanceAll(); });
-  function start(){
-    enhanceAll();
-    if(document.body) mo.observe(document.body, {childList:true, subtree:true});
+  var mo = new MutationObserver(function(){ enhanceAll(observedRoot); });
+  function observeRoom(root){
+    root=root || document.getElementById('ttRoomOverlay');
+    if(!root || root===observedRoot) return;
+    mo.disconnect();
+    observedRoot=root;
+    enhanceAll(root);
+    mo.observe(root, {childList:true, subtree:true});
   }
+  document.addEventListener('nexora:tiktok-room-built',function(event){
+    observeRoom(event && event.detail ? event.detail.overlay : null);
+  });
+  function start(){ observeRoom(document.getElementById('ttRoomOverlay')); }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();
 })();

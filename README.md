@@ -1,6 +1,6 @@
-# All Tools Nexora v6.3.7
+# All Tools Nexora v6.3.8
 
-Rilis stabilisasi untuk website All Tools Nexora. Fokus utama v6.3.7 adalah memastikan asset deploy terbaru dipakai browser, media TikTok tetap di dalam frame mobile, dan CRUD katalog tool selalu dapat dibuka dari dashboard admin.
+Rilis stabilisasi untuk website All Tools Nexora. Fokus utama v6.3.8 adalah memastikan asset deploy terbaru dipakai browser, media TikTok tetap di dalam frame mobile, dan CRUD katalog tool selalu dapat dibuka dari dashboard admin.
 
 ## Perubahan utama
 

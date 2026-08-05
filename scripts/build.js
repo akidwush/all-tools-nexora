@@ -42,4 +42,4 @@ if (failed.length) { console.error(`Build gagal membuat output: ${failed.join(",
 const before = 3917113;
 const after = fs.statSync(path.join(root, "index.html")).size;
 console.log(`Build selesai: public/ dibuat. index.html ${after.toLocaleString()} byte (turun ${Math.max(0, Math.round((1-after/before)*100))}%).`);
-console.log("Feature payload besar dimuat saat tool dibuka; deploy cache guards, TikTok media containment, Visual QA canvas guard, admin tool catalog CRUD, social link control, Runtime JS test, screenshot, visual baseline, analytics, feedback, audit log, login, dan dashboard admin v6.3.7 tersedia di /admin.");
+console.log("Feature payload besar dimuat saat tool dibuka; deploy cache guards, TikTok media containment, Visual QA canvas guard, admin tool catalog CRUD, social link control, Runtime JS test, screenshot, visual baseline, analytics, feedback, audit log, login, dan dashboard admin v6.3.8 tersedia di /admin.");
