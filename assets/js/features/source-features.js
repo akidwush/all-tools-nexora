@@ -207,7 +207,7 @@
       <div class="nx-source-tool" style="--nx-accent:#a78bfa;--nx-accent-2:#6d28d9;--nx-accent-rgb:167,139,250">
         <section class="nx-source-intro">
           <span class="nx-source-intro-icon"><i class="fa-solid fa-user-tie"></i></span>
-          <div><h2>FakeDev Profile</h2><p>Fungsi dan endpoint diambil dari HTML Nexus. Hasil gambar dibuat oleh API FakeDev sumber, bukan canvas lokal.</p></div>
+          <div><h2>FakeDev Profile</h2><p>API sumber dicoba lebih dahulu. Jika endpoint gagal, profile tetap dibuat melalui renderer lokal di perangkat.</p></div>
         </section>
         <section class="nx-source-grid">
           <div class="nx-source-card nx-source-form">
@@ -266,7 +266,7 @@
           download.onclick=()=>nxDownloadSource(currentUrl,`fakedev_${nxFilename(nama,"Developer")}.png`);
           const reason=error&&error.message?error.message:"API tidak tersedia";
           nxMarkFallback("ikyyxd","API "+reason+" · generator lokal aktif");
-          nxSetSourceStatus("nxFdStatus",`API sumber gagal (${reason}), tetapi profile ${nama} berhasil dibuat secara lokal.`,"warning");
+          nxSetSourceStatus("nxFdStatus",`Mode lokal aktif. Profile ${nama} berhasil dibuat meskipun API sumber gagal (${reason}).`,"success");
         }catch(localError){
           nxSetSourceStatus("nxFdStatus","API dan generator lokal gagal: "+localError.message,"error");
         }

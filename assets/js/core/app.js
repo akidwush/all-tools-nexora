@@ -1452,7 +1452,7 @@ function catalogListTools() {
 }
 
 window.NexoraToolCatalog = Object.freeze({
-    version: '6.3.11',
+    version: '6.3.12',
     has: catalogHasTool,
     list: catalogListTools
 });

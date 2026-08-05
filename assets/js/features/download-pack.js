@@ -358,6 +358,117 @@
     });
   };
 
+
+  function nxBankRoundRect(ctx,x,y,w,h,r){
+    const radius=Math.max(0,Math.min(r,Math.min(w,h)/2));
+    ctx.beginPath();
+    ctx.moveTo(x+radius,y);
+    ctx.arcTo(x+w,y,x+w,y+h,radius);
+    ctx.arcTo(x+w,y+h,x,y+h,radius);
+    ctx.arcTo(x,y+h,x,y,radius);
+    ctx.arcTo(x,y,x+w,y,radius);
+    ctx.closePath();
+  }
+
+  function nxBuildFakeBankJagoLocal(name,balance){
+    const canvas=document.createElement("canvas");
+    canvas.width=1080;
+    canvas.height=1350;
+    const ctx=canvas.getContext("2d");
+    if(!ctx)throw new Error("Canvas tidak tersedia");
+
+    const amount=Math.max(0,Number(balance)||0);
+    const amountText=new Intl.NumberFormat("id-ID").format(amount);
+    const now=new Date();
+
+    const bg=ctx.createLinearGradient(0,0,1080,1350);
+    bg.addColorStop(0,"#160a22");
+    bg.addColorStop(.52,"#281031");
+    bg.addColorStop(1,"#09050f");
+    ctx.fillStyle=bg;
+    ctx.fillRect(0,0,1080,1350);
+
+    ctx.globalAlpha=.18;
+    ctx.strokeStyle="#facc15";
+    ctx.lineWidth=2;
+    for(let x=-400;x<1400;x+=90){
+      ctx.beginPath();
+      ctx.moveTo(x,0);
+      ctx.lineTo(x+700,1350);
+      ctx.stroke();
+    }
+    ctx.globalAlpha=1;
+
+    nxBankRoundRect(ctx,56,56,968,1238,54);
+    ctx.fillStyle="rgba(14,8,20,.92)";
+    ctx.fill();
+    ctx.strokeStyle="rgba(250,204,21,.42)";
+    ctx.lineWidth=4;
+    ctx.stroke();
+
+    ctx.fillStyle="#facc15";
+    ctx.font="900 32px Arial,sans-serif";
+    ctx.fillText("NEXORA SIMULATION",110,145);
+    ctx.fillStyle="#f8fafc";
+    ctx.font="900 54px Arial,sans-serif";
+    ctx.fillText("FAKE BANK JAGO",110,220);
+
+    nxBankRoundRect(ctx,110,280,860,440,42);
+    const card=ctx.createLinearGradient(110,280,970,720);
+    card.addColorStop(0,"#facc15");
+    card.addColorStop(.58,"#f97316");
+    card.addColorStop(1,"#ea580c");
+    ctx.fillStyle=card;
+    ctx.fill();
+
+    ctx.fillStyle="rgba(17,24,39,.72)";
+    ctx.font="800 27px Arial,sans-serif";
+    ctx.fillText("SALDO SIMULASI",165,365);
+    ctx.fillStyle="#111827";
+    ctx.font="900 70px Arial,sans-serif";
+    ctx.fillText("Rp "+amountText,165,470);
+
+    ctx.font="700 25px Arial,sans-serif";
+    ctx.fillText("Nama contoh",165,565);
+    ctx.font="900 37px Arial,sans-serif";
+    const safeName=String(name||"Pengguna").slice(0,40);
+    ctx.fillText(safeName,165,620);
+
+    ctx.fillStyle="rgba(255,255,255,.88)";
+    nxBankRoundRect(ctx,110,780,860,180,34);
+    ctx.fill();
+    ctx.fillStyle="#7c2d12";
+    ctx.font="900 36px Arial,sans-serif";
+    ctx.fillText("SIMULASI — BUKAN BUKTI SALDO",155,855);
+    ctx.fillStyle="#431407";
+    ctx.font="600 24px Arial,sans-serif";
+    ctx.fillText("Tidak sah untuk transaksi, verifikasi, atau dokumen perbankan.",155,910);
+
+    ctx.fillStyle="#e2e8f0";
+    ctx.font="700 25px Arial,sans-serif";
+    ctx.fillText("Dibuat lokal di perangkat",110,1045);
+    ctx.fillStyle="#94a3b8";
+    ctx.font="500 23px Arial,sans-serif";
+    ctx.fillText(now.toLocaleString("id-ID"),110,1090);
+
+    ctx.save();
+    ctx.translate(540,1180);
+    ctx.rotate(-.12);
+    ctx.globalAlpha=.2;
+    ctx.fillStyle="#fef08a";
+    ctx.font="900 76px Arial,sans-serif";
+    ctx.textAlign="center";
+    ctx.fillText("DEMO / PARODI",0,0);
+    ctx.restore();
+
+    return new Promise((resolve,reject)=>{
+      canvas.toBlob(blob=>{
+        if(blob&&blob.size)resolve(blob);
+        else reject(new Error("Gagal membuat PNG lokal"));
+      },"image/png",.96);
+    });
+  }
+
   window.renderFakeBankJago = function(body){
     body.innerHTML = `
       <div class="nx-source-tool"
@@ -458,6 +569,7 @@
     `;
 
     let imageUrl = "";
+    let localObjectUrl = "";
 
     const nameInput =
       document.getElementById("nxBjName");
@@ -471,6 +583,43 @@
       document.getElementById("nxBjPreview");
     const image =
       document.getElementById("nxBjImage");
+
+    function releaseLocalUrl(){
+      if(localObjectUrl){
+        URL.revokeObjectURL(localObjectUrl);
+        localObjectUrl = "";
+      }
+    }
+
+    function finishResult(url,message,type){
+      imageUrl = url;
+      image.src = url;
+      preview.classList.add("show");
+      loader.classList.remove("show");
+      button.disabled = false;
+      setSourceStatus("nxBjStatus",message,type || "success");
+    }
+
+    async function renderLocal(name,balance,reason){
+      try{
+        releaseLocalUrl();
+        const blob=await nxBuildFakeBankJagoLocal(name,balance);
+        localObjectUrl=URL.createObjectURL(blob);
+        finishResult(
+          localObjectUrl,
+          "Server sumber tidak tersedia ("+reason+"). Gambar simulasi aman berhasil dibuat secara lokal.",
+          "success"
+        );
+      }catch(error){
+        loader.classList.remove("show");
+        button.disabled=false;
+        setSourceStatus(
+          "nxBjStatus",
+          "API dan renderer lokal gagal: "+(error&&error.message||"kesalahan tidak diketahui"),
+          "error"
+        );
+      }
+    }
 
     function run(){
       const name =
@@ -491,64 +640,50 @@
       loader.classList.add("show");
       preview.classList.remove("show");
       clearSourceStatus("nxBjStatus");
+      releaseLocalUrl();
+      imageUrl = "";
 
       const params = new URLSearchParams({
         nama:name,
         saldo:balance
       });
 
-      imageUrl =
+      const apiUrl =
         "https://api.nexray.eu.cc/maker/fakebank-jago?" +
         params.toString();
 
       const probe = new Image();
       let settled = false;
 
-      const timeout = setTimeout(() => {
+      const fallback = reason => {
         if(settled) return;
         settled = true;
-        loader.classList.remove("show");
-        button.disabled = false;
-        setSourceStatus(
-          "nxBjStatus",
-          "Server terlalu lama merespons. Coba lagi nanti.",
-          "error"
-        );
-      },15000);
+        clearTimeout(timeout);
+        probe.onload = null;
+        probe.onerror = null;
+        renderLocal(name,balance,reason);
+      };
+
+      const timeout = setTimeout(
+        () => fallback("timeout"),
+        6500
+      );
 
       probe.onload = () => {
         if(settled) return;
         settled = true;
         clearTimeout(timeout);
-
-        image.src = imageUrl;
-        preview.classList.add("show");
-        loader.classList.remove("show");
-        button.disabled = false;
-
-        setSourceStatus(
-          "nxBjStatus",
-          "Gambar simulasi berhasil dibuat.",
+        imageUrl = apiUrl;
+        finishResult(
+          apiUrl,
+          "Gambar simulasi berhasil dibuat melalui API sumber.",
           "success"
         );
       };
 
-      probe.onerror = () => {
-        if(settled) return;
-        settled = true;
-        clearTimeout(timeout);
-
-        loader.classList.remove("show");
-        button.disabled = false;
-
-        setSourceStatus(
-          "nxBjStatus",
-          "Gagal membuat gambar. Periksa data atau coba lagi nanti.",
-          "error"
-        );
-      };
-
-      probe.src = imageUrl;
+      probe.onerror = () => fallback("koneksi API gagal");
+      probe.referrerPolicy = "no-referrer";
+      probe.src = apiUrl;
     }
 
     button.addEventListener("click",run);
