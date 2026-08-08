@@ -1,3 +1,4 @@
+const { handleVDeploy } = require("../lib/vdeploy");
 const publicDatabaseHandler = require("../lib/public-database");
 const { getDatabaseConfig, pingDatabase } = require("../lib/database");
 const { readCachedToolHealth, normalizeCachedRows, summarizeHealth } = require("../lib/tool-health");
@@ -14,6 +15,9 @@ module.exports = async function handler(request, response) {
   const requestUrl = new URL(request.url || "/api/health", `http://${request.headers.host || "localhost"}`);
   if (requestUrl.searchParams.get("mode") === "database") {
     return publicDatabaseHandler(request, response);
+  }
+  if (requestUrl.searchParams.get("mode") === "vdeploy") {
+    return handleVDeploy(request, response);
   }
   if (request.method !== "GET" && request.method !== "HEAD") {
     response.setHeader("Allow", "GET, HEAD");
@@ -45,7 +49,7 @@ module.exports = async function handler(request, response) {
     status: serviceStatus,
     app: "All Tools Nexora",
     developer: "Dika",
-    version: "6.2.0",
+    version: "6.3.13-hf2",
     database: {
       configured: database.configured,
       connected: database.connected,

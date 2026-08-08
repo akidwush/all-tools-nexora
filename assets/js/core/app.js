@@ -974,20 +974,69 @@ async function nxLocalEnhance(file, imageUrl, strength = 55) {
 }
 
 let nxBgRemovalModulePromise = null;
+async function nxLoadBgRemovalModule() {
+    if (nxBgRemovalModulePromise) return nxBgRemovalModulePromise;
+    nxBgRemovalModulePromise = (async () => {
+        const sources = [
+            'https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.7.0/+esm',
+            'https://esm.sh/@imgly/background-removal@1.7.0?bundle'
+        ];
+        let lastError = null;
+        for (const source of sources) {
+            try {
+                const mod = await import(source);
+                const fn = mod.default || mod.removeBackground || mod;
+                if (typeof fn === 'function') return fn;
+            } catch (error) {
+                lastError = error;
+            }
+        }
+        throw lastError || new Error('Modul AI Remove BG tidak tersedia');
+    })().catch(error => {
+        nxBgRemovalModulePromise = null;
+        throw error;
+    });
+    return nxBgRemovalModulePromise;
+}
+
+async function nxPrepareBgInputBlob(file, imageUrl) {
+    const blob = file || await nxRemoteImageBlob(imageUrl);
+    if (!blob || blob.size < 20) throw new Error('File gambar kosong');
+    // Hindari lonjakan RAM Android pada foto kamera yang sangat besar.
+    if (blob.size <= 6 * 1024 * 1024) return blob;
+    const loaded = await nxLoadImageFromBlob(blob);
+    const img = loaded.img;
+    const sw = img.naturalWidth || img.width;
+    const sh = img.naturalHeight || img.height;
+    const maxSide = 1800;
+    const scale = Math.min(1, maxSide / Math.max(sw, sh));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(sw * scale));
+    canvas.height = Math.max(1, Math.round(sh * scale));
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    URL.revokeObjectURL(loaded.url);
+    return await new Promise((resolve, reject) => canvas.toBlob(
+        value => value ? resolve(value) : reject(new Error('Gagal mengoptimalkan gambar')),
+        'image/jpeg',
+        0.92
+    ));
+}
+
 async function nxAiRemoveBackground(file, imageUrl, onProgress) {
-    const inputBlob = file || await nxRemoteImageBlob(imageUrl);
-    if (!nxBgRemovalModulePromise) {
-        nxBgRemovalModulePromise = import('https://esm.sh/@imgly/background-removal@1.7.0?bundle')
-            .then(mod => mod.default || mod.removeBackground || mod);
-    }
-    const removeBackground = await nxBgRemovalModulePromise;
-    if (typeof removeBackground !== 'function') throw new Error('Modul AI Remove BG tidak tersedia');
-    const result = await removeBackground(inputBlob, {
+    const inputBlob = await nxPrepareBgInputBlob(file, imageUrl);
+    const removeBackground = await nxLoadBgRemovalModule();
+    const task = removeBackground(inputBlob, {
+        publicPath: 'https://staticimgly.com/@imgly/background-removal-data/1.7.0/dist/',
+        device: 'cpu',
+        model: 'isnet_quint8',
         progress: (key, current, total) => {
             if (typeof onProgress === 'function' && total) onProgress(Math.min(100, Math.round(current / total * 100)), key);
         },
-        output: { format: 'image/png', quality: 1 }
+        output: { format: 'image/png', quality: 1, type: 'foreground' }
     });
+    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Model AI terlalu lama merespons')), 75000));
+    const result = await Promise.race([task, timeout]);
     if (!(result instanceof Blob) || result.size < 100) throw new Error('Hasil AI kosong');
     return URL.createObjectURL(result);
 }
@@ -1000,51 +1049,63 @@ function nxColorDist(data, idx, rgb) {
 async function nxLocalRemoveBg(file, imageUrl) {
     const loaded = await nxLoadCanvasImage(file, imageUrl);
     const img = loaded.img;
-    const max = 1300;
-    const scale = Math.min(1, max / Math.max(img.naturalWidth || img.width, img.naturalHeight || img.height));
-    const w = Math.max(1, Math.round((img.naturalWidth || img.width) * scale));
-    const h = Math.max(1, Math.round((img.naturalHeight || img.height) * scale));
+    const max = 1500;
+    const sw = img.naturalWidth || img.width;
+    const sh = img.naturalHeight || img.height;
+    const scale = Math.min(1, max / Math.max(sw, sh));
+    const w = Math.max(1, Math.round(sw * scale));
+    const h = Math.max(1, Math.round(sh * scale));
     const canvas = document.createElement('canvas');
     canvas.width = w;
     canvas.height = h;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
     ctx.drawImage(img, 0, 0, w, h);
     const imageData = ctx.getImageData(0, 0, w, h);
     const d = imageData.data;
-    const corner = (x, y) => {
+    const rgbAt = (x, y) => {
         const i = (y * w + x) * 4;
         return [d[i], d[i + 1], d[i + 2]];
     };
-    const cs = [corner(0,0), corner(w-1,0), corner(0,h-1), corner(w-1,h-1)];
-    const bg = [0,1,2].map(i => Math.round(cs.reduce((a,c) => a + c[i], 0) / cs.length));
-    const tol = 64;
-    const soft = 36;
+    const edgeColors = [
+        rgbAt(0, 0), rgbAt(w - 1, 0), rgbAt(0, h - 1), rgbAt(w - 1, h - 1),
+        rgbAt(Math.floor(w / 2), 0), rgbAt(Math.floor(w / 2), h - 1),
+        rgbAt(0, Math.floor(h / 2)), rgbAt(w - 1, Math.floor(h / 2))
+    ];
+    const colorDistance = (idx, rgb) => {
+        const dr = d[idx] - rgb[0], dg = d[idx + 1] - rgb[1], db = d[idx + 2] - rgb[2];
+        return Math.sqrt(dr * dr + dg * dg + db * db);
+    };
+    const nearestEdgeDistance = idx => edgeColors.reduce((best, rgb) => Math.min(best, colorDistance(idx, rgb)), Infinity);
+    // Sedikit lebih toleran untuk latar gradien, tetapi tetap hanya menghapus area yang terhubung ke tepi.
+    const tol = 58;
+    const soft = 44;
     const seen = new Uint8Array(w * h);
-    const queue = [];
+    const queue = new Uint32Array(w * h);
+    let qHead = 0, qTail = 0;
     const push = (x, y) => {
         if (x < 0 || y < 0 || x >= w || y >= h) return;
         const p = y * w + x;
         if (seen[p]) return;
         const i = p * 4;
-        if (d[i + 3] < 8 || nxColorDist(d, i, bg) <= tol) {
+        if (d[i + 3] < 8 || nearestEdgeDistance(i) <= tol + soft) {
             seen[p] = 1;
-            queue.push(p);
+            queue[qTail++] = p;
         }
     };
     for (let x = 0; x < w; x++) { push(x, 0); push(x, h - 1); }
     for (let y = 0; y < h; y++) { push(0, y); push(w - 1, y); }
-    for (let qi = 0; qi < queue.length; qi++) {
-        const p = queue[qi], x = p % w, y = Math.floor(p / w);
+    while (qHead < qTail) {
+        const p = queue[qHead++], x = p % w, y = Math.floor(p / w);
         const i = p * 4;
-        const dist = nxColorDist(d, i, bg);
-        d[i + 3] = dist < tol ? 0 : Math.max(0, Math.min(255, Math.round((dist - tol) / soft * 255)));
+        const dist = nearestEdgeDistance(i);
+        if (dist <= tol) d[i + 3] = 0;
+        else d[i + 3] = Math.min(d[i + 3], Math.max(0, Math.min(255, Math.round((dist - tol) / soft * 255))));
         push(x + 1, y); push(x - 1, y); push(x, y + 1); push(x, y - 1);
     }
     ctx.putImageData(imageData, 0, 0);
     URL.revokeObjectURL(loaded.url);
     return nxCanvasToUrl(canvas);
 }
-
 
 async function nxRemoveBackgroundLocalFirst(file, imageUrl, onStatus) {
     const report = typeof onStatus === 'function' ? onStatus : () => {};
@@ -3031,7 +3092,7 @@ function renderMorse(body) {
 function renderRemovebg(body) {
     body.innerHTML = `
         <h2><i class="fas fa-eraser"></i> Remove Background</h2>
-        <p style="color:#8b7ab8;font-size:13px;margin-bottom:12px;">Upload gambar untuk diproses di browser. AI lokal menjadi mesin utama; API eksternal hanya dipakai sebagai cadangan terakhir.</p>
+        <p style="color:#8b7ab8;font-size:13px;margin-bottom:12px;">Upload gambar dan hapus latar langsung di perangkat. Model AI memakai mode ringan untuk Android; fallback lokal tetap tersedia jika model gagal dimuat.</p>
         <input type="url" id="removebgUrl" class="v-input" placeholder="URL gambar (opsional)">
         <input type="file" id="removebgFile" accept="image/png,image/jpeg,image/webp,image/jpg" style="display:none">
         <label for="removebgFile" style="display:flex;justify-content:center;align-items:center;gap:8px;width:100%;padding:13px;margin:10px 0;background:rgba(168,85,247,.06);border:1px dashed rgba(168,85,247,.28);border-radius:14px;cursor:pointer;font-size:13px;color:#b9a0e9;">
@@ -3069,7 +3130,7 @@ function renderRemovebg(body) {
         try {
             const output = await nxRemoveBackgroundLocalFirst(file, url, updateStatus);
             const api = getApiById('nanzz');
-            if (api) setApiStatus(api, 'warn', 'AI lokal aktif · API hanya cadangan');
+            if (api) setApiStatus(api, 'ok', 'Remove BG lokal siap');
             nxRenderImageResult(
                 result,
                 output.img,

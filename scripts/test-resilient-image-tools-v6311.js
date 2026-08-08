@@ -11,7 +11,9 @@ const app = read('assets/js/core/app.js');
 assert.match(app, /async function nxRemoveBackgroundLocalFirst\(/);
 assert.match(app, /await nxAiRemoveBackground\(file, imageUrl/);
 assert.match(app, /await nxLocalRemoveBg\(file, imageUrl\)/);
-assert.match(app, /AI lokal menjadi mesin utama; API eksternal hanya dipakai sebagai cadangan terakhir/);
+assert.match(app, /Model AI memakai mode ringan untuk Android/);
+assert.match(app, /isnet_quint8/);
+assert.match(app, /staticimgly\.com\/@imgly\/background-removal-data\/1\.7\.0\/dist/);
 assert.match(app, /const output = await nxRemoveBackgroundLocalFirst\(file, url, updateStatus\)/);
 assert.match(app, /updateStatus\('AI lokal gagal\. Mencoba API cadangan…'\)/);
 assert.match(app, /maxAttempts:\s*6/);
@@ -33,7 +35,7 @@ const sourceCss = read('assets/css/features/source-tools.css');
 assert.match(sourceCss, /\.nx-source-status\.warning\{/);
 
 const index = read('index.html');
-assert.ok(index.includes('assets/js/core/app.js?v=6.3.13-hf1'));
-assert.ok(index.includes('assets/js/core/lazy-loader.js?v=6.3.13-hf1'));
+assert.ok(index.includes('assets/js/core/app.js?v=6.3.13-hf2'));
+assert.ok(index.includes('assets/js/core/lazy-loader.js?v=6.3.13-hf2'));
 
 console.log('Nexora v6.3.13 tests lulus: Remove BG local-first dan FakeDev local fallback aktif.');

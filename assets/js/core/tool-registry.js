@@ -29,7 +29,7 @@
     ["calc","Calculator","local",null,"renderCalc",null],
     ["pwgen","Password Gen","local",null,"renderPwgen",null],
     ["morse","Morse Code","local",null,"renderMorse",null],
-    ["removebg","Remove BG","hybrid",null,"renderRemovebg","https://esm.sh/"],
+    ["removebg","Remove BG","local",null,"renderRemovebg",null],
     ["enhancer","Image Enhancer","local",null,"renderEnhancer",null],
     ["ttquote","Quote TikTok Nexus","module","tiktok-quote","renderTiktokQuote",null],
     ["qrgen","QR Generator","local",null,"renderQrGenerator",null],

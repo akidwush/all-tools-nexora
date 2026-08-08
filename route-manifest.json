@@ -17,6 +17,7 @@
     "/api/tool-health",
     "/api/media-download",
     "/api/sitegrabber",
+    "/api/vdeploy",
     "/api/admin/auth",
     "/api/admin/dashboard",
     "/api/admin/tools",

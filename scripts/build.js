@@ -9,7 +9,7 @@ const required = [
   "assets/css/core.css", "assets/css/components.css",
   "assets/js/core/bootstrap.js", "assets/js/core/network.js", "assets/js/core/performance.js", "assets/js/core/app.js", "assets/js/core/shell.js", "assets/js/core/social-links.js", "assets/js/core/tool-health.js", "assets/js/core/tool-registry.js", "assets/js/core/stability.js", "assets/js/core/lazy-loader.js", "assets/js/features/web-encryption.js", "assets/css/features/web-encryption.css",
   "assets/module-manifest.json",
-  "api/health.js", "api/feedback.js", "api/audit.js", "api/tool-health.js", "lib/media-download.js", "lib/sitegrabber-proxy.js", "lib/public-database.js", "lib/public-analytics.js",
+  "api/health.js", "api/feedback.js", "api/audit.js", "api/tool-health.js", "lib/media-download.js", "lib/sitegrabber-proxy.js", "lib/vdeploy.js", "lib/public-database.js", "lib/public-analytics.js",
   "api/admin/auth.js", "api/admin/dashboard.js", "api/admin/tools.js", "api/admin/visual.js", "api/admin/socials.js",
   "lib/database.js", "lib/audit.js", "lib/tool-health.js", "lib/admin-auth.js",
   "admin/index.html", "admin/login.html", "assets/css/admin.css", "assets/css/visual-qa.css", "assets/js/admin/login.js", "assets/js/admin/dashboard.js", "assets/js/admin/visual-qa.js", "assets/js/admin/functional-audit.js", "assets/js/core/runtime-observer.js",

@@ -39,7 +39,7 @@ if(indexBytes>180000) fail(`index.html masih terlalu besar: ${indexBytes} byte.`
 for(const token of ["assets/css/core.css","assets/js/core/app.js","assets/js/core/tool-health.js","assets/js/core/lazy-loader.js"]){
   if(!index.includes(token)) fail(`index.html belum merujuk aset modular: ${token}`);
 }
-if(!index.includes('id="nxToolHealth"')) fail("index.html belum memiliki panel tool health.");
+if(index.includes('id="nxToolHealth"')) fail("Panel tool health publik seharusnya sudah dihapus dari homepage.");
 const app=fs.readFileSync(path.join(root,"assets/js/core/app.js"),"utf8");
 if(!app.includes('data-tool-id="${safeId}"')) fail("app.js belum memberi data-tool-id stabil pada kartu.");
 const loader=fs.readFileSync(path.join(root,"assets/js/core/lazy-loader.js"),"utf8");
@@ -58,6 +58,7 @@ for(const token of ["assertPublicUrl","PRIVATE_IP_BLOCKED","readHeadersWithRedir
 const routeManifest=JSON.parse(fs.readFileSync(path.join(root,"route-manifest.json"),"utf8"));
 if(!(routeManifest.apiRoutes||[]).includes("/api/audit")) fail("route-manifest belum mencantumkan /api/audit");
 if(!(routeManifest.apiRoutes||[]).includes("/api/tool-health")) fail("route-manifest belum mencantumkan /api/tool-health");
+if(!(routeManifest.apiRoutes||[]).includes("/api/vdeploy")) fail("route-manifest belum mencantumkan /api/vdeploy");
 
 const healthApi=fs.readFileSync(path.join(root,"api/tool-health.js"),"utf8");
 const healthLib=fs.readFileSync(path.join(root,"lib/tool-health.js"),"utf8");
@@ -69,6 +70,12 @@ if(!healthUi.includes("/api/tool-health?refresh=auto")&&!healthUi.includes("/api
 const schema=fs.readFileSync(path.join(root,"database/schema.sql"),"utf8");
 for(const token of ["create table if not exists public.tool_health","consecutive_failures","success_rate"]){ if(!schema.includes(token)) fail(`Schema tool health belum lengkap: ${token}`); }
 if(!fs.existsSync(path.join(root,"database/migrations/002_tool_health.sql"))) fail("Migration tool health belum tersedia.");
+
+const vdeployLib=fs.readFileSync(path.join(root,"lib/vdeploy.js"),"utf8");
+const vercelConfig=fs.readFileSync(path.join(root,"vercel.json"),"utf8");
+for(const token of ["NEXUS_DEPLOY_ACCESS_KEY","VERCEL_TOKEN","NETLIFY_TOKEN","createVercel","createNetlify","extractZip"]) if(!vdeployLib.includes(token)) fail(`VDeploy HF2 belum lengkap: ${token}`);
+if(!vercelConfig.includes('"source": "/api/vdeploy"')) fail("Rewrite /api/vdeploy belum tersedia.");
+for(const token of ["nxLoadBgRemovalModule","isnet_quint8","staticimgly.com/@imgly/background-removal-data/1.7.0/dist/","nxLocalRemoveBg"]) if(!app.includes(token)) fail(`Remove BG HF2 belum lengkap: ${token}`);
 
 const adminRequired = [
   "admin/index.html", "admin/login.html", "assets/css/admin.css", "assets/js/admin/login.js", "assets/js/admin/dashboard.js",
