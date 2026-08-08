@@ -51,8 +51,13 @@ async function readBody(request) {
 }
 
 module.exports = async function handler(request, response) {
+  if (request.method === "OPTIONS") {
+    response.setHeader("Allow", "POST, OPTIONS");
+    response.setHeader("Cache-Control", "no-store, max-age=0");
+    return response.status(204).end();
+  }
   if (request.method !== "POST") {
-    response.setHeader("Allow", "POST");
+    response.setHeader("Allow", "POST, OPTIONS");
     return send(response, 405, { ok: false, error: "METHOD_NOT_ALLOWED" });
   }
 

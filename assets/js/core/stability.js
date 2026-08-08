@@ -62,7 +62,11 @@
   function cardStatus(id){
     var meta=registry&&registry.get(id);
     if(meta&&meta.restricted) return "restricted";
-    return normalizedHealth(healthMap[id]);
+    var raw=normalizedHealth(healthMap[id]);
+    /* Modul lokal tetap boleh dibuka walau health dependency/cached probe offline.
+       Status dependency ditampilkan di dalam fitur, bukan memblokir seluruh room. */
+    if(meta&&meta.mode==="module"&&raw==="offline") return "degraded";
+    return raw;
   }
   function applyCardStatus(){
     Array.prototype.forEach.call(document.querySelectorAll("[data-tool-id],[data-nx-room-tool]"),function(card){

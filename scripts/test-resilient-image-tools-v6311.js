@@ -33,7 +33,7 @@ const sourceCss = read('assets/css/features/source-tools.css');
 assert.match(sourceCss, /\.nx-source-status\.warning\{/);
 
 const index = read('index.html');
-assert.ok(index.includes('assets/js/core/app.js?v=6.3.13'));
-assert.ok(index.includes('assets/js/core/lazy-loader.js?v=6.3.13'));
+assert.ok(index.includes('assets/js/core/app.js?v=6.3.13-hf1'));
+assert.ok(index.includes('assets/js/core/lazy-loader.js?v=6.3.13-hf1'));
 
 console.log('Nexora v6.3.13 tests lulus: Remove BG local-first dan FakeDev local fallback aktif.');
