@@ -4,7 +4,7 @@ const path = require("node:path");
 
 const root = path.resolve(__dirname, "..");
 const pkg = require(path.join(root, "package.json"));
-assert.equal(pkg.version, "6.3.12");
+assert.equal(pkg.version, "6.3.13");
 
 const bank = fs.readFileSync(
   path.join(root, "assets/js/features/download-pack.js"),
@@ -54,5 +54,5 @@ assert.ok(
 );
 
 console.log(
-  "Nexora v6.3.12 tests lulus: Fake Bank lokal, Worm Auto routing, dan Multi-model failover aktif."
+  "Nexora v6.3.13 tests lulus: Fake Bank lokal, Worm Auto routing, dan Multi-model failover aktif."
 );

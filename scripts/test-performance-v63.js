@@ -8,7 +8,7 @@ const app=read("assets/js/core/app.js");
 const perf=read("assets/js/core/performance.js");
 const health=read("assets/js/core/tool-health.js");
 const stability=read("assets/js/core/stability.js");
-assert.equal(pkg.version,"6.3.12");
+assert.equal(pkg.version,"6.3.13");
 assert.match(html,/assets\/js\/core\/bootstrap\.js/);
 assert.match(html,/assets\/js\/core\/performance\.js/);
 assert.doesNotMatch(html,/data-nxgc-warm=/);

@@ -16,6 +16,7 @@
     "/api/audit",
     "/api/tool-health",
     "/api/media-download",
+    "/api/sitegrabber",
     "/api/admin/auth",
     "/api/admin/dashboard",
     "/api/admin/tools",

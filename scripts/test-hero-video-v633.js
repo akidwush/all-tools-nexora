@@ -6,7 +6,7 @@ const performanceJs = fs.readFileSync('assets/js/core/performance.js', 'utf8');
 const coreCss = fs.readFileSync('assets/css/core.css', 'utf8');
 const index = fs.readFileSync('index.html', 'utf8');
 
-assert.equal(pkg.version, '6.3.12');
+assert.equal(pkg.version, '6.3.13');
 assert(performanceJs.includes('heroMode=lowPower?"disabled":(mobileLike?"manual":"auto")'));
 assert(performanceJs.includes('IntersectionObserver'));
 assert(performanceJs.includes('window.scrollY>24'));

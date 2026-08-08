@@ -6,6 +6,8 @@
 
   var API_ENDPOINT="https://api.resellergaming.my.id/tools/getcode?url=";
   var LIVE_AUDIT_ENDPOINT="/api/audit";
+  var SITEGRABBER_ENDPOINT="/api/sitegrabber";
+  var SITEGRABBER_POLL_MS=3000;
   var LIVE_AUDIT_CHUNK_SIZE=12;
   var LIVE_AUDIT_MAX_ITEMS=120;
   var SOURCE_APP_ORIGIN="https://kaze-extract.netlify.app/";
@@ -39,6 +41,9 @@
   var lastFastRoute="Multi Server";
   var historyItems=[];
   var stats={total:0,success:0,fail:0};
+  var siteGrabberPollTimer=0;
+  var siteGrabberJobId="";
+  var siteGrabberReport=null;
   var elementCache={};
   var PROCESS_MESSAGES=[
     "Establishing secure connection...",
@@ -1508,6 +1513,190 @@
     });
   }
 
+
+  function siteGrabberSetState(state,message){
+    var card=byId("nxgcSgxStatus");
+    var label=byId("nxgcSgxStatusText");
+    if(card){
+      card.classList.remove("ready","busy","error","done");
+      if(state) card.classList.add(state);
+    }
+    if(label) label.textContent=message||"Belum diperiksa";
+  }
+
+  function siteGrabberSetProgress(percent,message,progress){
+    var safe=Math.max(0,Math.min(100,Number(percent)||0));
+    var bar=byId("nxgcSgxProgressBar");
+    var ratio=byId("nxgcSgxProgressText");
+    var detail=byId("nxgcSgxProgressDetail");
+    if(bar) bar.style.width=safe+"%";
+    if(ratio) ratio.textContent=Math.round(safe)+"%";
+    if(detail){
+      var p=progress||{};
+      var parts=[];
+      if(Number.isFinite(Number(p.pagesCompleted))) parts.push("Page "+Number(p.pagesCompleted)+"/"+Number(p.pagesDiscovered||p.pagesCompleted||0));
+      if(Number.isFinite(Number(p.assetsCompleted))) parts.push("Asset "+Number(p.assetsCompleted)+"/"+Number(p.assetsDiscovered||p.assetsCompleted||0));
+      if(Number(p.assetsFailed)>0) parts.push("Failed "+Number(p.assetsFailed));
+      detail.textContent=parts.length?parts.join(" · "):(message||"Menunggu worker...");
+    }
+  }
+
+  function siteGrabberToggleResult(ready){
+    var result=byId("nxgcSgxResult");
+    if(result) result.classList.toggle("show",Boolean(ready));
+    ["nxgcSgxDownload","nxgcSgxReport","nxgcSgxReportZip"].forEach(function(id){
+      var button=byId(id); if(button) button.disabled=!ready;
+    });
+  }
+
+  function siteGrabberStopPolling(){
+    clearTimeout(siteGrabberPollTimer);
+    siteGrabberPollTimer=0;
+  }
+
+  async function siteGrabberJson(action,init){
+    var requestInit=Object.assign({cache:"no-store",headers:{Accept:"application/json"},nexoraTimeoutMs:24000},init||{});
+    requestInit.headers=Object.assign({Accept:"application/json"},requestInit.headers||{});
+    var response=await (window.NexoraFetch||window.fetch)(SITEGRABBER_ENDPOINT+"?action="+encodeURIComponent(action),requestInit);
+    var data=await response.json().catch(function(){return {};});
+    if(!response.ok){
+      var error=new Error(data.message||data.error||("HTTP "+response.status));
+      error.status=response.status;
+      error.payload=data;
+      throw error;
+    }
+    return data;
+  }
+
+  async function refreshSiteGrabberHealth(){
+    siteGrabberSetState("busy","Memeriksa SiteGrabber X...");
+    try{
+      var payload=await siteGrabberJson("health",{method:"GET",nexoraTimeoutMs:10000});
+      var upstream=payload&&payload.upstream||{};
+      var services=upstream.services||{};
+      var worker=String(services.worker||"").toLowerCase();
+      if(payload.configured===false){
+        siteGrabberSetState("error","API key belum dikonfigurasi");
+        return false;
+      }
+      if(upstream.success===true || upstream.status==="ready"){
+        siteGrabberSetState("ready",worker?"Ready · worker "+worker:"SiteGrabber X ready");
+        return true;
+      }
+      siteGrabberSetState("error","SiteGrabber X degraded");
+      return false;
+    }catch(error){
+      siteGrabberSetState("error",String(error&&error.message||"SiteGrabber X offline"));
+      return false;
+    }
+  }
+
+  function renderSiteGrabberResult(data){
+    var result=data&&data.result||{};
+    var domain=byId("nxgcSgxDomain");
+    var pages=byId("nxgcSgxPages");
+    var assets=byId("nxgcSgxAssets");
+    var failed=byId("nxgcSgxFailed");
+    var bytes=byId("nxgcSgxBytes");
+    if(domain) domain.textContent=String(result.domain||"—");
+    if(pages) pages.textContent=String(Number(result.pages)||0);
+    if(assets) assets.textContent=String(Number(result.assets)||0);
+    if(failed) failed.textContent=String(Number(result.failedAssets)||0);
+    if(bytes) bytes.textContent=formatBytes(Number(result.bytes)||0);
+    siteGrabberToggleResult(true);
+  }
+
+  async function pollSiteGrabberJob(){
+    if(!siteGrabberJobId) return;
+    siteGrabberStopPolling();
+    try{
+      var response=await (window.NexoraFetch||window.fetch)(SITEGRABBER_ENDPOINT+"?action=job&id="+encodeURIComponent(siteGrabberJobId),{cache:"no-store",headers:{Accept:"application/json"},nexoraTimeoutMs:24000});
+      var payload=await response.json().catch(function(){return {};});
+      if(!response.ok) throw new Error(payload.message||payload.error||("HTTP "+response.status));
+      var data=payload.data||{};
+      var state=String(data.state||data.progress&&data.progress.status||"queued").toLowerCase();
+      var progress=data.progress||{};
+      var percent=Number(progress.percent)||0;
+      siteGrabberSetProgress(percent,progress.message||state,progress);
+      if(state==="completed"){
+        siteGrabberSetState("done","Capture selesai · ZIP siap");
+        siteGrabberSetProgress(100,"Capture selesai",progress);
+        renderSiteGrabberResult(data);
+        return;
+      }
+      if(["failed","cancelled","expired"].indexOf(state)>=0){
+        siteGrabberSetState("error",String(data.error||progress.message||("Job "+state)));
+        return;
+      }
+      siteGrabberSetState("busy",String(progress.message||("Job "+state)));
+      siteGrabberPollTimer=setTimeout(pollSiteGrabberJob,SITEGRABBER_POLL_MS);
+    }catch(error){
+      siteGrabberSetState("error",String(error&&error.message||"Gagal membaca status job"));
+    }
+  }
+
+  async function startSiteGrabberCapture(){
+    var input=byId("nxgcTargetUrl");
+    var mode=byId("nxgcSgxMode");
+    var consent=byId("nxgcSgxConsent");
+    var button=byId("nxgcSgxStart");
+    var raw=String(input&&input.value||"").trim();
+    if(!raw){showToast("Masukkan URL target terlebih dahulu.","fail");if(input)input.focus();return;}
+    try{raw=normalizeUrl(raw);}catch(error){showToast(error.message||"URL tidak valid.","fail");return;}
+    if(!consent || !consent.checked){showToast("Centang konfirmasi izin capture terlebih dahulu.","fail");return;}
+    siteGrabberStopPolling();
+    siteGrabberJobId="";
+    siteGrabberReport=null;
+    siteGrabberToggleResult(false);
+    siteGrabberSetProgress(0,"Mengirim job ke SiteGrabber X...",{});
+    siteGrabberSetState("busy","Mengirim capture job...");
+    if(button){button.disabled=true;button.classList.add("loading");}
+    try{
+      var response=await (window.NexoraFetch||window.fetch)(SITEGRABBER_ENDPOINT+"?action=capture",{
+        method:"POST",
+        headers:{"Content-Type":"application/json",Accept:"application/json"},
+        body:JSON.stringify({url:raw,mode:mode?mode.value:"single-page",consent:true}),
+        nexoraTimeoutMs:26000
+      });
+      var payload=await response.json().catch(function(){return {};});
+      if(!response.ok) throw new Error(payload.message||payload.error||("HTTP "+response.status));
+      siteGrabberJobId=String(payload.job&&payload.job.id||"");
+      if(!siteGrabberJobId) throw new Error("SiteGrabber tidak mengembalikan Job ID.");
+      var idNode=byId("nxgcSgxJobId"); if(idNode) idNode.textContent=siteGrabberJobId;
+      siteGrabberSetState("busy","Job queued · menunggu worker");
+      showToast("SiteGrabber X job berhasil dibuat.","success");
+      pollSiteGrabberJob();
+    }catch(error){
+      siteGrabberSetState("error",String(error&&error.message||"Capture SiteGrabber gagal"));
+      showToast("SiteGrabber X: "+String(error&&error.message||"capture gagal"),"fail");
+    }finally{
+      if(button){button.disabled=false;button.classList.remove("loading");}
+    }
+  }
+
+  function downloadSiteGrabber(kind){
+    if(!siteGrabberJobId){showToast("Belum ada capture SiteGrabber yang selesai.","fail");return;}
+    var action=kind==="report"?"report-download":"download";
+    var anchor=document.createElement("a");
+    anchor.href=SITEGRABBER_ENDPOINT+"?action="+action+"&id="+encodeURIComponent(siteGrabberJobId);
+    anchor.rel="noopener";
+    anchor.click();
+  }
+
+  async function copySiteGrabberReport(){
+    if(!siteGrabberJobId){showToast("Belum ada report SiteGrabber.","fail");return;}
+    try{
+      if(!siteGrabberReport){
+        var response=await (window.NexoraFetch||window.fetch)(SITEGRABBER_ENDPOINT+"?action=report&id="+encodeURIComponent(siteGrabberJobId),{cache:"no-store",headers:{Accept:"application/json"},nexoraTimeoutMs:24000});
+        var payload=await response.json().catch(function(){return {};});
+        if(!response.ok) throw new Error(payload.message||payload.error||("HTTP "+response.status));
+        siteGrabberReport=payload.data||{};
+      }
+      await copyText(JSON.stringify(siteGrabberReport,null,2));
+      showToast("Report SiteGrabber disalin.","success");
+    }catch(error){showToast("Report gagal: "+String(error&&error.message||error),"fail");}
+  }
+
   function handleHistoryClick(event){
     var retry=event.target.closest("[data-nxgc-retry]");
     if(retry){
@@ -1549,6 +1738,11 @@
     byId("nxgcCopyReport").addEventListener("click",copySourceReport);
     byId("nxgcDownloadReport").addEventListener("click",downloadSourceReport);
     byId("nxgcRunAudit").addEventListener("click",runLiveAudit);
+    byId("nxgcSgxRefresh").addEventListener("click",refreshSiteGrabberHealth);
+    byId("nxgcSgxStart").addEventListener("click",startSiteGrabberCapture);
+    byId("nxgcSgxDownload").addEventListener("click",function(){downloadSiteGrabber("capture");});
+    byId("nxgcSgxReport").addEventListener("click",copySiteGrabberReport);
+    byId("nxgcSgxReportZip").addEventListener("click",function(){downloadSiteGrabber("report");});
     byId("nxgcRefreshPreview").addEventListener("click",function(){
       if(currentHtml){
         renderPreview();
@@ -1677,6 +1871,27 @@
               '</div>'+ 
               '<p class="nxgc-report-note">Static report dibuat dari source. Live Audit memakai probe HEAD/OPTIONS/GET terbatas, memeriksa status HTTP, redirect, latency, MIME, dan risiko CORS tanpa mengirim data form.</p>'+ 
             '</section>'+
+            '<section class="nxgc-sgx" id="nxgcSiteGrabber">'+
+              '<div class="nxgc-sgx-head">'+
+                '<div><span class="nxgc-sgx-kicker"><i class="fas fa-spider"></i> SITEGRABBER X API</span><b>Advanced Capture Engine</b><small>Clone halaman, website penuh, atau asset melalui API server-side. API key tidak pernah dikirim ke browser.</small></div>'+
+                '<div class="nxgc-sgx-status" id="nxgcSgxStatus"><i class="fas fa-circle"></i><span id="nxgcSgxStatusText">Belum diperiksa</span><button type="button" id="nxgcSgxRefresh" title="Refresh status"><i class="fas fa-rotate-right"></i></button></div>'+
+              '</div>'+
+              '<div class="nxgc-sgx-controls">'+
+                '<label><span>Capture Mode</span><select id="nxgcSgxMode"><option value="single-page">Single Page</option><option value="full-website">Full Website</option><option value="asset-collector">Asset Collector</option></select></label>'+
+                '<label class="nxgc-sgx-consent"><input type="checkbox" id="nxgcSgxConsent"><span>Saya memiliki izin untuk menangkap target ini.</span></label>'+
+                '<button class="nxgc-sgx-start" id="nxgcSgxStart" type="button"><i class="fas fa-spider"></i><span>Capture via SiteGrabber X</span></button>'+
+              '</div>'+
+              '<div class="nxgc-sgx-progress">'+
+                '<div class="nxgc-sgx-progress-copy"><span id="nxgcSgxProgressDetail">Belum ada job.</span><b id="nxgcSgxProgressText">0%</b></div>'+
+                '<div class="nxgc-sgx-progress-track"><span id="nxgcSgxProgressBar"></span></div>'+
+                '<code id="nxgcSgxJobId">—</code>'+
+              '</div>'+
+              '<div class="nxgc-sgx-result" id="nxgcSgxResult">'+
+                '<div class="nxgc-sgx-metrics"><div><span>Domain</span><b id="nxgcSgxDomain">—</b></div><div><span>Pages</span><b id="nxgcSgxPages">0</b></div><div><span>Assets</span><b id="nxgcSgxAssets">0</b></div><div><span>Failed</span><b id="nxgcSgxFailed">0</b></div><div><span>Size</span><b id="nxgcSgxBytes">0 B</b></div></div>'+
+                '<div class="nxgc-sgx-actions"><button type="button" id="nxgcSgxDownload" disabled><i class="fas fa-file-zipper"></i> Download Clone ZIP</button><button type="button" id="nxgcSgxReport" disabled><i class="fas fa-copy"></i> Copy Report JSON</button><button type="button" id="nxgcSgxReportZip" disabled><i class="fas fa-box-archive"></i> Reports ZIP</button></div>'+
+              '</div>'+
+              '<p class="nxgc-sgx-note"><i class="fas fa-shield-halved"></i> API key disimpan hanya di Vercel Environment Variables. Capture tetap mengikuti robots/crawl guard, limit, dan validasi keamanan SiteGrabber-X.</p>'+
+            '</section>'+
             '<section class="nxgc-preview" id="nxgcPreview">'+
               '<div class="nxgc-preview-head">'+
                 '<div class="nxgc-preview-title"><i class="fas fa-display"></i><span>Live Preview</span></div>'+
@@ -1715,6 +1930,7 @@
     renderHistory();
     updateStats();
     clearResult(true);
+    siteGrabberToggleResult(false);
     clearInterval(sessionTimer);
     sessionTimer=setInterval(updateStats,30000);
   }
@@ -1728,6 +1944,7 @@
     document.body.classList.add("nx-getcode-open");
     document.body.style.overflow="hidden";
     if(stage) stage.scrollTop=0;
+    refreshSiteGrabberHealth();
     requestAnimationFrame(function(){
       requestAnimationFrame(function(){overlay.classList.add("on");});
     });
@@ -1739,6 +1956,7 @@
 
   function closeGetCodeRoom(){
     if(!overlay) return;
+    siteGrabberStopPolling();
     if(activeController){
       try{activeController.abort();}catch(error){}
       activeController=null;
