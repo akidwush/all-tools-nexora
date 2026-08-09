@@ -1410,6 +1410,7 @@ let toolsData = {
 { id: 'virusscan', icon: 'fa-solid fa-shield-virus', name: 'Virus Scan', desc: 'Scan URL, file, hash, domain & IP', badge: 'SECURITY' },
         { id: 'cryptomarket', icon: 'fa-solid fa-chart-line', name: 'Crypto Market Scanner', desc: 'Pantau harga, volume, market cap dan pergerakan crypto', badge: 'LIVE' },
         { id: 'webintel', icon: 'fa-solid fa-satellite-dish', name: 'Nexora Web Intelligence', desc: 'Audit SEO, security, performa, aksesibilitas dan teknologi website', badge: 'INTEL' },
+        { id: 'spaceexplorer', icon: 'fa-solid fa-user-astronaut', name: 'Space Explorer', desc: 'APOD, galeri Mars, asteroid dekat Bumi dan cuaca antariksa NASA', badge: 'NASA' },
         { id: 'calc', icon: 'fa-solid fa-calculator', name: 'Calculator', desc: 'Hitung cepat', badge: 'Math' },
         { id: 'pwgen', icon: 'fa-solid fa-key', name: 'Password Gen', desc: 'Password aman', badge: 'Secure' },
         { id: 'morse', icon: 'fa-solid fa-tower-broadcast', name: 'Morse Code', desc: 'Konversi morse', badge: 'Audio' },
@@ -1739,6 +1740,7 @@ function showTool(toolId) {
         case 'virusscan': renderVirusScan(body); break;
         case 'cryptomarket': renderCryptoMarket(body); break;
         case 'webintel': renderWebIntelligence(body); break;
+        case 'spaceexplorer': renderSpaceExplorer(body); break;
         case 'promptgenerate': renderPromptGenerator(body); break;
         case 'fakeovo': renderFakeOvo(body); break;
         case 'quotegenerator': renderQuoteGenerator(body); break;

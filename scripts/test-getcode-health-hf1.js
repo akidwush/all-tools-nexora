@@ -12,9 +12,9 @@ const index = read("index.html");
 assert.match(health, /id: "getcode"[\s\S]*?path: "\/assets\/js\/features\/get-code\.js"[\s\S]*?method: "HEAD"/);
 assert.doesNotMatch(health, /id: "getcode"[\s\S]{0,280}?path: "\/api\/audit"[\s\S]{0,120}?method: "OPTIONS"/);
 assert.match(stability, /meta&&meta\.mode==="module"&&raw==="offline"\) return "degraded"/);
-assert.match(lazy, /ASSET_VERSION = '6\.3\.13-hf5'/);
-assert.ok(index.includes('assets/js/core/stability.js?v=6.3.13-hf5'));
-assert.ok(index.includes('assets/js/core/lazy-loader.js?v=6.3.13-hf5'));
+assert.match(lazy, /ASSET_VERSION = '6\.3\.13-hf6'/);
+assert.ok(index.includes('assets/js/core/stability.js?v=6.3.13-hf6'));
+assert.ok(index.includes('assets/js/core/lazy-loader.js?v=6.3.13-hf6'));
 
 async function testOptions(){
   const handler = require("../api/audit");

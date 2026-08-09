@@ -70,6 +70,10 @@
       "destination": "/api/audit?mode=web-intelligence"
     },
     {
+      "source": "/api/space-explorer",
+      "destination": "/api/tool-health?mode=space-explorer"
+    },
+    {
       "source": "/api/vdeploy",
       "destination": "/api/health?mode=vdeploy"
     }

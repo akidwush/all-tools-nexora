@@ -190,7 +190,13 @@ for(const file of ["index.html","assets/js/features/get-code.js","assets/css/fea
 }
 
 const healthCatalog=require(path.join(root,"lib/tool-health.js")).TOOL_CATALOG;
-if(!Array.isArray(healthCatalog)||healthCatalog.length!==39) fail(`Tool health catalog harus memuat 39 tools, ditemukan ${healthCatalog?.length||0}.`);
+if(!Array.isArray(healthCatalog)||healthCatalog.length!==40) fail(`Tool health catalog harus memuat 40 tools, ditemukan ${healthCatalog?.length||0}.`);
+
+const spaceExplorerLib=fs.readFileSync(path.join(root,"lib/space-explorer.js"),"utf8");
+const spaceExplorerUi=fs.readFileSync(path.join(root,"assets/js/features/space-explorer.js"),"utf8");
+for(const token of ["NASA_API_KEY","DEMO_KEY","planetary/apod","neo/rest/v1/feed","DONKI/notifications","images-api.nasa.gov","NASA_RESPONSE_TOO_LARGE"]) if(!spaceExplorerLib.includes(token)) fail(`Space Explorer HF6 belum lengkap: ${token}`);
+for(const token of ["renderSpaceExplorer","/api/space-explorer","drawRadar","Mars Rover Photos API yang sudah diarsipkan","@media"]) if(!spaceExplorerUi.includes(token)&&!fs.readFileSync(path.join(root,"assets/css/features/space-explorer.css"),"utf8").includes(token)) fail(`UI Space Explorer HF6 belum lengkap: ${token}`);
+if(spaceExplorerUi.includes("NASA_API_KEY")||spaceExplorerUi.includes("DEMO_KEY")) fail("UI Space Explorer tidak boleh mengetahui atau membawa NASA API key.");
 
 
 const v62Required = [

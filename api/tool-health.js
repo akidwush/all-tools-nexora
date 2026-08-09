@@ -2,6 +2,7 @@ const crypto = require("node:crypto");
 const { handleMediaDownload } = require("../lib/media-download");
 const { handleSiteGrabber } = require("../lib/sitegrabber-proxy");
 const { handleCryptoMarket } = require("../lib/crypto-market");
+const { handleSpaceExplorer } = require("../lib/space-explorer");
 const {
   TOOL_CATALOG,
   getHealthConfig,
@@ -71,6 +72,9 @@ module.exports = async function handler(request, response) {
   }
   if (url.searchParams.get("mode") === "crypto-market") {
     return handleCryptoMarket(request, response, url);
+  }
+  if (url.searchParams.get("mode") === "space-explorer") {
+    return handleSpaceExplorer(request, response, url);
   }
 
   if (request.method !== "GET" && request.method !== "POST") {

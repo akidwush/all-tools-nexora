@@ -19,6 +19,7 @@
     "/api/sitegrabber",
     "/api/crypto-market",
     "/api/web-intelligence",
+    "/api/space-explorer",
     "/api/vdeploy",
     "/api/admin/auth",
     "/api/admin/dashboard",
