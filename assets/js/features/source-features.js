@@ -141,6 +141,49 @@
     return nxCanvasBlob(canvas);
   }
 
+  async function nxBuildCertificateFallback(nama){
+    const canvas=document.createElement("canvas");
+    canvas.width=1600;canvas.height=1000;
+    const ctx=canvas.getContext("2d");
+    const background=ctx.createLinearGradient(0,0,1600,1000);
+    background.addColorStop(0,"#080513");
+    background.addColorStop(.55,"#160b2b");
+    background.addColorStop(1,"#251044");
+    ctx.fillStyle=background;ctx.fillRect(0,0,1600,1000);
+
+    ctx.globalAlpha=.16;ctx.strokeStyle="#facc15";ctx.lineWidth=2;
+    for(let x=-500;x<1900;x+=80){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x+500,1000);ctx.stroke();}
+    ctx.globalAlpha=1;
+
+    nxRoundRect(ctx,90,90,1420,820,40);
+    ctx.fillStyle="rgba(8,5,19,.90)";ctx.fill();
+    ctx.strokeStyle="#facc15";ctx.lineWidth=7;ctx.stroke();
+    nxRoundRect(ctx,118,118,1364,764,30);
+    ctx.strokeStyle="rgba(192,132,252,.72)";ctx.lineWidth=3;ctx.stroke();
+
+    ctx.textAlign="center";ctx.textBaseline="alphabetic";
+    ctx.fillStyle="#facc15";ctx.font="900 38px Orbitron,Arial,sans-serif";
+    ctx.fillText("ALL TOOLS NEXORA",800,220);
+    ctx.fillStyle="#ffffff";ctx.font="900 78px Poppins,Arial,sans-serif";
+    ctx.fillText("SERTIFIKAT CUSTOM",800,335);
+    ctx.fillStyle="#c4b5fd";ctx.font="600 30px Poppins,Arial,sans-serif";
+    ctx.fillText("Sertifikat kreatif ini diberikan kepada",800,430);
+
+    ctx.fillStyle="#ffffff";ctx.font="900 82px Poppins,Arial,sans-serif";
+    const safeName=String(nama||"Nama Contoh").slice(0,70);
+    nxWrapCanvasText(ctx,safeName,800,555,1160,92,2);
+    ctx.beginPath();ctx.moveTo(300,665);ctx.lineTo(1300,665);
+    ctx.strokeStyle="rgba(250,204,21,.65)";ctx.lineWidth=3;ctx.stroke();
+
+    ctx.fillStyle="#ddd6fe";ctx.font="600 27px Poppins,Arial,sans-serif";
+    ctx.fillText("Karya kreatif · dibuat langsung di perangkat",800,735);
+    ctx.fillStyle="#a78bfa";ctx.font="700 23px Inter,Arial,sans-serif";
+    ctx.fillText(new Date().toLocaleDateString("id-ID",{day:"2-digit",month:"long",year:"numeric"}),800,795);
+    ctx.fillStyle="rgba(255,255,255,.62)";ctx.font="600 18px Inter,Arial,sans-serif";
+    ctx.fillText("Renderer lokal aktif — tidak bergantung pada API pihak ketiga",800,850);
+    return nxCanvasBlob(canvas);
+  }
+
   function nxMarkFallback(apiId,detail){
     try{
       if(typeof window.getApiById==="function"&&typeof window.setApiStatus==="function"){
@@ -283,20 +326,20 @@
       <div class="nx-source-tool" style="--nx-accent:#facc15;--nx-accent-2:#a855f7;--nx-accent-rgb:250,204,21">
         <section class="nx-source-intro">
           <span class="nx-source-intro-icon"><i class="fa-solid fa-certificate"></i></span>
-          <div><h2>Sertifikat Tolol</h2><p>Menggunakan endpoint Sertifikat Tolol asli dari HTML Nexus. Hasil tidak digambar ulang dan tidak memakai canvas lokal.</p></div>
+          <div><h2>Sertifikat Custom</h2><p>Membuat sertifikat melalui API sumber dengan renderer lokal otomatis saat API sedang tidak tersedia.</p></div>
         </section>
         <section class="nx-source-grid">
           <div class="nx-source-card nx-source-form">
             <div class="nx-source-field"><label>Nama pada Sertifikat</label><input id="nxSertNama" type="text" value="Nama Contoh" placeholder="Masukkan nama"></div>
             <button class="nx-source-btn" id="nxSertGenerate" type="button"><i class="fa-solid fa-certificate"></i> Generate Sertifikat</button>
-            <div class="nx-source-loader" id="nxSertLoader">Mengambil sertifikat asli</div>
+            <div class="nx-source-loader" id="nxSertLoader">Menyiapkan sertifikat</div>
             <div class="nx-source-status" id="nxSertStatus"></div>
             <div class="nx-source-note">Endpoint sumber: api.siputzx.my.id/api/canvas/sertifikat-tolol</div>
           </div>
           <div class="nx-source-card nx-source-result">
             <div class="nx-source-stage">
-              <div class="nx-source-empty" id="nxSertEmpty"><i class="fa-solid fa-certificate"></i>Hasil sertifikat API Nexus akan muncul di sini.</div>
-              <img id="nxSertResult" alt="Sertifikat Tolol API Nexus">
+              <div class="nx-source-empty" id="nxSertEmpty"><i class="fa-solid fa-certificate"></i>Hasil sertifikat akan muncul di sini.</div>
+              <img id="nxSertResult" alt="Sertifikat Custom Nexora">
             </div>
             <button class="nx-source-btn secondary" id="nxSertDownload" type="button" disabled><i class="fa-solid fa-download"></i> Download PNG</button>
           </div>
@@ -323,11 +366,24 @@
         currentUrl=URL.createObjectURL(blob);
         result.src=currentUrl;result.classList.add("show");empty.style.display="none";
         download.disabled=false;
-        download.onclick=()=>nxDownloadSource(currentUrl,`sertifikat_${nxFilename(nama,"nama")}.png`);
+        download.onclick=()=>nxDownloadSource(currentUrl,`sertifikat_custom_${nxFilename(nama,"nama")}.png`);
         nxSetSourceStatus("nxSertStatus",`Sertifikat untuk ${nama} berhasil dibuat oleh API sumber.`,"success");
       }catch(error){
         if(error && error.name==="AbortError") return;
-        nxSetSourceStatus("nxSertStatus","Gagal mengambil sertifikat: "+error.message,"error");
+        try{
+          loader.textContent="API sumber gagal · membuat hasil lokal";
+          const blob=await nxBuildCertificateFallback(nama);
+          if(currentUrl) URL.revokeObjectURL(currentUrl);
+          currentUrl=URL.createObjectURL(blob);
+          result.src=currentUrl;result.classList.add("show");empty.style.display="none";
+          download.disabled=false;
+          download.onclick=()=>nxDownloadSource(currentUrl,`sertifikat_custom_${nxFilename(nama,"nama")}.png`);
+          const reason=error&&error.message?error.message:"API tidak tersedia";
+          nxMarkFallback("siputzx-api","API "+reason+" · renderer sertifikat lokal aktif");
+          nxSetSourceStatus("nxSertStatus",`Mode lokal aktif. Sertifikat untuk ${nama} berhasil dibuat meskipun API sumber gagal (${reason}).`,"success");
+        }catch(localError){
+          nxSetSourceStatus("nxSertStatus","API dan renderer lokal gagal: "+localError.message,"error");
+        }
       }finally{
         loader.classList.remove("show");button.disabled=false;
       }

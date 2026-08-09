@@ -171,7 +171,7 @@ values
   ('fakebankjago', 'Fake Bank Jago', 'Generator visual saldo Bank Jago', 'maker', 'SIMULASI', 'fa-solid fa-building-columns', null, true, 0, '{}'::jsonb),
   ('brat', 'BRAT Generator', 'Static + animated GIF', 'maker', 'GIF', 'fa-solid fa-wand-magic-sparkles', null, true, 10, '{}'::jsonb),
   ('iqc', 'IQC Generator', 'Buat gambar IQC — Operator, Image & Dark', 'maker', '3 STYLE', 'fa-solid fa-image', null, true, 20, '{}'::jsonb),
-  ('sertifikat', 'Sertifikat Tolol', 'Buat sertifikat parodi dari nama melalui API gambar', 'maker', 'API', 'fa-solid fa-certificate', null, true, 30, '{}'::jsonb),
+  ('sertifikat', 'Sertifikat Custom', 'Buat sertifikat custom melalui API atau renderer lokal', 'maker', 'PNG', 'fa-solid fa-certificate', null, true, 30, '{}'::jsonb),
   ('ektp', 'E-KTP Generator', 'Full form demo', 'maker', 'Full', 'fa-solid fa-id-card', null, true, 40, '{}'::jsonb),
   ('fakedana', 'Fake Dana', 'Generate saldo Dana palsu', 'maker', 'Custom', 'fa-solid fa-money-bill-wave', null, true, 50, '{}'::jsonb),
   ('fakedev', 'FakeDev', 'Buat profil developer dari nama, bio, dan foto', 'maker', 'API', 'fa-solid fa-laptop-code', null, true, 60, '{}'::jsonb),

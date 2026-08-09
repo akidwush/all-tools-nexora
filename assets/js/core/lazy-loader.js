@@ -1,4 +1,4 @@
-/* Nexora v6.3.13 HF2 stable lazy module loader */
+/* Nexora v6.3.13 HF3 stable lazy module loader */
 (function(){
   'use strict';
 
@@ -25,15 +25,15 @@
     promptgenerate:'imported-tools',fakeovo:'imported-tools',quotegenerator:'imported-tools',carifakta:'imported-tools',mltools:'imported-tools',
     iqc:'generator-pack',winquotes:'generator-pack',nokiamsg:'generator-pack',
     terabox:'download-pack',fakebankjago:'download-pack',spotify:'download-pack',
-    unbanwa:'unban-whatsapp',zxvai:'nexus-ai',fotolink:'pix-vault',vdeploy:'deploy-center',webencryption:'web-encryption'
+    unbanwa:'unban-whatsapp',vdeploy:'deploy-center',webencryption:'web-encryption'
   };
 
   var labels = {
     'get code html':'getcode','tiktok':'tiktok','quote tiktok nexus':'ttquote','virus scan':'virusscan','baca komik full':'comicreader',
-    'sertifikat tolol':'sertifikat','fakedev':'fakedev','prompt generator':'promptgenerate','fake ovo':'fakeovo',
+    'sertifikat custom':'sertifikat','fakedev':'fakedev','prompt generator':'promptgenerate','fake ovo':'fakeovo',
     'quote generator':'quotegenerator','carifakta':'carifakta','ml tools':'mltools','iqc generator':'iqc',
     'windows quotes':'winquotes','nokia message':'nokiamsg','terabox downloader':'terabox','fake bank jago':'fakebankjago',
-    'spotify downloader':'spotify','unban whatsapp':'unbanwa','zxvai':'zxvai','nexus ai':'zxvai','foto to link':'fotolink',
+    'spotify downloader':'spotify','unban whatsapp':'unbanwa',
     'deploy & update web':'vdeploy','deploy website':'vdeploy','web encryption':'webencryption'
   };
 
@@ -41,7 +41,7 @@
   var assetPromises = new Map();
   /* Vercel serves /assets with a one-hour browser cache.  A module can
      therefore otherwise keep the previous CSS/JS after a successful deploy. */
-  var ASSET_VERSION = '6.3.13-hf2';
+  var ASSET_VERSION = '6.3.13-hf3';
   var baseShowTool = typeof window.showTool === 'function' ? window.showTool : null;
   var activeCard = null;
 
@@ -136,7 +136,7 @@
 
   function invokeSpecial(toolId,event){
     var openers={
-      getcode:'openGetCodeRoom',tiktok:'openTiktokRoom',unbanwa:'openNexusUnban',zxvai:'openNexusAI',fotolink:'openPix',vdeploy:'openDeploy'
+      getcode:'openGetCodeRoom',tiktok:'openTiktokRoom',unbanwa:'openNexusUnban',vdeploy:'openDeploy'
     };
     var name=openers[toolId];
     if(name && typeof window[name]==='function') return window[name](event||null);

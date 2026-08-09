@@ -32,7 +32,8 @@ assert.equal(new Set(seedIds).size, 37, "Seed database harus memuat seluruh 37 t
 
 const moduleManifest = JSON.parse(read("assets/module-manifest.json"));
 for (const tool of registry.list()) {
-  assert.ok(tool.handler, `${tool.id}: handler kosong`);
+  if (tool.mode === "external") assert.ok(tool.dependency, `${tool.id}: URL eksternal kosong`);
+  else assert.ok(tool.handler, `${tool.id}: handler kosong`);
   if (tool.module) {
     assert.ok(moduleManifest.modules[tool.module], `${tool.id}: modul ${tool.module} tidak terdaftar`);
     for (const asset of [...(moduleManifest.modules[tool.module].css || []), ...(moduleManifest.modules[tool.module].js || [])]) {

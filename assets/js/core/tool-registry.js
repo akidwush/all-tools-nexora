@@ -11,7 +11,7 @@
     ["fakebankjago","Fake Bank Jago","api","download-pack","renderFakeBankJago","https://api.nexray.eu.cc/"],
     ["brat","BRAT Generator","api",null,"renderBrat","https://api.siputzx.my.id/"],
     ["iqc","IQC Generator","api","generator-pack","renderIqc2","https://api.nexray.eu.cc/"],
-    ["sertifikat","Sertifikat Tolol","api","source-features","renderSertifikatTololSource","https://api.siputzx.my.id/"],
+    ["sertifikat","Sertifikat Custom","api","source-features","renderSertifikatTololSource","https://api.siputzx.my.id/"],
     ["ektp","E-KTP Generator","local",null,"renderEktp",null],
     ["fakedana","Fake Dana","api",null,"renderFakeDana","https://api.nexray.eu.cc/"],
     ["fakedev","FakeDev","api","source-features","renderFakeDev","https://api.ikyyxd.my.id/"],
@@ -36,8 +36,8 @@
     ["tiktokhd","Upload TikTok HD","external",null,"openTikTokHdUpload","https://www.tiktok.com/tiktokstudio"],
     ["getcode","Get Code HTML","module","get-code","openGetCodeRoom",null],
     ["vdeploy","Deploy & Update Web","module","deploy-center","openDeploy",null],
-    ["zxvai","ZxVAI","module","nexus-ai","openNexusAI","https://zxvaiapk.netlify.app/"],
-    ["fotolink","Foto To Link","module","pix-vault","openPix","https://pixvault-bykz.netlify.app/"],
+    ["zxvai","ZxVAI","external",null,null,"https://zxvaiapk.netlify.app/"],
+    ["fotolink","Foto To Link","external",null,null,"https://pixvault-bykz.netlify.app/"],
     ["webencryption","Web Encryption","module","web-encryption","renderWebEncryption",null],
     ["unbanwa","Unban WhatsApp","module","unban-whatsapp","openNexusUnban",null]
   ];

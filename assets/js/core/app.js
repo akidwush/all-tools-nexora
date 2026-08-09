@@ -930,7 +930,9 @@ async function nxLocalEnhance(file, imageUrl, strength = 55) {
     const img = loaded.img;
     const sw = img.naturalWidth || img.width;
     const sh = img.naturalHeight || img.height;
-    const maxSide = 2560;
+    const performanceProfile = window.__NEXORA_PERFORMANCE__ || {};
+    const constrainedDevice = Boolean(performanceProfile.lowPower || performanceProfile.mobileLike);
+    const maxSide = constrainedDevice ? 1800 : 2560;
     const upscale = Math.max(1, Math.min(2, maxSide / Math.max(sw, sh)));
     const w = Math.max(1, Math.round(sw * upscale));
     const h = Math.max(1, Math.round(sh * upscale));
@@ -947,7 +949,8 @@ async function nxLocalEnhance(file, imageUrl, strength = 55) {
     ctx.filter = 'none';
 
     // Unsharp mask ringan agar detail lebih tegas tanpa membuat noise berlebihan.
-    if (w * h <= 9000000) {
+    const sharpenPixelBudget = constrainedDevice ? 1800000 : 4200000;
+    if (w * h <= sharpenPixelBudget) {
         const source = ctx.getImageData(0, 0, w, h);
         const out = ctx.createImageData(w, h);
         const d = source.data, o = out.data;
@@ -1002,13 +1005,18 @@ async function nxLoadBgRemovalModule() {
 async function nxPrepareBgInputBlob(file, imageUrl) {
     const blob = file || await nxRemoteImageBlob(imageUrl);
     if (!blob || blob.size < 20) throw new Error('File gambar kosong');
-    // Hindari lonjakan RAM Android pada foto kamera yang sangat besar.
-    if (blob.size <= 6 * 1024 * 1024) return blob;
+    // Ukuran file JPEG kecil tidak berarti dimensi fotonya kecil. Selalu baca
+    // dimensinya agar foto kamera 12–50 MP tidak membuat tab Android kehabisan RAM.
     const loaded = await nxLoadImageFromBlob(blob);
     const img = loaded.img;
     const sw = img.naturalWidth || img.width;
     const sh = img.naturalHeight || img.height;
-    const maxSide = 1800;
+    const profile = window.__NEXORA_PERFORMANCE__ || {};
+    const maxSide = profile.lowPower ? 1280 : (profile.mobileLike ? 1440 : 1800);
+    if (Math.max(sw, sh) <= maxSide && blob.size <= 6 * 1024 * 1024) {
+        URL.revokeObjectURL(loaded.url);
+        return blob;
+    }
     const scale = Math.min(1, maxSide / Math.max(sw, sh));
     const canvas = document.createElement('canvas');
     canvas.width = Math.max(1, Math.round(sw * scale));
@@ -1049,7 +1057,8 @@ function nxColorDist(data, idx, rgb) {
 async function nxLocalRemoveBg(file, imageUrl) {
     const loaded = await nxLoadCanvasImage(file, imageUrl);
     const img = loaded.img;
-    const max = 1500;
+    const profile = window.__NEXORA_PERFORMANCE__ || {};
+    const max = profile.lowPower ? 1100 : (profile.mobileLike ? 1280 : 1500);
     const sw = img.naturalWidth || img.width;
     const sh = img.naturalHeight || img.height;
     const scale = Math.min(1, max / Math.max(sw, sh));
@@ -1110,14 +1119,19 @@ async function nxLocalRemoveBg(file, imageUrl) {
 async function nxRemoveBackgroundLocalFirst(file, imageUrl, onStatus) {
     const report = typeof onStatus === 'function' ? onStatus : () => {};
     let aiError = null;
-    try {
-        report('Menyiapkan model AI lokal…');
-        const img = await nxAiRemoveBackground(file, imageUrl, (percent, key) => {
-            report(`AI lokal ${percent}%${key ? ' · ' + key : ''}`);
-        });
-        return { img, engine: 'AI lokal', degraded: false };
-    } catch (error) {
-        aiError = error;
+    const profile = window.__NEXORA_PERFORMANCE__ || {};
+    if (!profile.lowPower) {
+        try {
+            report('Menyiapkan model AI lokal…');
+            const img = await nxAiRemoveBackground(file, imageUrl, (percent, key) => {
+                report(`AI lokal ${percent}%${key ? ' · ' + key : ''}`);
+            });
+            return { img, engine: 'AI lokal', degraded: false };
+        } catch (error) {
+            aiError = error;
+        }
+    } else {
+        aiError = new Error('Mode hemat memori aktif');
     }
 
     try {
@@ -1378,7 +1392,7 @@ let toolsData = {
     ],
     maker: [{ id: 'fakebankjago', icon: 'fa-solid fa-building-columns', name: 'Fake Bank Jago', desc: 'Generator visual saldo Bank Jago', badge: 'SIMULASI' },{ id: 'brat', icon: 'fa-solid fa-wand-magic-sparkles', name: 'BRAT Generator', desc: 'Static + animated GIF', badge: 'GIF' },
         { id: 'iqc', icon: 'fa-solid fa-image', name: 'IQC Generator', desc: 'Buat gambar IQC — Operator, Image & Dark', badge: '3 STYLE' },
-        { id: 'sertifikat', icon: 'fa-solid fa-certificate', name: 'Sertifikat Tolol', desc: 'Buat sertifikat parodi dari nama melalui API gambar', badge: 'API' },
+        { id: 'sertifikat', icon: 'fa-solid fa-certificate', name: 'Sertifikat Custom', desc: 'Buat sertifikat custom dari nama melalui API atau renderer lokal', badge: 'PNG' },
 
         { id: 'ektp', icon: 'fa-solid fa-id-card', name: 'E-KTP Generator', desc: 'Full form demo', badge: 'Full' },
         { id: 'fakedana', icon: 'fa-solid fa-money-bill-wave', name: 'Fake Dana', desc: 'Generate saldo Dana palsu', badge: 'Custom' },
@@ -1453,11 +1467,11 @@ function toolCardMarkup(item, isExternal = false) {
         `onclick="showTool('webencryption')"` :
         (item.id === 'tiktokhd' ?
             `onclick="window.openTikTokHdUpload && window.openTikTokHdUpload()"` :
-            (isExternal || item.link ?
+            (item.link ?
                 `onclick="window.open(decodeURIComponent('${safeLink}'),'_blank','noopener,noreferrer')"` :
                 `onclick="showTool('${safeId}')"`))));
     return `
-        <div class="tools-card" data-tool-id="${safeId}" ${clickAttr}>
+        <div class="tools-card" data-tool-id="${safeId}" role="button" tabindex="0" aria-label="Buka ${escapeToolHtml(item.name)}" ${clickAttr}>
             <div class="icon"><i class="${safeIcon}"></i></div>
             <h4>${escapeToolHtml(item.name)}</h4>
             <p>${escapeToolHtml(item.desc)}</p>
@@ -1625,17 +1639,25 @@ async function applyDatabaseToolConfiguration() {
             for (const item of items) baseById.set(item.id, { ...item, category });
         }
         const nextTools = { downloader: [], maker: [], tools: [], vault: [], external: [] };
+        const publicOverrides = {
+            sertifikat: {
+                name: 'Sertifikat Custom',
+                description: 'Buat sertifikat custom dari nama melalui API atau renderer lokal',
+                badge: 'PNG'
+            }
+        };
         for (const row of rows) {
             const base = baseById.get(String(row.id));
             if (!base && !row.external_url) continue;
             const category = allowedCategories.has(row.category) ? row.category : (base?.category || 'external');
+            const publicOverride = publicOverrides[String(row.id)] || null;
             nextTools[category].push({
                 ...(base || {}),
                 category,
                 id: String(row.id || base?.id || ''),
-                name: row.name || base?.name || row.id,
-                desc: row.description || base?.desc || '',
-                badge: row.badge || '',
+                name: publicOverride?.name || row.name || base?.name || row.id,
+                desc: publicOverride?.description || row.description || base?.desc || '',
+                badge: publicOverride?.badge || row.badge || '',
                 icon: row.icon || base?.icon || 'fa-solid fa-arrow-up-right-from-square',
                 link: row.external_url || base?.link,
                 sortOrder: Number(row.sort_order || 0),
@@ -1668,6 +1690,16 @@ document.querySelectorAll('.nav-tab').forEach(tab => {
         if (targetEl) targetEl.classList.add('active');
         renderActiveTab(target, true);
     });
+});
+
+// Kartu memakai elemen div agar layout lama tetap kompatibel. Jadikan seluruh
+// kartu benar-benar dapat dibuka dengan keyboard, bukan hanya terlihat seperti tombol.
+document.addEventListener('keydown', event => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    const card = event.target && event.target.closest ? event.target.closest('.tools-card[data-tool-id]') : null;
+    if (!card) return;
+    event.preventDefault();
+    card.click();
 });
 
 function showTool(toolId) {

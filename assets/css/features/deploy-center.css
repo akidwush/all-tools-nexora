@@ -3,7 +3,7 @@
 /* ===== original style block 20 ===== */
 #deployOverlay{
   position:fixed;inset:0;z-index:2147483000;display:none;
-  grid-template-rows:auto minmax(0,1fr);opacity:0;background:#050507;
+  grid-template-rows:auto auto minmax(0,1fr);opacity:0;background:#050507;
   transition:opacity .22s ease
 }
 #deployOverlay.on{opacity:1}
@@ -33,6 +33,23 @@
   color:#676776;font-family:'Poppins',sans-serif;font-size:7px;font-weight:750;
   letter-spacing:.09em;text-transform:uppercase
 }
+#deployFallback{
+  display:none;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:14px;
+  padding:12px 14px;border-bottom:1px solid rgba(250,204,21,.20);
+  background:linear-gradient(135deg,rgba(250,204,21,.10),rgba(168,85,247,.08));
+  color:#fef3c7;font-family:'Poppins',sans-serif
+}
+#deployFallback.show{display:grid}
+#deployFallback>div{display:grid;gap:3px;min-width:0}
+#deployFallback b{font-size:11px;font-weight:850}
+#deployFallback span{color:#c4b5d5;font-size:8px;font-weight:650;line-height:1.5}
+#deployFallback nav{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+#deployFallback a,#deployFallback button{
+  min-height:35px;display:inline-flex;align-items:center;justify-content:center;padding:0 11px;
+  border:1px solid rgba(255,255,255,.12);border-radius:10px;background:rgba(255,255,255,.055);
+  color:#f8fafc;font:750 8px 'Poppins',sans-serif;text-decoration:none;cursor:pointer
+}
+#deployFallback a:hover,#deployFallback button:hover{background:rgba(255,255,255,.10)}
 #deployStage{position:relative;min-width:0;min-height:0;overflow:hidden;background:#050506}
 #deployOverlay iframe{width:100%;height:100%;display:block;border:0;background:#050506}
 #deployLoader{
@@ -55,6 +72,9 @@ body.nx-deploy-open{overflow:hidden!important}
   #deployTopBar{gap:9px;padding-left:9px;padding-right:9px}
   #deployTopTitle b{font-size:10px}
   #deployTopTitle span{font-size:6px;letter-spacing:.07em}
+  #deployFallback{grid-template-columns:1fr;padding:10px}
+  #deployFallback nav{justify-content:flex-start}
+  #deployFallback a,#deployFallback button{flex:1 1 auto}
 }
 
 /* ===== original style block 27 ===== */
