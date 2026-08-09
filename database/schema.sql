@@ -190,6 +190,7 @@ values
   ('webintel', 'Nexora Web Intelligence', 'Audit SEO, security, performa, aksesibilitas dan teknologi website', 'tools', 'INTEL', 'fa-solid fa-satellite-dish', null, true, 67, '{"engine":"nexora","deepProvider":"google-pagespeed"}'::jsonb),
   ('spaceexplorer', 'Space Explorer', 'APOD, galeri Mars, asteroid dekat Bumi dan cuaca antariksa NASA', 'tools', 'NASA', 'fa-solid fa-user-astronaut', null, true, 68, '{"provider":"nasa","marsSource":"nasa-image-library"}'::jsonb),
   ('ocrintel', 'Nexora OCR Intelligence', 'Ekstrak teks dari gambar dan PDF, analisis dokumen, lalu buat searchable PDF', 'tools', 'OCR', 'fa-solid fa-file-lines', null, true, 69, '{"provider":"ocr-space","maxFreeBytes":1048576,"maxFreePdfPages":3}'::jsonb),
+  ('imagevectorizer', 'Nexora Image Vectorizer', 'Ubah PNG atau JPG menjadi SVG secara privat langsung di perangkat', 'tools', 'SVG', 'fa-solid fa-bezier-curve', null, true, 69, '{"provider":"local","engine":"vtracer","localOnly":true,"wasmVersion":"1.0.0-alpha.3"}'::jsonb),
   ('calc', 'Calculator', 'Hitung cepat', 'tools', 'Math', 'fa-solid fa-calculator', null, true, 70, '{}'::jsonb),
   ('pwgen', 'Password Gen', 'Password aman', 'tools', 'Secure', 'fa-solid fa-key', null, true, 80, '{}'::jsonb),
   ('morse', 'Morse Code', 'Konversi morse', 'tools', 'Audio', 'fa-solid fa-tower-broadcast', null, true, 90, '{}'::jsonb),

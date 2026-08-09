@@ -65,6 +65,14 @@
         "assets/js/features/ocr-intelligence.js"
       ]
     },
+    "image-vectorizer": {
+      "css": [
+        "assets/css/features/image-vectorizer.css"
+      ],
+      "js": [
+        "assets/js/features/image-vectorizer.js"
+      ]
+    },
     "comic-reader": {
       "css": [
         "assets/css/features/comic-reader.css"
@@ -152,6 +160,7 @@
     "webintel": "web-intelligence",
     "spaceexplorer": "space-explorer",
     "ocrintel": "ocr-intelligence",
+    "imagevectorizer": "image-vectorizer",
     "comicreader": "comic-reader",
     "sertifikat": "source-features",
     "fakedev": "source-features",

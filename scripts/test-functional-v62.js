@@ -17,18 +17,18 @@ vm.runInNewContext(read("assets/js/core/tool-registry.js"), sandbox, { filename:
 const registry = sandbox.window.NexoraToolRegistry;
 assert.ok(registry, "Tool registry tidak terpasang");
 assert.equal(registry.version, "6.3.13");
-assert.equal(registry.count, 41);
-assert.equal(registry.list().length, 41);
-assert.equal(new Set(registry.list().map((item) => item.id)).size, 41);
+assert.equal(registry.count, 42);
+assert.equal(registry.list().length, 42);
+assert.equal(new Set(registry.list().map((item) => item.id)).size, 42);
 assert.ok(events.includes("nexora:tool-registry-ready"));
 
 const healthCatalog = require(path.join(root, "lib/tool-health.js")).TOOL_CATALOG;
-assert.equal(healthCatalog.length, 41);
+assert.equal(healthCatalog.length, 42);
 assert.deepEqual(new Set(healthCatalog.map((item) => item.id)), new Set(registry.list().map((item) => item.id)));
 
 const seed = read("database/schema.sql");
 const seedIds = [...seed.matchAll(/\('([a-z0-9_-]+)',\s*'[^']+'/g)].map((match) => match[1]).filter((id) => registry.get(id));
-assert.equal(new Set(seedIds).size, 41, "Seed database harus memuat seluruh 41 tools");
+assert.equal(new Set(seedIds).size, 42, "Seed database harus memuat seluruh 42 tools");
 
 const moduleManifest = JSON.parse(read("assets/module-manifest.json"));
 for (const tool of registry.list()) {
@@ -84,4 +84,4 @@ const serverless = [];
 })(path.join(root, "api"));
 assert.ok(serverless.length <= 12, `Serverless functions ${serverless.length}/12`);
 
-console.log("Nexora v6.2 tests lulus: 41-tool registry, functional audit, stable lazy dispatch, health catalog lengkap, mobile nav 5 menu, dan Vercel Hobby valid.");
+console.log("Nexora v6.2 tests lulus: 42-tool registry, functional audit, stable lazy dispatch, health catalog lengkap, mobile nav 5 menu, dan Vercel Hobby valid.");

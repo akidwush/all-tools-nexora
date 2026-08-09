@@ -10,7 +10,8 @@ const types = {
   ".js": "text/javascript; charset=utf-8", ".mjs": "text/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8", ".png": "image/png", ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg", ".webp": "image/webp", ".gif": "image/gif", ".svg": "image/svg+xml",
-  ".ico": "image/x-icon", ".woff": "font/woff", ".woff2": "font/woff2", ".xml": "application/xml"
+  ".ico": "image/x-icon", ".woff": "font/woff", ".woff2": "font/woff2", ".xml": "application/xml",
+  ".wasm": "application/wasm"
 };
 const assetExtension = /\.(?:css|m?js|cjs|map|json|xml|txt|csv|png|jpe?g|gif|webp|avif|svg|ico|woff3?|eot|ttf|otf|mp3|wav|ogg|m4a|flac|mp4|webm|mov|m4v|3gp|wasm|webmanifest|pdf)$/i;
 

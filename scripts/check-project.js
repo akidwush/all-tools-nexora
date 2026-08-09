@@ -1,6 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
+const crypto = require("node:crypto");
 
 const root = path.resolve(__dirname, "..");
 let failed = false;
@@ -190,7 +191,7 @@ for(const file of ["index.html","assets/js/features/get-code.js","assets/css/fea
 }
 
 const healthCatalog=require(path.join(root,"lib/tool-health.js")).TOOL_CATALOG;
-if(!Array.isArray(healthCatalog)||healthCatalog.length!==41) fail(`Tool health catalog harus memuat 41 tools, ditemukan ${healthCatalog?.length||0}.`);
+if(!Array.isArray(healthCatalog)||healthCatalog.length!==42) fail(`Tool health catalog harus memuat 42 tools, ditemukan ${healthCatalog?.length||0}.`);
 
 const spaceExplorerLib=fs.readFileSync(path.join(root,"lib/space-explorer.js"),"utf8");
 const spaceExplorerUi=fs.readFileSync(path.join(root,"assets/js/features/space-explorer.js"),"utf8");
@@ -240,6 +241,29 @@ if(!(routeManifest.apiRoutes||[]).includes("/api/ocr-intelligence")) fail("Route
 if(!(vercelConfigV611.rewrites||[]).some((item)=>item.source==="/api/ocr-intelligence"&&String(item.destination||"").includes("mode=ocr-intelligence"))) fail("Rewrite OCR Intelligence belum tersedia.");
 if(!fs.existsSync(path.join(root,"database/migrations/011_nexora_ocr_intelligence.sql"))) fail("Migration OCR Intelligence HF8 belum tersedia.");
 if(!fs.existsSync(path.join(root,"scripts/test-ocr-intelligence-hf8.js"))) fail("Regression test OCR Intelligence HF8 belum tersedia.");
+
+const vectorUiHf9=fs.readFileSync(path.join(root,"assets/js/features/image-vectorizer.js"),"utf8");
+const vectorWorkerHf9=fs.readFileSync(path.join(root,"assets/js/workers/vtracer-worker.js"),"utf8");
+const vectorCssHf9=fs.readFileSync(path.join(root,"assets/css/features/image-vectorizer.css"),"utf8");
+const vectorManifestHf9=JSON.parse(fs.readFileSync(path.join(root,"assets/module-manifest.json"),"utf8"));
+for(const token of ["renderImageVectorizer","new Worker","sanitizeSvg","Download SVG","Copy SVG code","deviceProfile","12*1024*1024"]){
+  if(!vectorUiHf9.includes(token)) fail(`Image Vectorizer HF9 UI belum lengkap: ${token}`);
+}
+for(const token of ["importScripts","vectorize_rgba","vectorize_bytes","OffscreenCanvas","createImageBitmap","1.0.0-alpha.3","VTRACER_MODULE_NOT_ALLOWED"]){
+  if(!vectorWorkerHf9.includes(token)) fail(`Image Vectorizer HF9 worker belum lengkap: ${token}`);
+}
+for(const token of ["overflow-x:clip","100dvh","safe-area-inset-bottom","@media(max-width:720px)","@media(max-width:430px)","min-height:44px"]){
+  if(!vectorCssHf9.includes(token)) fail(`Image Vectorizer HF9 belum mobile-safe: ${token}`);
+}
+if(vectorUiHf9.includes("fetch(")) fail("Image Vectorizer tidak boleh mengunggah gambar ke server.");
+if(/https?:\/\//.test(vectorWorkerHf9)) fail("Worker VTracer hanya boleh memuat engine lokal.");
+if(vectorManifestHf9.tools.imagevectorizer!=="image-vectorizer") fail("Manifest Image Vectorizer HF9 belum terhubung.");
+const vectorGlueHash=crypto.createHash("sha256").update(fs.readFileSync(path.join(root,"assets/vendor/vtracer/vtracer_wasm.js"))).digest("hex");
+const vectorWasmHash=crypto.createHash("sha256").update(fs.readFileSync(path.join(root,"assets/vendor/vtracer/vtracer_wasm_bg.wasm"))).digest("hex");
+if(vectorGlueHash!=="e1855e9bb29d785344f672abdc692ca90ffa7ed863b9186b51c4e95a2a7dc17d") fail("VTracer JS glue checksum berubah.");
+if(vectorWasmHash!=="8037898af5acac5a98856b40675f54aa98c0e5d94cc47d4752740cf452fc1420") fail("VTracer WASM checksum berubah.");
+if(!fs.existsSync(path.join(root,"database/migrations/012_nexora_image_vectorizer.sql"))) fail("Migration Image Vectorizer HF9 belum tersedia.");
+if(!fs.existsSync(path.join(root,"scripts/test-image-vectorizer-hf9.js"))) fail("Regression test Image Vectorizer HF9 belum tersedia.");
 
 
 const v62Required = [
