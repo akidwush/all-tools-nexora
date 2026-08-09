@@ -57,6 +57,14 @@
         "assets/js/features/space-explorer.js"
       ]
     },
+    "ocr-intelligence": {
+      "css": [
+        "assets/css/features/ocr-intelligence.css"
+      ],
+      "js": [
+        "assets/js/features/ocr-intelligence.js"
+      ]
+    },
     "comic-reader": {
       "css": [
         "assets/css/features/comic-reader.css"
@@ -143,6 +151,7 @@
     "cryptomarket": "crypto-market",
     "webintel": "web-intelligence",
     "spaceexplorer": "space-explorer",
+    "ocrintel": "ocr-intelligence",
     "comicreader": "comic-reader",
     "sertifikat": "source-features",
     "fakedev": "source-features",

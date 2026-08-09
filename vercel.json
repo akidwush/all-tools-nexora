@@ -74,6 +74,10 @@
       "destination": "/api/tool-health?mode=space-explorer"
     },
     {
+      "source": "/api/ocr-intelligence",
+      "destination": "/api/tool-health?mode=ocr-intelligence"
+    },
+    {
       "source": "/api/vdeploy",
       "destination": "/api/health?mode=vdeploy"
     }

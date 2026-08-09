@@ -10,7 +10,7 @@ const tiktok = read('assets/js/features/tiktok.js');
 
 assert.equal(pkg.version, '6.3.13');
 assert.match(loader, /getcode:'openGetCodeRoom',tiktok:'openTiktokRoom'/);
-assert.match(loader, /ASSET_VERSION\s*=\s*['"]6\.3\.13-hf7['"]/);
+assert.match(loader, /ASSET_VERSION\s*=\s*['"]6\.3\.13-hf8['"]/);
 assert.match(tiktok, /var lightVideoUrl=stdUrl\|\|wmUrl\|\|hdUrl;/);
 assert.match(tiktok, /previewUrl:lightVideoUrl,title:'TikTok MP4 HD'/);
 assert.match(tiktok, /choices\.some\(function\(choice\)\{ return choice\.id==='std'; \}\) \? 'std'/);

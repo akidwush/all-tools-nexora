@@ -1,4 +1,4 @@
-/* Nexora v6.3.13 HF7 stable lazy module loader */
+/* Nexora v6.3.13 HF8 stable lazy module loader */
 (function(){
   'use strict';
 
@@ -10,6 +10,7 @@
     'crypto-market': {css:['assets/css/features/crypto-market.css'],js:['assets/js/features/crypto-market.js']},
     'web-intelligence': {css:['assets/css/features/web-intelligence.css'],js:['assets/js/features/web-intelligence.js']},
     'space-explorer': {css:['assets/css/features/space-explorer.css'],js:['assets/js/features/space-explorer.js']},
+    'ocr-intelligence': {css:['assets/css/features/ocr-intelligence.css'],js:['assets/js/features/ocr-intelligence.js']},
     'comic-reader': {css:['assets/css/features/comic-reader.css'],js:['assets/js/features/comic-reader.js']},
     'source-features': {css:['assets/css/features/source-tools.css'],js:['assets/js/features/source-features.js']},
     'imported-tools': {css:['assets/css/features/imported-tools.css'],js:['assets/js/features/imported-tools.js']},
@@ -23,7 +24,7 @@
   };
 
   var toolModules = {
-    getcode:'get-code',tiktok:'tiktok',ttquote:'tiktok-quote',virusscan:'virus-scan',cryptomarket:'crypto-market',webintel:'web-intelligence',spaceexplorer:'space-explorer',comicreader:'comic-reader',
+    getcode:'get-code',tiktok:'tiktok',ttquote:'tiktok-quote',virusscan:'virus-scan',cryptomarket:'crypto-market',webintel:'web-intelligence',spaceexplorer:'space-explorer',ocrintel:'ocr-intelligence',comicreader:'comic-reader',
     sertifikat:'source-features',fakedev:'source-features',
     promptgenerate:'imported-tools',fakeovo:'imported-tools',quotegenerator:'imported-tools',carifakta:'imported-tools',mltools:'imported-tools',
     iqc:'generator-pack',winquotes:'generator-pack',nokiamsg:'generator-pack',
@@ -32,7 +33,7 @@
   };
 
   var labels = {
-    'get code html':'getcode','tiktok':'tiktok','quote tiktok nexus':'ttquote','virus scan':'virusscan','crypto market scanner':'cryptomarket','nexora web intelligence':'webintel','space explorer':'spaceexplorer','baca komik full':'comicreader',
+    'get code html':'getcode','tiktok':'tiktok','quote tiktok nexus':'ttquote','virus scan':'virusscan','crypto market scanner':'cryptomarket','nexora web intelligence':'webintel','space explorer':'spaceexplorer','nexora ocr intelligence':'ocrintel','ocr intelligence':'ocrintel','baca komik full':'comicreader',
     'sertifikat custom':'sertifikat','fakedev':'fakedev','prompt generator':'promptgenerate','fake ovo':'fakeovo',
     'quote generator':'quotegenerator','carifakta':'carifakta','ml tools':'mltools','iqc generator':'iqc',
     'windows quotes':'winquotes','nokia message':'nokiamsg','terabox downloader':'terabox','fake bank jago':'fakebankjago',
@@ -44,7 +45,7 @@
   var assetPromises = new Map();
   /* Vercel serves /assets with a one-hour browser cache.  A module can
      therefore otherwise keep the previous CSS/JS after a successful deploy. */
-  var ASSET_VERSION = '6.3.13-hf7';
+  var ASSET_VERSION = '6.3.13-hf8';
   var baseShowTool = typeof window.showTool === 'function' ? window.showTool : null;
   var activeCard = null;
 

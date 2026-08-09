@@ -29,6 +29,7 @@
     ["cryptomarket","Crypto Market Scanner","api","crypto-market","renderCryptoMarket","https://api.coingecko.com/"],
     ["webintel","Nexora Web Intelligence","hybrid","web-intelligence","renderWebIntelligence","https://pagespeedonline.googleapis.com/"],
     ["spaceexplorer","Space Explorer","api","space-explorer","renderSpaceExplorer","https://api.nasa.gov/"],
+    ["ocrintel","Nexora OCR Intelligence","api","ocr-intelligence","renderOcrIntelligence","https://api.ocr.space/"],
     ["calc","Calculator","local",null,"renderCalc",null],
     ["pwgen","Password Gen","local",null,"renderPwgen",null],
     ["morse","Morse Code","local",null,"renderMorse",null],

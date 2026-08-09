@@ -3,6 +3,7 @@ const { handleMediaDownload } = require("../lib/media-download");
 const { handleSiteGrabber } = require("../lib/sitegrabber-proxy");
 const { handleCryptoMarket } = require("../lib/crypto-market");
 const { handleSpaceExplorer } = require("../lib/space-explorer");
+const { handleOcrIntelligence } = require("../lib/ocr-intelligence");
 const {
   TOOL_CATALOG,
   getHealthConfig,
@@ -75,6 +76,9 @@ module.exports = async function handler(request, response) {
   }
   if (url.searchParams.get("mode") === "space-explorer") {
     return handleSpaceExplorer(request, response, url);
+  }
+  if (url.searchParams.get("mode") === "ocr-intelligence") {
+    return handleOcrIntelligence(request, response, url);
   }
 
   if (request.method !== "GET" && request.method !== "POST") {

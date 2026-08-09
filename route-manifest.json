@@ -20,6 +20,7 @@
     "/api/crypto-market",
     "/api/web-intelligence",
     "/api/space-explorer",
+    "/api/ocr-intelligence",
     "/api/vdeploy",
     "/api/admin/auth",
     "/api/admin/dashboard",

@@ -190,7 +190,7 @@ for(const file of ["index.html","assets/js/features/get-code.js","assets/css/fea
 }
 
 const healthCatalog=require(path.join(root,"lib/tool-health.js")).TOOL_CATALOG;
-if(!Array.isArray(healthCatalog)||healthCatalog.length!==40) fail(`Tool health catalog harus memuat 40 tools, ditemukan ${healthCatalog?.length||0}.`);
+if(!Array.isArray(healthCatalog)||healthCatalog.length!==41) fail(`Tool health catalog harus memuat 41 tools, ditemukan ${healthCatalog?.length||0}.`);
 
 const spaceExplorerLib=fs.readFileSync(path.join(root,"lib/space-explorer.js"),"utf8");
 const spaceExplorerUi=fs.readFileSync(path.join(root,"assets/js/features/space-explorer.js"),"utf8");
@@ -222,6 +222,24 @@ for(const token of ["document.body.appendChild(modal);","modal.remove();"]){
   if(!spaceExplorerUi.includes(token)) fail(`Space modal portal HF7 belum lengkap: ${token}`);
 }
 if(!fs.existsSync(path.join(root,"scripts/test-mobile-layout-hf7.js"))) fail("Test Mobile Layout HF7 belum tersedia.");
+
+const ocrLibHf8=fs.readFileSync(path.join(root,"lib/ocr-intelligence.js"),"utf8");
+const ocrUiHf8=fs.readFileSync(path.join(root,"assets/js/features/ocr-intelligence.js"),"utf8");
+const ocrCssHf8=fs.readFileSync(path.join(root,"assets/css/features/ocr-intelligence.css"),"utf8");
+for(const token of ["OCR_SPACE_API_KEY","MAX_FILE_BYTES","base64Image","isCreateSearchablePdf","OCR_ENGINE_3_PDF_UNSUPPORTED","detectLanguage","documentStats","OCR_RATE_LIMITED"]){
+  if(!ocrLibHf8.includes(token)) fail(`OCR Intelligence HF8 backend belum lengkap: ${token}`);
+}
+for(const token of ["renderOcrIntelligence","/api/ocr-intelligence","Searchable PDF","localStorage","noiSearch","fileToDataUrl"]){
+  if(!ocrUiHf8.includes(token)) fail(`OCR Intelligence HF8 UI belum lengkap: ${token}`);
+}
+for(const token of ["overflow-x:clip","grid-template-columns:minmax(0,1fr)","@media(max-width:430px)","100dvh"]){
+  if(!ocrCssHf8.includes(token)) fail(`OCR Intelligence HF8 belum mobile-safe: ${token}`);
+}
+if(ocrUiHf8.includes("OCR_SPACE_API_KEY")) fail("OCR Intelligence UI tidak boleh mengetahui atau membawa API key.");
+if(!(routeManifest.apiRoutes||[]).includes("/api/ocr-intelligence")) fail("Route manifest belum mencantumkan OCR Intelligence.");
+if(!(vercelConfigV611.rewrites||[]).some((item)=>item.source==="/api/ocr-intelligence"&&String(item.destination||"").includes("mode=ocr-intelligence"))) fail("Rewrite OCR Intelligence belum tersedia.");
+if(!fs.existsSync(path.join(root,"database/migrations/011_nexora_ocr_intelligence.sql"))) fail("Migration OCR Intelligence HF8 belum tersedia.");
+if(!fs.existsSync(path.join(root,"scripts/test-ocr-intelligence-hf8.js"))) fail("Regression test OCR Intelligence HF8 belum tersedia.");
 
 
 const v62Required = [
