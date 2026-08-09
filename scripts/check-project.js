@@ -190,7 +190,7 @@ for(const file of ["index.html","assets/js/features/get-code.js","assets/css/fea
 }
 
 const healthCatalog=require(path.join(root,"lib/tool-health.js")).TOOL_CATALOG;
-if(!Array.isArray(healthCatalog)||healthCatalog.length!==37) fail(`Tool health catalog harus memuat 37 tools, ditemukan ${healthCatalog?.length||0}.`);
+if(!Array.isArray(healthCatalog)||healthCatalog.length!==38) fail(`Tool health catalog harus memuat 38 tools, ditemukan ${healthCatalog?.length||0}.`);
 
 
 const v62Required = [

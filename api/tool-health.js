@@ -1,6 +1,7 @@
 const crypto = require("node:crypto");
 const { handleMediaDownload } = require("../lib/media-download");
 const { handleSiteGrabber } = require("../lib/sitegrabber-proxy");
+const { handleCryptoMarket } = require("../lib/crypto-market");
 const {
   TOOL_CATALOG,
   getHealthConfig,
@@ -67,6 +68,9 @@ module.exports = async function handler(request, response) {
   }
   if (url.searchParams.get("mode") === "sitegrabber") {
     return handleSiteGrabber(request, response, url);
+  }
+  if (url.searchParams.get("mode") === "crypto-market") {
+    return handleCryptoMarket(request, response, url);
   }
 
   if (request.method !== "GET" && request.method !== "POST") {

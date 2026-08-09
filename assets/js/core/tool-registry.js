@@ -26,6 +26,7 @@
     ["quotegenerator","Quote Generator","module","imported-tools","renderQuoteGenerator",null],
     ["carifakta","CariFakta","module","imported-tools","renderCariFakta",null],
     ["virusscan","Virus Scan","module","virus-scan","renderVirusScan",null],
+    ["cryptomarket","Crypto Market Scanner","api","crypto-market","renderCryptoMarket","https://api.coingecko.com/"],
     ["calc","Calculator","local",null,"renderCalc",null],
     ["pwgen","Password Gen","local",null,"renderPwgen",null],
     ["morse","Morse Code","local",null,"renderMorse",null],

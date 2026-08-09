@@ -547,6 +547,7 @@
     carifakta:{renderer:'renderCariFakta', category:'tools', icon:'fa-solid fa-magnifying-glass-chart', title:'CariFakta', desc:'Periksa klaim, konteks, dan tingkat keyakinan menggunakan AI.', accent:'#4ade80', accent2:'#7c3aed', rgb:'74,222,128', badge:'Nexus Fact Intelligence'},
     mltools:{renderer:'renderMlTools', category:'tools', icon:'fa-solid fa-gamepad', title:'ML Tools Nexus', desc:'Script Skin MLBB, kalkulator Winrate, dan Stalk akun dengan mesin serta hasil asli ML Tools.', accent:'#67e8f9', accent2:'#7c3aed', rgb:'103,232,249', badge:'Nexus ML Gaming Lab'},
 virusscan:  {renderer:'renderVirusScan', category:'tools', icon:'fa-solid fa-shield-virus', title:'Virus Scan Nexora', desc:'Analisis lokal untuk URL, file, hash, domain, dan IP dalam ruang keamanan All Tools Nexora.', accent:'#c084fc', accent2:'#7c3aed', rgb:'192,132,252', badge:'Nexora Security Core'},
+    cryptomarket:{renderer:'renderCryptoMarket', category:'tools', icon:'fa-solid fa-chart-line', title:'Crypto Market Scanner', desc:'Pantau harga, volume, market cap, dominasi, dan pergerakan aset crypto melalui provider server-side.', accent:'#22d3ee', accent2:'#34d399', rgb:'34,211,238', badge:'Live Market Intelligence'},
 instagram:  {renderer:'renderInstagram',   category:'downloader', icon:'fa-brands fa-instagram', title:'Instagram Downloader', desc:'Ambil video, Reels, foto, carousel, metadata, dan caption dalam ruang download khusus.', accent:'#e879f9', accent2:'#c026d3', rgb:'232,121,249', badge:'Media Studio'},
     youtube:    {renderer:'renderYoutube',     category:'downloader', icon:'fa-brands fa-youtube', title:'YouTube Downloader', desc:'Pilih video MP4 atau audio MP3 dengan tampilan hasil dan opsi kualitas yang lebih luas.', accent:'#fb7185', accent2:'#dc2626', rgb:'251,113,133', badge:'Video & Audio'},
     spotify:    {renderer:'renderSpotify',     category:'downloader', icon:'fa-brands fa-spotify', title:'Spotify Downloader', desc:'Preview audio dan unduh MP3 menggunakan respons endpoint Spotify.', accent:'#4ade80', accent2:'#16a34a', rgb:'74,222,128', badge:'Nexus Spotify API'},
@@ -631,6 +632,12 @@ instagram:  {renderer:'renderInstagram',   category:'downloader', icon:'fa-brand
     document.getElementById('nxUniversalRoomBadge').textContent = meta.badge || 'Nexus Tool Room';
   }
 
+  function cleanupRoomBody(){
+    if(!roomBody || typeof roomBody.__nxCleanup!=='function') return;
+    try{ roomBody.__nxCleanup(); }catch(error){ try{ console.warn('[Nexus Room cleanup]',error); }catch(_error){} }
+    try{ delete roomBody.__nxCleanup; }catch(_error){ roomBody.__nxCleanup=null; }
+  }
+
   function openRoom(toolId){
     var meta = roomTools[toolId];
     if(!meta) return false;
@@ -646,6 +653,7 @@ instagram:  {renderer:'renderInstagram',   category:'downloader', icon:'fa-brand
     restoreScrollY = window.scrollY || window.pageYOffset || 0;
     closeLegacyViewer();
     applyMeta(meta);
+    cleanupRoomBody();
     roomBody.innerHTML = '';
 
     try{
@@ -678,6 +686,7 @@ instagram:  {renderer:'renderInstagram',   category:'downloader', icon:'fa-brand
     room.classList.remove('is-open');
     room.style.display = 'none';
     room.setAttribute('aria-hidden','true');
+    cleanupRoomBody();
     roomBody.innerHTML = '';
     currentToolId = '';
     document.body.classList.remove('nx-universal-room-open');

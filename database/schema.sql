@@ -186,6 +186,7 @@ values
   ('quotegenerator', 'Quote Generator', 'Buat gambar quote monokrom', 'tools', 'JPG', 'fa-solid fa-quote-left', null, true, 40, '{}'::jsonb),
   ('carifakta', 'CariFakta', 'Analisis klaim dan berita menggunakan AI', 'tools', 'AI', 'fa-solid fa-magnifying-glass-chart', null, true, 50, '{}'::jsonb),
   ('virusscan', 'Virus Scan', 'Scan URL, file, hash, domain & IP', 'tools', 'SECURITY', 'fa-solid fa-shield-virus', null, true, 60, '{}'::jsonb),
+  ('cryptomarket', 'Crypto Market Scanner', 'Pantau harga, volume, market cap dan pergerakan crypto', 'tools', 'LIVE', 'fa-solid fa-chart-line', null, true, 65, '{"provider":"coingecko","fallback":"coinpaprika"}'::jsonb),
   ('calc', 'Calculator', 'Hitung cepat', 'tools', 'Math', 'fa-solid fa-calculator', null, true, 70, '{}'::jsonb),
   ('pwgen', 'Password Gen', 'Password aman', 'tools', 'Secure', 'fa-solid fa-key', null, true, 80, '{}'::jsonb),
   ('morse', 'Morse Code', 'Konversi morse', 'tools', 'Audio', 'fa-solid fa-tower-broadcast', null, true, 90, '{}'::jsonb),

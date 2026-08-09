@@ -85,7 +85,7 @@ async function main() {
   await handler({ method: "GET", url: "/api/tool-health?refresh=0", headers: { host: `127.0.0.1:${port}` }, socket: {} }, apiResponse);
   assert.equal(captured.status, 200);
   assert.equal(captured.payload.source, "catalog");
-  assert.equal(captured.payload.data.length, 37);
+  assert.equal(captured.payload.data.length, 38);
 
   const protectedResponse = {
     setHeader() {}, status(code) { captured.protectedStatus = code; return this; },

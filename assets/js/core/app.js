@@ -1408,6 +1408,7 @@ let toolsData = {
         { id: 'quotegenerator', icon: 'fa-solid fa-quote-left', name: 'Quote Generator', desc: 'Buat gambar quote monokrom', badge: 'JPG' },
         { id: 'carifakta', icon: 'fa-solid fa-magnifying-glass-chart', name: 'CariFakta', desc: 'Analisis klaim dan berita menggunakan AI', badge: 'AI' },
 { id: 'virusscan', icon: 'fa-solid fa-shield-virus', name: 'Virus Scan', desc: 'Scan URL, file, hash, domain & IP', badge: 'SECURITY' },
+        { id: 'cryptomarket', icon: 'fa-solid fa-chart-line', name: 'Crypto Market Scanner', desc: 'Pantau harga, volume, market cap dan pergerakan crypto', badge: 'LIVE' },
         { id: 'calc', icon: 'fa-solid fa-calculator', name: 'Calculator', desc: 'Hitung cepat', badge: 'Math' },
         { id: 'pwgen', icon: 'fa-solid fa-key', name: 'Password Gen', desc: 'Password aman', badge: 'Secure' },
         { id: 'morse', icon: 'fa-solid fa-tower-broadcast', name: 'Morse Code', desc: 'Konversi morse', badge: 'Audio' },
@@ -1735,6 +1736,7 @@ function showTool(toolId) {
         case 'tanyaustadz': renderTanyaUstadz(body); break;
         case 'getcode': window.openGetcode && window.openGetcode(); closeTool(); return;
         case 'virusscan': renderVirusScan(body); break;
+        case 'cryptomarket': renderCryptoMarket(body); break;
         case 'promptgenerate': renderPromptGenerator(body); break;
         case 'fakeovo': renderFakeOvo(body); break;
         case 'quotegenerator': renderQuoteGenerator(body); break;

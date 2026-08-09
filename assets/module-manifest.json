@@ -33,6 +33,14 @@
         "assets/js/features/virus-scan.js"
       ]
     },
+    "crypto-market": {
+      "css": [
+        "assets/css/features/crypto-market.css"
+      ],
+      "js": [
+        "assets/js/features/crypto-market.js"
+      ]
+    },
     "comic-reader": {
       "css": [
         "assets/css/features/comic-reader.css"
@@ -116,6 +124,7 @@
     "tiktok": "tiktok",
     "ttquote": "tiktok-quote",
     "virusscan": "virus-scan",
+    "cryptomarket": "crypto-market",
     "comicreader": "comic-reader",
     "sertifikat": "source-features",
     "fakedev": "source-features",

@@ -208,6 +208,6 @@
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",initializeStatus,{once:true});
   else initializeStatus();
 
-  window.NexoraStability={version:"6.3.13-hf3",audit:audit,loadHealth:loadHealth,applyCardStatus:applyCardStatus,notify:notify,fetchJson:fetchJson,getLastAudit:function(){return lastAudit;},getHealth:function(id){return healthMap[id]||null;}};
+  window.NexoraStability={version:"6.3.13-hf4",audit:audit,loadHealth:loadHealth,applyCardStatus:applyCardStatus,notify:notify,fetchJson:fetchJson,getLastAudit:function(){return lastAudit;},getHealth:function(id){return healthMap[id]||null;}};
   window.dispatchEvent(new CustomEvent("nexora:stability-ready"));
 })();

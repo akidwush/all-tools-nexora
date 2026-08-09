@@ -17,6 +17,7 @@
     "/api/tool-health",
     "/api/media-download",
     "/api/sitegrabber",
+    "/api/crypto-market",
     "/api/vdeploy",
     "/api/admin/auth",
     "/api/admin/dashboard",
