@@ -18,6 +18,7 @@
     "/api/media-download",
     "/api/sitegrabber",
     "/api/crypto-market",
+    "/api/web-intelligence",
     "/api/vdeploy",
     "/api/admin/auth",
     "/api/admin/dashboard",

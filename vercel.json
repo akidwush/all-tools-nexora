@@ -66,6 +66,10 @@
       "destination": "/api/tool-health?mode=crypto-market"
     },
     {
+      "source": "/api/web-intelligence",
+      "destination": "/api/audit?mode=web-intelligence"
+    },
+    {
       "source": "/api/vdeploy",
       "destination": "/api/health?mode=vdeploy"
     }

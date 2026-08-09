@@ -6,7 +6,7 @@ const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 
 const index = read('index.html');
 assert.doesNotMatch(index, /id="nxToolHealth"/);
-assert.match(index, /assets\/js\/core\/lazy-loader\.js\?v=6\.3\.13-hf4/);
+assert.match(index, /assets\/js\/core\/lazy-loader\.js\?v=6\.3\.13-hf5/);
 
 const app = read('assets/js/core/app.js');
 assert.match(app, /async function nxLoadBgRemovalModule/);

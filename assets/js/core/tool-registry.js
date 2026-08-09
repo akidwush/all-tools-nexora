@@ -27,6 +27,7 @@
     ["carifakta","CariFakta","module","imported-tools","renderCariFakta",null],
     ["virusscan","Virus Scan","module","virus-scan","renderVirusScan",null],
     ["cryptomarket","Crypto Market Scanner","api","crypto-market","renderCryptoMarket","https://api.coingecko.com/"],
+    ["webintel","Nexora Web Intelligence","hybrid","web-intelligence","renderWebIntelligence","https://pagespeedonline.googleapis.com/"],
     ["calc","Calculator","local",null,"renderCalc",null],
     ["pwgen","Password Gen","local",null,"renderPwgen",null],
     ["morse","Morse Code","local",null,"renderMorse",null],

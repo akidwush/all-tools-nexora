@@ -41,6 +41,14 @@
         "assets/js/features/crypto-market.js"
       ]
     },
+    "web-intelligence": {
+      "css": [
+        "assets/css/features/web-intelligence.css"
+      ],
+      "js": [
+        "assets/js/features/web-intelligence.js"
+      ]
+    },
     "comic-reader": {
       "css": [
         "assets/css/features/comic-reader.css"
@@ -125,6 +133,7 @@
     "ttquote": "tiktok-quote",
     "virusscan": "virus-scan",
     "cryptomarket": "crypto-market",
+    "webintel": "web-intelligence",
     "comicreader": "comic-reader",
     "sertifikat": "source-features",
     "fakedev": "source-features",

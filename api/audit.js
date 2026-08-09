@@ -1,4 +1,5 @@
 const { auditBatch } = require("../lib/audit");
+const { handleWebIntelligence } = require("../lib/web-intelligence");
 
 const MAX_BODY_BYTES = 220_000;
 const WINDOW_MS = 60_000;
@@ -51,6 +52,10 @@ async function readBody(request) {
 }
 
 module.exports = async function handler(request, response) {
+  const requestUrl = new URL(request.url || "/api/audit", "http://localhost");
+  if (requestUrl.searchParams.get("mode") === "web-intelligence") {
+    return handleWebIntelligence(request, response, requestUrl);
+  }
   if (request.method === "OPTIONS") {
     response.setHeader("Allow", "POST, OPTIONS");
     response.setHeader("Cache-Control", "no-store, max-age=0");
