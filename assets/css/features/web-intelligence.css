@@ -40,3 +40,26 @@
 @media(max-width:720px){#nxUniversalRoom[data-tool="webintel"] .nx-room-wrap{padding:0 9px 24px}.nwi{padding-top:9px}.nwi-launch{margin-top:3vh}.nwi-launch-copy h2{font-size:30px}.nwi-launch-copy>p{font-size:10px}.nwi-scanning{grid-template-columns:1fr;align-content:center;padding:15px}.nwi-scan-visual{width:min(76vw,330px);margin:auto}.nwi-scan-copy{text-align:center}.nwi-scan-copy .nwi-kicker{justify-content:center}.nwi-scan-copy>button{margin-left:auto;margin-right:auto}.nwi-report-bar{top:0}.nwi-verdict{grid-template-columns:1fr;padding:17px;text-align:center}.nwi-score-ring{margin:auto}.nwi-grade-line,.nwi-verdict-meta{justify-content:center}.nwi-radar-wrap{grid-column:auto}.nwi-score-grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:3px}.nwi-score-card{flex:0 0 128px;scroll-snap-align:start}.nwi-tabs{top:62px;display:flex;overflow-x:auto;justify-content:flex-start}.nwi-tabs button{flex:0 0 auto;padding:0 12px}.nwi-overview-grid,.nwi-detail-grid{grid-template-columns:1fr}.nwi-check-list{grid-template-columns:1fr}.nwi-tech-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.nwi-content-title{align-items:flex-start;flex-direction:column;gap:5px}.nwi-content-title>p{text-align:left}.nwi-lighthouse .nwi-metric-mosaic{grid-template-columns:repeat(2,minmax(0,1fr))}.nwi-opportunities{grid-template-columns:1fr}}
 @media(max-width:480px){.nwi-launch-copy h2{font-size:26px}.nwi-url-field{grid-template-columns:auto minmax(0,1fr);padding:10px 11px}.nwi-url-field button{grid-column:1/-1;justify-content:center;width:100%}.nwi-mode-row{grid-template-columns:1fr}.nwi-capabilities{grid-template-columns:1fr 1fr}.nwi-capabilities article{min-height:112px;padding:12px}.nwi-capabilities strong{font-size:9px}#nwiRecentList{grid-template-columns:1fr}.nwi-report-bar{gap:6px}#nwiNewScan span{display:none}.nwi-target small{max-width:130px}.nwi-score-ring{width:112px;height:112px}.nwi-stat-grid,.nwi-metric-mosaic,.nwi-performance-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.nwi-priority{grid-template-columns:auto minmax(0,1fr)}.nwi-priority-badge{display:none}.nwi-tech-grid{grid-template-columns:1fr}.nwi-deep-callout{align-items:flex-start;flex-wrap:wrap}.nwi-deep-callout button{width:100%}.nwi-fact-list>div{grid-template-columns:100px minmax(0,1fr)}.nwi-lh-score-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(prefers-reduced-motion:reduce){.nwi-orbit span,.nwi-scan-beam{animation:none}.nwi *{scroll-behavior:auto!important;transition:none!important}}
+
+/* HF7 — keep every intelligence state inside the handset viewport */
+#nxUniversalRoom[data-tool="webintel"] .nx-room-scroll{overflow-x:hidden}
+#nxUniversalRoom[data-tool="webintel"] .nx-room-wrap{box-sizing:border-box;min-width:0;max-width:1240px;overflow-x:clip}
+.nwi,.nwi>*,.nwi-launch,.nwi-launch-copy,.nwi-scan-box,.nwi-url-field,.nwi-mode-row,.nwi-capabilities,.nwi-scanning,.nwi-report{width:100%;max-width:100%;min-width:0}
+.nwi{overflow-x:clip}
+.nwi-launch-copy h2,.nwi-launch-copy h2 em,.nwi-launch-copy>p{max-width:100%;overflow-wrap:anywhere}
+.nwi-url-field>*{min-width:0;max-width:100%}
+.nwi-mode>span>*,.nwi-capabilities article>*{min-width:0;max-width:100%}
+@media(max-width:720px){
+  #nxUniversalRoom[data-tool="webintel"] .nx-room-wrap{padding-inline:9px}
+  .nwi-launch{margin-top:18px}
+  .nwi-launch-copy h2{font-size:clamp(25px,8.3vw,32px);line-height:1.08;letter-spacing:-.035em}
+  .nwi-launch-copy>p{padding-inline:4px}
+  .nwi-scan-box{padding:10px;border-radius:19px}
+  .nwi-mode>span{min-width:0}
+  .nwi-safe-note{min-width:0;overflow-wrap:anywhere}
+}
+@media(max-width:390px){
+  .nwi-launch-copy h2{font-size:clamp(23px,7.8vw,28px)}
+  .nwi-capabilities{grid-template-columns:1fr}
+  .nwi-url-field{column-gap:8px}
+}

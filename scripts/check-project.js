@@ -198,6 +198,31 @@ for(const token of ["NASA_API_KEY","DEMO_KEY","planetary/apod","neo/rest/v1/feed
 for(const token of ["renderSpaceExplorer","/api/space-explorer","drawRadar","Mars Rover Photos API yang sudah diarsipkan","@media"]) if(!spaceExplorerUi.includes(token)&&!fs.readFileSync(path.join(root,"assets/css/features/space-explorer.css"),"utf8").includes(token)) fail(`UI Space Explorer HF6 belum lengkap: ${token}`);
 if(spaceExplorerUi.includes("NASA_API_KEY")||spaceExplorerUi.includes("DEMO_KEY")) fail("UI Space Explorer tidak boleh mengetahui atau membawa NASA API key.");
 
+const componentsHf7=fs.readFileSync(path.join(root,"assets/css/components.css"),"utf8");
+const adminCssHf7=fs.readFileSync(path.join(root,"assets/css/admin.css"),"utf8");
+const cryptoCssHf7=fs.readFileSync(path.join(root,"assets/css/features/crypto-market.css"),"utf8");
+const webIntelCssHf7=fs.readFileSync(path.join(root,"assets/css/features/web-intelligence.css"),"utf8");
+const spaceCssHf7=fs.readFileSync(path.join(root,"assets/css/features/space-explorer.css"),"utf8");
+for(const token of ["#nxUniversalRoom *::after{box-sizing:border-box}","overflow-x:hidden","to{opacity:1;transform:none}",".nx-room-tool-body>*",".nx-room-tool-body :where(*)"]){
+  if(!componentsHf7.includes(token)) fail(`Mobile Layout HF7 belum lengkap: ${token}`);
+}
+for(const token of ["grid-template-columns:minmax(0,1fr)",".login-shell{width:100%;max-width:450px;min-width:0}","overflow-x:hidden"]){
+  if(!adminCssHf7.includes(token)) fail(`Admin Login HF7 belum responsif: ${token}`);
+}
+for(const token of ["overflow-x:clip",".nx-crypto-controls>*{min-width:0;max-width:100%}"]){
+  if(!cryptoCssHf7.includes(token)) fail(`Crypto Market HF7 belum responsif: ${token}`);
+}
+for(const token of [".nwi-url-field>*{min-width:0;max-width:100%}","overflow-wrap:anywhere","font-size:clamp(25px,8.3vw,32px)"]){
+  if(!webIntelCssHf7.includes(token)) fail(`Web Intelligence HF7 belum responsif: ${token}`);
+}
+for(const token of ["100dvh","safe-area-inset-top","bottom:auto"]){
+  if(!spaceCssHf7.includes(token)) fail(`Space modal HF7 belum responsif: ${token}`);
+}
+for(const token of ["document.body.appendChild(modal);","modal.remove();"]){
+  if(!spaceExplorerUi.includes(token)) fail(`Space modal portal HF7 belum lengkap: ${token}`);
+}
+if(!fs.existsSync(path.join(root,"scripts/test-mobile-layout-hf7.js"))) fail("Test Mobile Layout HF7 belum tersedia.");
+
 
 const v62Required = [
   "assets/js/core/network.js", "assets/js/core/tool-registry.js", "assets/js/core/stability.js", "assets/js/admin/functional-audit.js",

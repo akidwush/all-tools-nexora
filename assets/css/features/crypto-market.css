@@ -24,3 +24,26 @@
 @media(max-width:760px){#nxUniversalRoom[data-tool="cryptomarket"] .nx-room-wrap{padding-left:10px;padding-right:10px}.nx-crypto{gap:13px}.nx-crypto-toolbar{align-items:stretch;flex-direction:column}.nx-crypto-controls{display:grid;grid-template-columns:1fr 1fr auto}.nx-crypto-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.nx-crypto-spotlight{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:3px}.nx-crypto-mover{flex:0 0 150px;scroll-snap-align:start}.nx-crypto-coins{grid-template-columns:1fr}.nx-crypto-section-head>small{display:none}}
 @media(max-width:420px){.nx-crypto-controls{grid-template-columns:1fr 1fr}.nx-crypto-controls #nxCryptoRefresh{grid-column:1/-1;justify-content:center}.nx-crypto-metric{padding:11px;gap:8px}.nx-crypto-metric-icon{width:31px;height:31px}.nx-crypto-metric strong{font-size:11px}.nx-crypto-market-head{align-items:stretch;flex-direction:column}.nx-crypto-search{width:100%;max-width:none}.nx-crypto-sort{width:100%}.nx-crypto-coin-top{grid-template-columns:auto minmax(0,1fr)}.nx-crypto-price{grid-column:2;text-align:left}.nx-crypto-rank{grid-row:1/3}.nx-crypto-price small{white-space:normal}}
 @media(prefers-reduced-motion:reduce){.nx-crypto-pulse{animation:none}.nx-crypto-mover{transition:none}}
+
+/* HF7 — strict mobile containment without disabling intentional carousels */
+#nxUniversalRoom[data-tool="cryptomarket"] .nx-room-scroll{overflow-x:hidden}
+#nxUniversalRoom[data-tool="cryptomarket"] .nx-room-wrap{box-sizing:border-box;min-width:0;max-width:1180px}
+.nx-crypto,.nx-crypto *,.nx-crypto *::before,.nx-crypto *::after{box-sizing:border-box}
+.nx-crypto{width:100%;max-width:100%;min-width:0;overflow-x:clip}
+.nx-crypto-toolbar,.nx-crypto-controls,.nx-crypto-provider,.nx-crypto-summary,.nx-crypto-market-head,.nx-crypto-coins{width:100%;max-width:100%;min-width:0}
+.nx-crypto-controls>*{min-width:0;max-width:100%}
+.nx-crypto-provider{flex-wrap:wrap;overflow-wrap:anywhere}
+.nx-crypto-provider span{min-width:0;overflow-wrap:anywhere}
+@media(max-width:760px){
+  #nxUniversalRoom[data-tool="cryptomarket"] .nx-room-wrap{padding-left:9px;padding-right:9px}
+  .nx-crypto-toolbar{padding:13px;border-radius:18px}
+  .nx-crypto-controls{grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto}
+  .nx-crypto-controls label,.nx-crypto-controls select{width:100%;min-width:0}
+  .nx-crypto-metric{overflow:hidden}
+}
+@media(max-width:430px){
+  .nx-crypto-controls{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .nx-crypto-controls #nxCryptoRefresh{grid-column:1/-1;width:100%;max-width:none}
+  .nx-crypto-summary{gap:8px}
+  .nx-crypto-provider{align-items:flex-start}
+}

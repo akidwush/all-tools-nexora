@@ -966,6 +966,19 @@ body.nx-about-dev-open{
   transition:opacity .28s ease,visibility .28s ease;
   isolation:isolate;
 }
+#nxUniversalRoom,
+#nxUniversalRoom *,
+#nxUniversalRoom *::before,
+#nxUniversalRoom *::after{box-sizing:border-box}
+#nxUniversalRoom .nx-room-shell,
+#nxUniversalRoom .nx-room-scroll,
+#nxUniversalRoom .nx-room-wrap,
+#nxUniversalRoom .nx-room-hero,
+#nxUniversalRoom .nx-room-panel,
+#nxUniversalRoom .nx-room-tool-body{
+  min-width:0;
+  max-width:100%;
+}
 #nxUniversalRoom.is-open{
   display:block!important;
   visibility:visible;
@@ -1081,7 +1094,8 @@ body.nx-about-dev-open{
 }
 #nxUniversalRoom .nx-room-scroll{
   min-height:0;
-  overflow:auto;
+  overflow-x:hidden;
+  overflow-y:auto;
   overscroll-behavior:contain;
   scroll-behavior:smooth;
   padding:clamp(14px,2vw,28px) clamp(10px,2.5vw,32px) 38px;
@@ -1093,7 +1107,7 @@ body.nx-about-dev-open{
 }
 @keyframes nxRoomEnter{
   from{opacity:0;transform:translateY(18px) scale(.985)}
-  to{opacity:1;transform:translateY(0) scale(1)}
+  to{opacity:1;transform:none}
 }
 #nxUniversalRoom .nx-room-hero{
   position:relative;
@@ -1174,6 +1188,14 @@ body.nx-about-dev-open{
   -webkit-backdrop-filter:blur(18px);
 }
 #nxUniversalRoom .nx-room-tool-body{width:100%;min-width:0}
+#nxUniversalRoom .nx-room-tool-body>*,
+#nxUniversalRoom .nx-room-tool-body>*>*{max-width:100%;min-width:0}
+.nx-room-tool-body :where(*){min-width:0;max-width:100%}
+#nxUniversalRoom .nx-room-tool-body img,
+#nxUniversalRoom .nx-room-tool-body video,
+#nxUniversalRoom .nx-room-tool-body iframe,
+#nxUniversalRoom .nx-room-tool-body svg,
+#nxUniversalRoom .nx-room-tool-body canvas{max-width:100%}
 #nxUniversalRoom .nx-room-tool-body>h2{
   display:none!important;
 }

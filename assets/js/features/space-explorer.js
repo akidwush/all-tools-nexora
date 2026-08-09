@@ -61,6 +61,7 @@
     var modal=root.querySelector('#nseModal');
     var modalMedia=root.querySelector('#nseModalMedia');
     var modalCopy=root.querySelector('#nseModalCopy');
+    document.body.appendChild(modal);
     var state={active:'apod',controller:null,clientCache:new Map(),radar:[],weather:[],weatherFilter:'all',destroyed:false};
     var favoriteKey='nexora-space-favorites-v1';
     var favorites=new Set();
@@ -179,7 +180,7 @@
     function keydown(event){if(event.key==='Escape'&&!modal.hidden)closeModal();}
     function clock(){if(state.destroyed)return;var now=new Date();utc.textContent='UTC '+String(now.getUTCHours()).padStart(2,'0')+':'+String(now.getUTCMinutes()).padStart(2,'0')+':'+String(now.getUTCSeconds()).padStart(2,'0');}
     var clockTimer=setInterval(clock,1000);clock();var resizeTimer;function resize(){clearTimeout(resizeTimer);resizeTimer=setTimeout(drawRadar,100);}window.addEventListener('resize',resize,{passive:true});document.addEventListener('keydown',keydown);
-    body.__nxCleanup=function(){state.destroyed=true;if(state.controller)state.controller.abort();clearInterval(clockTimer);clearTimeout(resizeTimer);window.removeEventListener('resize',resize);document.removeEventListener('keydown',keydown);document.body.style.overflow='';modal.hidden=true;};
+    body.__nxCleanup=function(){state.destroyed=true;if(state.controller)state.controller.abort();clearInterval(clockTimer);clearTimeout(resizeTimer);window.removeEventListener('resize',resize);document.removeEventListener('keydown',keydown);document.body.style.overflow='';modal.hidden=true;modal.remove();};
     load('apod',{});
   };
 })();

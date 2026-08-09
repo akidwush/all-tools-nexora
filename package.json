@@ -2,13 +2,13 @@
   "name": "all-tools-nexora-developer-dika",
   "version": "6.3.13",
   "private": true,
-  "description": "All Tools Nexora v6.3.13 HF6 — NASA Space Explorer mission interface",
+  "description": "All Tools Nexora v6.3.13 HF7 — mobile layout recovery",
   "scripts": {
     "dev": "node serve-local.js",
     "start": "node serve-local.js",
     "check": "node scripts/check-project.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test-api.js && node scripts/test-audit.js && node scripts/test-tool-health.js && node scripts/test-admin.js && node scripts/test-admin-v51.js && node scripts/test-visual-v60.js && node scripts/test-social-links.js && node scripts/test-serverless-limit.js && node scripts/test-network-v62.js && node scripts/test-functional-v62.js && node scripts/test-performance-v63.js && node scripts/test-unlocked-tools-v631.js && node scripts/test-all-grid-v632.js && node scripts/test-hero-video-v633.js && node scripts/test-scroll-stability-v634.js && node scripts/test-tiktok-media-layout-v635.js && node scripts/test-canvas-tool-crud-v636.js && node scripts/test-deploy-cache-guards-v637.js && node scripts/test-tiktok-runtime-v638.js && node scripts/test-tiktok-download-v639.js && node scripts/test-resilient-image-tools-v6311.js && node scripts/test-resilient-services-v6312.js && node scripts/test-sitegrabber-integration-v6313.js && node scripts/test-getcode-health-hf1.js && node scripts/test-feature-recovery-hf2.js && node scripts/test-complete-recovery-hf3.js && node scripts/test-crypto-market-hf4.js && node scripts/test-web-intelligence-hf5.js && node scripts/test-space-explorer-hf6.js"
+    "test": "node scripts/test-api.js && node scripts/test-audit.js && node scripts/test-tool-health.js && node scripts/test-admin.js && node scripts/test-admin-v51.js && node scripts/test-visual-v60.js && node scripts/test-social-links.js && node scripts/test-serverless-limit.js && node scripts/test-network-v62.js && node scripts/test-functional-v62.js && node scripts/test-performance-v63.js && node scripts/test-unlocked-tools-v631.js && node scripts/test-all-grid-v632.js && node scripts/test-hero-video-v633.js && node scripts/test-scroll-stability-v634.js && node scripts/test-tiktok-media-layout-v635.js && node scripts/test-canvas-tool-crud-v636.js && node scripts/test-deploy-cache-guards-v637.js && node scripts/test-tiktok-runtime-v638.js && node scripts/test-tiktok-download-v639.js && node scripts/test-resilient-image-tools-v6311.js && node scripts/test-resilient-services-v6312.js && node scripts/test-sitegrabber-integration-v6313.js && node scripts/test-getcode-health-hf1.js && node scripts/test-feature-recovery-hf2.js && node scripts/test-complete-recovery-hf3.js && node scripts/test-crypto-market-hf4.js && node scripts/test-web-intelligence-hf5.js && node scripts/test-space-explorer-hf6.js && node scripts/test-mobile-layout-hf7.js"
   },
   "engines": {
     "node": ">=18"
