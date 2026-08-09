@@ -72,9 +72,18 @@ for(const token of ["create table if not exists public.tool_health","consecutive
 if(!fs.existsSync(path.join(root,"database/migrations/002_tool_health.sql"))) fail("Migration tool health belum tersedia.");
 
 const vdeployLib=fs.readFileSync(path.join(root,"lib/vdeploy.js"),"utf8");
-const vercelConfig=fs.readFileSync(path.join(root,"vercel.json"),"utf8");
+let vercelConfig;
+try {
+  vercelConfig = JSON.parse(fs.readFileSync(path.join(root,"vercel.json"),"utf8"));
+} catch (error) {
+  fail(`vercel.json tidak valid: ${error.message}`);
+  vercelConfig = {};
+}
 for(const token of ["NEXUS_DEPLOY_ACCESS_KEY","VERCEL_TOKEN","NETLIFY_TOKEN","createVercel","createNetlify","extractZip"]) if(!vdeployLib.includes(token)) fail(`VDeploy HF2 belum lengkap: ${token}`);
-if(!vercelConfig.includes('"source": "/api/vdeploy"')) fail("Rewrite /api/vdeploy belum tersedia.");
+const hasVdeployRewrite = Array.isArray(vercelConfig.rewrites) && vercelConfig.rewrites.some((item) =>
+  item && item.source === "/api/vdeploy" && typeof item.destination === "string" && item.destination.includes("mode=vdeploy")
+);
+if(!hasVdeployRewrite) fail("Rewrite /api/vdeploy belum tersedia atau destination tidak valid.");
 for(const token of ["nxLoadBgRemovalModule","isnet_quint8","staticimgly.com/@imgly/background-removal-data/1.7.0/dist/","nxLocalRemoveBg"]) if(!app.includes(token)) fail(`Remove BG HF2 belum lengkap: ${token}`);
 
 const adminRequired = [
