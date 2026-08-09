@@ -2,7 +2,7 @@
   "name": "all-tools-nexora-developer-dika",
   "version": "6.3.13",
   "private": true,
-  "description": "All Tools Nexora v6.3.13 HF5 — Nexora Web Intelligence evidence-based website audit engine",
+  "description": "All Tools Nexora v6.3.13 HF5.1 — Nexora Web Intelligence DNS runtime hotfix",
   "scripts": {
     "dev": "node serve-local.js",
     "start": "node serve-local.js",

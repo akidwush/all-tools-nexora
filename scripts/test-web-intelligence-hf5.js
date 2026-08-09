@@ -139,6 +139,7 @@ async function main() {
   await handler({ method: "GET", url: "/api/audit?mode=web-intelligence&health=1", headers: {}, socket: {} }, health.response);
   assert.equal(health.captured.status, 200);
   assert.equal(health.captured.payload.engine, "nexora-web-intelligence");
+  assert.equal(health.captured.payload.engineVersion, "1.0.1");
 
   const invalid = responseCapture();
   await handler({ method: "POST", url: "/api/audit?mode=web-intelligence", headers: { "x-forwarded-for": "203.0.113.77" }, body: { url: "http://127.0.0.1", mode: "standard" }, socket: {} }, invalid.response);
@@ -157,7 +158,7 @@ async function main() {
   const css = read("assets/css/features/web-intelligence.css");
   for (const token of ["nwi-score-ring", "nwi-radar-wrap", "@media(max-width:480px)", "prefers-reduced-motion"]) assert.ok(css.includes(token));
   const backend = read("lib/web-intelligence.js");
-  for (const token of ["assertPublicUrl", "requestPinnedPage", "GOOGLE_PAGESPEED_API_KEY", "GOOGLE_SAFE_BROWSING_API_KEY", "MAX_HTML_BYTES"]) assert.ok(backend.includes(token));
+  for (const token of ["assertPublicUrl", "requestPinnedPage", "createPinnedLookup", "autoSelectFamily: false", "GOOGLE_PAGESPEED_API_KEY", "GOOGLE_SAFE_BROWSING_API_KEY", "MAX_HTML_BYTES"]) assert.ok(backend.includes(token));
   assert.ok(!ui.includes("GOOGLE_PAGESPEED_API_KEY"), "Nama/konfigurasi key tidak boleh diperlukan browser");
   assert.ok(read("database/migrations/009_nexora_web_intelligence.sql").includes("on conflict (id) do update"));
 

@@ -2,6 +2,7 @@ const assert = require("node:assert/strict");
 const {
   auditBatch,
   auditResource,
+  createPinnedLookup,
   isBlockedIp,
   validateUrlSyntax
 } = require("../lib/audit");
@@ -19,6 +20,25 @@ async function main() {
   assert.equal(validateUrlSyntax("https://example.com/path#hash").href, "https://example.com/path");
   assert.throws(() => validateUrlSyntax("file:///etc/passwd"), /HTTP dan HTTPS/);
   assert.throws(() => validateUrlSyntax("https://localhost/admin"), /lokal atau internal/);
+
+  const pinnedLookup = createPinnedLookup([
+    { address: "93.184.216.34", family: 4 },
+    { address: "2606:2800:220:1:248:1893:25c8:1946", family: 6 }
+  ]);
+  await new Promise((resolve, reject) => pinnedLookup("example.com", { all: true }, (error, addresses) => {
+    if (error) return reject(error);
+    assert.deepEqual(addresses, [
+      { address: "93.184.216.34", family: 4 },
+      { address: "2606:2800:220:1:248:1893:25c8:1946", family: 6 }
+    ]);
+    resolve();
+  }));
+  await new Promise((resolve, reject) => pinnedLookup("example.com", { family: 4 }, (error, address, family) => {
+    if (error) return reject(error);
+    assert.equal(address, "93.184.216.34");
+    assert.equal(family, 4);
+    resolve();
+  }));
 
   const lookup = async () => [{ address: "93.184.216.34", family: 4 }];
   const calls = [];
