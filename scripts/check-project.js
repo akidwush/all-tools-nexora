@@ -246,14 +246,14 @@ const vectorUiHf9=fs.readFileSync(path.join(root,"assets/js/features/image-vecto
 const vectorWorkerHf9=fs.readFileSync(path.join(root,"assets/js/workers/vtracer-worker.js"),"utf8");
 const vectorCssHf9=fs.readFileSync(path.join(root,"assets/css/features/image-vectorizer.css"),"utf8");
 const vectorManifestHf9=JSON.parse(fs.readFileSync(path.join(root,"assets/module-manifest.json"),"utf8"));
-for(const token of ["renderImageVectorizer","new Worker","sanitizeSvg","Download SVG","Copy SVG code","deviceProfile","12*1024*1024"]){
-  if(!vectorUiHf9.includes(token)) fail(`Image Vectorizer HF9 UI belum lengkap: ${token}`);
+for(const token of ["renderImageVectorizer","new Worker","sanitizeSvg","Download SVG","Copy SVG code","deviceProfile","12*1024*1024","setAttribute('viewBox'","preserveAspectRatio","OLD RESULT","maxColors:32","maxColors:64","fit 100%"]){
+  if(!vectorUiHf9.includes(token)) fail(`Image Vectorizer HF9.1 UI belum lengkap: ${token}`);
 }
 for(const token of ["importScripts","vectorize_rgba","vectorize_bytes","OffscreenCanvas","createImageBitmap","1.0.0-alpha.3","VTRACER_MODULE_NOT_ALLOWED"]){
   if(!vectorWorkerHf9.includes(token)) fail(`Image Vectorizer HF9 worker belum lengkap: ${token}`);
 }
-for(const token of ["overflow-x:clip","100dvh","safe-area-inset-bottom","@media(max-width:720px)","@media(max-width:430px)","min-height:44px"]){
-  if(!vectorCssHf9.includes(token)) fail(`Image Vectorizer HF9 belum mobile-safe: ${token}`);
+for(const token of ["overflow-x:clip","100dvh","safe-area-inset-bottom","@media(max-width:720px)","@media(max-width:430px)","min-height:44px","width:auto!important","max-height:min(68dvh,720px)"]){
+  if(!vectorCssHf9.includes(token)) fail(`Image Vectorizer HF9.1 belum mobile-safe: ${token}`);
 }
 if(vectorUiHf9.includes("fetch(")) fail("Image Vectorizer tidak boleh mengunggah gambar ke server.");
 if(/https?:\/\//.test(vectorWorkerHf9)) fail("Worker VTracer hanya boleh memuat engine lokal.");

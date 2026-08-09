@@ -131,9 +131,9 @@ async function main() {
   const registry = read("assets/js/core/tool-registry.js");
   const migration = read("database/migrations/012_nexora_image_vectorizer.sql");
 
-  for (const token of ["renderImageVectorizer", "new Worker", "Vectorize image", "Download SVG", "Copy SVG code", "12*1024*1024", "sanitizeSvg", "deviceProfile"]) assert.ok(ui.includes(token), `UI HF9 belum lengkap: ${token}`);
+  for (const token of ["renderImageVectorizer", "new Worker", "Vectorize image", "Download SVG", "Copy SVG code", "12*1024*1024", "sanitizeSvg", "deviceProfile", "setAttribute('viewBox'", "preserveAspectRatio", "OLD RESULT", "maxColors:32", "maxColors:64", "fit 100%"]) assert.ok(ui.includes(token), `UI HF9.1 belum lengkap: ${token}`);
   for (const token of ["importScripts", "vectorize_rgba", "vectorize_bytes", "OffscreenCanvas", "createImageBitmap", "1.0.0-alpha.3", "VTRACER_MODULE_NOT_ALLOWED"]) assert.ok(worker.includes(token), `Worker HF9 belum lengkap: ${token}`);
-  for (const token of ["overflow-x:clip", "100dvh", "safe-area-inset-bottom", "@media(max-width:720px)", "@media(max-width:430px)", "min-height:44px"]) assert.ok(css.includes(token), `CSS mobile HF9 belum lengkap: ${token}`);
+  for (const token of ["overflow-x:clip", "100dvh", "safe-area-inset-bottom", "@media(max-width:720px)", "@media(max-width:430px)", "min-height:44px", "width:auto!important", "max-height:min(68dvh,720px)"]) assert.ok(css.includes(token), `CSS mobile HF9.1 belum lengkap: ${token}`);
   assert.ok(!ui.includes("fetch("), "Image Vectorizer tidak boleh mengunggah gambar ke server");
   assert.ok(!worker.includes("https://") && !worker.includes("http://"), "Worker hanya boleh memuat aset lokal");
   assert.equal(manifest.tools.imagevectorizer, "image-vectorizer");
@@ -146,7 +146,7 @@ async function main() {
   assert.ok(read("assets/vendor/vtracer/LICENSE").includes("Permission is hereby granted"));
   assert.ok(read("assets/vendor/vtracer/VERSION.txt").includes("@visioncortex/vtracer 1.0.0-alpha.3"));
   await smokeWorker();
-  console.log("Image Vectorizer HF9 tests lulus: official WASM checksum, local worker, vectorization nyata, UI, keamanan SVG, export, dan layout mobile valid.");
+  console.log("Image Vectorizer HF9.1 tests lulus: official WASM checksum, local worker, vectorization nyata, viewBox fit, preset fidelity, truthful retry state, export, dan layout mobile valid.");
 }
 
 main().catch((error) => {

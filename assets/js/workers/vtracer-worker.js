@@ -1,9 +1,9 @@
-/* Nexora Image Vectorizer HF9 — local VTracer worker */
+/* Nexora Image Vectorizer HF9.1 — local VTracer worker */
 (function(){
   'use strict';
 
   var ENGINE_VERSION='1.0.0-alpha.3';
-  var CACHE_VERSION='6.3.13-hf9';
+  var CACHE_VERSION='6.3.13-hf9.1';
   var VENDOR_BASE='/assets/vendor/vtracer';
 
   function loadBytes(path){
