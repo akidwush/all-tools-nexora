@@ -1,7 +1,0 @@
-VTracer WebAssembly engine: @visioncortex/vtracer 1.0.0-alpha.3
-Official source: https://github.com/visioncortex/vtracer
-Registry: https://www.npmjs.com/package/@visioncortex/vtracer/v/1.0.0-alpha.3
-Package integrity: sha512-82rIJylIXu6dPv4Z0+wjKZVkNsZEdFg4ycDCWytQNuSoYLp31S1iZ+VFJP41+iVUNKmS5wVehwby/brQ91Qikw==
-Glue SHA-256: e1855e9bb29d785344f672abdc692ca90ffa7ed863b9186b51c4e95a2a7dc17d
-WASM SHA-256: 8037898af5acac5a98856b40675f54aa98c0e5d94cc47d4752740cf452fc1420
-Vendored for local-only browser execution. No image bytes are sent to Nexora.
