@@ -259,7 +259,25 @@
       setProgress(100,'SVG selesai');
       setBusy(false);
 
-      vectorHost.innerHTML=state.svg;
+      // HF9.4 — mobile-safe SVG preview.
+      // SVG FreeConvert dapat berukuran beberapa MB dan memiliki ribuan path.
+      // Jangan inject seluruh tree SVG melalui innerHTML karena sangat berat
+      // di browser Android. Render sebagai isolated Blob image instead.
+      vectorHost.replaceChildren();
+      var previewBlob=new Blob([state.svg],{type:'image/svg+xml;charset=utf-8'});
+      var previewUrl=URL.createObjectURL(previewBlob);
+      var previewImage=new Image();
+      previewImage.alt='Vector preview';
+      previewImage.decoding='async';
+      previewImage.style.cssText='display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;';
+      previewImage.onload=function(){
+        setTimeout(function(){URL.revokeObjectURL(previewUrl);},1000);
+      };
+      previewImage.onerror=function(){
+        URL.revokeObjectURL(previewUrl);
+      };
+      previewImage.src=previewUrl;
+      vectorHost.appendChild(previewImage);
       vector.hidden=false;
       empty.hidden=true;
       bgTools.hidden=false;
