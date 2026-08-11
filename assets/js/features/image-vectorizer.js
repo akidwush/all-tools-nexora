@@ -104,6 +104,23 @@
     function releaseFile(){if(state.objectUrl){URL.revokeObjectURL(state.objectUrl);state.objectUrl=null;}}
     function validFile(file){return file&&file.size>0&&file.size<=MAX_FILE_BYTES&&(ACCEPTED_TYPES.has(file.type)||/\.(?:png|jpe?g)$/i.test(file.name));}
     function markStale(){if(state.svg&&!state.busy){statusBadge.className='is-warning';statusBadge.innerHTML='<i class="fa-solid fa-rotate"></i> SETTINGS CHANGED';runButton.querySelector('span').textContent='Convert ulang';}}
+    function setBusy(value){
+      state.busy=value;
+      runButton.disabled=value||!state.file;
+      stopButton.hidden=!value;
+      fileInput.disabled=value;
+      progressBox.hidden=!value;
+      root.querySelectorAll('#nviPresets button,#nviStyles button,.nvi-sliders input,.nvi-select-row select,.nvi-switches input').forEach(function(item){
+        item.disabled=value;
+      });
+    }
+
+    function setProgress(value,label){
+      state.progress=Math.max(state.progress,Math.min(100,Number(value)||0));
+      progressBar.style.width=state.progress+'%';
+      progressValue.textContent=Math.round(state.progress)+'%';
+      if(label)progressLabel.textContent=label;
+    }
     function terminateWorker(){state.cancelled=true;}
 
     function sleep(ms){return new Promise(function(resolve){setTimeout(resolve,ms);});}
