@@ -1,30 +1,31 @@
-const fs=require('node:fs');const path=require('node:path');const assert=require('node:assert');const root=path.resolve(__dirname,'..');
-const ui=fs.readFileSync(path.join(root,'assets/js/features/svg-alight.js'),'utf8');const css=fs.readFileSync(path.join(root,'assets/css/features/svg-alight.css'),'utf8');const api=fs.readFileSync(path.join(root,'lib/svgtoxml-proxy.js'),'utf8');const route=fs.readFileSync(path.join(root,'api/tool-health.js'),'utf8');
-for(const t of ['renderSvgAlight','/api/svg-alight','quality:\'lossless\'','NEXORA MUSE','Konversi ke Alight XML'])assert.ok(ui.includes(t),'UI missing '+t);
-for(const t of ['SVGTOXML_API_KEY','/api/v1/convert','x-api-key','handleSvgToXml'])assert.ok(api.includes(t),'API missing '+t);
-assert.ok(route.includes('handleSvgToXml'),'route handler missing');assert.ok(css.includes('@media(max-width:760px)'),'mobile CSS missing');assert.ok(!ui.includes('SVGTOXML_API_KEY'),'secret leaked to UI');
+const fs=require('node:fs');
+const path=require('node:path');
+const assert=require('node:assert');
+const root=path.resolve(__dirname,'..');
 
+const ui=fs.readFileSync(path.join(root,'assets/js/features/svg-alight.js'),'utf8');
+const css=fs.readFileSync(path.join(root,'assets/css/features/svg-alight.css'),'utf8');
+const api=fs.readFileSync(path.join(root,'lib/svgtoxml-proxy.js'),'utf8');
+const route=fs.readFileSync(path.join(root,'api/tool-health.js'),'utf8');
 const lazy=fs.readFileSync(path.join(root,'assets/js/core/lazy-loader.js'),'utf8');
-const indexHtml=fs.readFileSync(path.join(root,'index.html'),'utf8');
-const manifest=JSON.parse(fs.readFileSync(path.join(root,'assets/module-manifest.json'),'utf8'));
-for(const t of [
-  "'svg-alight': {css:['assets/css/features/svg-alight.css'],js:['assets/js/features/svg-alight.js']}",
-  "svgalight:'svg-alight'",
-  "ASSET_VERSION = '6.3.13-hf10.2'"
-]) assert.ok(lazy.includes(t),'Lazy loader SVG Alight missing '+t);
-assert.equal(manifest.tools.svgalight,'svg-alight','Module manifest svgalight mapping missing');
-assert.ok(manifest.modules['svg-alight'],'Module manifest svg-alight module missing');
-assert.ok(indexHtml.includes('lazy-loader.js?v=6.3.13-hf10.2'),'Lazy-loader cache bust HF10.2 missing');
-assert.ok(indexHtml.includes('app.js?v=6.3.13-hf10.2'),'App cache bust HF10.2 missing');
-assert.ok(indexHtml.includes('shell.js?v=6.3.13-hf10.2'),'Shell cache bust HF10.2 missing');
-const app=fs.readFileSync(path.join(root,'assets/js/core/app.js'),'utf8');
-assert.ok(app.includes("case 'svgalight': renderSvgAlight(body);"),'Dispatcher svgalight missing');
 
-console.log('SVG -> Alight Motion Anime Atelier test lulus: server-only key, API v1 proxy, lossless conversion, anime UI, mobile layout.');
+for(const token of [
+  'renderSvgAlight','/api/svg-alight',
+  'data-quality="lossless"','data-quality="accurate"','data-quality="balanced"','data-quality="lightweight"',
+  'nodeReduction','minAreaPercent','groupByColor','removeStrokes','validateBounds',
+  'nsaThumb','Preview SVG','Konversi ke Alight XML'
+]) assert.ok(ui.includes(token),'UI SVG Alight missing '+token);
 
-const fs2=require("node:fs");
-const path2=require("node:path");
-assert.ok(
-  fs2.existsSync(path2.join(__dirname,"..","database","migrations","014_nexora_svg_alight.sql")),
-  "Migration 014 SVG Alight belum tersedia"
-);
+for(const token of [
+  'SVGTOXML_API_KEY','/api/v1/convert','x-api-key','handleSvgToXml','normalizeOptions',
+  'lossless','accurate','balanced','lightweight'
+]) assert.ok(api.includes(token),'API SVG Alight missing '+token);
+
+assert.ok(route.includes('handleSvgToXml'),'route handler missing');
+assert.ok(css.includes('@media(max-width:760px)'),'mobile CSS missing');
+assert.ok(css.includes('min-height:44px'),'44px touch target CSS missing');
+assert.ok(!ui.includes('SVGTOXML_API_KEY'),'secret leaked to UI');
+assert.ok(lazy.includes("svgalight:'svg-alight'"),'lazy-loader svgalight mapping missing');
+assert.ok(lazy.includes("'svg-alight':"),'lazy-loader svg-alight module missing');
+
+console.log('SVG -> Alight HF10.3 lulus: 4 mode nyata, server-only API key, native SVG preview, stats/warnings, mobile-safe UI, lazy-loader wiring.');

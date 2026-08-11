@@ -1412,7 +1412,7 @@ let toolsData = {
         { id: 'webintel', icon: 'fa-solid fa-satellite-dish', name: 'Nexora Web Intelligence', desc: 'Audit SEO, security, performa, aksesibilitas dan teknologi website', badge: 'INTEL' },
         { id: 'spaceexplorer', icon: 'fa-solid fa-user-astronaut', name: 'Space Explorer', desc: 'APOD, galeri Mars, asteroid dekat Bumi dan cuaca antariksa NASA', badge: 'NASA' },
         { id: 'ocrintel', icon: 'fa-solid fa-file-lines', name: 'Nexora OCR Intelligence', desc: 'Ekstrak teks dari gambar dan PDF, analisis dokumen, lalu buat searchable PDF', badge: 'OCR' },
-        { id: 'svgalight', icon: 'fa-solid fa-wand-magic-sparkles', name: 'SVG → Alight XML', desc: 'Konversi SVG menjadi XML Alight Motion dengan Anime Vector Atelier', badge: 'ANIME XML' },
+        { id: 'svgalight', icon: 'fa-solid fa-wand-magic-sparkles', name: 'SVG → Alight XML', desc: 'Konversi SVG ke XML Alight Motion dengan 4 mode: Lossless, Accurate, Balanced, Lightweight', badge: 'ANIME XML' },
         { id: 'imagevectorizer', icon: 'fa-solid fa-bezier-curve', name: 'Nexora Image Vectorizer', desc: 'Ubah PNG atau JPG menjadi SVG secara privat langsung di perangkat', badge: 'SVG' },
         { id: 'calc', icon: 'fa-solid fa-calculator', name: 'Calculator', desc: 'Hitung cepat', badge: 'Math' },
         { id: 'pwgen', icon: 'fa-solid fa-key', name: 'Password Gen', desc: 'Password aman', badge: 'Secure' },
