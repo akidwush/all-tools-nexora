@@ -250,11 +250,42 @@
     }
 
     function finish(rawSvg,durationMs){
-      try{state.svg=sanitizeSvg(rawSvg);}
-      catch(error){failRun(error.message);return;}
+      try{
+        var source=String(rawSvg||'');
+        var rawBytes=new TextEncoder().encode(source).byteLength;
 
-      var analysis=analyzeSvg(state.svg);
+        if(!/^\s*(?:<\?xml[^>]*>\s*)?<svg\b/i.test(source)){
+          throw new Error('SVG hasil FreeConvert tidak valid.');
+        }
+
+        // HF9.5 — large SVG fast path for Android/mobile.
+        // Avoid DOMParser + full-node traversal for multi-MB vectors.
+        if(rawBytes>750000){
+          state.svg=source;
+        }else{
+          state.svg=sanitizeSvg(source);
+        }
+      }catch(error){
+        failRun(error.message||'SVG gagal diproses browser.');
+        return;
+      }
+
       var svgBytes=new TextEncoder().encode(state.svg).byteLength;
+
+      // Lightweight statistics for large vectors.
+      var analysis={
+        paths:(state.svg.match(/<path\b/gi)||[]).length,
+        colors:0
+      };
+
+      try{
+        var colorMatches=state.svg.match(/#[0-9a-f]{3,8}\b/gi)||[];
+        analysis.colors=new Set(colorMatches.slice(0,20000).map(function(v){
+          return v.toLowerCase();
+        })).size;
+      }catch(_){
+        analysis.colors=0;
+      }
 
       setProgress(100,'SVG selesai');
       setBusy(false);
