@@ -150,6 +150,16 @@
 
     function sleep(ms){return new Promise(function(resolve){setTimeout(resolve,ms);});}
 
+    function friendlyError(error){
+      var code=String(error&&error.code||'');
+      var status=Number(error&&error.status||0);
+      if(code==='FC_NOT_CONFIGURED')return 'FreeConvert belum dikonfigurasi di Vercel. Tambahkan API key FreeConvert di Vercel lalu redeploy.';
+      if(code==='FREECONVERT_TIMEOUT'||status===504)return 'FreeConvert timeout. Coba lagi beberapa saat.';
+      if(status===429||code==='FREECONVERT_429'||code==='FREECONVERT_402')return 'Kuota/rate limit FreeConvert sedang habis. Coba lagi nanti atau cek paket API.';
+      if(code==='FREECONVERT_401'||code==='FREECONVERT_403')return 'FreeConvert menolak API key. Periksa API key FreeConvert di Vercel.';
+      return (error&&error.message)||'Konversi vector gagal.';
+    }
+
     async function api(payload){
       var response=await fetch('/api/tool-health?mode=image-vectorizer',{
         method:'POST',
@@ -158,7 +168,7 @@
       });
       var data={};
       try{data=await response.json();}catch(_){}
-      if(!response.ok||data.ok===false)throw new Error(data.message||('FreeConvert API gagal (HTTP '+response.status+').'));
+      if(!response.ok||data.ok===false){var err=new Error(data.message||('FreeConvert API gagal (HTTP '+response.status+').'));err.code=data.error||'';err.status=response.status;throw err;}
       return data;
     }
 
@@ -166,8 +176,10 @@
       var form=new FormData();
       Object.keys(upload.parameters||{}).forEach(function(key){form.append(key,upload.parameters[key]);});
       form.append('file',file,file.name);
-      var response=await fetch(upload.url,{method:'POST',body:form});
-      if(!response.ok)throw new Error('Upload ke FreeConvert gagal (HTTP '+response.status+').');
+      var response;
+      try{response=await fetch(upload.url,{method:'POST',body:form});}
+      catch(error){throw new Error('Upload langsung ke FreeConvert gagal terhubung. Periksa koneksi lalu coba lagi.');}
+      if(!response.ok){var detail='';try{detail=(await response.text()).slice(0,180);}catch(_){}throw new Error('Upload ke FreeConvert gagal (HTTP '+response.status+').'+(detail?' '+detail:''));}
     }
 
     async function pollResult(taskId){
@@ -232,7 +244,7 @@
         if(state.cancelled)return;
         finish(rawSvg,performance.now()-started);
       }catch(error){
-        if(!state.cancelled)failRun(error&&error.message);
+        if(!state.cancelled)failRun(friendlyError(error));
         else setBusy(false);
       }
     }
@@ -298,6 +310,18 @@
     root.querySelector('#nviDownload').addEventListener('click',function(){if(state.svg)download(safeName(state.file&&state.file.name)+'-nexora-vector.svg',state.svg);});root.querySelector('#nviCopy').addEventListener('click',function(){if(!state.svg)return;copyText(state.svg).then(function(){notify('Kode SVG disalin.','is-success');}).catch(function(){notify('Clipboard ditolak browser.','is-error');});});root.querySelector('#nviCodeToggle').addEventListener('click',function(){code.hidden=!code.hidden;if(!code.hidden)code.scrollIntoView({behavior:'smooth',block:'nearest'});});root.querySelector('#nviReset').addEventListener('click',clearFile);
     function paste(event){if(state.destroyed||state.busy||!event.clipboardData)return;var item=Array.from(event.clipboardData.items||[]).find(function(row){return row.type==='image/png'||row.type==='image/jpeg';});if(item){var file=item.getAsFile();if(file){event.preventDefault();setFile(new File([file],'clipboard-'+Date.now()+'.png',{type:file.type||'image/png'}));}}}
     document.addEventListener('paste',paste);body.__nxCleanup=function(){state.destroyed=true;state.cancelled=true;releaseFile();document.removeEventListener('paste',paste);clearTimeout(toast.__timer);};
-    updateLabels();engineBadge.className='is-ready';engineBadge.innerHTML='<i class="fa-solid fa-cloud"></i> FREECONVERT READY';
+    async function checkEngine(){
+      engineBadge.className='is-working';engineBadge.innerHTML='<i class="fa-solid fa-circle-notch fa-spin"></i> CHECKING';
+      try{
+        var response=await fetch('/api/tool-health?mode=image-vectorizer&health=1',{cache:'no-store'});
+        var data=await response.json();
+        if(!response.ok||!data.ok||!data.configured)throw Object.assign(new Error('FreeConvert belum dikonfigurasi.'),{code:'FC_NOT_CONFIGURED'});
+        engineBadge.className='is-ready';engineBadge.innerHTML='<i class="fa-solid fa-cloud"></i> FREECONVERT READY';
+      }catch(error){
+        engineBadge.className='is-error';engineBadge.innerHTML='<i class="fa-solid fa-triangle-exclamation"></i> ENGINE OFFLINE';
+        notify(friendlyError(error),'is-error');
+      }
+    }
+    updateLabels();checkEngine();
   };
 })();

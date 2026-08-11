@@ -28,6 +28,17 @@ for (const token of [
   assert.ok(ui.includes(token), `Frontend missing: ${token}`);
 }
 
+
+for (const token of [
+  "function friendlyError(",
+  "function checkEngine()",
+  "health=1",
+  "ENGINE OFFLINE",
+  "FC_NOT_CONFIGURED"
+]) {
+  assert.ok(ui.includes(token), `Frontend resilience missing: ${token}`);
+}
+
 assert.ok(!ui.includes("vtracer-worker"), "Frontend still references VTracer worker");
 assert.ok(!ui.includes("FREECONVERT_API_KEY"), "API key leaked into frontend");
 
