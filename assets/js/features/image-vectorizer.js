@@ -60,7 +60,7 @@
               <button type="button" data-preset="bw"><i class="fa-solid fa-circle-half-stroke"></i><span><b>B&amp;W</b><small>Line art / scan</small></span></button>
             </div></fieldset>
 
-            <fieldset class="nvi-fieldset"><legend>Vector style</legend><div class="nvi-style-row" id="nviStyles"><button type="button" data-style="spline" class="is-active"><i class="fa-solid fa-bezier-curve"></i>Spline</button><button type="button" data-style="polygon"><i class="fa-solid fa-draw-polygon"></i>Polygon</button><button type="button" data-style="pixel"><i class="fa-solid fa-border-all"></i>Pixel</button></div></fieldset>
+            <fieldset class="nvi-fieldset"><legend>Vector profile</legend><div class="nvi-style-row" id="nviStyles"><button type="button" data-style="spline" class="is-active"><i class="fa-solid fa-bezier-curve"></i>Smooth</button><button type="button" data-style="polygon"><i class="fa-solid fa-draw-polygon"></i>Angular</button><button type="button" data-style="pixel"><i class="fa-solid fa-border-all"></i>Pixel-like</button></div></fieldset>
 
             <div class="nvi-sliders">
               <label><span><b>Detail</b><output id="nviDetailValue">90</output></span><input id="nviDetail" type="range" min="20" max="100" value="90"></label>
@@ -72,7 +72,7 @@
             <div class="nvi-select-row"><label><span>Target warna</span><select id="nviColors"><option value="4">4 colors</option><option value="8">8 colors</option><option value="16">16 colors</option><option value="32" selected>32 colors</option><option value="64">64 colors</option></select></label><label><span>Output</span><select id="nviQuality"><option value="2" selected>Optimized</option><option value="1">Balanced</option><option value="0">Raw paths</option></select></label></div>
             <div class="nvi-switches"><label><input id="nviMosaic" type="checkbox" checked><span><i class="fa-solid fa-puzzle-piece"></i><b>Seam-free mosaic</b><small>Bentuk rapat tanpa celah putih.</small></span></label><label><input id="nviAdaptive" type="checkbox" checked><span><i class="fa-solid fa-wand-magic-sparkles"></i><b>Adaptive B&amp;W</b><small>Scan tetap bersih pada cahaya tidak rata.</small></span></label></div>
             <div class="nvi-local-note"><i class="fa-solid fa-lock"></i><p><b>Cloud vectorization.</b> Gambar diupload langsung ke FreeConvert menggunakan signed upload URL; API key tetap hanya di server Nexora.</p></div>
-            <div class="nvi-run-row"><button id="nviRun" class="nvi-run" type="button" disabled><i class="fa-solid fa-wand-magic-sparkles"></i><span>Vectorize image</span><b>→</b></button><button id="nviStop" class="nvi-stop" type="button" hidden><i class="fa-solid fa-stop"></i></button></div>
+            <div class="nvi-run-row"><button id="nviRun" class="nvi-run" type="button" disabled><i class="fa-solid fa-wand-magic-sparkles"></i><span>Convert to SVG</span><b>→</b></button><button id="nviStop" class="nvi-stop" type="button" hidden><i class="fa-solid fa-stop"></i></button></div>
             <div class="nvi-progress" id="nviProgress" hidden><div><span id="nviProgressLabel">Menyiapkan konversi</span><b id="nviProgressValue">0%</b></div><div><i id="nviProgressBar"></i></div><small>Upload dan konversi diproses oleh FreeConvert Cloud tanpa membebani CPU HP.</small></div>
           </article>
 
@@ -104,6 +104,31 @@
     function releaseFile(){if(state.objectUrl){URL.revokeObjectURL(state.objectUrl);state.objectUrl=null;}}
     function validFile(file){return file&&file.size>0&&file.size<=MAX_FILE_BYTES&&(ACCEPTED_TYPES.has(file.type)||/\.(?:png|jpe?g)$/i.test(file.name));}
     function markStale(){if(state.svg&&!state.busy){statusBadge.className='is-warning';statusBadge.innerHTML='<i class="fa-solid fa-rotate"></i> SETTINGS CHANGED';runButton.querySelector('span').textContent='Convert ulang';}}
+    function applyPreset(name){
+      var preset=PRESETS[name]||PRESETS.illustration||PRESETS.logo;
+      state.preset=name;
+      if(controls.detail&&preset.detail!=null)controls.detail.value=preset.detail;
+      if(controls.color&&preset.colorPrecision!=null)controls.color.value=preset.colorPrecision;
+      if(controls.noise&&preset.filterSpeckle!=null)controls.noise.value=preset.filterSpeckle;
+      if(controls.corner&&preset.cornerThreshold!=null)controls.corner.value=preset.cornerThreshold;
+      if(controls.colors&&preset.maxColors!=null)controls.colors.value=String(preset.maxColors);
+      if(controls.mosaic)controls.mosaic.checked=true;
+      if(controls.adaptive)controls.adaptive.checked=preset.adaptive!==false;
+      if(preset.mode)state.style=preset.mode;
+      root.querySelectorAll('#nviPresets button').forEach(function(button){button.classList.toggle('is-active',button.dataset.preset===name);});
+      root.querySelectorAll('#nviStyles button').forEach(function(button){button.classList.toggle('is-active',button.dataset.style===state.style);});
+      updateLabels();markStale();
+    }
+
+    function cloudTuning(){
+      var colors=controls.colors?Number(controls.colors.value):32;
+      var detail=controls.detail?Number(controls.detail.value):70;
+      var corner=controls.corner?Number(controls.corner.value):90;
+      var styleSmooth={spline:72,polygon:28,pixel:0}[state.style];
+      if(styleSmooth==null)styleSmooth=52;
+      var smoothness=Math.max(0,Math.min(100,Math.round((styleSmooth*0.62)+((100-corner/1.8)*0.18)+(detail*0.20))));
+      return {preset:state.preset,style:state.style,colorCount:Math.max(2,Math.min(256,colors||32)),smoothness:smoothness};
+    }
     function setBusy(value){
       state.busy=value;
       runButton.disabled=value||!state.file;
@@ -159,10 +184,10 @@
 
     function setFile(file){
       if(!validFile(file)){notify(file&&file.size>MAX_FILE_BYTES?'File melebihi 12 MB.':'Gunakan file PNG atau JPG yang valid.','is-error');return;}
-      releaseFile();state.file=file;state.svg='';state.objectUrl=URL.createObjectURL(file);thumb.src=state.objectUrl;originalImage.src=state.objectUrl;fileName.textContent=file.name;fileMeta.textContent=formatBytes(file.size)+' · membaca dimensi…';fileCard.hidden=false;drop.classList.add('has-file');empty.hidden=true;original.hidden=false;vector.hidden=true;stage.classList.remove('is-empty');stats.hidden=true;actions.hidden=true;bgTools.hidden=true;code.hidden=true;runButton.disabled=false;runButton.querySelector('span').textContent='Vectorize image';statusBadge.className='is-ready';statusBadge.innerHTML='<i class="fa-solid fa-cloud"></i> READY';
+      releaseFile();state.file=file;state.svg='';state.objectUrl=URL.createObjectURL(file);thumb.src=state.objectUrl;originalImage.src=state.objectUrl;fileName.textContent=file.name;fileMeta.textContent=formatBytes(file.size)+' · membaca dimensi…';fileCard.hidden=false;drop.classList.add('has-file');empty.hidden=true;original.hidden=false;vector.hidden=true;stage.classList.remove('is-empty');stats.hidden=true;actions.hidden=true;bgTools.hidden=true;code.hidden=true;runButton.disabled=false;runButton.querySelector('span').textContent='Convert to SVG';statusBadge.className='is-ready';statusBadge.innerHTML='<i class="fa-solid fa-cloud"></i> READY';
       var image=new Image();image.onload=function(){state.width=image.naturalWidth;state.height=image.naturalHeight;fileMeta.textContent=formatBytes(file.size)+' · '+state.width+' × '+state.height+' px';if(state.width*state.height>30000000){notify('Resolusi gambar sangat besar; proses cloud dapat membutuhkan waktu lebih lama.','is-warning');}};image.onerror=function(){clearFile();notify('Gambar tidak dapat dibuka.','is-error');};image.src=state.objectUrl;
     }
-    function clearFile(){releaseFile();state.file=null;state.svg='';state.width=0;state.height=0;fileInput.value='';thumb.removeAttribute('src');originalImage.removeAttribute('src');fileCard.hidden=true;drop.classList.remove('has-file');empty.hidden=false;original.hidden=true;vector.hidden=true;stage.className='nvi-stage is-empty view-split';stats.hidden=true;actions.hidden=true;bgTools.hidden=true;code.hidden=true;runButton.disabled=true;runButton.querySelector('span').textContent='Vectorize image';setBusy(false);}
+    function clearFile(){releaseFile();state.file=null;state.svg='';state.width=0;state.height=0;fileInput.value='';thumb.removeAttribute('src');originalImage.removeAttribute('src');fileCard.hidden=true;drop.classList.remove('has-file');empty.hidden=false;original.hidden=true;vector.hidden=true;stage.className='nvi-stage is-empty view-split';stats.hidden=true;actions.hidden=true;bgTools.hidden=true;code.hidden=true;runButton.disabled=true;runButton.querySelector('span').textContent='Convert to SVG';setBusy(false);}
     function failRun(message){var hasPrevious=Boolean(state.svg);setBusy(false);if(hasPrevious){statusBadge.className='is-warning';statusBadge.innerHTML='<i class="fa-solid fa-clock-rotate-left"></i> OLD RESULT';notify('Proses ulang gagal; preview sebelumnya tetap aman. '+message,'is-warning');}else{vector.hidden=true;stats.hidden=true;actions.hidden=true;bgTools.hidden=true;statusBadge.className='is-error';statusBadge.innerHTML='<i class="fa-solid fa-triangle-exclamation"></i> VECTOR FAILED';notify(message,'is-error');}}
     async function run(){
       if(!state.file||state.busy)return;
@@ -192,11 +217,13 @@
         if(state.cancelled)return;
 
         setProgress(48,'Memulai konversi PNG/JPG → SVG');
+        var tuning=cloudTuning();
         var startedTask=await api({
           action:'start',
           importTaskId:prepared.taskId,
           filename:state.file.name,
-          format:format
+          format:format,
+          tuning:tuning
         });
 
         setProgress(62,'Menunggu hasil vector');

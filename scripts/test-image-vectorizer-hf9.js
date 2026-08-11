@@ -78,3 +78,12 @@ for (const token of [
 console.log(
   "Image Vectorizer FreeConvert regression test lulus: server-only API key, signed direct upload, convert/export polling, SVG sanitization, route wiring, dan fit-safe mobile preview valid."
 );
+
+
+// FreeConvert advanced-option discovery: UI controls must affect the conversion request.
+assert.ok(ui.includes("function applyPreset("), "Mode Gambar tidak memiliki applyPreset");
+assert.ok(ui.includes("function cloudTuning()"), "Cloud tuning tidak tersedia");
+assert.ok(ui.includes("tuning:tuning"), "Tuning tidak dikirim ke backend");
+assert.ok(backend.includes("/query/options/convert?input_format="), "FreeConvert advanced options discovery tidak tersedia");
+assert.ok(backend.includes("buildAdvancedOptions"), "FreeConvert advanced options mapper tidak tersedia");
+console.log("FreeConvert advanced-option discovery: mode gambar dan vector profile terhubung ke request konversi.");
