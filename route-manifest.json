@@ -30,6 +30,7 @@
     "/api/admin/feedback",
     "/api/admin/audit",
     "/api/admin/visual",
-    "/api/admin/socials"
+    "/api/admin/socials",
+    "/api/svg-alight"
   ]
 }

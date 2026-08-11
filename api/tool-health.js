@@ -4,6 +4,7 @@ const { handleSiteGrabber } = require("../lib/sitegrabber-proxy");
 const { handleCryptoMarket } = require("../lib/crypto-market");
 const { handleSpaceExplorer } = require("../lib/space-explorer");
 const { handleOcrIntelligence } = require("../lib/ocr-intelligence");
+const { handleSvgToXml } = require("../lib/svgtoxml-proxy");
 const { handleFreeConvertVectorizer } = require("../lib/freeconvert-vectorizer");
 const {
   TOOL_CATALOG,
@@ -80,6 +81,9 @@ module.exports = async function handler(request, response) {
   }
   if (url.searchParams.get("mode") === "ocr-intelligence") {
     return handleOcrIntelligence(request, response, url);
+  }
+  if (url.searchParams.get("mode") === "svg-alight") {
+    return handleSvgToXml(request, response, url);
   }
 
   if (url.searchParams.get("mode") === "image-vectorizer") {

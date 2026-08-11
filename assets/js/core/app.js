@@ -1744,6 +1744,7 @@ function showTool(toolId) {
         case 'webintel': renderWebIntelligence(body); break;
         case 'spaceexplorer': renderSpaceExplorer(body); break;
         case 'ocrintel': renderOcrIntelligence(body); break;
+        case 'svgalight': renderSvgAlight(body); break;
         case 'imagevectorizer': renderImageVectorizer(body); break;
         case 'promptgenerate': renderPromptGenerator(body); break;
         case 'fakeovo': renderFakeOvo(body); break;

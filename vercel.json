@@ -78,6 +78,10 @@
       "destination": "/api/tool-health?mode=ocr-intelligence"
     },
     {
+      "source": "/api/svg-alight",
+      "destination": "/api/tool-health?mode=svg-alight"
+    },
+    {
       "source": "/api/vdeploy",
       "destination": "/api/health?mode=vdeploy"
     }

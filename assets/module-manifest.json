@@ -149,6 +149,14 @@
       "js": [
         "assets/js/features/web-encryption.js"
       ]
+    },
+    "svg-alight": {
+      "css": [
+        "assets/css/features/svg-alight.css"
+      ],
+      "js": [
+        "assets/js/features/svg-alight.js"
+      ]
     }
   },
   "tools": {
@@ -177,6 +185,7 @@
     "spotify": "download-pack",
     "unbanwa": "unban-whatsapp",
     "vdeploy": "deploy-center",
-    "webencryption": "web-encryption"
+    "webencryption": "web-encryption",
+    "svgalight": "svg-alight"
   }
 }
