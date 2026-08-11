@@ -21,7 +21,9 @@ for (const token of [
   "preserveAspectRatio",
   "fit 100%",
   "FreeConvert",
-  "function markStale()"
+  "function markStale()",
+  "function releaseFile()",
+  "function validFile("
 ]) {
   assert.ok(ui.includes(token), `Frontend missing: ${token}`);
 }

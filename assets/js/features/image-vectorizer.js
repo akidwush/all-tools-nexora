@@ -37,8 +37,8 @@
           <div class="nvi-hero-copy">
             <div class="nvi-kicker"><i class="fa-solid fa-bezier-curve"></i><span>CLOUD VECTOR ENGINE</span><b>FREECONVERT · API</b></div>
             <h2>Raster in.<br><em>Infinite scale out.</em></h2>
-            <p>Ubah PNG atau JPG menjadi SVG tajam langsung di perangkat. Tidak ada upload server, API key, kuota, atau antrean cloud.</p>
-            <div class="nvi-trust"><span><i class="fa-solid fa-shield-halved"></i> 100% LOCAL</span><span><i class="fa-solid fa-microchip"></i> RUST + WASM</span><span><i class="fa-solid fa-bolt"></i> WEB WORKER</span></div>
+            <p>Ubah PNG atau JPG menjadi SVG melalui FreeConvert Cloud dengan upload langsung yang aman dan preview proporsional.</p>
+            <div class="nvi-trust"><span><i class="fa-solid fa-cloud-arrow-up"></i> DIRECT UPLOAD</span><span><i class="fa-solid fa-key"></i> SERVER-ONLY KEY</span><span><i class="fa-solid fa-bezier-curve"></i> SVG CLOUD</span></div>
           </div>
           <div class="nvi-orbit" aria-hidden="true"><div class="nvi-pixel-grid"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="nvi-vector-mark"><svg viewBox="0 0 120 120"><path d="M20 92C29 30 49 19 91 28C72 47 92 69 64 91C49 102 34 100 20 92Z"/><circle cx="91" cy="28" r="6"/><circle cx="20" cy="92" r="6"/><circle cx="64" cy="91" r="6"/></svg></div><span>PNG</span><b>SVG</b></div>
         </section>
@@ -101,6 +101,8 @@
 
     function notify(message,tone){toast.textContent=message;toast.className='nvi-toast is-show '+(tone||'');clearTimeout(toast.__timer);toast.__timer=setTimeout(function(){toast.className='nvi-toast';},3000);}
     function updateLabels(){root.querySelector('#nviDetailValue').textContent=controls.detail.value;root.querySelector('#nviColorValue').textContent=controls.color.value+' / 8';root.querySelector('#nviNoiseValue').textContent=controls.noise.value+' px';var corner=Number(controls.corner.value);root.querySelector('#nviCornerValue').textContent=corner<60?'Smooth':(corner<125?'Balanced':'Sharp');}
+    function releaseFile(){if(state.objectUrl){URL.revokeObjectURL(state.objectUrl);state.objectUrl=null;}}
+    function validFile(file){return file&&file.size>0&&file.size<=MAX_FILE_BYTES&&(ACCEPTED_TYPES.has(file.type)||/\.(?:png|jpe?g)$/i.test(file.name));}
     function markStale(){if(state.svg&&!state.busy){statusBadge.className='is-warning';statusBadge.innerHTML='<i class="fa-solid fa-rotate"></i> SETTINGS CHANGED';runButton.querySelector('span').textContent='Convert ulang';}}
     function terminateWorker(){state.cancelled=true;}
 
@@ -140,8 +142,8 @@
 
     function setFile(file){
       if(!validFile(file)){notify(file&&file.size>MAX_FILE_BYTES?'File melebihi 12 MB.':'Gunakan file PNG atau JPG yang valid.','is-error');return;}
-      releaseFile();state.file=file;state.svg='';state.objectUrl=URL.createObjectURL(file);thumb.src=state.objectUrl;originalImage.src=state.objectUrl;fileName.textContent=file.name;fileMeta.textContent=formatBytes(file.size)+' · membaca dimensi…';fileCard.hidden=false;drop.classList.add('has-file');empty.hidden=true;original.hidden=false;vector.hidden=true;stage.classList.remove('is-empty');stats.hidden=true;actions.hidden=true;bgTools.hidden=true;code.hidden=true;runButton.disabled=false;runButton.querySelector('span').textContent='Vectorize image';statusBadge.className='is-local';statusBadge.innerHTML='<i class="fa-solid fa-shield-halved"></i> LOCAL ONLY';
-      var image=new Image();image.onload=function(){state.width=image.naturalWidth;state.height=image.naturalHeight;fileMeta.textContent=formatBytes(file.size)+' · '+state.width+' × '+state.height+' px';if(state.width*state.height>30000000){notify('Resolusi sangat besar; worker akan mengecilkan gambar secara aman.','is-warning');}};image.onerror=function(){clearFile();notify('Gambar tidak dapat dibuka.','is-error');};image.src=state.objectUrl;
+      releaseFile();state.file=file;state.svg='';state.objectUrl=URL.createObjectURL(file);thumb.src=state.objectUrl;originalImage.src=state.objectUrl;fileName.textContent=file.name;fileMeta.textContent=formatBytes(file.size)+' · membaca dimensi…';fileCard.hidden=false;drop.classList.add('has-file');empty.hidden=true;original.hidden=false;vector.hidden=true;stage.classList.remove('is-empty');stats.hidden=true;actions.hidden=true;bgTools.hidden=true;code.hidden=true;runButton.disabled=false;runButton.querySelector('span').textContent='Vectorize image';statusBadge.className='is-ready';statusBadge.innerHTML='<i class="fa-solid fa-cloud"></i> READY';
+      var image=new Image();image.onload=function(){state.width=image.naturalWidth;state.height=image.naturalHeight;fileMeta.textContent=formatBytes(file.size)+' · '+state.width+' × '+state.height+' px';if(state.width*state.height>30000000){notify('Resolusi gambar sangat besar; proses cloud dapat membutuhkan waktu lebih lama.','is-warning');}};image.onerror=function(){clearFile();notify('Gambar tidak dapat dibuka.','is-error');};image.src=state.objectUrl;
     }
     function clearFile(){releaseFile();state.file=null;state.svg='';state.width=0;state.height=0;fileInput.value='';thumb.removeAttribute('src');originalImage.removeAttribute('src');fileCard.hidden=true;drop.classList.remove('has-file');empty.hidden=false;original.hidden=true;vector.hidden=true;stage.className='nvi-stage is-empty view-split';stats.hidden=true;actions.hidden=true;bgTools.hidden=true;code.hidden=true;runButton.disabled=true;runButton.querySelector('span').textContent='Vectorize image';setBusy(false);}
     function failRun(message){var hasPrevious=Boolean(state.svg);setBusy(false);if(hasPrevious){statusBadge.className='is-warning';statusBadge.innerHTML='<i class="fa-solid fa-clock-rotate-left"></i> OLD RESULT';notify('Proses ulang gagal; preview sebelumnya tetap aman. '+message,'is-warning');}else{vector.hidden=true;stats.hidden=true;actions.hidden=true;bgTools.hidden=true;statusBadge.className='is-error';statusBadge.innerHTML='<i class="fa-solid fa-triangle-exclamation"></i> VECTOR FAILED';notify(message,'is-error');}}
