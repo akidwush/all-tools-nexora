@@ -96,14 +96,14 @@
 
     var root=body.querySelector('.nvi');var fileInput=root.querySelector('#nviFile');var drop=root.querySelector('#nviDrop');var fileCard=root.querySelector('#nviFileCard');var thumb=root.querySelector('#nviThumb');var fileName=root.querySelector('#nviFileName');var fileMeta=root.querySelector('#nviFileMeta');var engineBadge=root.querySelector('#nviEngine');var runButton=root.querySelector('#nviRun');var stopButton=root.querySelector('#nviStop');var progressBox=root.querySelector('#nviProgress');var progressLabel=root.querySelector('#nviProgressLabel');var progressValue=root.querySelector('#nviProgressValue');var progressBar=root.querySelector('#nviProgressBar');var stage=root.querySelector('#nviStage');var empty=root.querySelector('#nviEmpty');var original=root.querySelector('#nviOriginal');var originalImage=root.querySelector('#nviOriginalImage');var vector=root.querySelector('#nviVector');var vectorHost=root.querySelector('#nviVectorHost');var vectorLabel=root.querySelector('#nviVectorLabel');var statusBadge=root.querySelector('#nviStatus');var bgTools=root.querySelector('#nviBgTools');var stats=root.querySelector('#nviStats');var actions=root.querySelector('#nviActions');var code=root.querySelector('#nviCode');var codeText=root.querySelector('#nviCodeText');var toast=root.querySelector('#nviToast');
     var controls={detail:root.querySelector('#nviDetail'),color:root.querySelector('#nviColor'),noise:root.querySelector('#nviNoise'),corner:root.querySelector('#nviCorner'),colors:root.querySelector('#nviColors'),quality:root.querySelector('#nviQuality'),mosaic:root.querySelector('#nviMosaic'),adaptive:root.querySelector('#nviAdaptive')};
-    var state={file:null,objectUrl:null,width:0,height:0,preset:'illustration',style:'spline',svg:'',busy:false,progress:0,destroyed:false,cancelled:false};
+    var state={file:null,objectUrl:null,previewUrl:null,svgBlob:null,svgText:'',width:0,height:0,preset:'illustration',style:'spline',busy:false,progress:0,destroyed:false,cancelled:false,phase:'IDLE'};
     var profile=deviceProfile();root.querySelector('#nviProfile').textContent=profile.label+' · '+(profile.maxPixels/1000000).toFixed(1)+' MP';
 
     function notify(message,tone){toast.textContent=message;toast.className='nvi-toast is-show '+(tone||'');clearTimeout(toast.__timer);toast.__timer=setTimeout(function(){toast.className='nvi-toast';},3000);}
     function updateLabels(){root.querySelector('#nviDetailValue').textContent=controls.detail.value;root.querySelector('#nviColorValue').textContent=controls.color.value+' / 8';root.querySelector('#nviNoiseValue').textContent=controls.noise.value+' px';var corner=Number(controls.corner.value);root.querySelector('#nviCornerValue').textContent=corner<60?'Smooth':(corner<125?'Balanced':'Sharp');}
-    function releaseFile(){if(state.objectUrl){URL.revokeObjectURL(state.objectUrl);state.objectUrl=null;}}
+    function releaseFile(){if(state.objectUrl){URL.revokeObjectURL(state.objectUrl);state.objectUrl=null;}if(state.previewUrl){URL.revokeObjectURL(state.previewUrl);state.previewUrl=null;}state.svgBlob=null;state.svgText='';}
     function validFile(file){return file&&file.size>0&&file.size<=MAX_FILE_BYTES&&(ACCEPTED_TYPES.has(file.type)||/\.(?:png|jpe?g)$/i.test(file.name));}
-    function markStale(){if(state.svg&&!state.busy){statusBadge.className='is-warning';statusBadge.innerHTML='<i class="fa-solid fa-rotate"></i> SETTINGS CHANGED';runButton.querySelector('span').textContent='Convert ulang';}}
+    function markStale(){if(state.svgBlob&&!state.busy){statusBadge.className='is-warning';statusBadge.innerHTML='<i class="fa-solid fa-rotate"></i> SETTINGS CHANGED';runButton.querySelector('span').textContent='Convert ulang';}}
     function applyPreset(name){
       var preset=PRESETS[name]||PRESETS.illustration||PRESETS.logo;
       state.preset=name;
@@ -153,200 +153,75 @@
     function friendlyError(error){
       var code=String(error&&error.code||'');
       var status=Number(error&&error.status||0);
-      if(code==='FC_NOT_CONFIGURED')return 'FreeConvert belum dikonfigurasi di Vercel. Tambahkan API key FreeConvert di Vercel lalu redeploy.';
+      if(code==='FC_NOT_CONFIGURED'||code==='FREECONVERT_NOT_CONFIGURED')return 'FreeConvert belum dikonfigurasi di Vercel.';
       if(code==='FREECONVERT_TIMEOUT'||status===504)return 'FreeConvert timeout. Coba lagi beberapa saat.';
-      if(status===429||code==='FREECONVERT_429'||code==='FREECONVERT_402')return 'Kuota/rate limit FreeConvert sedang habis. Coba lagi nanti atau cek paket API.';
-      if(code==='FREECONVERT_401'||code==='FREECONVERT_403')return 'FreeConvert menolak API key. Periksa API key FreeConvert di Vercel.';
+      if(status===429||code==='FREECONVERT_429'||code==='FREECONVERT_402')return 'Kuota/rate limit FreeConvert sedang habis.';
+      if(code==='FREECONVERT_401'||code==='FREECONVERT_403')return 'FreeConvert menolak API key.';
       return (error&&error.message)||'Konversi vector gagal.';
     }
 
     async function api(payload){
-      var response=await fetch('/api/tool-health?mode=image-vectorizer',{
-        method:'POST',
-        headers:{'content-type':'application/json'},
-        body:JSON.stringify(Object.assign({tool:'image-vectorizer'},payload))
-      });
-      var data={};
-      try{data=await response.json();}catch(_){}
+      var response=await fetch('/api/tool-health?mode=image-vectorizer',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(Object.assign({tool:'image-vectorizer'},payload))});
+      var data={};try{data=await response.json();}catch(_){}
       if(!response.ok||data.ok===false){var err=new Error(data.message||('FreeConvert API gagal (HTTP '+response.status+').'));err.code=data.error||'';err.status=response.status;throw err;}
       return data;
     }
 
     async function uploadDirect(upload,file){
-      var form=new FormData();
-      Object.keys(upload.parameters||{}).forEach(function(key){form.append(key,upload.parameters[key]);});
-      form.append('file',file,file.name);
-      var response;
-      try{response=await fetch(upload.url,{method:'POST',body:form});}
-      catch(error){throw new Error('Upload langsung ke FreeConvert gagal terhubung. Periksa koneksi lalu coba lagi.');}
-      if(!response.ok){var detail='';try{detail=(await response.text()).slice(0,180);}catch(_){}throw new Error('Upload ke FreeConvert gagal (HTTP '+response.status+').'+(detail?' '+detail:''));}
+      var form=new FormData();Object.keys(upload.parameters||{}).forEach(function(key){form.append(key,upload.parameters[key]);});form.append('file',file,file.name);
+      var response;try{response=await fetch(upload.url,{method:'POST',body:form});}catch(_){throw new Error('Upload langsung ke FreeConvert gagal terhubung.');}
+      if(!response.ok)throw new Error('Upload ke FreeConvert gagal (HTTP '+response.status+').');
     }
 
     async function pollResult(taskId){
+      state.phase='POLL';
       for(var i=0;i<100&&!state.cancelled&&!state.destroyed;i++){
         var result=await api({action:'result',taskId:taskId});
-        if(result.status==='success'&&result.svg)return result.svg;
+        if(result.status==='success'||result.ready===true)return taskId;
         if(result.status==='failed')throw new Error(result.message||'FreeConvert gagal memproses gambar.');
-        setProgress(Math.min(94,62+i*.45),'FreeConvert sedang membuat SVG');
-        await sleep(1500);
+        setProgress(Math.min(94,62+i*.45),'FreeConvert sedang membuat SVG');await sleep(1500);
       }
-      if(state.cancelled)throw new Error('Proses dihentikan.');
-      throw new Error('Konversi terlalu lama. Coba lagi.');
+      if(state.cancelled)throw new Error('Proses dihentikan.');throw new Error('Konversi terlalu lama. Coba lagi.');
+    }
+
+    async function fetchSvgBlob(taskId){
+      state.phase='RECEIVE';
+      var response=await fetch('/api/tool-health?mode=image-vectorizer&download='+encodeURIComponent(taskId),{cache:'no-store'});
+      if(!response.ok){var msg='';try{msg=(await response.text()).slice(0,220);}catch(_){}throw new Error('Download SVG gagal (HTTP '+response.status+').'+(msg?' '+msg:''));}
+      var blob=await response.blob();if(!blob.size)throw new Error('SVG hasil kosong.');if(blob.size>8*1024*1024)throw new Error('SVG hasil terlalu besar untuk browser.');
+      var head=await blob.slice(0,512).text();if(!/^\s*(?:<\?xml[^>]*>\s*)?<svg\b/i.test(head))throw new Error('Output FreeConvert bukan SVG valid.');return blob;
     }
 
     function setFile(file){
       if(!validFile(file)){notify(file&&file.size>MAX_FILE_BYTES?'File melebihi 12 MB.':'Gunakan file PNG atau JPG yang valid.','is-error');return;}
-      releaseFile();state.file=file;state.svg='';state.objectUrl=URL.createObjectURL(file);thumb.src=state.objectUrl;originalImage.src=state.objectUrl;fileName.textContent=file.name;fileMeta.textContent=formatBytes(file.size)+' · membaca dimensi…';fileCard.hidden=false;drop.classList.add('has-file');empty.hidden=true;original.hidden=false;vector.hidden=true;stage.classList.remove('is-empty');stats.hidden=true;actions.hidden=true;bgTools.hidden=true;code.hidden=true;runButton.disabled=false;runButton.querySelector('span').textContent='Convert to SVG';statusBadge.className='is-ready';statusBadge.innerHTML='<i class="fa-solid fa-cloud"></i> READY';
-      var image=new Image();image.onload=function(){state.width=image.naturalWidth;state.height=image.naturalHeight;fileMeta.textContent=formatBytes(file.size)+' · '+state.width+' × '+state.height+' px';if(state.width*state.height>30000000){notify('Resolusi gambar sangat besar; proses cloud dapat membutuhkan waktu lebih lama.','is-warning');}};image.onerror=function(){clearFile();notify('Gambar tidak dapat dibuka.','is-error');};image.src=state.objectUrl;
+      releaseFile();state.file=file;state.phase='READY';state.objectUrl=URL.createObjectURL(file);thumb.src=state.objectUrl;originalImage.src=state.objectUrl;fileName.textContent=file.name;fileMeta.textContent=formatBytes(file.size)+' · membaca dimensi…';fileCard.hidden=false;drop.classList.add('has-file');empty.hidden=true;original.hidden=false;vector.hidden=true;stage.classList.remove('is-empty');stats.hidden=true;actions.hidden=true;bgTools.hidden=true;code.hidden=true;codeText.textContent='';runButton.disabled=false;runButton.querySelector('span').textContent='Convert to SVG';statusBadge.className='is-ready';statusBadge.innerHTML='<i class="fa-solid fa-cloud"></i> READY';statusBadge.removeAttribute('title');
+      var image=new Image();image.onload=function(){state.width=image.naturalWidth;state.height=image.naturalHeight;fileMeta.textContent=formatBytes(file.size)+' · '+state.width+' × '+state.height+' px';};image.onerror=function(){clearFile();notify('Gambar tidak dapat dibuka.','is-error');};image.src=state.objectUrl;
     }
-    function clearFile(){releaseFile();state.file=null;state.svg='';state.width=0;state.height=0;fileInput.value='';thumb.removeAttribute('src');originalImage.removeAttribute('src');fileCard.hidden=true;drop.classList.remove('has-file');empty.hidden=false;original.hidden=true;vector.hidden=true;stage.className='nvi-stage is-empty view-split';stats.hidden=true;actions.hidden=true;bgTools.hidden=true;code.hidden=true;runButton.disabled=true;runButton.querySelector('span').textContent='Convert to SVG';setBusy(false);}
-    function failRun(message){var hasPrevious=Boolean(state.svg);setBusy(false);if(hasPrevious){statusBadge.className='is-warning';statusBadge.innerHTML='<i class="fa-solid fa-clock-rotate-left"></i> OLD RESULT';notify('Proses ulang gagal; preview sebelumnya tetap aman. '+message,'is-warning');}else{vector.hidden=true;stats.hidden=true;actions.hidden=true;bgTools.hidden=true;statusBadge.className='is-error';statusBadge.innerHTML='<i class="fa-solid fa-triangle-exclamation"></i> VECTOR FAILED';notify(message,'is-error');}}
+    function clearFile(){releaseFile();state.file=null;state.width=0;state.height=0;state.phase='IDLE';fileInput.value='';thumb.removeAttribute('src');originalImage.removeAttribute('src');vectorHost.replaceChildren();fileCard.hidden=true;drop.classList.remove('has-file');empty.hidden=false;original.hidden=true;vector.hidden=true;stage.className='nvi-stage is-empty view-split';stats.hidden=true;actions.hidden=true;bgTools.hidden=true;code.hidden=true;codeText.textContent='';runButton.disabled=true;runButton.querySelector('span').textContent='Convert to SVG';setBusy(false);}
+    function failRun(message){var phase=state.phase||'UNKNOWN';var hasPrevious=Boolean(state.svgBlob);setBusy(false);progressBox.hidden=false;progressLabel.textContent='FAILED ['+phase+'] · '+(message||'Konversi gagal.');progressValue.textContent='!';progressBar.style.width='100%';statusBadge.title='['+phase+'] '+(message||'Konversi gagal.');if(hasPrevious){statusBadge.className='is-warning';statusBadge.innerHTML='<i class="fa-solid fa-clock-rotate-left"></i> OLD RESULT';}else{vector.hidden=true;stats.hidden=true;actions.hidden=true;bgTools.hidden=true;statusBadge.className='is-error';statusBadge.innerHTML='<i class="fa-solid fa-triangle-exclamation"></i> FAILED · '+phase;}notify('Gagal ['+phase+']: '+message,'is-error');}
     async function run(){
-      if(!state.file||state.busy)return;
-      state.cancelled=false;
-      setBusy(true);
-      state.progress=0;
-      setProgress(4,'Meminta signed upload URL');
-      statusBadge.className='is-working';
-      statusBadge.innerHTML='<i class="fa-solid fa-circle-notch fa-spin"></i> CONVERTING';
-      var started=performance.now();
-
+      if(!state.file||state.busy)return;state.cancelled=false;state.phase='PREPARE';setBusy(true);state.progress=0;progressBar.style.width='0%';setProgress(4,'Meminta signed upload URL');statusBadge.className='is-working';statusBadge.innerHTML='<i class="fa-solid fa-circle-notch fa-spin"></i> CONVERTING';statusBadge.removeAttribute('title');var started=performance.now();
       try{
         var format=(state.file.type==='image/jpeg'||/\.jpe?g$/i.test(state.file.name))?'jpg':'png';
-
-        var prepared=await api({
-          action:'prepare',
-          filename:state.file.name,
-          size:state.file.size,
-          format:format
-        });
-
-        if(state.cancelled)return;
-
-        setProgress(18,'Mengupload gambar langsung ke FreeConvert');
-        await uploadDirect(prepared.upload,state.file);
-
-        if(state.cancelled)return;
-
-        setProgress(48,'Memulai konversi PNG/JPG → SVG');
-        var tuning=cloudTuning();
-        var startedTask=await api({
-          action:'start',
-          importTaskId:prepared.taskId,
-          filename:state.file.name,
-          format:format,
-          tuning:tuning
-        });
-
-        setProgress(62,'Menunggu hasil vector');
-        var rawSvg=await pollResult(startedTask.exportTaskId);
-
-        if(state.cancelled)return;
-        finish(rawSvg,performance.now()-started);
-      }catch(error){
-        if(!state.cancelled)failRun(friendlyError(error));
-        else setBusy(false);
-      }
+        var prepared=await api({action:'prepare',filename:state.file.name,size:state.file.size,format:format});if(state.cancelled)return;
+        state.phase='UPLOAD';setProgress(18,'Mengupload gambar langsung ke FreeConvert');await uploadDirect(prepared.upload,state.file);if(state.cancelled)return;
+        state.phase='START';setProgress(48,'Memulai konversi PNG/JPG → SVG');var tuning=cloudTuning();var startedTask=await api({action:'start',importTaskId:prepared.taskId,filename:state.file.name,format:format,tuning:tuning});
+        state.phase='POLL';setProgress(62,'Menunggu hasil vector');var exportTaskId=await pollResult(startedTask.exportTaskId);if(state.cancelled)return;
+        setProgress(95,'Mengambil SVG tanpa JSON besar');var blob=await fetchSvgBlob(exportTaskId);if(state.cancelled)return;
+        state.phase='RENDER';finishBlob(blob,performance.now()-started);
+      }catch(error){if(!state.cancelled)failRun(friendlyError(error));else setBusy(false);}
     }
 
-    function finish(rawSvg,durationMs){
-      try{
-        var source=String(rawSvg||'');
-        var rawBytes=new TextEncoder().encode(source).byteLength;
-
-        if(!/^\s*(?:<\?xml[^>]*>\s*)?<svg\b/i.test(source)){
-          throw new Error('SVG hasil FreeConvert tidak valid.');
-        }
-
-        // HF9.5 — large SVG fast path for Android/mobile.
-        // Avoid DOMParser + full-node traversal for multi-MB vectors.
-        if(rawBytes>750000){
-          state.svg=source;
-        }else{
-          state.svg=sanitizeSvg(source);
-        }
-      }catch(error){
-        failRun(error.message||'SVG gagal diproses browser.');
-        return;
-      }
-
-      var svgBytes=new TextEncoder().encode(state.svg).byteLength;
-
-      // Lightweight statistics for large vectors.
-      var analysis={
-        paths:(state.svg.match(/<path\b/gi)||[]).length,
-        colors:0
-      };
-
-      try{
-        var colorMatches=state.svg.match(/#[0-9a-f]{3,8}\b/gi)||[];
-        analysis.colors=new Set(colorMatches.slice(0,20000).map(function(v){
-          return v.toLowerCase();
-        })).size;
-      }catch(_){
-        analysis.colors=0;
-      }
-
-      setProgress(100,'SVG selesai');
-      setBusy(false);
-
-      // HF9.4 — mobile-safe SVG preview.
-      // SVG FreeConvert dapat berukuran beberapa MB dan memiliki ribuan path.
-      // Jangan inject seluruh tree SVG melalui innerHTML karena sangat berat
-      // di browser Android. Render sebagai isolated Blob image instead.
-      vectorHost.replaceChildren();
-      var previewBlob=new Blob([state.svg],{type:'image/svg+xml;charset=utf-8'});
-      var previewUrl=URL.createObjectURL(previewBlob);
-      var previewImage=new Image();
-      previewImage.alt='Vector preview';
-      previewImage.decoding='async';
-      previewImage.style.cssText='display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;';
-      previewImage.onload=function(){
-        setTimeout(function(){URL.revokeObjectURL(previewUrl);},1000);
-      };
-      previewImage.onerror=function(){
-        URL.revokeObjectURL(previewUrl);
-      };
-      previewImage.src=previewUrl;
-      vectorHost.appendChild(previewImage);
-      vector.hidden=false;
-      empty.hidden=true;
-      bgTools.hidden=false;
-      actions.hidden=false;
-      stats.hidden=false;
-
-      stage.classList.remove('is-empty','view-original','view-split');
-      stage.classList.add('view-vector');
-
-      root.querySelectorAll('#nviViewTabs button').forEach(function(button){
-        button.classList.toggle('is-active',button.dataset.view==='vector');
-      });
-
-      vectorLabel.textContent=(state.width||'?')+' × '+(state.height||'?')+' · fit 100%';
-      statusBadge.className='is-success';
-      statusBadge.innerHTML='<i class="fa-solid fa-circle-check"></i> VECTOR READY';
-      runButton.querySelector('span').textContent='Convert ulang';
-
-      var ratio=state.file?Math.round((1-svgBytes/state.file.size)*100):0;
-
-      stats.replaceChildren(
-        metric('fa-solid fa-bezier-curve','Paths',analysis.paths.toLocaleString('id-ID'),'curve & shape'),
-        metric('fa-solid fa-palette','Colors',(analysis.colors||0).toLocaleString('id-ID'),'detected palette'),
-        metric('fa-solid fa-file-code','SVG size',formatBytes(svgBytes),ratio>0?ratio+'% lebih kecil':'vector output'),
-        metric('fa-regular fa-clock','Process',(durationMs/1000).toFixed(1)+' s','cloud pipeline')
-      );
-
-      codeText.textContent=state.svg;
-      root.querySelector('#nviCodeSize').textContent=formatBytes(svgBytes);
-
-      requestAnimationFrame(function(){
-        if(matchMedia('(max-width:720px)').matches){
-          root.querySelector('.nvi-preview-panel').scrollIntoView({behavior:'smooth',block:'start'});
-        }
-      });
-
-      notify('SVG FreeConvert selesai dan preview tetap fit 100%.','is-success');
+    function finishBlob(blob,durationMs){
+      state.svgBlob=blob;state.svgText='';if(state.previewUrl)URL.revokeObjectURL(state.previewUrl);state.previewUrl=URL.createObjectURL(blob);setProgress(100,'SVG selesai');setBusy(false);vectorHost.replaceChildren();
+      var previewImage=new Image();previewImage.alt='Vector preview';previewImage.decoding='async';previewImage.style.cssText='display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;';previewImage.src=state.previewUrl;vectorHost.appendChild(previewImage);
+      vector.hidden=false;empty.hidden=true;bgTools.hidden=false;actions.hidden=false;stats.hidden=false;stage.classList.remove('is-empty','view-original','view-split');stage.classList.add('view-vector');root.querySelectorAll('#nviViewTabs button').forEach(function(button){button.classList.toggle('is-active',button.dataset.view==='vector');});
+      vectorLabel.textContent=(state.width||'?')+' × '+(state.height||'?')+' · fit 100% · mobile blob preview';statusBadge.className='is-success';statusBadge.innerHTML='<i class="fa-solid fa-circle-check"></i> VECTOR READY';statusBadge.removeAttribute('title');runButton.querySelector('span').textContent='Convert ulang';state.phase='READY';
+      var ratio=state.file?Math.round((1-blob.size/state.file.size)*100):0;stats.replaceChildren(metric('fa-solid fa-bezier-curve','Paths','Cloud','lazy parse'),metric('fa-solid fa-palette','Colors','—','lazy parse'),metric('fa-solid fa-file-code','SVG size',formatBytes(blob.size),ratio>0?ratio+'% lebih kecil':'vector output'),metric('fa-regular fa-clock','Process',(durationMs/1000).toFixed(1)+' s','cloud pipeline'));
+      root.querySelector('#nviCodeSize').textContent=formatBytes(blob.size);codeText.textContent='Klik View code untuk memuat source SVG.';requestAnimationFrame(function(){if(matchMedia('(max-width:720px)').matches){root.querySelector('.nvi-preview-panel').scrollIntoView({behavior:'smooth',block:'start'});}});notify('SVG selesai. Preview memakai Blob agar stabil di Android.','is-success');
     }
+
+    async function ensureSvgText(){if(state.svgText)return state.svgText;if(!state.svgBlob)throw new Error('SVG belum tersedia.');state.svgText=await state.svgBlob.text();return state.svgText;}
 
     function metric(icon,label,value,sub){var item=node('article');item.innerHTML='<i class="'+icon+'"></i>';var copy=node('div');copy.append(node('span','',label),node('strong','',value),node('small','',sub||''));item.appendChild(copy);return item;}
 
@@ -356,21 +231,9 @@
     Object.values(controls).forEach(function(control){control.addEventListener('input',function(){updateLabels();markStale();});control.addEventListener('change',markStale);});
     root.querySelector('#nviViewTabs').addEventListener('click',function(event){var button=event.target.closest('button[data-view]');if(!button)return;stage.classList.remove('view-original','view-split','view-vector');stage.classList.add('view-'+button.dataset.view);root.querySelectorAll('#nviViewTabs button').forEach(function(item){item.classList.toggle('is-active',item===button);});});
     root.querySelector('#nviBgTools').addEventListener('click',function(event){var button=event.target.closest('button[data-bg]');if(!button)return;stage.dataset.bg=button.dataset.bg;root.querySelectorAll('#nviBgTools button').forEach(function(item){item.classList.toggle('is-active',item===button);});});
-    root.querySelector('#nviDownload').addEventListener('click',function(){if(state.svg)download(safeName(state.file&&state.file.name)+'-nexora-vector.svg',state.svg);});root.querySelector('#nviCopy').addEventListener('click',function(){if(!state.svg)return;copyText(state.svg).then(function(){notify('Kode SVG disalin.','is-success');}).catch(function(){notify('Clipboard ditolak browser.','is-error');});});root.querySelector('#nviCodeToggle').addEventListener('click',function(){code.hidden=!code.hidden;if(!code.hidden)code.scrollIntoView({behavior:'smooth',block:'nearest'});});root.querySelector('#nviReset').addEventListener('click',clearFile);
+    root.querySelector('#nviDownload').addEventListener('click',function(){if(!state.svgBlob)return;download(safeName(state.file&&state.file.name)+'-nexora-vector.svg',state.svgBlob,'image/svg+xml');});root.querySelector('#nviCopy').addEventListener('click',function(){ensureSvgText().then(copyText).then(function(){notify('Kode SVG disalin.','is-success');}).catch(function(error){notify(error&&error.message||'Clipboard ditolak browser.','is-error');});});root.querySelector('#nviCodeToggle').addEventListener('click',function(){code.hidden=!code.hidden;if(!code.hidden){ensureSvgText().then(function(text){codeText.textContent=text;}).catch(function(error){codeText.textContent=error.message;});code.scrollIntoView({behavior:'smooth',block:'nearest'});}});root.querySelector('#nviReset').addEventListener('click',clearFile);
     function paste(event){if(state.destroyed||state.busy||!event.clipboardData)return;var item=Array.from(event.clipboardData.items||[]).find(function(row){return row.type==='image/png'||row.type==='image/jpeg';});if(item){var file=item.getAsFile();if(file){event.preventDefault();setFile(new File([file],'clipboard-'+Date.now()+'.png',{type:file.type||'image/png'}));}}}
     document.addEventListener('paste',paste);body.__nxCleanup=function(){state.destroyed=true;state.cancelled=true;releaseFile();document.removeEventListener('paste',paste);clearTimeout(toast.__timer);};
-    async function checkEngine(){
-      engineBadge.className='is-working';engineBadge.innerHTML='<i class="fa-solid fa-circle-notch fa-spin"></i> CHECKING';
-      try{
-        var response=await fetch('/api/tool-health?mode=image-vectorizer&health=1',{cache:'no-store'});
-        var data=await response.json();
-        if(!response.ok||!data.ok||!data.configured)throw Object.assign(new Error('FreeConvert belum dikonfigurasi.'),{code:'FC_NOT_CONFIGURED'});
-        engineBadge.className='is-ready';engineBadge.innerHTML='<i class="fa-solid fa-cloud"></i> FREECONVERT READY';
-      }catch(error){
-        engineBadge.className='is-error';engineBadge.innerHTML='<i class="fa-solid fa-triangle-exclamation"></i> ENGINE OFFLINE';
-        notify(friendlyError(error),'is-error');
-      }
-    }
-    updateLabels();checkEngine();
+    async function checkEngine(){engineBadge.className='is-working';engineBadge.innerHTML='<i class="fa-solid fa-circle-notch fa-spin"></i> CHECKING';try{var response=await fetch('/api/tool-health?mode=image-vectorizer&health=1',{cache:'no-store'});var data=await response.json();if(!response.ok||!data.ok||!data.configured)throw new Error('FreeConvert belum dikonfigurasi.');engineBadge.className='is-ready';engineBadge.innerHTML='<i class="fa-solid fa-cloud"></i> FREECONVERT READY';}catch(error){engineBadge.className='is-error';engineBadge.innerHTML='<i class="fa-solid fa-triangle-exclamation"></i> ENGINE OFFLINE';notify(error.message||'Engine offline.','is-error');}}updateLabels();checkEngine();
   };
 })();
