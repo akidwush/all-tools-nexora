@@ -20,7 +20,8 @@ for (const token of [
   "sanitizeSvg",
   "preserveAspectRatio",
   "fit 100%",
-  "FreeConvert"
+  "FreeConvert",
+  "function markStale()"
 ]) {
   assert.ok(ui.includes(token), `Frontend missing: ${token}`);
 }

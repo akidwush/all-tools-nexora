@@ -101,6 +101,7 @@
 
     function notify(message,tone){toast.textContent=message;toast.className='nvi-toast is-show '+(tone||'');clearTimeout(toast.__timer);toast.__timer=setTimeout(function(){toast.className='nvi-toast';},3000);}
     function updateLabels(){root.querySelector('#nviDetailValue').textContent=controls.detail.value;root.querySelector('#nviColorValue').textContent=controls.color.value+' / 8';root.querySelector('#nviNoiseValue').textContent=controls.noise.value+' px';var corner=Number(controls.corner.value);root.querySelector('#nviCornerValue').textContent=corner<60?'Smooth':(corner<125?'Balanced':'Sharp');}
+    function markStale(){if(state.svg&&!state.busy){statusBadge.className='is-warning';statusBadge.innerHTML='<i class="fa-solid fa-rotate"></i> SETTINGS CHANGED';runButton.querySelector('span').textContent='Convert ulang';}}
     function terminateWorker(){state.cancelled=true;}
 
     function sleep(ms){return new Promise(function(resolve){setTimeout(resolve,ms);});}
