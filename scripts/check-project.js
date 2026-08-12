@@ -26,7 +26,7 @@ const required = [
   "assets/module-manifest.json", "assets/js/core/tool-registry.js", "assets/js/core/app.js",
   "api/health.js", "api/feedback.js", "api/audit.js", "api/tool-health.js",
   "lib/database.js", "lib/memory-store.js", "lib/tool-health.js", "lib/vdeploy.js",
-  "lib/freeconvert-vectorizer.js", "lib/sitegrabber-proxy.js", "database/schema.sql"
+  "lib/freeconvert-vectorizer.js", "lib/bigjpg-upscaler.js", "lib/sitegrabber-proxy.js", "database/schema.sql"
 ];
 for (const relative of required) if (!fs.existsSync(path.join(root, relative))) fail(`File wajib hilang: ${relative}`);
 

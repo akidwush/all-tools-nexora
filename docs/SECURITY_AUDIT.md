@@ -1,7 +1,7 @@
 # Audit Keamanan dan Stabilitas
 
 Tanggal audit: 12 Agustus 2026  
-Versi hasil perbaikan: 6.3.15
+Versi hasil perbaikan: 6.3.16
 
 ## Ringkasan
 
@@ -23,6 +23,8 @@ Audit mencakup frontend, iframe tool, 12 Vercel Functions, proxy pihak ketiga, a
 | Sedang | Test/build bergantung pada nomor rilis serta dokumen historis | Audit dinamis, test runner, dan build deterministik menggantikannya |
 | Sedang | Situs tidak mengirim CSP dan metadata social sharing tidak lengkap | CSP kompatibel dipasang pada Vercel/server lokal; Open Graph dan Twitter Card dilengkapi |
 | Sedang | Image Vectorizer hanya memantau task ekspor sehingga penyebab task induk hilang | Task convert dan export dipantau terpisah; kode kuota, autentikasi, timeout, dan provider diteruskan ke UI |
+| Tinggi | Integrasi upscaler publik dapat membocorkan API key atau menguras kuota provider | Big Image memakai proxy server-only, token job HMAC, batas per-IP/global, dan tidak mengirim key ke browser |
+| Tinggi | Bigjpg membutuhkan URL publik sehingga file pengguna berisiko diletakkan pada storage terbuka | Sumber disimpan di bucket Supabase privat, hanya dibagikan lewat signed URL terbatas waktu, lalu dibersihkan pada status terminal/cancel/expiry |
 
 ## Verifikasi
 
@@ -35,11 +37,12 @@ npm run build
 npm audit --omit=dev
 ```
 
-Regression test memeriksa konsistensi 43 tool, sintaks seluruh JavaScript, batas 12 Functions, isolasi iframe, bounded memory, ukuran payload, route emulation, dan penolakan akses file privat dari server lokal.
+Regression test memeriksa konsistensi 44 tool, sintaks seluruh JavaScript, batas 12 Functions, isolasi iframe, bounded memory, ukuran payload, route emulation, dan penolakan akses file privat dari server lokal.
 
 ## Risiko tersisa
 
 - Tool yang memakai API pihak ketiga mengikuti ketersediaan, kuota, dan kontrak provider tersebut.
+- Big Image mengirim gambar kepada Bigjpg untuk diproses. Kebijakan retensi provider tetap berlaku di luar bucket privat Nexora; pengguna harus memiliki hak atas gambar yang dikirim.
 - Source HTML legacy berukuran besar masih dipertahankan untuk beberapa tool aktif. Sandbox membatasi haknya, tetapi migrasi bertahap ke komponen native akan membuat pemeliharaan lebih mudah.
 - CSP aktif masih mengizinkan inline script/style dan sejumlah origin eksternal untuk kompatibilitas payload legacy. Migrasikan handler dan payload tersebut bertahap agar `'unsafe-inline'` serta allowlist yang tidak lagi diperlukan dapat dihapus.
 - Token deployment memiliki hak tinggi. Gunakan token scoped, rotasi berkala, lindungi `NEXUS_DEPLOY_ACCESS_KEY`, dan audit aktivitas provider.

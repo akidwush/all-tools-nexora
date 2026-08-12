@@ -6,6 +6,7 @@ const { handleSpaceExplorer } = require("../lib/space-explorer");
 const { handleOcrIntelligence } = require("../lib/ocr-intelligence");
 const { handleSvgToXml } = require("../lib/svgtoxml-proxy");
 const { handleFreeConvertVectorizer } = require("../lib/freeconvert-vectorizer");
+const { handleBigImage } = require("../lib/bigjpg-upscaler");
 const {
   TOOL_CATALOG,
   getHealthConfig,
@@ -88,6 +89,10 @@ module.exports = async function handler(request, response) {
 
   if (url.searchParams.get("mode") === "image-vectorizer") {
     return handleFreeConvertVectorizer(request, response, url);
+  }
+
+  if (url.searchParams.get("mode") === "big-image") {
+    return handleBigImage(request, response, url);
   }
 
   if (request.method !== "GET" && request.method !== "POST") {

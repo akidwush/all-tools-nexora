@@ -86,6 +86,10 @@
       "destination": "/api/tool-health?mode=svg-alight"
     },
     {
+      "source": "/api/big-image",
+      "destination": "/api/tool-health?mode=big-image"
+    },
+    {
       "source": "/api/vdeploy",
       "destination": "/api/health?mode=vdeploy"
     }

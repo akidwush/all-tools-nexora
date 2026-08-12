@@ -1,6 +1,6 @@
 # All Tools Nexora
 
-All Tools Nexora v6.3.15 adalah website toolkit statis dengan 43 tool, lazy-loaded feature modules, dashboard admin, Supabase, dan 12 Vercel Functions. Source frontend tetap tanpa framework dan tidak memiliki dependency npm produksi.
+All Tools Nexora v6.3.16 adalah website toolkit statis dengan 44 tool, lazy-loaded feature modules, dashboard admin, Supabase, dan 12 Vercel Functions. Source frontend tetap tanpa framework dan tidak memiliki dependency npm produksi.
 
 ## Menjalankan secara lokal
 
@@ -48,7 +48,7 @@ Salin `.env.example` dan isi hanya layanan yang digunakan. Variable utama:
 
 - Database/admin: `SUPABASE_URL`, `SUPABASE_SECRET_KEY` atau `SUPABASE_SERVICE_ROLE_KEY`, serta `FEEDBACK_HASH_SALT`.
 - Operasional: `HEALTH_CHECK_TOKEN` dan pengaturan timeout/cache opsional.
-- Tool eksternal: `COINGECKO_API_KEY`, `GOOGLE_PAGESPEED_API_KEY`, `GOOGLE_SAFE_BROWSING_API_KEY`, `NASA_API_KEY`, `OCR_SPACE_API_KEY`, `FREECONVERT_API_KEY`, dan `SVGTOXML_API_KEY`.
+- Tool eksternal: `COINGECKO_API_KEY`, `GOOGLE_PAGESPEED_API_KEY`, `GOOGLE_SAFE_BROWSING_API_KEY`, `NASA_API_KEY`, `OCR_SPACE_API_KEY`, `FREECONVERT_API_KEY`, `BIGJPG_API_KEY`, dan `SVGTOXML_API_KEY`.
 - SiteGrabber: `SITEGRABBER_API_BASE_URL` dan `SITEGRABBER_API_KEY`.
 - Deploy Center: `NEXUS_DEPLOY_ACCESS_KEY`, kemudian token `VERCEL_TOKEN` atau `NETLIFY_TOKEN`.
 
@@ -59,6 +59,8 @@ Jangan memakai prefix publik untuk secret dan jangan menaruh key di HTML/JavaScr
 Untuk instalasi baru, jalankan `database/schema.sql` melalui Supabase SQL Editor. Buat user di Supabase Authentication, ganti `GANTI_EMAIL_ADMIN` pada `database/setup-first-admin.sql`, lalu jalankan file tersebut.
 
 Untuk database lama, jalankan migration yang belum pernah diterapkan dari `database/migrations/` sesuai urutan nomor. Backup database terlebih dahulu.
+
+Big Image memerlukan `database/migrations/015_big_image_bigjpg.sql`. Migration tersebut membuat tabel job dan bucket `big-image-inputs` privat. Atur `BIGJPG_API_KEY` serta `BIGJPG_JOB_SECRET` di Vercel, lalu redeploy. Batas per-IP/global dapat disesuaikan melalui `BIGJPG_HOURLY_IP_LIMIT` dan `BIGJPG_DAILY_TASK_LIMIT`.
 
 ## Pemeriksaan dan build
 
@@ -78,9 +80,11 @@ Deploy ke Vercel menggunakan konfigurasi `vercel.json`. Seluruh secret harus dia
 
 - VDeploy membatasi ZIP ke 3,2 MB agar payload base64 tidak melewati batas request Function.
 - Proxy SVG dan arsip SiteGrabber dibatasi 4 MB.
+- Upload Big Image dibatasi 4 MB, diverifikasi dari magic bytes PNG/JPG, disimpan sementara di bucket privat, serta dilindungi token HMAC dan rate limit.
 - Konten legacy yang dijalankan lewat `srcdoc` berada dalam iframe sandbox tanpa akses same-origin.
 - Header Content Security Policy membatasi sumber script, frame, object, worker, dan koneksi browser; kebijakan tetap mengizinkan provider yang memang dipakai tool legacy.
 - Image Vectorizer memantau task konversi dan ekspor secara terpisah agar kegagalan kuota, kredensial, timeout, atau engine tidak lagi tertutup pesan dependency umum.
+- Big Image memakai API key Bigjpg hanya pada server, memvalidasi URL publik, memantau task secara terpisah, dan membersihkan file sumber saat task selesai, gagal, dihentikan, atau kedaluwarsa.
 - Sebagian tool bergantung pada API pihak ketiga dan tetap dapat mengalami kuota, perubahan kontrak, atau downtime.
 
 Lihat [audit keamanan](docs/SECURITY_AUDIT.md) dan [riwayat perubahan](CHANGELOG.md).

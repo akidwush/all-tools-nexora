@@ -31,6 +31,7 @@
     "/api/admin/audit",
     "/api/admin/visual",
     "/api/admin/socials",
-    "/api/svg-alight"
+    "/api/svg-alight",
+    "/api/big-image"
   ]
 }

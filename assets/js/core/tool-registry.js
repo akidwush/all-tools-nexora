@@ -32,6 +32,7 @@
     ["ocrintel","Nexora OCR Intelligence","api","ocr-intelligence","renderOcrIntelligence","https://api.ocr.space/"],
     ["svgalight","SVG → Alight XML","api","svg-alight","renderSvgAlight","https://svgtoxml.vercel.app/"],
     ["imagevectorizer","Nexora Image Vectorizer","module","image-vectorizer","renderImageVectorizer",null],
+    ["bigimage","Big Image","api","big-image","renderBigImage",null],
     ["calc","Calculator","local",null,"renderCalc",null],
     ["pwgen","Password Gen","local",null,"renderPwgen",null],
     ["morse","Morse Code","local",null,"renderMorse",null],
@@ -63,6 +64,6 @@
     return ({ready:"Siap",degraded:"Terbatas",offline:"Gangguan",restricted:"Terbatas",missing:"Tidak lengkap",unknown:"Belum dicek"})[status] || status;
   }
 
-  window.NexoraToolRegistry = Object.freeze({version:"6.3.15",count:rows.length,get:get,list:list,statusLabel:statusLabel});
+  window.NexoraToolRegistry = Object.freeze({version:"6.3.16",count:rows.length,get:get,list:list,statusLabel:statusLabel});
   window.dispatchEvent(new CustomEvent("nexora:tool-registry-ready"));
 })();

@@ -73,6 +73,14 @@
         "assets/js/features/image-vectorizer.js"
       ]
     },
+    "big-image": {
+      "css": [
+        "assets/css/features/big-image.css"
+      ],
+      "js": [
+        "assets/js/features/big-image.js"
+      ]
+    },
     "comic-reader": {
       "css": [
         "assets/css/features/comic-reader.css"
@@ -153,6 +161,7 @@
     "spaceexplorer": "space-explorer",
     "ocrintel": "ocr-intelligence",
     "imagevectorizer": "image-vectorizer",
+    "bigimage": "big-image",
     "comicreader": "comic-reader",
     "sertifikat": "source-features",
     "fakedev": "source-features",

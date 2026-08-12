@@ -57,6 +57,7 @@ const API_ROUTES = Object.freeze({
   "/api/space-explorer": { file: "api/tool-health.js", mode: "space-explorer" },
   "/api/ocr-intelligence": { file: "api/tool-health.js", mode: "ocr-intelligence" },
   "/api/svg-alight": { file: "api/tool-health.js", mode: "svg-alight" },
+  "/api/big-image": { file: "api/tool-health.js", mode: "big-image" },
   "/api/vdeploy": { file: "api/health.js", mode: "vdeploy" },
   "/api/admin/auth": { file: "api/admin/auth.js" },
   "/api/admin/dashboard": { file: "api/admin/dashboard.js" },
@@ -77,7 +78,7 @@ function bodyLimit(pathname, requestUrl) {
   const mode = requestUrl.searchParams.get("mode") || API_ROUTES[pathname]?.mode || "";
   if (pathname === "/api/vdeploy") return 4_400_000;
   if (pathname === "/api/ocr-intelligence" || mode === "ocr-intelligence") return 1_600_000;
-  if (mode === "image-vectorizer") return 4_200_000;
+  if (mode === "image-vectorizer" || mode === "big-image") return 4_200_000;
   if (pathname === "/api/audit") return 230_000;
   return 550_000;
 }

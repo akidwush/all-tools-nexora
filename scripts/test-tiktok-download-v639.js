@@ -12,7 +12,7 @@ const vercel = JSON.parse(read("vercel.json"));
 const routes = JSON.parse(read("route-manifest.json"));
 const { API_ROUTES } = require("../serve-local");
 
-assert.equal(pkg.version, "6.3.15");
+assert.equal(pkg.version, "6.3.16");
 assert.match(tiktok, /\/api\/media-download\?/);
 assert.match(tiktok, /probeDownload\(choice\)/);
 assert.match(tiktok, /triggerStreamDownload\(choice\)/);

@@ -1,4 +1,4 @@
-/* Nexora v6.3.15 lazy module loader */
+/* Nexora v6.3.16 lazy module loader */
 (function(){
   'use strict';
 
@@ -12,6 +12,7 @@
     'space-explorer': {css:['assets/css/features/space-explorer.css'],js:['assets/js/features/space-explorer.js']},
     'ocr-intelligence': {css:['assets/css/features/ocr-intelligence.css'],js:['assets/js/features/ocr-intelligence.js']},
     'image-vectorizer': {css:['assets/css/features/image-vectorizer.css'],js:['assets/js/features/image-vectorizer.js']},
+    'big-image': {css:['assets/css/features/big-image.css'],js:['assets/js/features/big-image.js']},
     'svg-alight': {css:['assets/css/features/svg-alight.css'],js:['assets/js/features/svg-alight.js']},
     'comic-reader': {css:['assets/css/features/comic-reader.css'],js:['assets/js/features/comic-reader.js']},
     'source-features': {css:['assets/css/features/source-tools.css'],js:['assets/js/features/source-features.js']},
@@ -24,7 +25,7 @@
   };
 
   var toolModules = {
-    getcode:'get-code',tiktok:'tiktok',ttquote:'tiktok-quote',virusscan:'virus-scan',cryptomarket:'crypto-market',webintel:'web-intelligence',spaceexplorer:'space-explorer',ocrintel:'ocr-intelligence',svgalight:'svg-alight',imagevectorizer:'image-vectorizer',comicreader:'comic-reader',
+    getcode:'get-code',tiktok:'tiktok',ttquote:'tiktok-quote',virusscan:'virus-scan',cryptomarket:'crypto-market',webintel:'web-intelligence',spaceexplorer:'space-explorer',ocrintel:'ocr-intelligence',svgalight:'svg-alight',imagevectorizer:'image-vectorizer',bigimage:'big-image',comicreader:'comic-reader',
     sertifikat:'source-features',fakedev:'source-features',
     promptgenerate:'imported-tools',fakeovo:'imported-tools',quotegenerator:'imported-tools',carifakta:'imported-tools',mltools:'imported-tools',
     iqc:'generator-pack',winquotes:'generator-pack',nokiamsg:'generator-pack',
@@ -33,7 +34,7 @@
   };
 
   var labels = {
-    'get code html':'getcode','tiktok':'tiktok','quote tiktok nexus':'ttquote','virus scan':'virusscan','crypto market scanner':'cryptomarket','nexora web intelligence':'webintel','space explorer':'spaceexplorer','nexora ocr intelligence':'ocrintel','ocr intelligence':'ocrintel','svg → alight xml':'svgalight','svg alight xml':'svgalight','anime vector atelier':'svgalight','nexora image vectorizer':'imagevectorizer','image vectorizer':'imagevectorizer','baca komik full':'comicreader',
+    'get code html':'getcode','tiktok':'tiktok','quote tiktok nexus':'ttquote','virus scan':'virusscan','crypto market scanner':'cryptomarket','nexora web intelligence':'webintel','space explorer':'spaceexplorer','nexora ocr intelligence':'ocrintel','ocr intelligence':'ocrintel','svg → alight xml':'svgalight','svg alight xml':'svgalight','anime vector atelier':'svgalight','nexora image vectorizer':'imagevectorizer','image vectorizer':'imagevectorizer','big image':'bigimage','bigjpg upscaler':'bigimage','baca komik full':'comicreader',
     'sertifikat custom':'sertifikat','fakedev':'fakedev','prompt generator':'promptgenerate','fake ovo':'fakeovo',
     'quote generator':'quotegenerator','carifakta':'carifakta','ml tools':'mltools','iqc generator':'iqc',
     'windows quotes':'winquotes','nokia message':'nokiamsg','terabox downloader':'terabox','fake bank jago':'fakebankjago',
@@ -45,7 +46,7 @@
   var assetPromises = new Map();
   /* Vercel serves /assets with a one-hour browser cache.  A module can
      therefore otherwise keep the previous CSS/JS after a successful deploy. */
-  var ASSET_VERSION = '6.3.15';
+  var ASSET_VERSION = '6.3.16';
   var baseShowTool = typeof window.showTool === 'function' ? window.showTool : null;
   var activeCard = null;
 

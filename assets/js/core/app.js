@@ -1415,7 +1415,8 @@ let toolsData = {
         { id: 'spaceexplorer', icon: 'fa-solid fa-user-astronaut', name: 'Space Explorer', desc: 'APOD, galeri Mars, asteroid dekat Bumi dan cuaca antariksa NASA', badge: 'NASA' },
         { id: 'ocrintel', icon: 'fa-solid fa-file-lines', name: 'Nexora OCR Intelligence', desc: 'Ekstrak teks dari gambar dan PDF, analisis dokumen, lalu buat searchable PDF', badge: 'OCR' },
         { id: 'svgalight', icon: 'fa-solid fa-wand-magic-sparkles', name: 'SVG → Alight XML', desc: 'Konversi SVG ke XML Alight Motion dengan 4 mode: Lossless, Accurate, Balanced, Lightweight', badge: 'ANIME XML' },
-        { id: 'imagevectorizer', icon: 'fa-solid fa-bezier-curve', name: 'Nexora Image Vectorizer', desc: 'Ubah PNG atau JPG menjadi SVG secara privat langsung di perangkat', badge: 'SVG' },
+        { id: 'imagevectorizer', icon: 'fa-solid fa-bezier-curve', name: 'Nexora Image Vectorizer', desc: 'Ubah PNG atau JPG menjadi SVG melalui FreeConvert Cloud', badge: 'SVG' },
+        { id: 'bigimage', icon: 'fa-solid fa-up-right-and-down-left-from-center', name: 'Big Image', desc: 'Upscale ilustrasi dan foto 2×–16× melalui Bigjpg AI', badge: 'BIGJPG AI' },
         { id: 'calc', icon: 'fa-solid fa-calculator', name: 'Calculator', desc: 'Hitung cepat', badge: 'Math' },
         { id: 'pwgen', icon: 'fa-solid fa-key', name: 'Password Gen', desc: 'Password aman', badge: 'Secure' },
         { id: 'morse', icon: 'fa-solid fa-tower-broadcast', name: 'Morse Code', desc: 'Konversi morse', badge: 'Audio' },
@@ -1535,7 +1536,7 @@ function catalogListTools() {
 }
 
 window.NexoraToolCatalog = Object.freeze({
-    version: '6.3.15',
+    version: '6.3.16',
     has: catalogHasTool,
     list: catalogListTools
 });
@@ -1749,6 +1750,7 @@ function showTool(toolId) {
         case 'ocrintel': renderOcrIntelligence(body); break;
         case 'svgalight': renderSvgAlight(body); break;
         case 'imagevectorizer': renderImageVectorizer(body); break;
+        case 'bigimage': renderBigImage(body); break;
         case 'promptgenerate': renderPromptGenerator(body); break;
         case 'fakeovo': renderFakeOvo(body); break;
         case 'quotegenerator': renderQuoteGenerator(body); break;

@@ -5,7 +5,7 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 const pkg = JSON.parse(read('package.json'));
-assert.equal(pkg.version, '6.3.15');
+assert.equal(pkg.version, '6.3.16');
 
 const app = read('assets/js/core/app.js');
 assert.match(app, /async function nxRemoveBackgroundLocalFirst\(/);
@@ -35,7 +35,7 @@ const sourceCss = read('assets/css/features/source-tools.css');
 assert.match(sourceCss, /\.nx-source-status\.warning\{/);
 
 const index = read('index.html');
-assert.ok(index.includes('assets/js/core/app.js?v=6.3.15'));
-assert.ok(index.includes('assets/js/core/lazy-loader.js?v=6.3.15'));
+assert.ok(index.includes('assets/js/core/app.js?v=6.3.16'));
+assert.ok(index.includes('assets/js/core/lazy-loader.js?v=6.3.16'));
 
-console.log('Nexora v6.3.15 tests lulus: Remove BG local-first dan FakeDev local fallback aktif.');
+console.log('Nexora v6.3.16 tests lulus: Remove BG local-first dan FakeDev local fallback aktif.');

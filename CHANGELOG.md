@@ -1,5 +1,18 @@
 # Changelog
 
+## 6.3.16 — 2026-08-12
+
+### Fitur
+
+- Menambahkan **Big Image**, AI upscaler Bigjpg untuk ilustrasi/foto dengan skala 2×, 4×, 8×, dan 16×, lima tingkat reduksi noise, polling task, serta preview Before/After yang tetap proporsional di HP.
+- Menambahkan upload sementara melalui bucket Supabase privat dan signed URL karena API Bigjpg menerima URL gambar, bukan file lokal langsung.
+
+### Keamanan dan stabilitas
+
+- Menjaga `BIGJPG_API_KEY` sepenuhnya di server, melindungi job dengan token HMAC, memvalidasi URL publik, memeriksa magic bytes PNG/JPG, serta membatasi upload 4 MB.
+- Menambahkan rate limit per-IP dan global berbasis database, pembersihan sumber pada status terminal/cancel, serta pembersihan oportunistik untuk job yang ditinggalkan.
+- Mempertahankan batas 12/12 Vercel Functions dengan multiplexing pada `api/tool-health.js` dan menyinkronkan katalog menjadi 44 tool.
+
 ## 6.3.15 — 2026-08-12
 
 ### Perbaikan

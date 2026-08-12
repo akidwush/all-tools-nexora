@@ -51,7 +51,7 @@
       frame.removeAttribute("src");state.running=false;button.disabled=false;button.innerHTML='<i class="fa-solid fa-play"></i> Jalankan Audit';
     }
   }
-  function restore(){try{var cached=JSON.parse(localStorage.getItem("nexora-admin-functional-audit-v62")||"null");if(cached&&cached.version==="6.3.15"&&Array.isArray(cached.results)){state.result=cached;render();}}catch(_){ }}
+  function restore(){try{var cached=JSON.parse(localStorage.getItem("nexora-admin-functional-audit-v62")||"null");if(cached&&cached.version==="6.3.16"&&Array.isArray(cached.results)){state.result=cached;render();}}catch(_){ }}
   function bind(){var button=$("#runFunctionalAudit"),filter=$("#functionalStatusFilter");if(button)button.addEventListener("click",run);if(filter)filter.addEventListener("change",render);document.addEventListener("nexora:functional-section-open",function(){if(!state.result)restore();});}
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",function(){restore();bind();});else{restore();bind();}
   window.NexoraAdminFunctionalAudit={run:run,render:render};
