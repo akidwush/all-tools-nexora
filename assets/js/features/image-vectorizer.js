@@ -167,9 +167,25 @@
       return data;
     }
 
+    async function uploadViaProxy(upload,file){
+      var headers={
+        'Content-Type':file.type||'application/octet-stream',
+        'X-Nexora-Upload-Url':String(upload&&upload.url||''),
+        'X-Nexora-Upload-Params':encodeURIComponent(JSON.stringify(upload&&upload.parameters||{})),
+        'X-Nexora-Filename':encodeURIComponent(file.name||'image')
+      };
+      var response;try{response=await fetch('/api/tool-health?mode=image-vectorizer&proxyUpload=1',{method:'POST',headers:headers,body:file});}
+      catch(_){throw new Error('Upload proxy Nexora gagal terhubung.');}
+      var data={};try{data=await response.json();}catch(_){}
+      if(!response.ok||data.ok===false)throw new Error(data.message||('Upload proxy gagal (HTTP '+response.status+').'));
+      return data;
+    }
+
     async function uploadDirect(upload,file){
+      // File kecil memakai same-origin proxy agar browser mobile tidak terhalang CORS signed upload.
+      if(file.size<=4*1024*1024)return uploadViaProxy(upload,file);
       var form=new FormData();Object.keys(upload.parameters||{}).forEach(function(key){form.append(key,upload.parameters[key]);});form.append('file',file,file.name);
-      var response;try{response=await fetch(upload.url,{method:'POST',body:form});}catch(_){throw new Error('Upload langsung ke FreeConvert gagal terhubung.');}
+      var response;try{response=await fetch(upload.url,{method:'POST',body:form});}catch(_){throw new Error('Upload langsung FreeConvert gagal. Untuk file >4 MB, coba koneksi/browser lain.');}
       if(!response.ok)throw new Error('Upload ke FreeConvert gagal (HTTP '+response.status+').');
     }
 
