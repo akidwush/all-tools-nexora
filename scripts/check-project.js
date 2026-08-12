@@ -28,11 +28,7 @@ for(const filename of ["index.html","about.html","feedback.html","admin/index.ht
   }
   if(filename==="index.html" && /<style\b/i.test(source)) fail("index.html masih memiliki CSS inline.");
 }
-const jsFiles=walk(root).filter((file)=>{
-  if(!file.endsWith(".js")) return false;
-  const relative=path.relative(root,file).replace(/\\/g,"/");
-  return !relative.startsWith("assets/vendor/vtracer/");
-});
+const jsFiles=walk(root).filter((file)=>file.endsWith(".js"));
 for(const file of jsFiles){
   const relative=path.relative(root,file);
   try{ new vm.Script(fs.readFileSync(file,"utf8"),{filename:relative}); }
@@ -248,34 +244,59 @@ if(!fs.existsSync(path.join(root,"scripts/test-ocr-intelligence-hf8.js"))) fail(
 
 const vectorUiHf9=fs.readFileSync(path.join(root,"assets/js/features/image-vectorizer.js"),"utf8");
 const vectorCssHf9=fs.readFileSync(path.join(root,"assets/css/features/image-vectorizer.css"),"utf8");
+const vectorApiHf9=fs.readFileSync(path.join(root,"lib/freeconvert-vectorizer.js"),"utf8");
+const toolHealthApiHf9=fs.readFileSync(path.join(root,"api/tool-health.js"),"utf8");
 const vectorManifestHf9=JSON.parse(fs.readFileSync(path.join(root,"assets/module-manifest.json"),"utf8"));
-for(const token of ["renderImageVectorizer","VTRACER_LOCAL","ColorImageConverter","BinaryImageConverter","new_with_string","converter.tick()","quantizeCanvas","binarizeCanvas","optimizeSvgText","fidelityScore","Adaptive HQ","NO DAILY LIMIT","Download SVG","Copy SVG code","fit 100%"]){
-  if(!vectorUiHf9.includes(token)) fail(`Image Vectorizer VTracer lokal belum lengkap: ${token}`);
-}
-for(const forbidden of ["/api/tool-health?mode=image-vectorizer","uploadDirect","pollResult","FREECONVERT_API_KEY","FREECONVERT READY"]){
-  if(vectorUiHf9.includes(forbidden)) fail(`Image Vectorizer masih bergantung ke FreeConvert: ${forbidden}`);
-}
-for(const token of ["overflow-x:clip","100dvh","safe-area-inset-bottom","@media(max-width:720px)","@media(max-width:430px)","min-height:44px","width:auto!important","max-height:min(68dvh,720px)"]){
-  if(!vectorCssHf9.includes(token)) fail(`Image Vectorizer VTracer belum mobile-safe: ${token}`);
-}
 
-for(const file of [
-  "assets/vendor/vtracer/vtracer-loader.js",
-  "assets/vendor/vtracer/vtracer_webapp_bg.js",
-  "assets/vendor/vtracer/vtracer_webapp_bg.wasm"
+for(const token of [
+  "renderImageVectorizer",
+  "sanitizeSvg",
+  "Download SVG",
+  "Copy SVG code",
+  "preserveAspectRatio",
+  "fit 100%",
+  "uploadDirect",
+  "pollResult",
+  "action:'prepare'",
+  "action:'start'",
+  "action:'result'",
+  "/api/tool-health?mode=image-vectorizer"
 ]){
-  if(!fs.existsSync(path.join(root,file))) fail(`Vendor VTracer self-hosted hilang: ${file}`);
-}
-const vectorLoaderHf112=fs.readFileSync(path.join(root,"assets/vendor/vtracer/vtracer-loader.js"),"utf8");
-for(const token of ["initVTracer","WebAssembly.instantiateStreaming","vtracer_webapp_bg.wasm","__wbg_set_wasm"]){
-  if(!vectorLoaderHf112.includes(token)) fail(`Loader VTracer HF11.2 belum lengkap: ${token}`);
-}
-for(const forbidden of ["vtracer-webapp@0.4.0/+esm","esm.sh/vtracer-webapp","esm.run/vtracer-webapp"]){
-  if(vectorUiHf9.includes(forbidden)) fail(`Image Vectorizer masih memakai CDN ESM bermasalah: ${forbidden}`);
+  if(!vectorUiHf9.includes(token)) fail(`Image Vectorizer FreeConvert UI belum lengkap: ${token}`);
 }
 
+for(const token of [
+  "FREECONVERT_API_KEY",
+  "/process/import/upload",
+  "/process/convert",
+  "/process/export/url",
+  "handleFreeConvertVectorizer",
+  "prepareUpload",
+  "startConversion",
+  "fetchResult"
+]){
+  if(!vectorApiHf9.includes(token)) fail(`FreeConvert backend belum lengkap: ${token}`);
+}
+
+for(const token of [
+  "overflow-x:clip",
+  "100dvh",
+  "safe-area-inset-bottom",
+  "@media(max-width:720px)",
+  "@media(max-width:430px)",
+  "min-height:44px",
+  "width:auto!important",
+  "max-height:min(68dvh,720px)"
+]){
+  if(!vectorCssHf9.includes(token)) fail(`Image Vectorizer FreeConvert belum mobile-safe: ${token}`);
+}
+
+if(vectorUiHf9.includes("FREECONVERT_API_KEY")) fail("Frontend Image Vectorizer tidak boleh membawa FREECONVERT_API_KEY.");
+if(!toolHealthApiHf9.includes('mode") === "image-vectorizer"')) fail("Route FreeConvert Image Vectorizer belum terhubung.");
+if(!toolHealthApiHf9.includes("handleFreeConvertVectorizer")) fail("Handler FreeConvert belum terhubung ke API.");
 if(vectorManifestHf9.tools.imagevectorizer!=="image-vectorizer") fail("Manifest Image Vectorizer belum terhubung.");
-if(!fs.existsSync(path.join(root,"database/migrations/012_nexora_image_vectorizer.sql"))) fail("Migration Image Vectorizer belum tersedia.");
+if(!fs.existsSync(path.join(root,"database/migrations/012_nexora_image_vectorizer.sql"))) fail("Migration Image Vectorizer HF9 belum tersedia.");
+if(!fs.existsSync(path.join(root,"database/migrations/013_freeconvert_image_vectorizer.sql"))) fail("Migration FreeConvert Image Vectorizer belum tersedia.");
 if(!fs.existsSync(path.join(root,"scripts/test-image-vectorizer-hf9.js"))) fail("Regression test Image Vectorizer belum tersedia.");
 
 

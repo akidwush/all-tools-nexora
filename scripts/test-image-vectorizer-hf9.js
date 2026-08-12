@@ -1,71 +1,100 @@
-const fs = require('node:fs');
-const path = require('node:path');
-const assert = require('node:assert');
+const fs = require("node:fs");
+const path = require("node:path");
+const assert = require("node:assert");
 
-const root = path.resolve(__dirname, '..');
-const ui = fs.readFileSync(path.join(root, 'assets/js/features/image-vectorizer.js'), 'utf8');
-const css = fs.readFileSync(path.join(root, 'assets/css/features/image-vectorizer.css'), 'utf8');
-const loader = fs.readFileSync(path.join(root, 'assets/vendor/vtracer/vtracer-loader.js'), 'utf8');
+const root = path.resolve(__dirname, "..");
 
-for (const token of [
-  'VTRACER_LOCAL',
-  '/assets/vendor/vtracer/vtracer-loader.js?v=hf11.1',
-  'ColorImageConverter',
-  'BinaryImageConverter',
-  'new_with_string',
-  'converter.tick()',
-  'quantizeCanvas',
-  'binarizeCanvas',
-  'optimizeSvgText',
-  'fidelityScore',
-  'Adaptive HQ',
-  'NO DAILY LIMIT',
-  'Local vectorization',
-  'function applyPreset(',
-  'function buildParams(',
-  'length_threshold:clamp(length,3.5,10)',
-  'filter_speckle:Math.round(noise*noise)',
-  'color_precision:Math.round(clamp(8-colorPrecision,0,7))',
-  'path_precision:pathPrecision',
-  'Cutout mosaic',
-  'fit 100%'
-]) assert.ok(ui.includes(token), `VTracer frontend missing: ${token}`);
+const ui = fs.readFileSync(path.join(root, "assets/js/features/image-vectorizer.js"), "utf8");
+const apiRoute = fs.readFileSync(path.join(root, "api/tool-health.js"), "utf8");
+const backend = fs.readFileSync(path.join(root, "lib/freeconvert-vectorizer.js"), "utf8");
+const css = fs.readFileSync(path.join(root, "assets/css/features/image-vectorizer.css"), "utf8");
+const envExample = fs.readFileSync(path.join(root, ".env.example"), "utf8");
 
 for (const token of [
-  'initVTracer',
-  'WebAssembly.instantiateStreaming',
-  'vtracer_webapp_bg.wasm',
-  '__wbg_set_wasm'
-]) assert.ok(loader.includes(token), `VTracer loader missing: ${token}`);
-
-for (const forbidden of [
-  '/api/tool-health?mode=image-vectorizer',
-  'uploadDirect',
-  'pollResult',
+  "/api/tool-health?mode=image-vectorizer",
+  "uploadDirect",
+  "pollResult",
   "action:'prepare'",
   "action:'start'",
   "action:'result'",
-  'FREECONVERT_API_KEY',
-  'FREECONVERT READY',
-  'FreeConvert sedang',
-  'vtracer-webapp@0.4.0/+esm',
-  'esm.sh/vtracer-webapp',
-  'esm.run/vtracer-webapp'
-]) assert.ok(!ui.includes(forbidden), `Cloud/CDN dependency still present: ${forbidden}`);
+  "sanitizeSvg",
+  "preserveAspectRatio",
+  "fit 100%",
+  "FreeConvert",
+  "function markStale()",
+  "function releaseFile()",
+  "function validFile("
+]) {
+  assert.ok(ui.includes(token), `Frontend missing: ${token}`);
+}
 
-for (const file of [
-  'assets/vendor/vtracer/vtracer-loader.js',
-  'assets/vendor/vtracer/vtracer_webapp_bg.js',
-  'assets/vendor/vtracer/vtracer_webapp_bg.wasm'
-]) assert.ok(fs.existsSync(path.join(root, file)), `Vendor file missing: ${file}`);
 
 for (const token of [
-  'overflow-x:clip',
-  '100dvh',
-  '@media(max-width:720px)',
-  '@media(max-width:430px)',
-  'width:auto!important',
-  'max-height:min(68dvh,720px)'
-]) assert.ok(css.includes(token), `CSS missing: ${token}`);
+  "function friendlyError(",
+  "function checkEngine()",
+  "health=1",
+  "ENGINE OFFLINE",
+  "FC_NOT_CONFIGURED"
+]) {
+  assert.ok(ui.includes(token), `Frontend resilience missing: ${token}`);
+}
 
-console.log('Image Vectorizer HF11.2 regression lulus: self-hosted VTracer WASM, build-safe ESM vendor, adaptive tuning, tanpa FreeConvert API/CDN bundle.');
+assert.ok(!ui.includes("vtracer-worker"), "Frontend still references VTracer worker");
+assert.ok(!ui.includes("FREECONVERT_API_KEY"), "API key leaked into frontend");
+
+assert.ok(
+  apiRoute.includes('mode") === "image-vectorizer"'),
+  "Image Vectorizer mode route missing"
+);
+
+assert.ok(
+  apiRoute.includes("handleFreeConvertVectorizer"),
+  "FreeConvert handler not wired"
+);
+
+for (const token of [
+  "FREECONVERT_API_KEY",
+  "/process/import/upload",
+  "/process/convert",
+  "/process/export/url",
+  "prepareUpload",
+  "startConversion",
+  "fetchResult",
+  "handleFreeConvertVectorizer"
+]) {
+  assert.ok(backend.includes(token), `Backend missing: ${token}`);
+}
+
+assert.ok(
+  envExample.includes("FREECONVERT_API_KEY="),
+  "FREECONVERT_API_KEY missing from env example"
+);
+
+assert.ok(
+  !envExample.includes("NEXT_PUBLIC_FREECONVERT_API_KEY"),
+  "FreeConvert API key must not be public"
+);
+
+for (const token of [
+  "overflow-x:clip",
+  "100dvh",
+  "@media(max-width:720px)",
+  "@media(max-width:430px)",
+  "width:auto!important",
+  "max-height:min(68dvh,720px)"
+]) {
+  assert.ok(css.includes(token), `CSS missing: ${token}`);
+}
+
+console.log(
+  "Image Vectorizer FreeConvert regression test lulus: server-only API key, signed direct upload, convert/export polling, SVG sanitization, route wiring, dan fit-safe mobile preview valid."
+);
+
+
+// FreeConvert advanced-option discovery: UI controls must affect the conversion request.
+assert.ok(ui.includes("function applyPreset("), "Mode Gambar tidak memiliki applyPreset");
+assert.ok(ui.includes("function cloudTuning()"), "Cloud tuning tidak tersedia");
+assert.ok(ui.includes("tuning:tuning"), "Tuning tidak dikirim ke backend");
+assert.ok(backend.includes("/query/options/convert?input_format="), "FreeConvert advanced options discovery tidak tersedia");
+assert.ok(backend.includes("buildAdvancedOptions"), "FreeConvert advanced options mapper tidak tersedia");
+console.log("FreeConvert advanced-option discovery: mode gambar dan vector profile terhubung ke request konversi.");

@@ -47,7 +47,7 @@
   var assetPromises = new Map();
   /* Vercel serves /assets with a one-hour browser cache.  A module can
      therefore otherwise keep the previous CSS/JS after a successful deploy. */
-  var ASSET_VERSION = '6.3.13-hf11.2-20260812';
+  var ASSET_VERSION = '6.3.13-hf10.4';
   var baseShowTool = typeof window.showTool === 'function' ? window.showTool : null;
   var activeCard = null;
 
