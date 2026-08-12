@@ -650,6 +650,8 @@ window.addEventListener('message', function(event) {
     const data = event.data;
 
     if (!data || data.type !== 'nx-api-status') return;
+    const sourceFrame = document.querySelector('.nx-imported-frame');
+    if (!sourceFrame || event.source !== sourceFrame.contentWindow) return;
 
     const api = getApiById(data.provider);
 
@@ -1533,7 +1535,7 @@ function catalogListTools() {
 }
 
 window.NexoraToolCatalog = Object.freeze({
-    version: '6.3.13',
+    version: '6.3.14',
     has: catalogHasTool,
     list: catalogListTools
 });

@@ -12,8 +12,8 @@ assert.ok(config.rewrites.some((item) => item?.source === '/api/vdeploy' && Stri
 // Guard: check-project tidak boleh kembali ke pencarian substring whitespace-sensitive.
 const audit = fs.readFileSync(path.join(root, 'scripts/check-project.js'), 'utf8');
 assert.doesNotMatch(audit, /vercelConfig\.includes\(['"]\\?"source\\?": \\"\/api\/vdeploy/);
-assert.match(audit, /JSON\.parse\(fs\.readFileSync\(path\.join\(root,"vercel\.json"\)/);
-assert.match(audit, /hasVdeployRewrite/);
+assert.match(audit, /const vercel = json\("vercel\.json"\)/);
+assert.match(audit, /for \(const rewrite of vercel\.rewrites \|\| \[\]\)/);
 new vm.Script(audit, { filename: 'scripts/check-project.js' });
 
 console.log('HF3 lulus: rewrite VDeploy divalidasi secara semantik, bukan berdasarkan whitespace JSON.');

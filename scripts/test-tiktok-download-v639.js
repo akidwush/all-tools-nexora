@@ -10,9 +10,9 @@ const toolHealthApi = read("api/tool-health.js");
 const media = read("lib/media-download.js");
 const vercel = JSON.parse(read("vercel.json"));
 const routes = JSON.parse(read("route-manifest.json"));
-const localServer = read("serve-local.js");
+const { API_ROUTES } = require("../serve-local");
 
-assert.equal(pkg.version, "6.3.13");
+assert.equal(pkg.version, "6.3.14");
 assert.match(tiktok, /\/api\/media-download\?/);
 assert.match(tiktok, /probeDownload\(choice\)/);
 assert.match(tiktok, /triggerStreamDownload\(choice\)/);
@@ -33,7 +33,7 @@ assert.match(media, /Content-Disposition/);
 assert.match(media, /MAX_DOWNLOADS_PER_WINDOW/);
 assert.ok(vercel.rewrites.some((item) => item.source === "/api/media-download" && /mode=media-download/.test(item.destination)));
 assert.ok(routes.apiRoutes.includes("/api/media-download"));
-assert.match(localServer, /pathname === "\/api\/media-download"/);
+assert.equal(API_ROUTES["/api/media-download"].mode, "media-download");
 
 const mediaModule = require(path.join(root, "lib/media-download.js"));
 assert.equal(mediaModule.isAllowedHost("v16m-default.akamaized.net"), true);

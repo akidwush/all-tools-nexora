@@ -6,8 +6,7 @@ const root = path.resolve(__dirname, "..");
 const required = [
   "api/admin/socials.js",
   "assets/js/core/social-links.js",
-  "database/migrations/006_social_links.sql",
-  "V6_1_VALIDATION.md"
+  "database/migrations/006_social_links.sql"
 ];
 for (const file of required) assert.equal(fs.existsSync(path.join(root, file)), true, `${file} harus tersedia`);
 

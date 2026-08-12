@@ -13,7 +13,7 @@
     return decodeURIComponent(encoded);
   }
   window.renderVirusScan=function(body){
-    body.innerHTML='<div class="nx-virus-embed"><div class="nx-virus-loading" id="nxVirusLoading">Loading Security Core</div><iframe class="nx-virus-frame" id="nxVirusFrame" title="All Tools Nexora Virus Scan" allow="clipboard-write" loading="eager"></iframe></div>';
+    body.innerHTML='<div class="nx-virus-embed"><div class="nx-virus-loading" id="nxVirusLoading">Loading Security Core</div><iframe class="nx-virus-frame" id="nxVirusFrame" title="All Tools Nexora Virus Scan" sandbox="allow-scripts allow-forms allow-popups allow-modals allow-downloads" allow="clipboard-write" referrerpolicy="no-referrer" loading="eager"></iframe></div>';
     var frame=document.getElementById('nxVirusFrame');
     var loading=document.getElementById('nxVirusLoading');
     if(!frame) return;

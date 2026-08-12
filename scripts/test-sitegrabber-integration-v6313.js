@@ -12,7 +12,7 @@ const getCode = read("assets/js/features/get-code.js");
 const css = read("assets/css/features/get-code.css");
 const env = read(".env.example");
 
-assert.equal(pkg.version, "6.3.13");
+assert.equal(pkg.version, "6.3.14");
 assert.ok(vercel.rewrites.some((r) => r.source === "/api/sitegrabber" && /mode=sitegrabber/.test(r.destination)));
 assert.match(api, /handleSiteGrabber/);
 assert.match(proxy, /SITEGRABBER_API_BASE_URL/);
@@ -37,4 +37,4 @@ for (const file of ["index.html", "assets/js/features/get-code.js", "assets/css/
   assert.equal(/sgx_live_(?!your_server_only_key)[A-Za-z0-9_-]{10,}/.test(source), false, `${file} must not expose a raw SiteGrabber API key`);
 }
 
-console.log("Nexora v6.3.13 tests lulus: SiteGrabber-X API key server-side, capture polling, report, dan ZIP download aktif.");
+console.log("Nexora v6.3.14 tests lulus: SiteGrabber-X API key server-side, capture polling, report, dan ZIP download aktif.");

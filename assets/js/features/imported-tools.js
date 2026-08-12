@@ -55,6 +55,13 @@
     return decodeURIComponent(encoded);
   }
 
+  function hardenSource(source){
+    var html=String(source||"").replace(/\blocalStorage\./g,"window.nxSafeStorage.");
+    var storageShim='<script>(function(){"use strict";window.nxSafeStorage={getItem:function(key){try{return window.localStorage.getItem(key);}catch(error){return null;}},setItem:function(key,value){try{window.localStorage.setItem(key,value);}catch(error){}},removeItem:function(key){try{window.localStorage.removeItem(key);}catch(error){}},clear:function(){try{window.localStorage.clear();}catch(error){}}};})();<\/script>';
+    if(/<head[\s>]/i.test(html)) return html.replace(/<head([^>]*)>/i,"<head$1>"+storageShim);
+    return storageShim+html;
+  }
+
   function renderSource(body,toolId){
     var config=NX_SOURCE_APPS[toolId];
     if(!config) return;
@@ -86,7 +93,7 @@
               '<span>'+config.loading+'</span>'+
             '</div>'+
           '</div>'+
-          '<iframe class="nx-imported-frame" title="'+config.title+'" allow="clipboard-write; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe>'+
+          '<iframe class="nx-imported-frame" title="'+config.title+'" sandbox="allow-scripts allow-forms allow-popups allow-modals allow-downloads" allow="clipboard-write; fullscreen" referrerpolicy="no-referrer"></iframe>'+
         '</div>'+
       '</div>';
 
@@ -100,7 +107,7 @@
     },{once:true});
 
     try{
-      frame.srcdoc=decodeSource(config.payload);
+      frame.srcdoc=hardenSource(decodeSource(config.payload));
     }catch(error){
       if(loading){
         loading.innerHTML=

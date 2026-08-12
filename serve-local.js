@@ -1,156 +1,226 @@
+"use strict";
+
 const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
 
 const root = __dirname;
-const port = Number(process.env.PORT || 4173);
-const host = process.env.HOST || "127.0.0.1";
-const types = {
-  ".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8",
-  ".js": "text/javascript; charset=utf-8", ".mjs": "text/javascript; charset=utf-8",
-  ".json": "application/json; charset=utf-8", ".png": "image/png", ".jpg": "image/jpeg",
-  ".jpeg": "image/jpeg", ".webp": "image/webp", ".gif": "image/gif", ".svg": "image/svg+xml",
-  ".ico": "image/x-icon", ".woff": "font/woff", ".woff2": "font/woff2", ".xml": "application/xml",
+const defaultPort = Number(process.env.PORT || 4173);
+const defaultHost = process.env.HOST || "127.0.0.1";
+
+const contentTypes = {
+  ".html": "text/html; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8",
+  ".mjs": "text/javascript; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".webp": "image/webp",
+  ".gif": "image/gif",
+  ".svg": "image/svg+xml",
+  ".ico": "image/x-icon",
+  ".woff": "font/woff",
+  ".woff2": "font/woff2",
+  ".xml": "application/xml",
   ".wasm": "application/wasm"
 };
-const assetExtension = /\.(?:css|m?js|cjs|map|json|xml|txt|csv|png|jpe?g|gif|webp|avif|svg|ico|woff3?|eot|ttf|otf|mp3|wav|ogg|m4a|flac|mp4|webm|mov|m4v|3gp|wasm|webmanifest|pdf)$/i;
 
-function existing(relative) {
-  let file = path.resolve(root, String(relative || "index.html").replace(/^\/+/, ""));
-  if (file !== root && !file.startsWith(root + path.sep)) return null;
-  try {
-    if (fs.statSync(file).isDirectory()) file = path.join(file, "index.html");
-    return fs.statSync(file).isFile() ? file : null;
-  } catch { return null; }
+const cleanRoutes = {
+  "/": "index.html",
+  "/index.html": "index.html",
+  "/about": "about.html",
+  "/about.html": "about.html",
+  "/feedback": "feedback.html",
+  "/feedback.html": "feedback.html",
+  "/admin": "admin/index.html",
+  "/admin/": "admin/index.html",
+  "/admin/index.html": "admin/index.html",
+  "/admin/login": "admin/login.html",
+  "/admin/login.html": "admin/login.html",
+  "/favicon.svg": "favicon.svg"
+};
+
+const API_ROUTES = Object.freeze({
+  "/api/health": { file: "api/health.js" },
+  "/api/database": { file: "api/health.js", mode: "database" },
+  "/api/feedback": { file: "api/feedback.js" },
+  "/api/analytics": { file: "api/feedback.js", mode: "analytics" },
+  "/api/audit": { file: "api/audit.js" },
+  "/api/web-intelligence": { file: "api/audit.js", mode: "web-intelligence" },
+  "/api/tool-health": { file: "api/tool-health.js" },
+  "/api/media-download": { file: "api/tool-health.js", mode: "media-download" },
+  "/api/sitegrabber": { file: "api/tool-health.js", mode: "sitegrabber" },
+  "/api/crypto-market": { file: "api/tool-health.js", mode: "crypto-market" },
+  "/api/space-explorer": { file: "api/tool-health.js", mode: "space-explorer" },
+  "/api/ocr-intelligence": { file: "api/tool-health.js", mode: "ocr-intelligence" },
+  "/api/svg-alight": { file: "api/tool-health.js", mode: "svg-alight" },
+  "/api/vdeploy": { file: "api/health.js", mode: "vdeploy" },
+  "/api/admin/auth": { file: "api/admin/auth.js" },
+  "/api/admin/dashboard": { file: "api/admin/dashboard.js" },
+  "/api/admin/tools": { file: "api/admin/tools.js" },
+  "/api/admin/analytics": { file: "api/admin/analytics.js" },
+  "/api/admin/feedback": { file: "api/admin/feedback.js" },
+  "/api/admin/audit": { file: "api/admin/audit.js" },
+  "/api/admin/visual": { file: "api/admin/visual.js" },
+  "/api/admin/socials": { file: "api/admin/socials.js" }
+});
+
+function normalizeApiPath(pathname) {
+  const clean = pathname.endsWith(".js") ? pathname.slice(0, -3) : pathname;
+  return Object.hasOwn(API_ROUTES, clean) ? clean : "";
+}
+
+function bodyLimit(pathname, requestUrl) {
+  const mode = requestUrl.searchParams.get("mode") || API_ROUTES[pathname]?.mode || "";
+  if (pathname === "/api/vdeploy") return 4_400_000;
+  if (pathname === "/api/ocr-intelligence" || mode === "ocr-intelligence") return 1_600_000;
+  if (mode === "image-vectorizer") return 4_200_000;
+  if (pathname === "/api/audit") return 230_000;
+  return 550_000;
 }
 
 function decorateResponse(response) {
   response.status = (statusCode) => { response.statusCode = statusCode; return response; };
-  response.json = (payload) => response.end(JSON.stringify(payload));
+  response.json = (payload) => {
+    if (!response.hasHeader("Content-Type")) response.setHeader("Content-Type", "application/json; charset=utf-8");
+    return response.end(JSON.stringify(payload));
+  };
+  response.send = (payload) => {
+    if (Buffer.isBuffer(payload) || typeof payload === "string") return response.end(payload);
+    return response.json(payload);
+  };
   return response;
 }
 
-async function readJson(request) {
+async function readBody(request, limit) {
+  const declared = Number(request.headers["content-length"] || 0);
+  if (declared > limit) throw Object.assign(new Error("Payload terlalu besar."), { status: 413 });
   const chunks = [];
   let size = 0;
   for await (const chunk of request) {
     size += chunk.length;
-    if (size > 64 * 1024) throw Object.assign(new Error("Payload terlalu besar."), { status: 413 });
-    chunks.push(chunk);
+    if (size > limit) throw Object.assign(new Error("Payload terlalu besar."), { status: 413 });
+    chunks.push(Buffer.from(chunk));
   }
   if (!chunks.length) return {};
-  try { return JSON.parse(Buffer.concat(chunks).toString("utf8")); }
+  const body = Buffer.concat(chunks);
+  const type = String(request.headers["content-type"] || "").toLowerCase();
+  if (!/(?:application\/json|\+json)(?:;|$)/.test(type)) return body;
+  try { return JSON.parse(body.toString("utf8")); }
   catch { throw Object.assign(new Error("JSON tidak valid."), { status: 400 }); }
 }
 
-async function runApi(modulePath, request, response) {
+async function runApi(route, request, response, requestUrl) {
   try {
-    if (["POST", "PUT", "PATCH", "DELETE"].includes(request.method || "")) request.body = await readJson(request);
-    const handler = require(modulePath);
+    if (route.mode) requestUrl.searchParams.set("mode", route.mode);
+    request.url = `${requestUrl.pathname}${requestUrl.search}`;
+    request.query = Object.fromEntries(requestUrl.searchParams.entries());
+    if (!["GET", "HEAD", "OPTIONS"].includes(request.method || "GET")) {
+      request.body = await readBody(request, bodyLimit(normalizeApiPath(requestUrl.pathname), requestUrl));
+    }
+    const handler = require(path.join(root, route.file));
     await handler(request, decorateResponse(response));
   } catch (error) {
-    if (response.headersSent) return response.end();
+    if (response.headersSent) {
+      if (!response.writableEnded) response.end();
+      return;
+    }
     response.statusCode = error.status || 500;
     response.setHeader("Content-Type", "application/json; charset=utf-8");
-    response.end(JSON.stringify({ ok: false, error: "LOCAL_API_ERROR", message: error.message }));
+    response.end(JSON.stringify({
+      ok: false,
+      error: error.status === 413 ? "PAYLOAD_TOO_LARGE" : error.status === 400 ? "INVALID_JSON" : "LOCAL_API_ERROR",
+      message: error.message
+    }));
   }
 }
 
-http.createServer(async (request, response) => {
-  const securityHeaders = {
-    "X-Content-Type-Options": "nosniff",
-    "Referrer-Policy": "strict-origin-when-cross-origin",
-    "X-Frame-Options": "SAMEORIGIN"
-  };
-  for (const [name, value] of Object.entries(securityHeaders)) response.setHeader(name, value);
+function hasUnsafeSegment(pathname) {
+  return pathname.includes("\0") || pathname.split("/").some((segment) => segment === ".." || segment.startsWith("."));
+}
 
-  let pathname;
-  try { pathname = decodeURIComponent(new URL(request.url || "/", `http://${request.headers.host || "localhost"}`).pathname); }
-  catch { response.writeHead(400); return response.end("Bad request"); }
+function isStaticPathAllowed(pathname) {
+  if (hasUnsafeSegment(pathname)) return false;
+  if (Object.hasOwn(cleanRoutes, pathname)) return true;
+  return pathname.startsWith("/assets/") && pathname.length > "/assets/".length;
+}
 
-  if (pathname === "/api/health" || pathname === "/api/health.js") {
-    return runApi(path.join(root, "api", "health.js"), request, response);
-  }
-  if (pathname === "/api/feedback" || pathname === "/api/feedback.js") {
-    return runApi(path.join(root, "api", "feedback.js"), request, response);
-  }
-  if (pathname === "/api/analytics" || pathname === "/api/analytics.js") {
-    const url = new URL(request.url || "/api/analytics", `http://${request.headers.host || "localhost"}`);
-    url.searchParams.set("mode", "analytics");
-    request.url = `${url.pathname}?${url.searchParams.toString()}`;
-    return runApi(path.join(root, "api", "feedback.js"), request, response);
-  }
-  if (pathname === "/api/database" || pathname === "/api/database.js") {
-    const url = new URL(request.url || "/api/database", `http://${request.headers.host || "localhost"}`);
-    url.searchParams.set("mode", "database");
-    request.url = `${url.pathname}?${url.searchParams.toString()}`;
-    return runApi(path.join(root, "api", "health.js"), request, response);
-  }
-  if (pathname === "/api/audit" || pathname === "/api/audit.js") {
-    return runApi(path.join(root, "api", "audit.js"), request, response);
-  }
-  if (pathname === "/api/tool-health" || pathname === "/api/tool-health.js") {
-    return runApi(path.join(root, "api", "tool-health.js"), request, response);
-  }
-  if (pathname === "/api/media-download" || pathname === "/api/media-download.js") {
-    const url = new URL(request.url || "/api/media-download", `http://${request.headers.host || "localhost"}`);
-    url.searchParams.set("mode", "media-download");
-    request.url = `${url.pathname}?${url.searchParams.toString()}`;
-    return runApi(path.join(root, "api", "tool-health.js"), request, response);
-  }
-  if (pathname === "/api/admin/auth" || pathname === "/api/admin/auth.js") {
-    return runApi(path.join(root, "api", "admin", "auth.js"), request, response);
-  }
-  if (pathname === "/api/admin/dashboard" || pathname === "/api/admin/dashboard.js") {
-    return runApi(path.join(root, "api", "admin", "dashboard.js"), request, response);
-  }
-  if (pathname === "/api/admin/tools" || pathname === "/api/admin/tools.js") {
-    return runApi(path.join(root, "api", "admin", "tools.js"), request, response);
-  }
-  if (pathname === "/api/admin/analytics" || pathname === "/api/admin/analytics.js") {
-    return runApi(path.join(root, "api", "admin", "analytics.js"), request, response);
-  }
-  if (pathname === "/api/admin/feedback" || pathname === "/api/admin/feedback.js") {
-    return runApi(path.join(root, "api", "admin", "feedback.js"), request, response);
-  }
-  if (pathname === "/api/admin/audit" || pathname === "/api/admin/audit.js") {
-    return runApi(path.join(root, "api", "admin", "audit.js"), request, response);
-  }
-  if (pathname === "/api/admin/visual" || pathname === "/api/admin/visual.js") {
-    return runApi(path.join(root, "api", "admin", "visual.js"), request, response);
-  }
-  if (pathname === "/api/admin/socials" || pathname === "/api/admin/socials.js") {
-    return runApi(path.join(root, "api", "admin", "socials.js"), request, response);
-  }
+function existingPublicFile(pathname) {
+  if (!isStaticPathAllowed(pathname)) return null;
+  const relative = cleanRoutes[pathname] || pathname.slice(1);
+  const file = path.resolve(root, relative);
+  if (file !== root && !file.startsWith(`${root}${path.sep}`)) return null;
+  try { return fs.statSync(file).isFile() ? file : null; }
+  catch { return null; }
+}
 
-  if (!["GET", "HEAD"].includes(request.method || "GET")) {
-    response.writeHead(405, { Allow: "GET, HEAD" });
-    return response.end("Method not allowed");
-  }
+function applySecurityHeaders(response) {
+  response.setHeader("X-Content-Type-Options", "nosniff");
+  response.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  response.setHeader("Permissions-Policy", "camera=(), geolocation=(), microphone=(self)");
+  response.setHeader("X-Frame-Options", "SAMEORIGIN");
+}
 
-  const cleanRoutes = {
-    "/about": "/about.html",
-    "/feedback": "/feedback.html",
-    "/admin": "/admin/index.html",
-    "/admin/login": "/admin/login.html"
-  };
-  const relative = cleanRoutes[pathname] || pathname;
-  let file = existing(relative);
-  const navigation = !assetExtension.test(pathname) && /text\/html/i.test(request.headers.accept || "");
-  if (!file && navigation) file = existing("index.html");
-  if (!file) {
-    response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
-    return response.end("Not found");
-  }
+function createLocalServer() {
+  return http.createServer(async (request, response) => {
+    applySecurityHeaders(response);
+    let requestUrl;
+    let pathname;
+    try {
+      requestUrl = new URL(request.url || "/", `http://${request.headers.host || "localhost"}`);
+      pathname = decodeURIComponent(requestUrl.pathname);
+    } catch {
+      response.writeHead(400);
+      response.end("Bad request");
+      return;
+    }
 
-  const stat = fs.statSync(file);
-  response.writeHead(200, {
-    "Content-Type": types[path.extname(file).toLowerCase()] || "application/octet-stream",
-    "Content-Length": String(stat.size),
-    "Cache-Control": path.extname(file) === ".html" ? "no-cache" : "public, max-age=3600"
+    const apiPath = normalizeApiPath(pathname);
+    if (apiPath) {
+      requestUrl.pathname = apiPath;
+      return runApi(API_ROUTES[apiPath], request, response, requestUrl);
+    }
+    if (pathname.startsWith("/api/")) {
+      response.writeHead(404, { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" });
+      response.end(JSON.stringify({ ok: false, error: "API_ROUTE_NOT_FOUND" }));
+      return;
+    }
+    if (!["GET", "HEAD"].includes(request.method || "GET")) {
+      response.writeHead(405, { Allow: "GET, HEAD" });
+      response.end("Method not allowed");
+      return;
+    }
+
+    let file = existingPublicFile(pathname);
+    const navigation = /text\/html/i.test(request.headers.accept || "") && !path.extname(pathname) && !hasUnsafeSegment(pathname);
+    if (!file && navigation) file = existingPublicFile("/");
+    if (!file) {
+      response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+      response.end("Not found");
+      return;
+    }
+
+    const stat = fs.statSync(file);
+    const extension = path.extname(file).toLowerCase();
+    response.writeHead(200, {
+      "Content-Type": contentTypes[extension] || "application/octet-stream",
+      "Content-Length": String(stat.size),
+      "Cache-Control": extension === ".html" ? "no-cache" : "public, max-age=3600"
+    });
+    if (request.method === "HEAD") return response.end();
+    fs.createReadStream(file).on("error", () => response.destroy()).pipe(response);
   });
-  if (request.method === "HEAD") return response.end();
-  fs.createReadStream(file).on("error", () => response.destroy()).pipe(response);
-}).listen(port, host, () => {
-  console.log(`All Tools Nexora: http://${host}:${port}`);
-});
+}
+
+if (require.main === module) {
+  const server = createLocalServer();
+  server.listen(defaultPort, defaultHost, () => {
+    const address = server.address();
+    const activePort = typeof address === "object" && address ? address.port : defaultPort;
+    console.log(`All Tools Nexora: http://${defaultHost}:${activePort}`);
+  });
+}
+
+module.exports = { API_ROUTES, createLocalServer, isStaticPathAllowed };

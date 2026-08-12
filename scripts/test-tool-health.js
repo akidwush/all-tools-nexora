@@ -5,7 +5,8 @@ const {
   classifyProbe,
   fetchProbe,
   runToolHealthChecks,
-  summarizeHealth
+  summarizeHealth,
+  TOOL_CATALOG
 } = require("../lib/tool-health");
 
 async function main() {
@@ -85,7 +86,8 @@ async function main() {
   await handler({ method: "GET", url: "/api/tool-health?refresh=0", headers: { host: `127.0.0.1:${port}` }, socket: {} }, apiResponse);
   assert.equal(captured.status, 200);
   assert.equal(captured.payload.source, "catalog");
-  assert.equal(captured.payload.data.length, 42);
+  assert.equal(captured.payload.data.length, TOOL_CATALOG.length);
+  assert.equal(TOOL_CATALOG.length, 43);
 
   const protectedResponse = {
     setHeader() {}, status(code) { captured.protectedStatus = code; return this; },

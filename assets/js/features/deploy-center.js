@@ -44,6 +44,10 @@
     var deploySource=new TextDecoder("utf-8").decode(bytes);
     var safeOrigin=String(location.origin||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;");
     deploySource=deploySource.replace("<head>","<head><base href=\""+safeOrigin+"/\">");
+    deploySource=deploySource.replace(
+      'src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"',
+      'src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous" referrerpolicy="no-referrer"'
+    );
     blobUrl=URL.createObjectURL(new Blob([deploySource],{type:"text/html"}));
 
     ov=document.createElement("div");

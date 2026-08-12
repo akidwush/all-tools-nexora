@@ -1,8 +1,10 @@
 const publicAnalyticsHandler = require("../lib/public-analytics");
 const { anonymousHash, databaseRequest, getDatabaseConfig } = require("../lib/database");
+const { pruneMap, setBounded } = require("../lib/memory-store");
 
 const recentRequests = new Map();
 const WINDOW_MS = 60_000;
+const MAX_BODY_BYTES = 8_192;
 
 function send(response, status, payload) {
   response.setHeader("Cache-Control", "no-store");
@@ -12,11 +14,18 @@ function send(response, status, payload) {
 
 function clientIp(request) {
   const forwarded = String(request.headers["x-forwarded-for"] || "").split(",")[0].trim();
-  return forwarded || request.socket?.remoteAddress || "unknown";
+  return (forwarded || request.socket?.remoteAddress || "unknown").slice(0, 80);
 }
 
 function clean(value, maxLength) {
   return String(value || "").replace(/[\u0000-\u001f\u007f]/g, " ").trim().slice(0, maxLength);
+}
+
+function bodyBytes(request) {
+  const declared = Number(request.headers["content-length"] || 0);
+  if (Number.isFinite(declared) && declared > 0) return declared;
+  try { return Buffer.byteLength(JSON.stringify(request.body || {})); }
+  catch { return MAX_BODY_BYTES + 1; }
 }
 
 module.exports = async function handler(request, response) {
@@ -46,6 +55,10 @@ module.exports = async function handler(request, response) {
   if (request.method !== "POST") {
     response.setHeader("Allow", "GET, POST, OPTIONS");
     return send(response, 405, { ok: false, error: "METHOD_NOT_ALLOWED" });
+  }
+
+  if (bodyBytes(request) > MAX_BODY_BYTES) {
+    return send(response, 413, { ok: false, error: "PAYLOAD_TOO_LARGE", message: "Payload feedback terlalu besar." });
   }
 
   if (!getDatabaseConfig().configured) {
@@ -81,7 +94,12 @@ module.exports = async function handler(request, response) {
       message: "Tunggu satu menit sebelum mengirim laporan berikutnya."
     });
   }
-  recentRequests.set(ipHash, Date.now());
+  const now = Date.now();
+  setBounded(recentRequests, ipHash, now, {
+    maxEntries: 2_000,
+    now,
+    isExpired: (savedAt) => now - savedAt >= WINDOW_MS
+  });
 
   try {
     const rows = await databaseRequest("feedback", {

@@ -48,7 +48,7 @@
             <header class="nvi-panel-head"><div><span>01 · SOURCE & SETTINGS</span><h3>Image to Vector</h3></div><b id="nviEngine"><i class="fa-solid fa-circle-notch fa-spin"></i> LOADING</b></header>
             <label class="nvi-drop" id="nviDrop" for="nviFile">
               <input id="nviFile" type="file" accept="image/png,image/jpeg,.png,.jpg,.jpeg">
-              <i class="fa-solid fa-image"></i><strong>Drop atau pilih gambar</strong><small>PNG / JPG · maksimal 12 MB · diproses lokal</small>
+              <i class="fa-solid fa-image"></i><strong>Drop atau pilih gambar</strong><small>PNG / JPG · maksimal 12 MB · diproses melalui FreeConvert</small>
               <span><i class="fa-solid fa-folder-open"></i> Pilih gambar</span>
             </label>
             <div class="nvi-file" id="nviFileCard" hidden><img id="nviThumb" alt="Preview gambar"><div><span>RASTER READY</span><strong id="nviFileName"></strong><small id="nviFileMeta"></small></div><button id="nviRemove" type="button" aria-label="Hapus gambar"><i class="fa-solid fa-xmark"></i></button></div>

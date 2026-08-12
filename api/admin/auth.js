@@ -12,6 +12,7 @@ const {
 } = require("../../lib/admin-auth");
 const { databaseRequest } = require("../../lib/database");
 const { recordAdminAudit } = require("../../lib/admin-audit");
+const { takeFixedWindow } = require("../../lib/memory-store");
 
 const attempts = new Map();
 const WINDOW_MS = 15 * 60 * 1000;
@@ -24,7 +25,7 @@ function send(response, status, payload) {
 }
 
 function clientIp(request) {
-  return String(request.headers["x-forwarded-for"] || "").split(",")[0].trim() || request.socket?.remoteAddress || "unknown";
+  return (String(request.headers["x-forwarded-for"] || "").split(",")[0].trim() || request.socket?.remoteAddress || "unknown").slice(0, 80);
 }
 
 function clean(value, maxLength) {
@@ -36,15 +37,11 @@ function attemptKey(request, email) {
 }
 
 function allowAttempt(key) {
-  const now = Date.now();
-  const current = attempts.get(key);
-  if (!current || now - current.startedAt > WINDOW_MS) {
-    attempts.set(key, { count: 1, startedAt: now });
-    return true;
-  }
-  current.count += 1;
-  attempts.set(key, current);
-  return current.count <= MAX_ATTEMPTS;
+  return takeFixedWindow(attempts, key, {
+    windowMs: WINDOW_MS,
+    limit: MAX_ATTEMPTS,
+    maxEntries: 1_000
+  }).allowed;
 }
 
 module.exports = async function handler(request, response) {

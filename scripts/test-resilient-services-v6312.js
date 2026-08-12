@@ -4,7 +4,7 @@ const path = require("node:path");
 
 const root = path.resolve(__dirname, "..");
 const pkg = require(path.join(root, "package.json"));
-assert.equal(pkg.version, "6.3.13");
+assert.equal(pkg.version, "6.3.14");
 
 const bank = fs.readFileSync(
   path.join(root, "assets/js/features/download-pack.js"),
@@ -27,32 +27,9 @@ const fakeDev = fs.readFileSync(
 assert.ok(fakeDev.includes("Mode lokal aktif. Profile"));
 assert.ok(fakeDev.includes('"success"'));
 
-const nexusJs = fs.readFileSync(
-  path.join(root, "assets/js/features/nexus-ai.js"),
-  "utf8"
-);
-const match = nexusJs.match(/var AIVA_B64 = "([^"]+)";/);
-assert.ok(match, "Payload Nexus AI tidak ditemukan");
-const html = Buffer.from(match[1], "base64").toString("utf8");
-
-for (const token of [
-  'if(api==="worm")return callWorm(message,history);',
-  'if(api==="worm")return callWorm(message,history,signal);',
-  "if (api === 'worm') return callWorm(message, history);",
-  "if (api === 'worm') return callWorm(message, history, signal);",
-  "function nxMultiReplyUnavailable",
-  "async function nxResolveMultiReplies",
-  "const workerCount=Math.min(2,queue.length)",
-  "nxCallAutomaticModelBackup("
-]) {
-  assert.ok(html.includes(token), `Nexus AI belum memiliki: ${token}`);
-}
-
-assert.ok(
-  html.includes('if(api!=="worm"&&!isPrimary&&!nxIsAutomaticBackupRun())'),
-  "nxPrimaryCall masih menolak Worm sebelum router dijalankan"
-);
+assert.equal(fs.existsSync(path.join(root, "assets/js/features/nexus-ai.js")), false, "Modul Nexus AI mati harus dibuang");
+assert.equal(fs.existsSync(path.join(root, "assets/js/features/pix-vault.js")), false, "Modul Pix Vault dengan key lama harus dibuang");
 
 console.log(
-  "Nexora v6.3.13 tests lulus: Fake Bank lokal, Worm Auto routing, dan Multi-model failover aktif."
+  "Regression layanan lulus: Fake Bank/FakeDev fallback aktif dan modul mati berisiko sudah dibuang."
 );

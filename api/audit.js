@@ -1,5 +1,6 @@
 const { auditBatch } = require("../lib/audit");
 const { handleWebIntelligence } = require("../lib/web-intelligence");
+const { takeFixedWindow } = require("../lib/memory-store");
 
 const MAX_BODY_BYTES = 220_000;
 const WINDOW_MS = 60_000;
@@ -14,24 +15,15 @@ function send(response, status, payload) {
 
 function clientIp(request) {
   const forwarded = String(request.headers["x-forwarded-for"] || "").split(",")[0].trim();
-  return forwarded || request.socket?.remoteAddress || "unknown";
+  return (forwarded || request.socket?.remoteAddress || "unknown").slice(0, 80);
 }
 
 function rateLimit(request) {
-  const now = Date.now();
-  const key = clientIp(request);
-  const current = requestBuckets.get(key);
-  if (!current || current.resetAt <= now) {
-    requestBuckets.set(key, { count: 1, resetAt: now + WINDOW_MS });
-    return { allowed: true, remaining: MAX_REQUESTS_PER_WINDOW - 1, resetAt: now + WINDOW_MS };
-  }
-  current.count += 1;
-  requestBuckets.set(key, current);
-  return {
-    allowed: current.count <= MAX_REQUESTS_PER_WINDOW,
-    remaining: Math.max(0, MAX_REQUESTS_PER_WINDOW - current.count),
-    resetAt: current.resetAt
-  };
+  return takeFixedWindow(requestBuckets, clientIp(request), {
+    windowMs: WINDOW_MS,
+    limit: MAX_REQUESTS_PER_WINDOW,
+    maxEntries: 2_000
+  });
 }
 
 async function readBody(request) {

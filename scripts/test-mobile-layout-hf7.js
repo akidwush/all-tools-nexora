@@ -33,8 +33,8 @@ for (const token of [
   "@media(max-width:480px)",
   ".login-card{padding:20px 17px;border-radius:22px}"
 ]) assert.ok(admin.includes(token), `Admin Login kehilangan guard: ${token}`);
-assert.ok(read("admin/login.html").includes("assets/css/admin.css?v=6.3.13-hf7"));
-assert.ok(read("admin/index.html").includes("assets/css/admin.css?v=6.3.13-hf7"));
+assert.ok(read("admin/login.html").includes("assets/css/admin.css?v=6.3.14"));
+assert.ok(read("admin/index.html").includes("assets/css/admin.css?v=6.3.14"));
 
 const crypto = read("assets/css/features/crypto-market.css");
 for (const token of [
@@ -72,7 +72,7 @@ for (const file of [
 
 const index = read("index.html");
 const loader = read("assets/js/core/lazy-loader.js");
-assert.ok(index.includes("assets/css/components.css?v=6.3.13-hf9.1"));
-assert.match(loader, /ASSET_VERSION = '6\.3\.13-hf9\.1'/);
+assert.ok(index.includes("assets/css/components.css?v=6.3.14"));
+assert.match(loader, /ASSET_VERSION = '6\.3\.14'/);
 
 console.log("Mobile Layout HF7 tests lulus: room containment global, Admin Login, Crypto Market, Web Intelligence, Space modal portal, CSS balance, dan cache bust aktif.");

@@ -1,45 +1,51 @@
+"use strict";
+
 const fs = require("node:fs");
 const path = require("node:path");
 const { spawnSync } = require("node:child_process");
 
 const root = path.resolve(__dirname, "..");
 const output = path.join(root, "public");
-const required = [
-  "index.html", "about.html", "feedback.html", "favicon.svg", "vercel.json",
-  "assets/css/core.css", "assets/css/components.css",
-  "assets/js/core/bootstrap.js", "assets/js/core/network.js", "assets/js/core/performance.js", "assets/js/core/app.js", "assets/js/core/shell.js", "assets/js/core/social-links.js", "assets/js/core/tool-health.js", "assets/js/core/tool-registry.js", "assets/js/core/stability.js", "assets/js/core/lazy-loader.js", "assets/js/features/web-encryption.js", "assets/css/features/web-encryption.css", "assets/js/features/web-intelligence.js", "assets/css/features/web-intelligence.css", "assets/js/features/space-explorer.js", "assets/css/features/space-explorer.css", "assets/js/features/ocr-intelligence.js", "assets/css/features/ocr-intelligence.css", "assets/js/features/image-vectorizer.js", "assets/css/features/image-vectorizer.css", "assets/js/features/svg-alight.js", "assets/css/features/svg-alight.css", ,
-  "assets/module-manifest.json",
-  "api/health.js", "api/feedback.js", "api/audit.js", "api/tool-health.js", "lib/media-download.js", "lib/sitegrabber-proxy.js", "lib/vdeploy.js", "lib/web-intelligence.js", "lib/space-explorer.js", "lib/ocr-intelligence.js", "lib/svgtoxml-proxy.js", "lib/public-database.js", "lib/public-analytics.js",
-  "api/admin/auth.js", "api/admin/dashboard.js", "api/admin/tools.js", "api/admin/visual.js", "api/admin/socials.js",
-  "lib/database.js", "lib/audit.js", "lib/tool-health.js", "lib/admin-auth.js",
-  "admin/index.html", "admin/login.html", "assets/css/admin.css", "assets/css/visual-qa.css", "assets/js/admin/login.js", "assets/js/admin/dashboard.js", "assets/js/admin/visual-qa.js", "assets/js/admin/functional-audit.js", "assets/js/core/runtime-observer.js",
-  "database/schema.sql", "database/migrations/002_tool_health.sql", "database/migrations/003_admin_dashboard.sql", "database/migrations/004_analytics_feedback_audit.sql", "database/migrations/005_visual_runtime_validation.sql", "database/migrations/006_social_links.sql", "database/migrations/009_nexora_web_intelligence.sql", "database/migrations/010_nasa_space_explorer.sql", "database/migrations/011_nexora_ocr_intelligence.sql", "database/migrations/012_nexora_image_vectorizer.sql", "database/migrations/014_nexora_svg_alight.sql", "database/setup-first-admin.sql", "scripts/test-mobile-layout-hf7.js", "scripts/test-ocr-intelligence-hf8.js", "scripts/test-image-vectorizer-hf9.js", "V6_1_VALIDATION.md", "V6_1_1_VALIDATION.md", "V6_2_VALIDATION.md", "V6_3_VALIDATION.md", "V6_3_1_VALIDATION.md", "V6_3_2_VALIDATION.md", "V6_3_11_VALIDATION.md", "V6_3_13_VALIDATION.md"
-];
-const missing = required.filter((file) => !fs.existsSync(path.join(root, file)));
-if (missing.length) {
-  console.error(`Build gagal. File hilang: ${missing.join(", ")}`);
-  process.exit(1);
+
+function run(script) {
+  const result = spawnSync(process.execPath, [path.join(root, "scripts", script)], {
+    cwd: root,
+    stdio: "inherit",
+    env: { ...process.env, NODE_ENV: "test" }
+  });
+  if (result.status !== 0) process.exit(result.status || 1);
 }
-for (const filename of ["package.json", "vercel.json", "route-manifest.json", "assets/module-manifest.json"]) {
-  try { JSON.parse(fs.readFileSync(path.join(root, filename), "utf8")); }
-  catch (error) { console.error(`Build gagal. ${filename} bukan JSON valid: ${error.message}`); process.exit(1); }
-}
-const audit = spawnSync(process.execPath, [path.join(root, "scripts/check-project.js")], { stdio: "inherit" });
-if (audit.status !== 0) process.exit(audit.status || 1);
+
+run("check-project.js");
+run("run-tests.js");
+
 fs.rmSync(output, { recursive: true, force: true });
 fs.mkdirSync(output, { recursive: true });
+
 for (const filename of ["index.html", "about.html", "feedback.html", "favicon.svg", "route-manifest.json"]) {
   fs.copyFileSync(path.join(root, filename), path.join(output, filename));
 }
 fs.cpSync(path.join(root, "assets"), path.join(output, "assets"), { recursive: true, force: true });
 fs.cpSync(path.join(root, "admin"), path.join(output, "admin"), { recursive: true, force: true });
-const generated = [
-  "public/index.html", "public/admin/index.html", "public/admin/login.html", "public/assets/css/admin.css",
-  "public/assets/js/admin/dashboard.js", "public/assets/js/admin/visual-qa.js", "public/assets/js/admin/functional-audit.js", "public/assets/css/visual-qa.css", "public/assets/js/core/runtime-observer.js", "public/assets/js/core/bootstrap.js", "public/assets/js/core/network.js", "public/assets/js/core/performance.js", "public/assets/js/core/tool-registry.js", "public/assets/js/core/stability.js", "public/assets/js/core/lazy-loader.js", "public/assets/js/core/social-links.js", "public/assets/js/core/tool-health.js", "public/assets/js/core/analytics.js", "public/assets/module-manifest.json"
+
+const manifest = JSON.parse(fs.readFileSync(path.join(root, "assets/module-manifest.json"), "utf8"));
+const expected = [
+  "public/index.html", "public/about.html", "public/feedback.html", "public/favicon.svg",
+  "public/admin/index.html", "public/admin/login.html", "public/assets/js/core/app.js",
+  "public/assets/js/core/tool-registry.js", "public/assets/module-manifest.json",
+  ...Object.values(manifest.modules || {}).flatMap((module) => [...(module.css || []), ...(module.js || [])].map((file) => `public/${file}`))
 ];
-const failed = generated.filter((file) => !fs.existsSync(path.join(root, file)));
-if (failed.length) { console.error(`Build gagal membuat output: ${failed.join(", ")}`); process.exit(1); }
-const before = 3917113;
-const after = fs.statSync(path.join(root, "index.html")).size;
-console.log(`Build selesai: public/ dibuat. index.html ${after.toLocaleString()} byte (turun ${Math.max(0, Math.round((1-after/before)*100))}%).`);
-console.log("Feature payload besar dimuat saat tool dibuka; Image Vectorizer FreeConvert Cloud dengan signed direct upload dan preview fit-safe, OCR Intelligence HF8, Mobile Layout Recovery HF7, modal portal viewport-safe, deploy cache guards, TikTok media containment, Visual QA canvas guard, admin tool catalog CRUD, social link control, Runtime JS test, screenshot, visual baseline, analytics, feedback, audit log, login, dashboard admin, TikTok streaming, functional audit katalog progresif, Safe Layout Visual QA v6.3.13, dan SiteGrabber-X server-side aktif.");
+const missing = [...new Set(expected)].filter((relative) => !fs.existsSync(path.join(root, relative)));
+if (missing.length) {
+  console.error(`Build gagal membuat ${missing.length} file: ${missing.join(", ")}`);
+  process.exit(1);
+}
+
+const files = (function walk(directory) {
+  return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const absolute = path.join(directory, entry.name);
+    return entry.isDirectory() ? walk(absolute) : [absolute];
+  });
+})(output);
+const bytes = files.reduce((total, file) => total + fs.statSync(file).size, 0);
+console.log(`Build selesai: public/ berisi ${files.length} file (${(bytes / 1024 / 1024).toFixed(2)} MB).`);

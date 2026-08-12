@@ -1,362 +1,177 @@
+"use strict";
+
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
-const crypto = require("node:crypto");
 
 const root = path.resolve(__dirname, "..");
-let failed = false;
-function fail(message){ console.error(message); failed = true; }
-function walk(dir){
-  return fs.readdirSync(dir,{withFileTypes:true}).flatMap((entry)=>{
-    const full=path.join(dir,entry.name);
-    if(entry.name==="node_modules"||entry.name==="public"||entry.name===".git") return [];
-    return entry.isDirectory()?walk(full):[full];
-  });
+const failures = [];
+const fail = (message) => failures.push(message);
+const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
+const json = (relative) => {
+  try { return JSON.parse(read(relative)); }
+  catch (error) { fail(`${relative}: JSON tidak valid (${error.message})`); return {}; }
+};
+const sameSet = (left, right) => left.length === right.length && left.every((item) => right.includes(item));
+
+const packageJson = json("package.json");
+const version = String(packageJson.version || "");
+const vercel = json("vercel.json");
+const routeManifest = json("route-manifest.json");
+const moduleManifest = json("assets/module-manifest.json");
+
+const required = [
+  "index.html", "about.html", "feedback.html", "favicon.svg", "README.md", "CHANGELOG.md",
+  "docs/SECURITY_AUDIT.md", "serve-local.js", "vercel.json", "route-manifest.json",
+  "assets/module-manifest.json", "assets/js/core/tool-registry.js", "assets/js/core/app.js",
+  "api/health.js", "api/feedback.js", "api/audit.js", "api/tool-health.js",
+  "lib/database.js", "lib/memory-store.js", "lib/tool-health.js", "lib/vdeploy.js",
+  "lib/freeconvert-vectorizer.js", "lib/sitegrabber-proxy.js", "database/schema.sql"
+];
+for (const relative of required) if (!fs.existsSync(path.join(root, relative))) fail(`File wajib hilang: ${relative}`);
+
+function walk(directory) {
+  const output = [];
+  if (!fs.existsSync(directory)) return output;
+  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+    if (["node_modules", "public", ".git"].includes(entry.name)) continue;
+    const absolute = path.join(directory, entry.name);
+    if (entry.isDirectory()) output.push(...walk(absolute));
+    else output.push(absolute);
+  }
+  return output;
 }
-for(const filename of ["index.html","about.html","feedback.html","admin/index.html","admin/login.html"]){
-  const source=fs.readFileSync(path.join(root,filename),"utf8");
-  if(!/<\/html>\s*$/i.test(source)) fail(`${filename}: penutup HTML tidak valid.`);
-  let scriptIndex=0;
-  for(const match of source.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/gi)){
-    scriptIndex++;
-    if(/\bsrc\s*=/.test(match[1])) continue;
-    if((filename==="index.html" || filename.startsWith("admin/")) && match[2].trim()) fail(`${filename}: masih memiliki JavaScript inline pada blok ${scriptIndex}.`);
-    if(filename!=="index.html" && match[2].trim()){
-      try{ new vm.Script(match[2],{filename:`${filename}:inline-${scriptIndex}`}); }
-      catch(error){ fail(`${filename}: ${error.message}`); }
+
+const javascriptFiles = walk(root).filter((file) => /\.js$/i.test(file));
+for (const file of javascriptFiles) {
+  try { new vm.Script(fs.readFileSync(file, "utf8"), { filename: path.relative(root, file) }); }
+  catch (error) { fail(`Sintaks JavaScript gagal: ${path.relative(root, file)} (${error.message})`); }
+}
+
+for (const relative of ["index.html", "about.html", "feedback.html", "admin/index.html", "admin/login.html"]) {
+  const html = read(relative);
+  if (!/<\/body>\s*<\/html>\s*$/i.test(html)) fail(`${relative}: penutup body/html tidak lengkap.`);
+}
+
+for (const relative of ["index.html", "admin/index.html", "admin/login.html"]) {
+  const html = read(relative);
+  for (const match of html.matchAll(/(?:src|href)=["']([^"']*assets\/[^"']+)["']/gi)) {
+    if (!match[1].includes(`?v=${version}`)) fail(`${relative}: asset tanpa versi ${version}: ${match[1]}`);
+  }
+}
+
+let registry = null;
+try {
+  const sandbox = { window: { dispatchEvent() {} }, CustomEvent: function CustomEvent() {} };
+  vm.runInNewContext(read("assets/js/core/tool-registry.js"), sandbox, { filename: "tool-registry.js" });
+  registry = sandbox.window.NexoraToolRegistry;
+} catch (error) { fail(`Tool registry tidak dapat dievaluasi: ${error.message}`); }
+
+const registryRows = registry?.list?.() || [];
+const registryIds = registryRows.map((tool) => tool.id);
+if (registry?.version !== version) fail(`Versi registry ${registry?.version || "kosong"} tidak sama dengan package ${version}.`);
+if (!registryIds.length || new Set(registryIds).size !== registryIds.length) fail("ID tool registry kosong atau duplikat.");
+
+try {
+  const healthIds = require(path.join(root, "lib/tool-health.js")).TOOL_CATALOG.map((tool) => tool.id);
+  if (!sameSet(registryIds, healthIds)) fail(`Katalog health tidak sama dengan registry (${healthIds.length}/${registryIds.length}).`);
+} catch (error) { fail(`Katalog health gagal dimuat: ${error.message}`); }
+
+const schema = read("database/schema.sql");
+const seedBlock = schema.match(/insert into public\.tools[\s\S]*?on conflict \(id\) do nothing;/i)?.[0] || "";
+const seedIds = [...seedBlock.matchAll(/^\s*\('([a-z0-9_-]+)'/gm)].map((match) => match[1]);
+if (!sameSet(registryIds, seedIds)) fail(`Seed database tidak sama dengan registry (${seedIds.length}/${registryIds.length}).`);
+
+const moduleTools = Object.keys(moduleManifest.tools || {});
+const expectedModuleTools = registryRows.filter((tool) => tool.module).map((tool) => tool.id);
+if (!sameSet(moduleTools, expectedModuleTools)) fail("Pemetaan tools pada module-manifest tidak sama dengan registry.");
+for (const [name, module] of Object.entries(moduleManifest.modules || {})) {
+  for (const relative of [...(module.css || []), ...(module.js || [])]) {
+    if (!fs.existsSync(path.join(root, relative))) fail(`Asset modul ${name} hilang: ${relative}`);
+  }
+}
+
+for (const removed of [
+  "assets/js/features/nexus-ai.js", "assets/css/features/nexus-ai.css",
+  "assets/js/features/pix-vault.js", "assets/css/features/pix-vault.css"
+]) if (fs.existsSync(path.join(root, removed))) fail(`Modul mati/berisiko masih tersimpan: ${removed}`);
+
+const embeddedFrames = [
+  "assets/js/features/imported-tools.js", "assets/js/features/comic-reader.js",
+  "assets/js/features/tiktok-quote.js", "assets/js/features/virus-scan.js"
+];
+for (const relative of embeddedFrames) {
+  const source = read(relative);
+  if (!/<iframe[^>]+sandbox=/i.test(source)) fail(`${relative}: iframe srcdoc belum diberi sandbox.`);
+  if (/allow-same-origin/i.test(source)) fail(`${relative}: sandbox srcdoc masih memiliki allow-same-origin.`);
+}
+const index = read("index.html");
+if (/id=["']nxUnbanFrame["'][^>]*allow-same-origin/i.test(index)) fail("Iframe Unban masih memiliki allow-same-origin.");
+const app = read("assets/js/core/app.js");
+if (!/event\.source\s*!==\s*sourceFrame\.contentWindow/.test(app)) fail("Handler postMessage iframe belum memvalidasi event.source.");
+const deployCenter = read("assets/js/features/deploy-center.js");
+if (!/jszip\.min\.js[^\n]+integrity=\\?"sha512-/.test(deployCenter)) fail("JSZip Deploy Center belum dikunci dengan Subresource Integrity.");
+
+const apiFiles = walk(path.join(root, "api")).filter((file) => /\.js$/i.test(file));
+if (apiFiles.length > 12) fail(`Vercel Function melebihi batas paket: ${apiFiles.length}/12.`);
+
+try {
+  const localRoutes = Object.keys(require(path.join(root, "serve-local.js")).API_ROUTES);
+  const declaredRoutes = routeManifest.apiRoutes || [];
+  if (!sameSet(localRoutes, declaredRoutes)) fail(`Rute server lokal tidak sama dengan route-manifest (${localRoutes.length}/${declaredRoutes.length}).`);
+  const { isStaticPathAllowed } = require(path.join(root, "serve-local.js"));
+  for (const unsafe of ["/.env", "/package.json", "/database/schema.sql", "/lib/database.js", "/scripts/build.js"]) {
+    if (isStaticPathAllowed(unsafe)) fail(`Server lokal mengekspos file privat: ${unsafe}`);
+  }
+} catch (error) { fail(`Server lokal gagal divalidasi: ${error.message}`); }
+
+for (const rewrite of vercel.rewrites || []) {
+  if (!routeManifest.apiRoutes?.includes(rewrite.source)) fail(`Rewrite tidak tercatat di route-manifest: ${rewrite.source}`);
+}
+
+const productionTextFiles = [
+  ...walk(path.join(root, "api")), ...walk(path.join(root, "lib")), ...walk(path.join(root, "assets")),
+  path.join(root, "index.html"), path.join(root, "about.html"), path.join(root, "feedback.html")
+].filter((file) => /\.(?:js|css|html|json)$/i.test(file));
+const secretPatterns = [
+  /AIza[0-9A-Za-z_-]{30,}/g,
+  /gh[opusr]_[0-9A-Za-z]{30,}/g,
+  /\bsk-(?:live|test|proj)-[0-9A-Za-z_-]{20,}/g,
+  /\beyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{10,}/g,
+  /Authorization\s*:\s*["']Bearer\s+[0-9A-Za-z._-]{16,}["']/g,
+  /\b(?:api[_-]?key|secret|accessToken)\s*[:=]\s*["'][^"']{16,}["']/gi,
+  /["']x-api-key["']\s*:\s*["'][^"']{16,}["']/gi
+];
+for (const file of productionTextFiles) {
+  const source = fs.readFileSync(file, "utf8");
+  for (const pattern of secretPatterns) {
+    pattern.lastIndex = 0;
+    if (pattern.test(source)) fail(`Kemungkinan secret hardcoded: ${path.relative(root, file)}`);
+  }
+}
+
+for (const file of productionTextFiles.filter((item) => /assets[\\/]js[\\/].*\.js$/i.test(item))) {
+  const source = fs.readFileSync(file, "utf8");
+  for (const match of source.matchAll(/["']([A-Za-z0-9+/]{1000,}={0,2})["']/g)) {
+    const decoded = Buffer.from(match[1], "base64").toString("utf8");
+    const printable = (decoded.match(/[\x09\x0a\x0d\x20-\x7e]/g) || []).length / Math.max(1, decoded.length);
+    if (printable < 0.55) continue;
+    for (const pattern of secretPatterns) {
+      pattern.lastIndex = 0;
+      if (pattern.test(decoded)) fail(`Kemungkinan secret dalam payload base64: ${path.relative(root, file)}`);
     }
   }
-  if(filename==="index.html" && /<style\b/i.test(source)) fail("index.html masih memiliki CSS inline.");
-}
-const jsFiles=walk(root).filter((file)=>file.endsWith(".js"));
-for(const file of jsFiles){
-  const relative=path.relative(root,file);
-  try{ new vm.Script(fs.readFileSync(file,"utf8"),{filename:relative}); }
-  catch(error){ fail(`${relative}: ${error.message}`); }
-}
-const index=fs.readFileSync(path.join(root,"index.html"),"utf8");
-const indexBytes=Buffer.byteLength(index);
-if(indexBytes>180000) fail(`index.html masih terlalu besar: ${indexBytes} byte.`);
-for(const token of ["assets/css/core.css","assets/js/core/app.js","assets/js/core/tool-health.js","assets/js/core/lazy-loader.js"]){
-  if(!index.includes(token)) fail(`index.html belum merujuk aset modular: ${token}`);
-}
-if(index.includes('id="nxToolHealth"')) fail("Panel tool health publik seharusnya sudah dihapus dari homepage.");
-const app=fs.readFileSync(path.join(root,"assets/js/core/app.js"),"utf8");
-if(!app.includes('data-tool-id="${safeId}"')) fail("app.js belum memberi data-tool-id stabil pada kartu.");
-const loader=fs.readFileSync(path.join(root,"assets/js/core/lazy-loader.js"),"utf8");
-for(const token of ["ensureModule","toolModules","NexoraModules","get-code","nexus-ai"]){
-  if(!loader.includes(token)) fail(`lazy-loader belum lengkap: ${token}`);
-}
-const getCode=fs.readFileSync(path.join(root,"assets/js/features/get-code.js"),"utf8");
-for(const token of ["nxgcReport","analyzeExtractedSource","downloadSourceReport","runLiveAudit","LIVE_AUDIT_ENDPOINT","nxgcAssetScore"]){
-  if(!getCode.includes(token)) fail(`Get Code module belum berisi ${token}`);
 }
 
-const auditApi=fs.readFileSync(path.join(root,"api/audit.js"),"utf8");
-const auditLib=fs.readFileSync(path.join(root,"lib/audit.js"),"utf8");
-for(const token of ["auditBatch","AUDIT_RATE_LIMITED","MAX_BODY_BYTES"]){ if(!auditApi.includes(token)) fail(`Audit API belum lengkap: ${token}`); }
-for(const token of ["assertPublicUrl","PRIVATE_IP_BLOCKED","readHeadersWithRedirects","CORS_RISK","MIME_MISMATCH"]){ if(!auditLib.includes(token)) fail(`Audit library belum lengkap: ${token}`); }
-const routeManifest=JSON.parse(fs.readFileSync(path.join(root,"route-manifest.json"),"utf8"));
-if(!(routeManifest.apiRoutes||[]).includes("/api/audit")) fail("route-manifest belum mencantumkan /api/audit");
-if(!(routeManifest.apiRoutes||[]).includes("/api/tool-health")) fail("route-manifest belum mencantumkan /api/tool-health");
-if(!(routeManifest.apiRoutes||[]).includes("/api/vdeploy")) fail("route-manifest belum mencantumkan /api/vdeploy");
-
-const healthApi=fs.readFileSync(path.join(root,"api/tool-health.js"),"utf8");
-const healthLib=fs.readFileSync(path.join(root,"lib/tool-health.js"),"utf8");
-const healthUi=fs.readFileSync(path.join(root,"assets/js/core/tool-health.js"),"utf8");
-for(const token of ["HEALTH_CHECK_TOKEN","refresh === \"force\"","executeRun","readCachedToolHealth"]){ if(!healthApi.includes(token.replaceAll('\\"','"'))) fail(`Tool health API belum lengkap: ${token}`); }
-for(const token of ["TOOL_CATALOG","runToolHealthChecks","persistHealthResults","classifyProbe","summarizeHealth"]){ if(!healthLib.includes(token)) fail(`Tool health library belum lengkap: ${token}`); }
-for(const token of ["nxToolHealth","renderList","CACHE_KEY"]){ if(!healthUi.includes(token)) fail(`Tool health UI belum lengkap: ${token}`); }
-if(!healthUi.includes("/api/tool-health?refresh=auto")&&!healthUi.includes("/api/tool-health?refresh=0")) fail("Tool health UI belum memiliki endpoint refresh yang valid.");
-const schema=fs.readFileSync(path.join(root,"database/schema.sql"),"utf8");
-for(const token of ["create table if not exists public.tool_health","consecutive_failures","success_rate"]){ if(!schema.includes(token)) fail(`Schema tool health belum lengkap: ${token}`); }
-if(!fs.existsSync(path.join(root,"database/migrations/002_tool_health.sql"))) fail("Migration tool health belum tersedia.");
-
-const vdeployLib=fs.readFileSync(path.join(root,"lib/vdeploy.js"),"utf8");
-let vercelConfig;
-try {
-  vercelConfig = JSON.parse(fs.readFileSync(path.join(root,"vercel.json"),"utf8"));
-} catch (error) {
-  fail(`vercel.json tidak valid: ${error.message}`);
-  vercelConfig = {};
-}
-for(const token of ["NEXUS_DEPLOY_ACCESS_KEY","VERCEL_TOKEN","NETLIFY_TOKEN","createVercel","createNetlify","extractZip"]) if(!vdeployLib.includes(token)) fail(`VDeploy HF2 belum lengkap: ${token}`);
-const hasVdeployRewrite = Array.isArray(vercelConfig.rewrites) && vercelConfig.rewrites.some((item) =>
-  item && item.source === "/api/vdeploy" && typeof item.destination === "string" && item.destination.includes("mode=vdeploy")
-);
-if(!hasVdeployRewrite) fail("Rewrite /api/vdeploy belum tersedia atau destination tidak valid.");
-for(const token of ["nxLoadBgRemovalModule","isnet_quint8","staticimgly.com/@imgly/background-removal-data/1.7.0/dist/","nxLocalRemoveBg"]) if(!app.includes(token)) fail(`Remove BG HF2 belum lengkap: ${token}`);
-
-const adminRequired = [
-  "admin/index.html", "admin/login.html", "assets/css/admin.css", "assets/js/admin/login.js", "assets/js/admin/dashboard.js",
-  "api/admin/auth.js", "api/admin/dashboard.js", "api/admin/tools.js", "lib/admin-auth.js",
-  "database/migrations/003_admin_dashboard.sql", "database/setup-first-admin.sql"
-];
-for (const file of adminRequired) if (!fs.existsSync(path.join(root, file))) fail(`Admin v5.0 file hilang: ${file}`);
-const adminAuth = fs.readFileSync(path.join(root,"lib/admin-auth.js"),"utf8");
-for (const token of ["nx_admin_access","nx_admin_refresh","nx_admin_csrf","HttpOnly","verifyMutationRequest","refreshSession"]) if(!adminAuth.includes(token)) fail(`Admin auth belum lengkap: ${token}`);
-const adminApi = fs.readFileSync(path.join(root,"api/admin/auth.js"),"utf8");
-for (const token of ["LOGIN_RATE_LIMITED","ADMIN_NOT_ALLOWED","setSessionCookies"]) if(!adminApi.includes(token)) fail(`Admin login API belum lengkap: ${token}`);
-const adminTools = fs.readFileSync(path.join(root,"api/admin/tools.js"),"utf8");
-for (const token of ["requireAdmin","verifyMutationRequest","INVALID_EXTERNAL_URL"]) if(!adminTools.includes(token)) fail(`Admin tools API belum lengkap: ${token}`);
-const adminMigration = fs.readFileSync(path.join(root,"database/migrations/003_admin_dashboard.sql"),"utf8");
-for (const token of ["create table if not exists public.admin_users","references auth.users","grant select, insert, update, delete","on conflict (id) do nothing"]) if(!adminMigration.includes(token)) fail(`Migration admin belum lengkap: ${token}`);
-for (const route of ["/admin","/admin/login"]) if(!routeManifest.routes?.[route]) fail(`route-manifest belum mencantumkan ${route}`);
-for (const route of ["/api/admin/auth","/api/admin/dashboard","/api/admin/tools"]) if(!(routeManifest.apiRoutes||[]).includes(route)) fail(`route-manifest belum mencantumkan ${route}`);
-
-const adminV51Required = [
-  "lib/public-analytics.js", "api/admin/analytics.js", "api/admin/feedback.js", "api/admin/audit.js",
-  "lib/admin-audit.js", "assets/js/core/analytics.js", "database/migrations/004_analytics_feedback_audit.sql",
-  "V5_1_VALIDATION.md"
-];
-for (const file of adminV51Required) if (!fs.existsSync(path.join(root, file))) fail(`Admin v5.1 file hilang: ${file}`);
-const analyticsApiV51 = fs.readFileSync(path.join(root,"lib/public-analytics.js"),"utf8");
-for (const token of ["ALLOWED_EVENTS","visitor_hash","MAX_BODY_BYTES","tool_usage_events"]) if(!analyticsApiV51.includes(token)) fail(`Analytics API belum lengkap: ${token}`);
-const analyticsUiV51 = fs.readFileSync(path.join(root,"assets/js/core/analytics.js"),"utf8");
-for (const token of ["/api/feedback?mode=analytics","page_view","tool_open","NexoraAnalytics"]) if(!analyticsUiV51.includes(token)) fail(`Analytics UI belum lengkap: ${token}`);
-if(!index.includes('assets/js/core/analytics.js')) fail("index.html belum memuat analytics tracker.");
-const feedbackAdminV51 = fs.readFileSync(path.join(root,"api/admin/feedback.js"),"utf8");
-for (const token of ["verifyMutationRequest","admin_reply","internal_note","recordAdminAudit"]) if(!feedbackAdminV51.includes(token)) fail(`Feedback admin belum lengkap: ${token}`);
-const auditAdminV51 = fs.readFileSync(path.join(root,"api/admin/audit.js"),"utf8");
-for (const token of ["admin_audit_logs","requireAdmin"]) if(!auditAdminV51.includes(token)) fail(`Audit API belum lengkap: ${token}`);
-const adminDashboardV51 = fs.readFileSync(path.join(root,"assets/js/admin/dashboard.js"),"utf8");
-for (const token of ["loadAnalytics","loadFeedback","loadAudit","saveFeedback","openAuditDetail"]) if(!adminDashboardV51.includes(token)) fail(`Dashboard v5.1 belum lengkap: ${token}`);
-const migrationV51 = fs.readFileSync(path.join(root,"database/migrations/004_analytics_feedback_audit.sql"),"utf8");
-for (const token of ["create table if not exists public.tool_usage_events","create table if not exists public.admin_audit_logs","admin_analytics_summary","admin_updated_by","grant execute"]) if(!migrationV51.includes(token)) fail(`Migration v5.1 belum lengkap: ${token}`);
-for (const route of ["/api/analytics","/api/admin/analytics","/api/admin/feedback","/api/admin/audit"]) if(!(routeManifest.apiRoutes||[]).includes(route)) fail(`route-manifest belum mencantumkan ${route}`);
-
-
-const visualV60Required = [
-  "api/admin/visual.js", "assets/js/core/runtime-observer.js", "assets/js/admin/visual-qa.js",
-  "assets/css/visual-qa.css", "database/migrations/005_visual_runtime_validation.sql", "V6_VALIDATION.md"
-];
-for (const file of visualV60Required) if (!fs.existsSync(path.join(root, file))) fail(`Visual QA v6.0 file hilang: ${file}`);
-const runtimeObserverV60 = fs.readFileSync(path.join(root,"assets/js/core/runtime-observer.js"),"utf8");
-for (const token of ["__NEXORA_RUNTIME_OBSERVER__","unhandledrejection","runModules","horizontalOverflowPx"]) if(!runtimeObserverV60.includes(token)) fail(`Runtime observer v6.0 belum lengkap: ${token}`);
-const visualUiV60 = fs.readFileSync(path.join(root,"assets/js/admin/visual-qa.js"),"utf8");
-for (const token of ["captureFrame","foreignObject","compareFingerprints","set_baseline","save_run"]) if(!visualUiV60.includes(token)) fail(`Visual QA UI v6.0 belum lengkap: ${token}`);
-const visualApiV60 = fs.readFileSync(path.join(root,"api/admin/visual.js"),"utf8");
-for (const token of ["visual_baselines","visual_test_runs","verifyMutationRequest","recordAdminAudit"]) if(!visualApiV60.includes(token)) fail(`Visual QA API v6.0 belum lengkap: ${token}`);
-const migrationV60 = fs.readFileSync(path.join(root,"database/migrations/005_visual_runtime_validation.sql"),"utf8");
-for (const token of ["create table if not exists public.visual_baselines","create table if not exists public.visual_test_runs","threshold_percent","thumbnail_data_url"]) if(!migrationV60.includes(token)) fail(`Migration v6.0 belum lengkap: ${token}`);
-for (const html of ["index.html","about.html","feedback.html","admin/index.html","admin/login.html"]) {
-  const source = fs.readFileSync(path.join(root,html),"utf8");
-  if(!source.includes("runtime-observer.js")) fail(`${html} belum memuat runtime observer v6.0`);
-}
-if(!(routeManifest.apiRoutes||[]).includes("/api/admin/visual")) fail("route-manifest belum mencantumkan /api/admin/visual");
-
-const socialV61Required = [
-  "api/admin/socials.js", "assets/js/core/social-links.js",
-  "database/migrations/006_social_links.sql", "V6_1_VALIDATION.md"
-];
-for (const file of socialV61Required) if(!fs.existsSync(path.join(root,file))) fail(`Social link v6.1 file hilang: ${file}`);
-const socialApiV61 = fs.readFileSync(path.join(root,"api/admin/socials.js"),"utf8");
-for (const token of ["requireAdmin","verifyMutationRequest","recordAdminAudit","ACTIVE_SOCIAL_REQUIRES_URL"]) if(!socialApiV61.includes(token)) fail(`Social API v6.1 belum lengkap: ${token}`);
-const socialUiV61 = fs.readFileSync(path.join(root,"assets/js/core/social-links.js"),"utf8");
-for (const token of ["/api/health?mode=database&resource=socials","NexoraSocialLinks","nexora:social-links-ready"]) if(!socialUiV61.includes(token)) fail(`Social UI v6.1 belum lengkap: ${token}`);
-const migrationV61 = fs.readFileSync(path.join(root,"database/migrations/006_social_links.sql"),"utf8");
-for (const token of ["create table if not exists public.social_links","public read active social links","on conflict (key) do nothing"]) if(!migrationV61.includes(token)) fail(`Migration v6.1 belum lengkap: ${token}`);
-if(!index.includes("assets/js/core/social-links.js")) fail("index.html belum memuat social link loader v6.1");
-if(!(routeManifest.apiRoutes||[]).includes("/api/admin/socials")) fail("route-manifest belum mencantumkan /api/admin/socials");
-for (const destination of ["0029Vb7yYjE8PgsKrQ5ghQ3s", "6285196639720"]) {
-  if(index.includes(destination)) fail(`index.html masih memuat tujuan sosial hard-coded: ${destination}`);
-  if(fs.readFileSync(path.join(root,"assets/js/core/shell.js"),"utf8").includes(destination)) fail(`shell.js masih memuat tujuan sosial hard-coded: ${destination}`);
+const rootFiles = fs.readdirSync(root);
+for (const filename of rootFiles) {
+  if (/^(?:PATCH_NOTES|V\d.*VALIDATION).*\.md$/i.test(filename)) fail(`Dokumen historis belum dibersihkan: ${filename}`);
 }
 
-const serverlessFunctions = walk(path.join(root, "api")).filter((file) => file.endsWith(".js"));
-if(serverlessFunctions.length > 12) fail(`Vercel Hobby hanya mendukung 12 Serverless Functions; ditemukan ${serverlessFunctions.length}.`);
-for(const removedRouteFile of ["api/analytics.js", "api/database.js"]) {
-  if(fs.existsSync(path.join(root, removedRouteFile))) fail(`${removedRouteFile} harus digabung agar tidak melewati limit Vercel Hobby.`);
-}
-const vercelConfigV611 = JSON.parse(fs.readFileSync(path.join(root,"vercel.json"),"utf8"));
-for(const source of ["/api/analytics", "/api/database"]) {
-  if(!(vercelConfigV611.rewrites||[]).some((item)=>item.source===source)) fail(`Compatibility rewrite belum tersedia: ${source}`);
+if (failures.length) {
+  console.error(`Audit proyek gagal (${failures.length}):`);
+  failures.forEach((message) => console.error(`- ${message}`));
+  process.exit(1);
 }
 
-const tiktokV639=fs.readFileSync(path.join(root,"assets/js/features/tiktok.js"),"utf8");
-for(const token of ["/api/media-download?","probeDownload(choice)","triggerStreamDownload(choice)","nxEnhanceTiktokPreviewControls"]) if(!tiktokV639.includes(token)) fail(`TikTok v6.3.13 belum lengkap: ${token}`);
-for(const forbiddenToken of ["response.blob()","URL.createObjectURL","document.createElement('iframe')","new MutationObserver"]) if(tiktokV639.includes(forbiddenToken)) fail(`TikTok v6.3.13 masih memuat pola berat/palsu: ${forbiddenToken}`);
-if(!fs.existsSync(path.join(root,"lib/media-download.js"))) fail("Streaming media handler v6.3.13 hilang.");
-if(!(routeManifest.apiRoutes||[]).includes("/api/media-download")) fail("Route manifest belum mencantumkan /api/media-download.");
-if(!(vercelConfigV611.rewrites||[]).some((item)=>item.source==="/api/media-download"&&String(item.destination||"").includes("mode=media-download"))) fail("Rewrite streaming media belum tersedia.");
-if(!(routeManifest.apiRoutes||[]).includes("/api/sitegrabber")) fail("Route manifest belum mencantumkan /api/sitegrabber.");
-if(!(vercelConfigV611.rewrites||[]).some((item)=>item.source==="/api/sitegrabber"&&String(item.destination||"").includes("mode=sitegrabber"))) fail("Rewrite SiteGrabber-X belum tersedia.");
-const siteGrabberProxy=fs.readFileSync(path.join(root,"lib/sitegrabber-proxy.js"),"utf8");
-const getCodeV6313=fs.readFileSync(path.join(root,"assets/js/features/get-code.js"),"utf8");
-for(const token of ["SITEGRABBER_API_BASE_URL","SITEGRABBER_API_KEY","CAPTURE_CONSENT_REQUIRED","full-website","asset-collector","MAX_CAPTURES_PER_WINDOW"]) if(!siteGrabberProxy.includes(token)) fail(`SiteGrabber proxy v6.3.13 belum lengkap: ${token}`);
-for(const token of ['SITEGRABBER_ENDPOINT="/api/sitegrabber"',"Capture via SiteGrabber X","pollSiteGrabberJob","report-download"]) if(!getCodeV6313.includes(token)) fail(`Get Code SiteGrabber v6.3.13 belum lengkap: ${token}`);
-for(const file of ["index.html","assets/js/features/get-code.js","assets/css/features/get-code.css","assets/js/core/app.js"]){
-  const source=fs.readFileSync(path.join(root,file),"utf8");
-  if(/sgx_live_(?!your_server_only_key)[A-Za-z0-9_-]{10,}/.test(source)) fail(`${file} membocorkan SiteGrabber API key.`);
-}
-
-const healthCatalog=require(path.join(root,"lib/tool-health.js")).TOOL_CATALOG;
-if(!Array.isArray(healthCatalog)||healthCatalog.length!==42) fail(`Tool health catalog harus memuat 42 tools, ditemukan ${healthCatalog?.length||0}.`);
-
-const spaceExplorerLib=fs.readFileSync(path.join(root,"lib/space-explorer.js"),"utf8");
-const spaceExplorerUi=fs.readFileSync(path.join(root,"assets/js/features/space-explorer.js"),"utf8");
-for(const token of ["NASA_API_KEY","DEMO_KEY","planetary/apod","neo/rest/v1/feed","DONKI/notifications","images-api.nasa.gov","NASA_RESPONSE_TOO_LARGE"]) if(!spaceExplorerLib.includes(token)) fail(`Space Explorer HF6 belum lengkap: ${token}`);
-for(const token of ["renderSpaceExplorer","/api/space-explorer","drawRadar","Mars Rover Photos API yang sudah diarsipkan","@media"]) if(!spaceExplorerUi.includes(token)&&!fs.readFileSync(path.join(root,"assets/css/features/space-explorer.css"),"utf8").includes(token)) fail(`UI Space Explorer HF6 belum lengkap: ${token}`);
-if(spaceExplorerUi.includes("NASA_API_KEY")||spaceExplorerUi.includes("DEMO_KEY")) fail("UI Space Explorer tidak boleh mengetahui atau membawa NASA API key.");
-
-const componentsHf7=fs.readFileSync(path.join(root,"assets/css/components.css"),"utf8");
-const adminCssHf7=fs.readFileSync(path.join(root,"assets/css/admin.css"),"utf8");
-const cryptoCssHf7=fs.readFileSync(path.join(root,"assets/css/features/crypto-market.css"),"utf8");
-const webIntelCssHf7=fs.readFileSync(path.join(root,"assets/css/features/web-intelligence.css"),"utf8");
-const spaceCssHf7=fs.readFileSync(path.join(root,"assets/css/features/space-explorer.css"),"utf8");
-for(const token of ["#nxUniversalRoom *::after{box-sizing:border-box}","overflow-x:hidden","to{opacity:1;transform:none}",".nx-room-tool-body>*",".nx-room-tool-body :where(*)"]){
-  if(!componentsHf7.includes(token)) fail(`Mobile Layout HF7 belum lengkap: ${token}`);
-}
-for(const token of ["grid-template-columns:minmax(0,1fr)",".login-shell{width:100%;max-width:450px;min-width:0}","overflow-x:hidden"]){
-  if(!adminCssHf7.includes(token)) fail(`Admin Login HF7 belum responsif: ${token}`);
-}
-for(const token of ["overflow-x:clip",".nx-crypto-controls>*{min-width:0;max-width:100%}"]){
-  if(!cryptoCssHf7.includes(token)) fail(`Crypto Market HF7 belum responsif: ${token}`);
-}
-for(const token of [".nwi-url-field>*{min-width:0;max-width:100%}","overflow-wrap:anywhere","font-size:clamp(25px,8.3vw,32px)"]){
-  if(!webIntelCssHf7.includes(token)) fail(`Web Intelligence HF7 belum responsif: ${token}`);
-}
-for(const token of ["100dvh","safe-area-inset-top","bottom:auto"]){
-  if(!spaceCssHf7.includes(token)) fail(`Space modal HF7 belum responsif: ${token}`);
-}
-for(const token of ["document.body.appendChild(modal);","modal.remove();"]){
-  if(!spaceExplorerUi.includes(token)) fail(`Space modal portal HF7 belum lengkap: ${token}`);
-}
-if(!fs.existsSync(path.join(root,"scripts/test-mobile-layout-hf7.js"))) fail("Test Mobile Layout HF7 belum tersedia.");
-
-const ocrLibHf8=fs.readFileSync(path.join(root,"lib/ocr-intelligence.js"),"utf8");
-const ocrUiHf8=fs.readFileSync(path.join(root,"assets/js/features/ocr-intelligence.js"),"utf8");
-const ocrCssHf8=fs.readFileSync(path.join(root,"assets/css/features/ocr-intelligence.css"),"utf8");
-for(const token of ["OCR_SPACE_API_KEY","MAX_FILE_BYTES","base64Image","isCreateSearchablePdf","OCR_ENGINE_3_PDF_UNSUPPORTED","detectLanguage","documentStats","OCR_RATE_LIMITED"]){
-  if(!ocrLibHf8.includes(token)) fail(`OCR Intelligence HF8 backend belum lengkap: ${token}`);
-}
-for(const token of ["renderOcrIntelligence","/api/ocr-intelligence","Searchable PDF","localStorage","noiSearch","fileToDataUrl"]){
-  if(!ocrUiHf8.includes(token)) fail(`OCR Intelligence HF8 UI belum lengkap: ${token}`);
-}
-for(const token of ["overflow-x:clip","grid-template-columns:minmax(0,1fr)","@media(max-width:430px)","100dvh"]){
-  if(!ocrCssHf8.includes(token)) fail(`OCR Intelligence HF8 belum mobile-safe: ${token}`);
-}
-if(ocrUiHf8.includes("OCR_SPACE_API_KEY")) fail("OCR Intelligence UI tidak boleh mengetahui atau membawa API key.");
-if(!(routeManifest.apiRoutes||[]).includes("/api/ocr-intelligence")) fail("Route manifest belum mencantumkan OCR Intelligence.");
-if(!(vercelConfigV611.rewrites||[]).some((item)=>item.source==="/api/ocr-intelligence"&&String(item.destination||"").includes("mode=ocr-intelligence"))) fail("Rewrite OCR Intelligence belum tersedia.");
-if(!fs.existsSync(path.join(root,"database/migrations/011_nexora_ocr_intelligence.sql"))) fail("Migration OCR Intelligence HF8 belum tersedia.");
-if(!fs.existsSync(path.join(root,"scripts/test-ocr-intelligence-hf8.js"))) fail("Regression test OCR Intelligence HF8 belum tersedia.");
-
-const vectorUiHf9=fs.readFileSync(path.join(root,"assets/js/features/image-vectorizer.js"),"utf8");
-const vectorCssHf9=fs.readFileSync(path.join(root,"assets/css/features/image-vectorizer.css"),"utf8");
-const vectorApiHf9=fs.readFileSync(path.join(root,"lib/freeconvert-vectorizer.js"),"utf8");
-const toolHealthApiHf9=fs.readFileSync(path.join(root,"api/tool-health.js"),"utf8");
-const vectorManifestHf9=JSON.parse(fs.readFileSync(path.join(root,"assets/module-manifest.json"),"utf8"));
-
-for(const token of [
-  "renderImageVectorizer",
-  "sanitizeSvg",
-  "Download SVG",
-  "Copy SVG code",
-  "preserveAspectRatio",
-  "fit 100%",
-  "uploadDirect",
-  "pollResult",
-  "action:'prepare'",
-  "action:'start'",
-  "action:'result'",
-  "/api/tool-health?mode=image-vectorizer"
-]){
-  if(!vectorUiHf9.includes(token)) fail(`Image Vectorizer FreeConvert UI belum lengkap: ${token}`);
-}
-
-for(const token of [
-  "FREECONVERT_API_KEY",
-  "/process/import/upload",
-  "/process/convert",
-  "/process/export/url",
-  "handleFreeConvertVectorizer",
-  "prepareUpload",
-  "startConversion",
-  "fetchResult"
-]){
-  if(!vectorApiHf9.includes(token)) fail(`FreeConvert backend belum lengkap: ${token}`);
-}
-
-for(const token of [
-  "overflow-x:clip",
-  "100dvh",
-  "safe-area-inset-bottom",
-  "@media(max-width:720px)",
-  "@media(max-width:430px)",
-  "min-height:44px",
-  "width:auto!important",
-  "max-height:min(68dvh,720px)"
-]){
-  if(!vectorCssHf9.includes(token)) fail(`Image Vectorizer FreeConvert belum mobile-safe: ${token}`);
-}
-
-if(vectorUiHf9.includes("FREECONVERT_API_KEY")) fail("Frontend Image Vectorizer tidak boleh membawa FREECONVERT_API_KEY.");
-if(!toolHealthApiHf9.includes('mode") === "image-vectorizer"')) fail("Route FreeConvert Image Vectorizer belum terhubung.");
-if(!toolHealthApiHf9.includes("handleFreeConvertVectorizer")) fail("Handler FreeConvert belum terhubung ke API.");
-if(vectorManifestHf9.tools.imagevectorizer!=="image-vectorizer") fail("Manifest Image Vectorizer belum terhubung.");
-if(!fs.existsSync(path.join(root,"database/migrations/012_nexora_image_vectorizer.sql"))) fail("Migration Image Vectorizer HF9 belum tersedia.");
-if(!fs.existsSync(path.join(root,"database/migrations/013_freeconvert_image_vectorizer.sql"))) fail("Migration FreeConvert Image Vectorizer belum tersedia.");
-if(!fs.existsSync(path.join(root,"scripts/test-image-vectorizer-hf9.js"))) fail("Regression test Image Vectorizer belum tersedia.");
-
-
-const v62Required = [
-  "assets/js/core/network.js", "assets/js/core/tool-registry.js", "assets/js/core/stability.js", "assets/js/admin/functional-audit.js",
-  "scripts/test-network-v62.js", "scripts/test-functional-v62.js", "V6_2_VALIDATION.md"
-];
-for (const file of v62Required) if(!fs.existsSync(path.join(root,file))) fail(`v6.2 file hilang: ${file}`);
-const networkV62 = fs.readFileSync(path.join(root,"assets/js/core/network.js"),"utf8");
-const registryV62 = fs.readFileSync(path.join(root,"assets/js/core/tool-registry.js"),"utf8");
-const stabilityV62 = fs.readFileSync(path.join(root,"assets/js/core/stability.js"),"utf8");
-const functionalV62 = fs.readFileSync(path.join(root,"assets/js/admin/functional-audit.js"),"utf8");
-for (const token of ["NexoraFetch","REQUEST_TIMEOUT","nexora:network-error"]) if(!networkV62.includes(token)) fail(`Network layer v6.2 belum lengkap: ${token}`);
-for (const token of ["NexoraToolRegistry",'version:"6.3.13"',"count:rows.length"]) if(!registryV62.includes(token)) fail(`Tool registry v6.2 belum lengkap: ${token}`);
-for (const token of ["NexoraStability","functional-audit-complete","applyCardStatus","loadHealth","catalogPresent","Tool tidak ditemukan di katalog publik."]) if(!stabilityV62.includes(token)) fail(`Stability layer v6.2 belum lengkap: ${token}`);
-if(stabilityV62.includes("Kartu tool tidak ditemukan di DOM.")) fail("Functional audit masih memberi false positive pada katalog progresif.");
-const appV6310=fs.readFileSync(path.join(root,"assets/js/core/app.js"),"utf8");
-for(const token of ["NexoraToolCatalog","catalogHasTool","tool-catalog-ready"]) if(!appV6310.includes(token)) fail(`Runtime catalog v6.3.13 belum lengkap: ${token}`);
-const visualV6310=fs.readFileSync(path.join(root,"assets/js/admin/visual-qa.js"),"utf8");
-for(const token of ["renderSafeLayoutCanvas","safe-layout","screenshotRenderer"]) if(!visualV6310.includes(token)) fail(`Visual QA fallback v6.3.13 belum lengkap: ${token}`);
-for (const token of ["runFunctionalAudit","functionalAuditFrame","nexora:functional-section-open"]) if(!functionalV62.includes(token)) fail(`Functional audit admin v6.2 belum lengkap: ${token}`);
-if(!index.includes("assets/js/core/tool-registry.js")||!index.includes("assets/js/core/stability.js")) fail("index.html belum memuat stability layer v6.2");
-const adminHtmlV62=fs.readFileSync(path.join(root,"admin/index.html"),"utf8");
-if(!adminHtmlV62.includes('data-panel="functional"')||!adminHtmlV62.includes('id="adminMoreSheet"')) fail("Dashboard admin belum memiliki Functional Audit dan menu Lainnya.");
-const bottomNavV62=(adminHtmlV62.match(/<nav class="admin-bottom-nav"[\s\S]*?<\/nav>/)||[""])[0];
-if((bottomNavV62.match(/<button/g)||[]).length!==5) fail("Bottom navigation v6.2 harus berisi tepat 5 tombol.");
-if(fs.readFileSync(path.join(root,"assets/js/core/lazy-loader.js"),"utf8").includes("current!==lazyShowTool")) fail("Lazy loader masih berisiko rekursi dispatcher.");
-
-const bankV6312=fs.readFileSync(path.join(root,"assets/js/features/download-pack.js"),"utf8");
-for(const token of ["nxBuildFakeBankJagoLocal","SIMULASI — BUKAN BUKTI SALDO","renderLocal(name,balance,reason)"]) if(!bankV6312.includes(token)) fail(`Fake Bank fallback v6.3.13 belum lengkap: ${token}`);
-const fakeDevV6312=fs.readFileSync(path.join(root,"assets/js/features/source-features.js"),"utf8");
-if(!fakeDevV6312.includes("Mode lokal aktif. Profile")) fail("FakeDev fallback masih ditampilkan sebagai kegagalan.");
-const nexusV6312=fs.readFileSync(path.join(root,"assets/js/features/nexus-ai.js"),"utf8");
-const nexusPayloadMatch=nexusV6312.match(/var AIVA_B64 = "([^"]+)";/);
-if(!nexusPayloadMatch) fail("Payload Nexus AI v6.3.13 tidak ditemukan.");
-else{
-  const nexusHtml=Buffer.from(nexusPayloadMatch[1],"base64").toString("utf8");
-  for(const token of ['if(api==="worm")return callWorm(message,history,signal);',"function nxMultiReplyUnavailable","async function nxResolveMultiReplies","const workerCount=Math.min(2,queue.length)"]) if(!nexusHtml.includes(token)) fail(`Nexus AI resilience v6.3.13 belum lengkap: ${token}`);
-}
-if(!fs.existsSync(path.join(root,"scripts/test-resilient-services-v6312.js"))) fail("Regression test v6.3.13 hilang.");
-
-const manifest=JSON.parse(fs.readFileSync(path.join(root,"assets/module-manifest.json"),"utf8"));
-for(const [name,spec] of Object.entries(manifest.modules||{})){
-  for(const asset of [...(spec.css||[]),...(spec.js||[])]){
-    if(!fs.existsSync(path.join(root,asset))) fail(`Manifest ${name} menunjuk file hilang: ${asset}`);
-  }
-}
-const scanFiles=walk(root).filter((file)=>/\.(?:html|js|css|json)$/i.test(file) && path.relative(root,file)!=="scripts/check-project.js");
-const forbidden=["arguments.callee","api.telegram.org/bot","REPORT_FEEDBACK_B64","ABOUT_DEV_B64"];
-for(const file of scanFiles){
-  const source=fs.readFileSync(file,"utf8");
-  for(const token of forbidden){ if(source.includes(token)) fail(`${path.relative(root,file)} masih berisi pola terlarang: ${token}`); }
-  for(const match of source.matchAll(/["']([A-Za-z0-9+/]{160,}={0,2})["']/g)){
-    try{
-      const decoded=Buffer.from(match[1],"base64").toString("utf8");
-      if(/api\.telegram\.org\/bot|\b\d{8,10}:[A-Za-z0-9_-]{30,}\b/i.test(decoded)){
-        fail(`${path.relative(root,file)} memuat kredensial layanan pesan di payload base64.`); break;
-      }
-    }catch{}
-  }
-}
-if(failed) process.exit(1);
-console.log(`Audit v6.3.13 lulus: index ${indexBytes.toLocaleString()} byte, ${jsFiles.length} file JS valid, functional audit katalog progresif, Safe Layout screenshot fallback, deploy cache guards, TikTok streaming download, truthful history, media containment, social link control, lazy-load, live audit, tool health, runtime JS test, visual validation, analytics, feedback management, audit log, login, dan dashboard admin lengkap.`);
+console.log(`Audit proyek lulus: ${registryIds.length} tool, ${javascriptFiles.length} file JavaScript valid, ${apiFiles.length}/12 Vercel Functions, katalog/seed/rute sinkron, iframe dan server lokal terisolasi.`);

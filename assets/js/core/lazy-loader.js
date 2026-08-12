@@ -1,4 +1,4 @@
-/* Nexora v6.3.13 HF10.2 SVG Alight lazy-loader hotfix */
+/* Nexora v6.3.14 lazy module loader */
 (function(){
   'use strict';
 
@@ -19,8 +19,6 @@
     'generator-pack': {css:[],js:['assets/js/features/generator-pack.js']},
     'download-pack': {css:['assets/css/features/source-tools.css'],js:['assets/js/features/source-features.js','assets/js/features/download-pack.js']},
     'unban-whatsapp': {css:[],js:['assets/js/features/unban-whatsapp.js']},
-    'nexus-ai': {css:['assets/css/features/nexus-ai.css'],js:['assets/js/features/nexus-ai.js']},
-    'pix-vault': {css:['assets/css/features/pix-vault.css'],js:['assets/js/features/pix-vault.js']},
     'deploy-center': {css:['assets/css/features/deploy-center.css'],js:['assets/js/features/deploy-center.js']},
     'web-encryption': {css:['assets/css/features/web-encryption.css'],js:['assets/js/features/web-encryption.js']}
   };
@@ -47,7 +45,7 @@
   var assetPromises = new Map();
   /* Vercel serves /assets with a one-hour browser cache.  A module can
      therefore otherwise keep the previous CSS/JS after a successful deploy. */
-  var ASSET_VERSION = '6.3.13-hf10.4';
+  var ASSET_VERSION = '6.3.14';
   var baseShowTool = typeof window.showTool === 'function' ? window.showTool : null;
   var activeCard = null;
 

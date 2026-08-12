@@ -3,5 +3,10 @@
 .vercel
 node_modules
 npm-debug.log*
+.cache/
+coverage/
+dist/
+.DS_Store
+*.log
 
 public/

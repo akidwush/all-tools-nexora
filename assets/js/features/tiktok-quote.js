@@ -22,7 +22,7 @@
     body.innerHTML =
       '<div class="nx-ttquote-embed">' +
         '<div class="nx-ttquote-loading" id="nxTtQuoteLoading">Loading Quote Chat</div>' +
-        '<iframe class="nx-ttquote-frame" id="nxTtQuoteFrame" title="Nexus TikTok Quote Chat" allow="clipboard-write" loading="eager"></iframe>' +
+        '<iframe class="nx-ttquote-frame" id="nxTtQuoteFrame" title="Nexus TikTok Quote Chat" sandbox="allow-scripts allow-forms allow-popups allow-modals allow-downloads" allow="clipboard-write" referrerpolicy="no-referrer" loading="eager"></iframe>' +
       '</div>';
 
     var frame = document.getElementById('nxTtQuoteFrame');

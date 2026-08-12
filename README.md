@@ -1,50 +1,88 @@
-# All Tools Nexora v6.3.12
+# All Tools Nexora
 
-Rilis ketahanan layanan untuk tool yang bergantung pada API eksternal. Fokus v6.3.12 adalah menjaga Fake Bank Jago dan Nexus AI tetap dapat digunakan ketika provider timeout, sibuk, berubah, atau gagal.
+All Tools Nexora v6.3.14 adalah website toolkit statis dengan 43 tool, lazy-loaded feature modules, dashboard admin, Supabase, dan 12 Vercel Functions. Source frontend tetap tanpa framework dan tidak memiliki dependency npm produksi.
 
-## Perubahan utama v6.3.12
+## Menjalankan secara lokal
 
-- Fake Bank Jago memakai API sumber terlebih dahulu lalu otomatis membuat PNG simulasi lokal jika API timeout atau gagal.
-- Hasil lokal Fake Bank diberi watermark besar `SIMULASI — BUKAN BUKTI SALDO`.
-- Worm Auto tidak lagi ditolak sebagai “model backup” sebelum router Worm dijalankan.
-- Worm mencoba route asli, core Nexus, DeepSeek, lalu backup publik secara otomatis.
-- Multi-model memvalidasi respons “model sedang sibuk” dan menjalankan failover per model.
-- Failover Multi-model dibatasi dua worker agar tidak membanjiri provider dari HP.
-- FakeDev fallback lokal ditampilkan sebagai keberhasilan, bukan error/peringatan palsu.
-- Tidak menambah Serverless Function; tetap kompatibel dengan batas Vercel Hobby.
-
-## Upgrade
-
-Tidak ada migration SQL atau environment variable baru.
+Node.js 18 atau lebih baru diperlukan.
 
 ```bash
-npm install
+cp .env.example .env
+npm ci
+npm test
+npm run dev
+```
+
+Buka `http://127.0.0.1:4173`. Server lokal meniru seluruh rewrite API di `vercel.json` dan hanya menyajikan halaman serta asset publik.
+
+### Termux
+
+```bash
+pkg update
+pkg install git nodejs
+git clone https://github.com/akidwush/all-tools-nexora.git
+cd all-tools-nexora
+cp .env.example .env
+npm ci
+npm test
+npm run dev
+```
+
+## Struktur proyek
+
+| Lokasi | Isi |
+|---|---|
+| `index.html`, `assets/` | UI publik, core runtime, dan feature modules |
+| `admin/` | Login dan dashboard admin |
+| `api/` | 12 entry point Vercel Functions |
+| `lib/` | Handler, proxy, database, rate limit, dan validasi keamanan |
+| `database/` | Skema lengkap, migrations, dan setup admin pertama |
+| `scripts/` | Audit proyek, regression test, build, dan server lokal |
+| `public/` | Output build sementara; tidak disimpan di Git |
+
+`assets/js/core/tool-registry.js` adalah sumber daftar tool. `assets/module-manifest.json`, `lib/tool-health.js`, dan seed `database/schema.sql` wajib tetap sinkron; `npm run check` memverifikasi semuanya.
+
+## Konfigurasi
+
+Salin `.env.example` dan isi hanya layanan yang digunakan. Variable utama:
+
+- Database/admin: `SUPABASE_URL`, `SUPABASE_SECRET_KEY` atau `SUPABASE_SERVICE_ROLE_KEY`, serta `FEEDBACK_HASH_SALT`.
+- Operasional: `HEALTH_CHECK_TOKEN` dan pengaturan timeout/cache opsional.
+- Tool eksternal: `COINGECKO_API_KEY`, `GOOGLE_PAGESPEED_API_KEY`, `GOOGLE_SAFE_BROWSING_API_KEY`, `NASA_API_KEY`, `OCR_SPACE_API_KEY`, `FREECONVERT_API_KEY`, dan `SVGTOXML_API_KEY`.
+- SiteGrabber: `SITEGRABBER_API_BASE_URL` dan `SITEGRABBER_API_KEY`.
+- Deploy Center: `NEXUS_DEPLOY_ACCESS_KEY`, kemudian token `VERCEL_TOKEN` atau `NETLIFY_TOKEN`.
+
+Jangan memakai prefix publik untuk secret dan jangan menaruh key di HTML/JavaScript browser. Jika `FEEDBACK_HASH_SALT` kosong, server memakai salt acak per proses; konfigurasi nilai tetap tetap disarankan agar hash konsisten antar-instance.
+
+## Database dan admin
+
+Untuk instalasi baru, jalankan `database/schema.sql` melalui Supabase SQL Editor. Buat user di Supabase Authentication, ganti `GANTI_EMAIL_ADMIN` pada `database/setup-first-admin.sql`, lalu jalankan file tersebut.
+
+Untuk database lama, jalankan migration yang belum pernah diterapkan dari `database/migrations/` sesuai urutan nomor. Backup database terlebih dahulu.
+
+## Pemeriksaan dan build
+
+```bash
 npm run check
 npm test
 npm run build
 ```
 
-## Environment Vercel
+- `npm run check` memeriksa sintaks, katalog, seed, manifest, rute, batas Functions, iframe sandbox, asset version, dan kemungkinan secret hardcoded.
+- `npm test` menjalankan seluruh regression test di `scripts/test-*.js`.
+- `npm run build` menjalankan kedua pemeriksaan lalu membuat `public/` dari source frontend.
 
-```text
-SUPABASE_URL
-SUPABASE_SERVICE_ROLE_KEY atau SUPABASE_SECRET_KEY
-HEALTH_CHECK_TOKEN
-DATABASE_TIMEOUT_MS
-FEEDBACK_HASH_SALT
-```
+Deploy ke Vercel menggunakan konfigurasi `vercel.json`. Seluruh secret harus diatur sebagai environment variable server-side.
 
-## Endpoint
+## Batas dan keamanan
 
-Jumlah function fisik tetap maksimal 12. Alias `/api/analytics`, `/api/database`, dan `/api/media-download` menggunakan rewrite di `vercel.json`.
+- VDeploy membatasi ZIP ke 3,2 MB agar payload base64 tidak melewati batas request Function.
+- Proxy SVG dan arsip SiteGrabber dibatasi 4 MB.
+- Konten legacy yang dijalankan lewat `srcdoc` berada dalam iframe sandbox tanpa akses same-origin.
+- Sebagian tool bergantung pada API pihak ketiga dan tetap dapat mengalami kuota, perubahan kontrak, atau downtime.
 
-Dashboard admin:
+Lihat [audit keamanan](docs/SECURITY_AUDIT.md) dan [riwayat perubahan](CHANGELOG.md).
 
-```text
-/admin
-/admin/login
-```
+## Lisensi
 
-## Catatan
-
-Tool yang memakai provider publik tetap dapat mengalami gangguan eksternal. v6.3.12 mencegah kegagalan tunggal langsung mematikan fitur dengan fallback lokal atau failover provider yang jujur.
+Belum ada file lisensi di repository. Tambahkan lisensi eksplisit sebelum distribusi ulang di luar ketentuan pemilik proyek.

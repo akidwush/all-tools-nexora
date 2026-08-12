@@ -1,31 +1,5 @@
 /* Nexora application shell — extracted from index.html v3. Classic script; keep execution order. */
 
-/* ===== original script 7: nxTikTokStudioTopLevelPortal ===== */
-(function(){
-  'use strict';
-
-  var ALLOWED_TIKTOK_URLS = [
-    'https://www.tiktok.com/tiktokstudio',
-    'https://www.tiktok.com/tiktokstudio/upload?lang=id-ID'
-  ];
-
-  window.addEventListener('message',function(event){
-    if(
-      !event.data ||
-      event.data.type !== 'nx-open-tiktok-top-level' ||
-      ALLOWED_TIKTOK_URLS.indexOf(event.data.url) === -1
-    ){
-      return;
-    }
-
-    var opened = window.open(event.data.url,'_blank','noopener,noreferrer');
-
-    if(!opened){
-      window.location.href = event.data.url;
-    }
-  });
-})();
-
 /* ===== original script 13: nxAboutDevRoomScript ===== */
 (function(){
   "use strict";

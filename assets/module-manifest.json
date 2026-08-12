@@ -118,22 +118,6 @@
         "assets/js/features/unban-whatsapp.js"
       ]
     },
-    "nexus-ai": {
-      "css": [
-        "assets/css/features/nexus-ai.css"
-      ],
-      "js": [
-        "assets/js/features/nexus-ai.js"
-      ]
-    },
-    "pix-vault": {
-      "css": [
-        "assets/css/features/pix-vault.css"
-      ],
-      "js": [
-        "assets/js/features/pix-vault.js"
-      ]
-    },
     "deploy-center": {
       "css": [
         "assets/css/features/deploy-center.css"
