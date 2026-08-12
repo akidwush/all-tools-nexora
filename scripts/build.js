@@ -9,6 +9,9 @@ const required = [
   "assets/css/core.css", "assets/css/components.css",
   "assets/js/core/bootstrap.js", "assets/js/core/network.js", "assets/js/core/performance.js", "assets/js/core/app.js", "assets/js/core/shell.js", "assets/js/core/social-links.js", "assets/js/core/tool-health.js", "assets/js/core/tool-registry.js", "assets/js/core/stability.js", "assets/js/core/lazy-loader.js", "assets/js/features/web-encryption.js", "assets/css/features/web-encryption.css", "assets/js/features/web-intelligence.js", "assets/css/features/web-intelligence.css", "assets/js/features/space-explorer.js", "assets/css/features/space-explorer.css", "assets/js/features/ocr-intelligence.js", "assets/css/features/ocr-intelligence.css", "assets/js/features/image-vectorizer.js", "assets/css/features/image-vectorizer.css", "assets/js/features/svg-alight.js", "assets/css/features/svg-alight.css", ,
   "assets/module-manifest.json",
+  "assets/vendor/vtracer/vtracer-loader.js",
+  "assets/vendor/vtracer/vtracer_webapp_bg.js",
+  "assets/vendor/vtracer/vtracer_webapp_bg.wasm",
   "api/health.js", "api/feedback.js", "api/audit.js", "api/tool-health.js", "lib/media-download.js", "lib/sitegrabber-proxy.js", "lib/vdeploy.js", "lib/web-intelligence.js", "lib/space-explorer.js", "lib/ocr-intelligence.js", "lib/svgtoxml-proxy.js", "lib/public-database.js", "lib/public-analytics.js",
   "api/admin/auth.js", "api/admin/dashboard.js", "api/admin/tools.js", "api/admin/visual.js", "api/admin/socials.js",
   "lib/database.js", "lib/audit.js", "lib/tool-health.js", "lib/admin-auth.js",
@@ -35,7 +38,7 @@ fs.cpSync(path.join(root, "assets"), path.join(output, "assets"), { recursive: t
 fs.cpSync(path.join(root, "admin"), path.join(output, "admin"), { recursive: true, force: true });
 const generated = [
   "public/index.html", "public/admin/index.html", "public/admin/login.html", "public/assets/css/admin.css",
-  "public/assets/js/admin/dashboard.js", "public/assets/js/admin/visual-qa.js", "public/assets/js/admin/functional-audit.js", "public/assets/css/visual-qa.css", "public/assets/js/core/runtime-observer.js", "public/assets/js/core/bootstrap.js", "public/assets/js/core/network.js", "public/assets/js/core/performance.js", "public/assets/js/core/tool-registry.js", "public/assets/js/core/stability.js", "public/assets/js/core/lazy-loader.js", "public/assets/js/core/social-links.js", "public/assets/js/core/tool-health.js", "public/assets/js/core/analytics.js", "public/assets/module-manifest.json"
+  "public/assets/js/admin/dashboard.js", "public/assets/js/admin/visual-qa.js", "public/assets/js/admin/functional-audit.js", "public/assets/css/visual-qa.css", "public/assets/js/core/runtime-observer.js", "public/assets/js/core/bootstrap.js", "public/assets/js/core/network.js", "public/assets/js/core/performance.js", "public/assets/js/core/tool-registry.js", "public/assets/js/core/stability.js", "public/assets/js/core/lazy-loader.js", "public/assets/js/core/social-links.js", "public/assets/js/core/tool-health.js", "public/assets/js/core/analytics.js", "public/assets/module-manifest.json", "public/assets/vendor/vtracer/vtracer-loader.js", "public/assets/vendor/vtracer/vtracer_webapp_bg.js", "public/assets/vendor/vtracer/vtracer_webapp_bg.wasm"
 ];
 const failed = generated.filter((file) => !fs.existsSync(path.join(root, file)));
 if (failed.length) { console.error(`Build gagal membuat output: ${failed.join(", ")}`); process.exit(1); }

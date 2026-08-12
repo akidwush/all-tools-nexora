@@ -1,14 +1,10 @@
-/* Nexora Image Vectorizer HF11 — VTracer local WASM + adaptive tuning + SVG optimizer */
+/* Nexora Image Vectorizer HF11.1 — VTracer local WASM + adaptive tuning + SVG optimizer */
 (function(){
   'use strict';
 
   var MAX_FILE_BYTES=12*1024*1024;
   var ACCEPTED_TYPES=new Set(['image/png','image/jpeg']);
-  var VTRACER_SOURCES=[
-    'https://cdn.jsdelivr.net/npm/vtracer-webapp@0.4.0/+esm',
-    'https://esm.sh/vtracer-webapp@0.4.0?bundle',
-    'https://esm.run/vtracer-webapp@0.4.0'
-  ];
+  var VTRACER_LOCAL='/assets/vendor/vtracer/vtracer-loader.js?v=hf11.1';
 
   var PRESETS={
     logo:{label:'Logo',mode:'spline',detail:82,colorPrecision:7,filterSpeckle:7,cornerThreshold:58,maxColors:8,layerDifference:18,mosaic:true},
@@ -30,17 +26,32 @@
   function dynamicImport(url){return Function('u','return import(u)')(url);}
   function loadVTracer(){
     if(window.__nexoraVTracerPromise)return window.__nexoraVTracerPromise;
+
     window.__nexoraVTracerPromise=(async function(){
-      var lastError=null;
-      for(var i=0;i<VTRACER_SOURCES.length;i++){
-        try{
-          var mod=await dynamicImport(VTRACER_SOURCES[i]);
-          if(mod&&typeof mod.ColorImageConverter==='function'&&typeof mod.BinaryImageConverter==='function')return mod;
-          throw new Error('Binding VTracer tidak lengkap.');
-        }catch(error){lastError=error;}
+      var loader=await dynamicImport(VTRACER_LOCAL);
+      if(!loader||typeof loader.initVTracer!=='function'){
+        throw new Error('Loader VTracer lokal tidak valid.');
       }
-      throw new Error('VTracer WASM gagal dimuat. Periksa koneksi/CDN lalu coba lagi. '+(lastError&&lastError.message?lastError.message:''));
-    })().catch(function(error){window.__nexoraVTracerPromise=null;throw error;});
+
+      var mod=await loader.initVTracer();
+
+      if(
+        !mod ||
+        typeof mod.ColorImageConverter!=='function' ||
+        typeof mod.BinaryImageConverter!=='function'
+      ){
+        throw new Error('Binding VTracer lokal tidak lengkap.');
+      }
+
+      return mod;
+    })().catch(function(error){
+      window.__nexoraVTracerPromise=null;
+      throw new Error(
+        'VTracer WASM lokal gagal dimuat. '+
+        (error&&error.message?error.message:String(error))
+      );
+    });
+
     return window.__nexoraVTracerPromise;
   }
 
