@@ -554,13 +554,7 @@ instagram:  {renderer:'renderInstagram',   category:'downloader', icon:'fa-brand
 
   function getRenderer(name){
     var fn = window[name];
-    if(typeof fn === 'function') return fn;
-    try{
-      fn = eval(name);
-      return typeof fn === 'function' ? fn : null;
-    }catch(e){
-      return null;
-    }
+    return typeof fn === 'function' ? fn : null;
   }
 
   function buildRoom(){

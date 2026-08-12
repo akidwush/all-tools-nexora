@@ -1,5 +1,15 @@
 # Changelog
 
+## 6.3.15 — 2026-08-12
+
+### Perbaikan
+
+- Memantau task konversi dan ekspor FreeConvert secara terpisah sehingga pesan `Dependent task(s) failed` tidak lagi menyembunyikan penyebab utama.
+- Mengelompokkan kode kegagalan FreeConvert menjadi kuota, kredensial/izin, timeout, provider, dan konversi.
+- Menambahkan CSP aktif untuk membatasi script, frame, object, worker, form, dan koneksi eksternal tanpa memutus provider aktif.
+- Menghapus fallback `eval` dari pencarian renderer agar `unsafe-eval` tidak diperlukan.
+- Melengkapi canonical URL, Open Graph, dan Twitter Card pada halaman utama.
+
 ## 6.3.14 — 2026-08-12
 
 ### Keamanan

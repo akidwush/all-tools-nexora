@@ -111,6 +111,14 @@ const app = read("assets/js/core/app.js");
 if (!/event\.source\s*!==\s*sourceFrame\.contentWindow/.test(app)) fail("Handler postMessage iframe belum memvalidasi event.source.");
 const deployCenter = read("assets/js/features/deploy-center.js");
 if (!/jszip\.min\.js[^\n]+integrity=\\?"sha512-/.test(deployCenter)) fail("JSZip Deploy Center belum dikunci dengan Subresource Integrity.");
+const globalHeaders = (vercel.headers || []).find((entry) => entry.source === "/(.*)")?.headers || [];
+const csp = globalHeaders.find((entry) => String(entry.key).toLowerCase() === "content-security-policy")?.value || "";
+for (const directive of ["script-src 'self'", "connect-src 'self'", "frame-src 'self'", "object-src 'none'"]) {
+  if (!csp.includes(directive)) fail(`Directive CSP hilang: ${directive}`);
+}
+for (const property of ["og:title", "og:description", "og:image"]) {
+  if (!new RegExp(`property=["']${property}["']`, "i").test(index)) fail(`Metadata sosial hilang: ${property}`);
+}
 
 const apiFiles = walk(path.join(root, "api")).filter((file) => /\.js$/i.test(file));
 if (apiFiles.length > 12) fail(`Vercel Function melebihi batas paket: ${apiFiles.length}/12.`);

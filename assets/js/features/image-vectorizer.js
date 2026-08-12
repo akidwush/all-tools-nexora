@@ -152,11 +152,15 @@
 
     function friendlyError(error){
       var code=String(error&&error.code||'');
+      var normalizedCode=code.toLowerCase();
       var status=Number(error&&error.status||0);
       if(code==='FC_NOT_CONFIGURED'||code==='FREECONVERT_NOT_CONFIGURED')return 'FreeConvert belum dikonfigurasi di Vercel.';
       if(code==='FREECONVERT_TIMEOUT'||status===504)return 'FreeConvert timeout. Coba lagi beberapa saat.';
-      if(status===429||code==='FREECONVERT_429'||code==='FREECONVERT_402')return 'Kuota/rate limit FreeConvert sedang habis.';
+      if(status===429||code==='FREECONVERT_429'||code==='FREECONVERT_402'||/(?:daily_operations|out_of_conversion|quota|limit_exceed|payment|required|subscription)/.test(normalizedCode))return 'Kuota FreeConvert habis ('+(code||'LIMIT')+'). Tunggu reset kuota atau gunakan paket/API key yang masih memiliki saldo.';
       if(code==='FREECONVERT_401'||code==='FREECONVERT_403')return 'FreeConvert menolak API key.';
+      if(/(?:invalid_credentials|insufficient_permission|unauthorized|forbidden)/.test(normalizedCode))return 'API key FreeConvert tidak valid atau tidak memiliki izin ('+code+').';
+      if(/(?:engine_timeout|upload_timeout)/.test(normalizedCode))return 'Proses FreeConvert timeout ('+code+'). Coba lagi beberapa saat.';
+      if(code&&normalizedCode!=='task_failed')return ((error&&error.message)||'Konversi FreeConvert gagal.')+' ['+code+']';
       return (error&&error.message)||'Konversi vector gagal.';
     }
 
@@ -189,13 +193,18 @@
       if(!response.ok)throw new Error('Upload ke FreeConvert gagal (HTTP '+response.status+').');
     }
 
-    async function pollResult(taskId){
-      state.phase='POLL';
+    async function pollResult(taskId,options){
+      options=options||{};var start=Number(options.start||62),end=Number(options.end||94),label=options.label||'FreeConvert sedang membuat SVG';
       for(var i=0;i<100&&!state.cancelled&&!state.destroyed;i++){
         var result=await api({action:'result',taskId:taskId});
         if(result.status==='success'||result.ready===true)return taskId;
-        if(result.status==='failed')throw new Error(result.message||'FreeConvert gagal memproses gambar.');
-        setProgress(Math.min(94,62+i*.45),'FreeConvert sedang membuat SVG');await sleep(1500);
+        if(result.status==='failed'){
+          var taskError=new Error(result.message||'FreeConvert gagal memproses gambar.');
+          taskError.code=result.errorCode||'TASK_FAILED';
+          taskError.status=result.errorCategory==='quota'?429:result.errorCategory==='auth'?403:422;
+          throw taskError;
+        }
+        setProgress(Math.min(end,start+i*((end-start)/100)),label);await sleep(1500);
       }
       if(state.cancelled)throw new Error('Proses dihentikan.');throw new Error('Konversi terlalu lama. Coba lagi.');
     }
@@ -222,7 +231,8 @@
         var prepared=await api({action:'prepare',filename:state.file.name,size:state.file.size,format:format});if(state.cancelled)return;
         state.phase='UPLOAD';setProgress(18,'Mengupload gambar langsung ke FreeConvert');await uploadDirect(prepared.upload,state.file);if(state.cancelled)return;
         state.phase='START';setProgress(48,'Memulai konversi PNG/JPG → SVG');var tuning=cloudTuning();var startedTask=await api({action:'start',importTaskId:prepared.taskId,filename:state.file.name,format:format,tuning:tuning});
-        state.phase='POLL';setProgress(62,'Menunggu hasil vector');var exportTaskId=await pollResult(startedTask.exportTaskId);if(state.cancelled)return;
+        state.phase='CONVERT';setProgress(58,'Memantau task konversi utama');await pollResult(startedTask.convertTaskId,{start:58,end:82,label:'FreeConvert sedang membuat vector'});if(state.cancelled)return;
+        state.phase='EXPORT';setProgress(84,'Memantau task ekspor SVG');var exportTaskId=await pollResult(startedTask.exportTaskId,{start:84,end:94,label:'FreeConvert sedang mengekspor SVG'});if(state.cancelled)return;
         setProgress(95,'Mengambil SVG tanpa JSON besar');var blob=await fetchSvgBlob(exportTaskId);if(state.cancelled)return;
         state.phase='RENDER';finishBlob(blob,performance.now()-started);
       }catch(error){if(!state.cancelled)failRun(friendlyError(error));else setBusy(false);}

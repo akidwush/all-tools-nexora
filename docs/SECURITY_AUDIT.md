@@ -1,7 +1,7 @@
 # Audit Keamanan dan Stabilitas
 
 Tanggal audit: 12 Agustus 2026  
-Versi hasil perbaikan: 6.3.14
+Versi hasil perbaikan: 6.3.15
 
 ## Ringkasan
 
@@ -21,6 +21,8 @@ Audit mencakup frontend, iframe tool, 12 Vercel Functions, proxy pihak ketiga, a
 | Sedang | Katalog UI memiliki 43 tool tetapi health catalog/seed hanya 42 | `svgalight` ditambahkan dan audit sinkronisasi otomatis dibuat |
 | Sedang | Feedback tidak memiliki batas body dan fallback hash salt dapat ditebak | Body dibatasi 8 KB dan salt fallback dibuat acak per proses |
 | Sedang | Test/build bergantung pada nomor rilis serta dokumen historis | Audit dinamis, test runner, dan build deterministik menggantikannya |
+| Sedang | Situs tidak mengirim CSP dan metadata social sharing tidak lengkap | CSP kompatibel dipasang pada Vercel/server lokal; Open Graph dan Twitter Card dilengkapi |
+| Sedang | Image Vectorizer hanya memantau task ekspor sehingga penyebab task induk hilang | Task convert dan export dipantau terpisah; kode kuota, autentikasi, timeout, dan provider diteruskan ke UI |
 
 ## Verifikasi
 
@@ -39,6 +41,6 @@ Regression test memeriksa konsistensi 43 tool, sintaks seluruh JavaScript, batas
 
 - Tool yang memakai API pihak ketiga mengikuti ketersediaan, kuota, dan kontrak provider tersebut.
 - Source HTML legacy berukuran besar masih dipertahankan untuk beberapa tool aktif. Sandbox membatasi haknya, tetapi migrasi bertahap ke komponen native akan membuat pemeliharaan lebih mudah.
-- Content Security Policy global yang ketat belum diterapkan karena source lama masih memakai inline style/script dan beberapa origin eksternal. Terapkan CSP dalam mode report-only sebelum enforcement.
+- CSP aktif masih mengizinkan inline script/style dan sejumlah origin eksternal untuk kompatibilitas payload legacy. Migrasikan handler dan payload tersebut bertahap agar `'unsafe-inline'` serta allowlist yang tidak lagi diperlukan dapat dihapus.
 - Token deployment memiliki hak tinggi. Gunakan token scoped, rotasi berkala, lindungi `NEXUS_DEPLOY_ACCESS_KEY`, dan audit aktivitas provider.
 - Audit ini tidak menggantikan penetration test terhadap deployment produksi beserta konfigurasi akun/provider yang sebenarnya.

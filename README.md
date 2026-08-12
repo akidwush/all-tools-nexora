@@ -1,6 +1,6 @@
 # All Tools Nexora
 
-All Tools Nexora v6.3.14 adalah website toolkit statis dengan 43 tool, lazy-loaded feature modules, dashboard admin, Supabase, dan 12 Vercel Functions. Source frontend tetap tanpa framework dan tidak memiliki dependency npm produksi.
+All Tools Nexora v6.3.15 adalah website toolkit statis dengan 43 tool, lazy-loaded feature modules, dashboard admin, Supabase, dan 12 Vercel Functions. Source frontend tetap tanpa framework dan tidak memiliki dependency npm produksi.
 
 ## Menjalankan secara lokal
 
@@ -79,6 +79,8 @@ Deploy ke Vercel menggunakan konfigurasi `vercel.json`. Seluruh secret harus dia
 - VDeploy membatasi ZIP ke 3,2 MB agar payload base64 tidak melewati batas request Function.
 - Proxy SVG dan arsip SiteGrabber dibatasi 4 MB.
 - Konten legacy yang dijalankan lewat `srcdoc` berada dalam iframe sandbox tanpa akses same-origin.
+- Header Content Security Policy membatasi sumber script, frame, object, worker, dan koneksi browser; kebijakan tetap mengizinkan provider yang memang dipakai tool legacy.
+- Image Vectorizer memantau task konversi dan ekspor secara terpisah agar kegagalan kuota, kredensial, timeout, atau engine tidak lagi tertutup pesan dependency umum.
 - Sebagian tool bergantung pada API pihak ketiga dan tetap dapat mengalami kuota, perubahan kontrak, atau downtime.
 
 Lihat [audit keamanan](docs/SECURITY_AUDIT.md) dan [riwayat perubahan](CHANGELOG.md).

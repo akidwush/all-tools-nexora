@@ -1,4 +1,4 @@
-/* Nexora v6.3.14 lazy module loader */
+/* Nexora v6.3.15 lazy module loader */
 (function(){
   'use strict';
 
@@ -45,7 +45,7 @@
   var assetPromises = new Map();
   /* Vercel serves /assets with a one-hour browser cache.  A module can
      therefore otherwise keep the previous CSS/JS after a successful deploy. */
-  var ASSET_VERSION = '6.3.14';
+  var ASSET_VERSION = '6.3.15';
   var baseShowTool = typeof window.showTool === 'function' ? window.showTool : null;
   var activeCard = null;
 

@@ -7,6 +7,7 @@ const path = require("node:path");
 const root = __dirname;
 const defaultPort = Number(process.env.PORT || 4173);
 const defaultHost = process.env.HOST || "127.0.0.1";
+const CONTENT_SECURITY_POLICY = "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://cdn.tailwindcss.com https://esm.sh; script-src-attr 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://freeconvert.com https://*.freeconvert.com https://api-nanzz.my.id https://api.allorigins.win https://api.country.is https://api.ikyyxd.my.id https://api.mangadex.org https://api.microlink.io https://api.nexadev.my.id https://api.nexray.eu.cc https://api.qrserver.com https://api.resellergaming.my.id https://api.siputzx.my.id https://apii.nexadev.my.id https://api.groq.com https://carifakta-tnz.vercel.app https://cors-anyway.huskymobile.com https://corsproxy.io https://eu.r.jina.ai https://images.weserv.nl https://ipapi.co https://ipwho.is https://kaze-extract.netlify.app https://kyzznekoo.zone.id https://nexus-tools.my.id https://proxy.corsfix.com https://r.jina.ai https://raw.githubusercontent.com https://staticimgly.com https://sylvatica.my.id https://test.cors.workers.dev https://tikwm.com https://uploads.mangadex.org https://wsrv.nl https://www.tikwm.com https://zxvaiapk.netlify.app https://cdn.jsdelivr.net https://esm.sh https://c.termai.cc; frame-src 'self' blob: data: https://kaze-extract.netlify.app; worker-src 'self' blob:; object-src 'none'; base-uri 'self' https:; form-action 'self' https:; frame-ancestors 'self'; manifest-src 'self'; upgrade-insecure-requests";
 
 const contentTypes = {
   ".html": "text/html; charset=utf-8",
@@ -161,6 +162,7 @@ function applySecurityHeaders(response) {
   response.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
   response.setHeader("Permissions-Policy", "camera=(), geolocation=(), microphone=(self)");
   response.setHeader("X-Frame-Options", "SAMEORIGIN");
+  response.setHeader("Content-Security-Policy", CONTENT_SECURITY_POLICY);
 }
 
 function createLocalServer() {
@@ -223,4 +225,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { API_ROUTES, createLocalServer, isStaticPathAllowed };
+module.exports = { API_ROUTES, CONTENT_SECURITY_POLICY, createLocalServer, isStaticPathAllowed };

@@ -9,6 +9,7 @@ const apiRoute = fs.readFileSync(path.join(root, "api/tool-health.js"), "utf8");
 const backend = fs.readFileSync(path.join(root, "lib/freeconvert-vectorizer.js"), "utf8");
 const css = fs.readFileSync(path.join(root, "assets/css/features/image-vectorizer.css"), "utf8");
 const envExample = fs.readFileSync(path.join(root, ".env.example"), "utf8");
+const { classifyTaskErrorCode } = require("../lib/freeconvert-vectorizer");
 
 for (const token of [
   "/api/tool-health?mode=image-vectorizer",
@@ -27,6 +28,20 @@ for (const token of [
 ]) {
   assert.ok(ui.includes(token), `Frontend missing: ${token}`);
 }
+
+for (const token of [
+  "startedTask.convertTaskId",
+  "errorCategory==='quota'",
+  "state.phase='CONVERT'",
+  "state.phase='EXPORT'"
+]) {
+  assert.ok(ui.includes(token), `Frontend task diagnostics missing: ${token}`);
+}
+
+assert.equal(classifyTaskErrorCode("daily_operations_limit_exceeds"), "quota");
+assert.equal(classifyTaskErrorCode("out_of_conversion_minutes"), "quota");
+assert.equal(classifyTaskErrorCode("invalid_credentials"), "auth");
+assert.equal(classifyTaskErrorCode("processing_failed"), "provider");
 
 
 for (const token of [
@@ -87,7 +102,7 @@ for (const token of [
 }
 
 console.log(
-  "Image Vectorizer FreeConvert regression test lulus: server-only API key, signed direct upload, convert/export polling, SVG sanitization, route wiring, dan fit-safe mobile preview valid."
+  "Image Vectorizer FreeConvert regression test lulus: server-only API key, signed direct upload, diagnosis task convert/export, SVG sanitization, route wiring, dan fit-safe mobile preview valid."
 );
 
 

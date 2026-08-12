@@ -17,7 +17,7 @@ sandbox.window.dispatchEvent = (event) => events.push(event.type);
 vm.runInNewContext(read("assets/js/core/tool-registry.js"), sandbox, { filename: "tool-registry.js" });
 const registry = sandbox.window.NexoraToolRegistry;
 assert.ok(registry, "Tool registry tidak terpasang");
-assert.equal(registry.version, "6.3.14");
+assert.equal(registry.version, "6.3.15");
 assert.equal(registry.count, EXPECTED_TOOL_COUNT);
 assert.equal(registry.list().length, EXPECTED_TOOL_COUNT);
 assert.equal(new Set(registry.list().map((item) => item.id)).size, EXPECTED_TOOL_COUNT);

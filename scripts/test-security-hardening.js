@@ -6,6 +6,7 @@ const path = require("node:path");
 const { MAX_ARCHIVE_BYTES } = require("../lib/vdeploy");
 const { MAX_SVG_BYTES, downloadPublicSvg } = require("../lib/freeconvert-vectorizer");
 const { setBounded, takeFixedWindow } = require("../lib/memory-store");
+const { CONTENT_SECURITY_POLICY } = require("../serve-local");
 
 const root = path.resolve(__dirname, "..");
 const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
@@ -43,5 +44,23 @@ assert.ok(!database.includes("all-tools-nexora-local-fallback"));
 const deployCenter = read("assets/js/features/deploy-center.js");
 assert.ok(deployCenter.includes("integrity=\"sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==\""));
 assert.ok(deployCenter.includes("crossorigin=\"anonymous\""));
+const vercel = JSON.parse(read("vercel.json"));
+const globalHeaders = vercel.headers.find((entry) => entry.source === "/(.*)")?.headers || [];
+const csp = globalHeaders.find((entry) => entry.key.toLowerCase() === "content-security-policy")?.value || "";
+assert.equal(csp, CONTENT_SECURITY_POLICY, "CSP Vercel dan server lokal berbeda");
+for (const directive of [
+  "default-src 'self'", "script-src 'self'", "connect-src 'self'", "frame-src 'self'",
+  "worker-src 'self' blob:", "object-src 'none'", "frame-ancestors 'self'"
+]) assert.ok(csp.includes(directive), `Directive CSP hilang: ${directive}`);
+assert.ok(!csp.split(/;\s*/).find((directive) => directive.startsWith("script-src "))?.split(/\s+/).includes("'unsafe-eval'"));
+assert.doesNotMatch(read("assets/js/core/shell.js"), /\beval\s*\(/);
 
-console.log("Security regression lulus: body limit, bounded memory, iframe isolation, SRI, redirect guard, dan salt acak aktif.");
+const index = read("index.html");
+for (const property of ["og:title", "og:description", "og:image", "og:url"]) {
+  assert.match(index, new RegExp(`property=["']${property}["']`, "i"), `Metadata ${property} hilang`);
+}
+for (const name of ["twitter:card", "twitter:title", "twitter:description", "twitter:image"]) {
+  assert.match(index, new RegExp(`name=["']${name}["']`, "i"), `Metadata ${name} hilang`);
+}
+
+console.log("Security regression lulus: CSP aktif, metadata sosial lengkap, body limit, bounded memory, iframe isolation, SRI, redirect guard, dan salt acak aktif.");
