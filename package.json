@@ -2,7 +2,7 @@
   "name": "all-tools-nexora-developer-dika",
   "version": "6.3.13",
   "private": true,
-  "description": "All Tools Nexora v6.3.13 HF9.1 — VTracer viewport and fidelity recovery",
+  "description": "All Tools Nexora v6.3.13 HF11 \u2014 VTracer local WASM adaptive vectorizer",
   "scripts": {
     "dev": "node serve-local.js",
     "start": "node serve-local.js",
