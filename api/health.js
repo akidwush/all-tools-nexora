@@ -49,7 +49,7 @@ module.exports = async function handler(request, response) {
     status: serviceStatus,
     app: "All Tools Nexora",
     developer: "Dika",
-    version: "6.3.16",
+    version: "6.3.17",
     database: {
       configured: database.configured,
       connected: database.connected,

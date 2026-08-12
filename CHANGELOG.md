@@ -1,5 +1,15 @@
 # Changelog
 
+## 6.3.17 — 2026-08-12
+
+### Perbaikan Big Image
+
+- Mengklasifikasikan respons provider `requires_vip` sebagai pembatasan paket, bukan kegagalan generik.
+- Menjadikan Bigjpg sebagai engine utama dan otomatis beralih ke Image Enhancer lokal hingga 2× ketika akses paket, kuota, kredensial, timeout, atau infrastruktur cloud menolak proses.
+- Menonaktifkan pilihan 4×/8×/16× selama fallback lokal agar hasil tidak diklaim melebihi kemampuan engine yang dipakai.
+- Mengganti indikator menyesatkan `BIGJPG READY` menjadi `BIGJPG KEY SET`; hak menjalankan task baru dinyatakan setelah submit provider berhasil.
+- Menampilkan engine hasil secara eksplisit sebagai `BIGJPG AI` atau `LOCAL`, menjaga preview proporsional, serta membersihkan Object URL fallback saat reset/keluar tool.
+
 ## 6.3.16 — 2026-08-12
 
 ### Fitur

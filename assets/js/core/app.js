@@ -978,6 +978,10 @@ async function nxLocalEnhance(file, imageUrl, strength = 55) {
     return nxCanvasToUrl(canvas);
 }
 
+// API lokal stabil untuk feature module lazy-loaded seperti Big Image.
+// Hanya fungsi yang diperlukan yang diekspos; tidak ada secret/provider key.
+window.NexoraLocalEnhance = nxLocalEnhance;
+
 let nxBgRemovalModulePromise = null;
 async function nxLoadBgRemovalModule() {
     if (nxBgRemovalModulePromise) return nxBgRemovalModulePromise;
@@ -1536,7 +1540,7 @@ function catalogListTools() {
 }
 
 window.NexoraToolCatalog = Object.freeze({
-    version: '6.3.16',
+    version: '6.3.17',
     has: catalogHasTool,
     list: catalogListTools
 });

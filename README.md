@@ -1,6 +1,6 @@
 # All Tools Nexora
 
-All Tools Nexora v6.3.16 adalah website toolkit statis dengan 44 tool, lazy-loaded feature modules, dashboard admin, Supabase, dan 12 Vercel Functions. Source frontend tetap tanpa framework dan tidak memiliki dependency npm produksi.
+All Tools Nexora v6.3.17 adalah website toolkit statis dengan 44 tool, lazy-loaded feature modules, dashboard admin, Supabase, dan 12 Vercel Functions. Source frontend tetap tanpa framework dan tidak memiliki dependency npm produksi.
 
 ## Menjalankan secara lokal
 
@@ -60,7 +60,7 @@ Untuk instalasi baru, jalankan `database/schema.sql` melalui Supabase SQL Editor
 
 Untuk database lama, jalankan migration yang belum pernah diterapkan dari `database/migrations/` sesuai urutan nomor. Backup database terlebih dahulu.
 
-Big Image memerlukan `database/migrations/015_big_image_bigjpg.sql`. Migration tersebut membuat tabel job dan bucket `big-image-inputs` privat. Atur `BIGJPG_API_KEY` serta `BIGJPG_JOB_SECRET` di Vercel, lalu redeploy. Batas per-IP/global dapat disesuaikan melalui `BIGJPG_HOURLY_IP_LIMIT` dan `BIGJPG_DAILY_TASK_LIMIT`.
+Big Image memerlukan `database/migrations/015_big_image_bigjpg.sql`. Migration tersebut membuat tabel job dan bucket `big-image-inputs` privat. Atur `BIGJPG_API_KEY` serta `BIGJPG_JOB_SECRET` di Vercel, lalu redeploy. Batas per-IP/global dapat disesuaikan melalui `BIGJPG_HOURLY_IP_LIMIT` dan `BIGJPG_DAILY_TASK_LIMIT`. Bigjpg tetap menjadi engine utama; jika task API ditolak karena `requires_vip`, kuota, autentikasi, timeout, atau infrastruktur cloud, UI beralih jujur ke enhancer lokal hingga 2×.
 
 ## Pemeriksaan dan build
 
@@ -84,7 +84,7 @@ Deploy ke Vercel menggunakan konfigurasi `vercel.json`. Seluruh secret harus dia
 - Konten legacy yang dijalankan lewat `srcdoc` berada dalam iframe sandbox tanpa akses same-origin.
 - Header Content Security Policy membatasi sumber script, frame, object, worker, dan koneksi browser; kebijakan tetap mengizinkan provider yang memang dipakai tool legacy.
 - Image Vectorizer memantau task konversi dan ekspor secara terpisah agar kegagalan kuota, kredensial, timeout, atau engine tidak lagi tertutup pesan dependency umum.
-- Big Image memakai API key Bigjpg hanya pada server, memvalidasi URL publik, memantau task secara terpisah, dan membersihkan file sumber saat task selesai, gagal, dihentikan, atau kedaluwarsa.
+- Big Image memakai API key Bigjpg hanya pada server, memvalidasi URL publik, memantau task secara terpisah, dan membersihkan file sumber saat task selesai, gagal, dihentikan, atau kedaluwarsa. Status health hanya menyatakan konfigurasi key/infrastruktur; hak paket provider diverifikasi saat submit, dengan fallback lokal hingga 2× jika cloud menolak.
 - Sebagian tool bergantung pada API pihak ketiga dan tetap dapat mengalami kuota, perubahan kontrak, atau downtime.
 
 Lihat [audit keamanan](docs/SECURITY_AUDIT.md) dan [riwayat perubahan](CHANGELOG.md).

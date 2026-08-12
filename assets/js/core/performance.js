@@ -173,7 +173,7 @@
   },{once:true});
 
   window.__NEXORA_PERFORMANCE__={
-    version:"6.3.16",
+    version:"6.3.17",
     lowPower:lowPower,
     mobileLike:mobileLike,
     heroMode:heroMode,

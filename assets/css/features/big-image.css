@@ -1,4 +1,4 @@
-/* Nexora Big Image v6.3.16 — mobile-first Bigjpg upscale studio */
+/* Nexora Big Image v6.3.17 — Bigjpg primary with local fallback */
 #nxUniversalRoom[data-tool="bigimage"] .nx-room-scroll{padding:0;overflow-x:hidden;background:#05060b}
 #nxUniversalRoom[data-tool="bigimage"] .nx-room-wrap{box-sizing:border-box;width:100%;max-width:1320px;min-width:0;padding:0 14px 36px;overflow-x:clip}
 #nxUniversalRoom[data-tool="bigimage"] .nx-room-hero{display:none!important}
@@ -23,6 +23,7 @@
 .nbi-intro-copy>p:last-child{max-width:680px;margin:11px 0 0;color:#8fa4bb;font-size:13px;line-height:1.65}
 .nbi-engine{position:relative;display:flex;align-items:center;gap:8px;min-height:38px;padding:0 13px;border:1px solid rgba(125,211,252,.18);border-radius:999px;color:#9ab0c5;background:rgba(6,10,18,.72);font:800 9px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.11em;white-space:nowrap}
 .nbi-engine.is-ready{border-color:rgba(52,211,153,.32);color:#6ee7b7;background:rgba(16,185,129,.08)}
+.nbi-engine.is-warning{border-color:rgba(250,204,21,.3);color:#fde68a;background:rgba(234,179,8,.07)}
 .nbi-engine.is-error{border-color:rgba(251,113,133,.32);color:#fda4af;background:rgba(244,63,94,.08)}
 .nbi-feature-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:18px 0}
 .nbi-feature-strip article{display:flex;align-items:center;gap:11px;min-height:70px;padding:13px 15px;border:1px solid var(--line);border-radius:17px;background:linear-gradient(145deg,rgba(13,20,33,.9),rgba(8,12,21,.88))}
@@ -87,6 +88,7 @@
 .nbi-scale-grid span{margin-top:5px;font:800 7px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.09em}
 .nbi-scale-grid button.is-active{border-color:#38bdf8;color:#8eeaff;background:linear-gradient(145deg,rgba(14,165,233,.17),rgba(139,92,246,.1));box-shadow:0 0 24px rgba(56,189,248,.07)}
 .nbi-scale-grid button.is-active strong{color:#e8f9ff}
+.nbi-scale-grid button.is-unavailable{cursor:not-allowed;border-style:dashed;opacity:.34;filter:saturate(.25)}
 .nbi-noise{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border:1px solid rgba(125,211,252,.13);border-radius:14px;background:rgba(4,8,15,.48)}
 .nbi-noise strong,.nbi-noise small{display:block}
 .nbi-noise strong{color:#bdcddd;font-size:10px}

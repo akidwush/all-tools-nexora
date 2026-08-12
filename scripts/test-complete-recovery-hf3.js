@@ -62,7 +62,7 @@ assert.match(app, /const maxSide = profile\.lowPower \? 1280 : \(profile\.mobile
 assert.match(app, /const max = profile\.lowPower \? 1100 : \(profile\.mobileLike \? 1280 : 1500\)/);
 assert.match(app, /if \(!profile\.lowPower\)/);
 
-assert.ok(read("index.html").includes("v=6.3.16"));
+assert.ok(read("index.html").includes("v=6.3.17"));
 assert.ok(fs.existsSync(path.join(root, "database/migrations/007_public_tool_cleanup.sql")));
 
 console.log("Nexora HF3 recovery tests lulus: status kartu, routing, fallback, aksesibilitas, cache, dan batas memori aktif.");

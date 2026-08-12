@@ -105,4 +105,4 @@ const apiFiles = [];
 })(path.join(root,"api"));
 assert.equal(apiFiles.length,12);
 
-console.log("Big Image v6.3.16 tests lulus: Bigjpg server-only, private signed upload, HMAC job, rate limit, cleanup, polling, mobile preview, migration, dan 12-function limit aman.");
+console.log("Big Image v6.3.17 tests lulus: Bigjpg server-only, private signed upload, HMAC job, rate limit, cleanup, polling, mobile preview, migration, dan 12-function limit aman.");

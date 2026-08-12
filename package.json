@@ -1,6 +1,6 @@
 {
   "name": "all-tools-nexora-developer-dika",
-  "version": "6.3.16",
+  "version": "6.3.17",
   "private": true,
   "description": "All Tools Nexora — static frontend and hardened Vercel Functions toolkit",
   "scripts": {
