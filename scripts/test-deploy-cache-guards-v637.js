@@ -8,7 +8,7 @@ const pkg = JSON.parse(read('package.json'));
 assert.equal(pkg.version, '6.3.13');
 
 const loader = read('assets/js/core/lazy-loader.js');
-assert.match(loader, /ASSET_VERSION\s*=\s*['"]6\.3\.13-hf9\.1['"]/);
+assert.ok(loader.includes("var ASSET_VERSION = '6.3.13-hf9.7-20260812'"));
 assert.match(loader, /var requestUrl = versioned\(url\)/);
 assert.match(loader, /link\.href=requestUrl/);
 assert.match(loader, /script\.src=requestUrl/);
@@ -19,8 +19,8 @@ assert.match(core, /#ttRoomOverlay \.tt-preview-video,[\s\S]*?width:100%!importa
 assert.match(core, /#ttRoomOverlay \.dl-media-grid\{width:100%;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
 
 const index = read('index.html');
-assert.ok(index.includes('assets/css/core.css?v=6.3.13-hf9.1'));
-assert.ok(index.includes('assets/js/core/lazy-loader.js?v=6.3.13-hf9.1'));
+assert.ok(index.includes('assets/css/core.css?v=6.3.13-hf9.7-20260812'));
+assert.ok(index.includes('assets/js/core/lazy-loader.js?v=6.3.13-hf9.7-20260812'));
 
 const admin = read('admin/index.html');
 assert.ok(admin.includes('id="addToolButton" data-add-tool="true"'));
