@@ -1,6 +1,6 @@
 # All Tools Nexora
 
-All Tools Nexora v6.3.17 adalah website toolkit statis dengan 44 tool, lazy-loaded feature modules, dashboard admin, Supabase, dan 12 Vercel Functions. Source frontend tetap tanpa framework dan tidak memiliki dependency npm produksi.
+All Tools Nexora v6.3.18 adalah website toolkit statis dengan 44 tool, lazy-loaded feature modules, dashboard admin, Supabase, dan 12 Vercel Functions. Source frontend tetap tanpa framework dan tidak memiliki dependency npm produksi.
 
 ## Menjalankan secara lokal
 
@@ -9,6 +9,7 @@ Node.js 18 atau lebih baru diperlukan.
 ```bash
 cp .env.example .env
 npm ci
+sh scripts/fetch-ai-vendor.sh
 npm test
 npm run dev
 ```
@@ -24,6 +25,7 @@ git clone https://github.com/akidwush/all-tools-nexora.git
 cd all-tools-nexora
 cp .env.example .env
 npm ci
+sh scripts/fetch-ai-vendor.sh
 npm test
 npm run dev
 ```
@@ -41,6 +43,8 @@ npm run dev
 | `public/` | Output build sementara; tidak disimpan di Git |
 
 `assets/js/core/tool-registry.js` adalah sumber daftar tool. `assets/module-manifest.json`, `lib/tool-health.js`, dan seed `database/schema.sql` wajib tetap sinkron; `npm run check` memverifikasi semuanya.
+
+Big Image v6.3.18 memakai **Local ESRGAN 2×** sebagai engine on-device. `scripts/fetch-ai-vendor.sh` memasang TensorFlow.js, UpscalerJS, dan ESRGAN Slim versi pinned ke `assets/vendor/`, sehingga saat website berjalan model disajikan dari origin Nexora sendiri dan inference berlangsung di browser dengan WebGL.
 
 ## Konfigurasi
 

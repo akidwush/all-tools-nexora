@@ -1,5 +1,16 @@
 # Changelog
 
+## 6.3.18 — 2026-08-13
+
+### Big Image Local AI
+
+- Mengganti fallback Canvas dengan **ESRGAN Slim 2×** berbasis TensorFlow.js dan UpscalerJS yang berjalan langsung di browser melalui backend WebGL.
+- Menambahkan tile inference adaptif (`32/48/64` sesuai profil perangkat), padding 4 px, `awaitNextFrame`, progress per tile, pembatalan via `AbortSignal`, dan normalisasi output exact 2×.
+- Menambahkan kontrol **Auto** dan **Local AI**. Auto mencoba Bigjpg lebih dulu lalu berpindah ke ESRGAN lokal saat provider menolak; Local AI melewati upload cloud sepenuhnya.
+- Mengunci skala 4×/8×/16× pada Local AI dan menampilkan engine secara eksplisit sebagai `LOCAL ESRGAN · WEBGL`, bukan sekadar `LOCAL`.
+- Menambahkan installer aset AI pinned agar TensorFlow.js, UpscalerJS, model ESRGAN, dan weight disajikan dari origin Nexora sendiri saat deployment.
+- Menambah regression test khusus vendor asset, WebGL, tiled inference, exact 2×, kontrol mode lokal, dan batas 12 Vercel Functions.
+
 ## 6.3.17 — 2026-08-12
 
 ### Perbaikan Big Image

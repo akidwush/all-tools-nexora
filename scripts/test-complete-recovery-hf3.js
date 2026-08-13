@@ -57,12 +57,13 @@ assert.match(deploy, /Salin perintah Termux/);
 assert.match(deployCss, /#deployFallback\.show\{display:grid\}/);
 
 // Batas gambar mencegah buffer berukuran ekstrem pada perangkat Android.
-assert.match(app, /const sharpenPixelBudget = constrainedDevice \? 1800000 : 4200000/);
+assert.match(app, /const patchSize = profile\.lowPower \? 32 : \(profile\.mobileLike \? 48 : 64\)/);
+assert.match(app, /const padding = 4/);
 assert.match(app, /const maxSide = profile\.lowPower \? 1280 : \(profile\.mobileLike \? 1440 : 1800\)/);
 assert.match(app, /const max = profile\.lowPower \? 1100 : \(profile\.mobileLike \? 1280 : 1500\)/);
 assert.match(app, /if \(!profile\.lowPower\)/);
 
-assert.ok(read("index.html").includes("v=6.3.17"));
+assert.ok(read("index.html").includes("v=6.3.18"));
 assert.ok(fs.existsSync(path.join(root, "database/migrations/007_public_tool_cleanup.sql")));
 
 console.log("Nexora HF3 recovery tests lulus: status kartu, routing, fallback, aksesibilitas, cache, dan batas memori aktif.");

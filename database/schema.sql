@@ -212,7 +212,7 @@ on conflict (id) do nothing;
 notify pgrst, 'reload schema';
 
 -- ============================================================
--- Nexora v6.3.17 — Big Image / Bigjpg
+-- Nexora v6.3.18 — Big Image / Bigjpg
 
 create table if not exists public.big_image_jobs (
   id uuid primary key default gen_random_uuid(),

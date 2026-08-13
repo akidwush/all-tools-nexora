@@ -4,7 +4,7 @@ const path = require("node:path");
 
 const root = path.resolve(__dirname, "..");
 const pkg = require(path.join(root, "package.json"));
-assert.equal(pkg.version, "6.3.17");
+assert.equal(pkg.version, "6.3.18");
 
 const bank = fs.readFileSync(
   path.join(root, "assets/js/features/download-pack.js"),

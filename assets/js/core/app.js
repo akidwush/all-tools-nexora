@@ -927,60 +927,139 @@ function nxCanvasToUrl(canvas) {
     });
 }
 
-async function nxLocalEnhance(file, imageUrl, strength = 55) {
+const NX_LOCAL_ESRGAN_ASSETS = Object.freeze({
+    tensorflow: '/assets/vendor/tfjs/tf.min.js',
+    upscaler: '/assets/vendor/upscaler/upscaler.min.js',
+    model: '/assets/vendor/esrgan-slim/x2/model.json'
+});
+
+let nxEsrganReadyPromise = null;
+let nxEsrganInstance = null;
+
+function nxLoadVendorScript(src, ready) {
+    if (typeof ready === 'function' && ready()) return Promise.resolve();
+    const existing = document.querySelector(`script[data-nexora-vendor="${src}"]`);
+    if (existing && existing.__nxPromise) return existing.__nxPromise;
+    const script = existing || document.createElement('script');
+    script.src = src;
+    script.async = true;
+    script.dataset.nexoraVendor = src;
+    script.crossOrigin = 'anonymous';
+    script.__nxPromise = new Promise((resolve, reject) => {
+        script.addEventListener('load', () => {
+            if (typeof ready !== 'function' || ready()) resolve();
+            else reject(new Error(`Vendor AI tidak mengekspos API yang diharapkan: ${src}`));
+        }, { once: true });
+        script.addEventListener('error', () => reject(new Error(`Aset vendor AI gagal dimuat: ${src}`)), { once: true });
+    });
+    if (!existing) document.head.appendChild(script);
+    return script.__nxPromise;
+}
+
+async function nxEnsureLocalEsrgan() {
+    if (nxEsrganInstance) return nxEsrganInstance;
+    if (nxEsrganReadyPromise) return nxEsrganReadyPromise;
+    nxEsrganReadyPromise = (async () => {
+        await nxLoadVendorScript(NX_LOCAL_ESRGAN_ASSETS.tensorflow, () => Boolean(window.tf && window.tf.ready));
+        await window.tf.setBackend('webgl');
+        await window.tf.ready();
+        if (window.tf.getBackend() !== 'webgl') {
+            throw Object.assign(new Error('WebGL tidak tersedia untuk ESRGAN lokal.'), { code: 'LOCAL_ESRGAN_WEBGL_UNAVAILABLE' });
+        }
+        await nxLoadVendorScript(NX_LOCAL_ESRGAN_ASSETS.upscaler, () => typeof window.Upscaler === 'function');
+        nxEsrganInstance = new window.Upscaler({
+            model: {
+                scale: 2,
+                path: NX_LOCAL_ESRGAN_ASSETS.model,
+                preprocess: input => window.tf.tidy(() => window.tf.mul(input, 1 / 255)),
+                postprocess: output => window.tf.tidy(() => output.clipByValue(0, 255))
+            }
+        });
+        return nxEsrganInstance;
+    })().catch(error => {
+        nxEsrganReadyPromise = null;
+        nxEsrganInstance = null;
+        throw error;
+    });
+    return nxEsrganReadyPromise;
+}
+
+async function nxObjectUrlFromDataUrl(dataUrl) {
+    const response = await fetch(dataUrl);
+    if (!response.ok) throw new Error('Hasil ESRGAN tidak dapat dibaca.');
+    const blob = await response.blob();
+    if (!blob || blob.size < 32) throw new Error('Hasil ESRGAN kosong.');
+    return URL.createObjectURL(blob);
+}
+
+async function nxNormalizeExact2x(resultUrl, sourceWidth, sourceHeight) {
+    const expectedWidth = Math.max(1, sourceWidth * 2);
+    const expectedHeight = Math.max(1, sourceHeight * 2);
+    const loaded = await nxLoadImageFromBlob(await (await fetch(resultUrl)).blob());
+    const resultWidth = loaded.img.naturalWidth || loaded.img.width;
+    const resultHeight = loaded.img.naturalHeight || loaded.img.height;
+    if (resultWidth === expectedWidth && resultHeight === expectedHeight) {
+        URL.revokeObjectURL(loaded.url);
+        return resultUrl;
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = expectedWidth;
+    canvas.height = expectedHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(loaded.img, 0, 0, expectedWidth, expectedHeight);
+    URL.revokeObjectURL(loaded.url);
+    URL.revokeObjectURL(resultUrl);
+    return nxCanvasToUrl(canvas);
+}
+
+async function nxLocalEnhance(file, imageUrl, strength = 55, onProgress, signal) {
+    void strength;
     const loaded = await nxLoadCanvasImage(file, imageUrl);
     const img = loaded.img;
     const sw = img.naturalWidth || img.width;
     const sh = img.naturalHeight || img.height;
-    const performanceProfile = window.__NEXORA_PERFORMANCE__ || {};
-    const constrainedDevice = Boolean(performanceProfile.lowPower || performanceProfile.mobileLike);
-    const maxSide = constrainedDevice ? 1800 : 2560;
-    const upscale = Math.max(1, Math.min(2, maxSide / Math.max(sw, sh)));
-    const w = Math.max(1, Math.round(sw * upscale));
-    const h = Math.max(1, Math.round(sh * upscale));
-    const canvas = document.createElement('canvas');
-    canvas.width = w; canvas.height = h;
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-    const contrast = 1.03 + strength / 1000;
-    const saturation = 1.02 + strength / 900;
-    const brightness = 1.01 + strength / 2500;
-    ctx.filter = `contrast(${contrast}) saturate(${saturation}) brightness(${brightness})`;
-    ctx.drawImage(img, 0, 0, w, h);
-    ctx.filter = 'none';
-
-    // Unsharp mask ringan agar detail lebih tegas tanpa membuat noise berlebihan.
-    const sharpenPixelBudget = constrainedDevice ? 1800000 : 4200000;
-    if (w * h <= sharpenPixelBudget) {
-        const source = ctx.getImageData(0, 0, w, h);
-        const out = ctx.createImageData(w, h);
-        const d = source.data, o = out.data;
-        const amount = 0.18 + (strength / 100) * 0.34;
-        for (let y = 0; y < h; y++) {
-            for (let x = 0; x < w; x++) {
-                const i = (y * w + x) * 4;
-                for (let c = 0; c < 3; c++) {
-                    const center = d[i+c];
-                    const left = d[(y*w + Math.max(0,x-1))*4+c];
-                    const right = d[(y*w + Math.min(w-1,x+1))*4+c];
-                    const up = d[(Math.max(0,y-1)*w + x)*4+c];
-                    const down = d[(Math.min(h-1,y+1)*w + x)*4+c];
-                    const sharp = center + amount * (4*center-left-right-up-down);
-                    o[i+c] = Math.max(0, Math.min(255, sharp));
-                }
-                o[i+3] = d[i+3];
-            }
-        }
-        ctx.putImageData(out, 0, 0);
+    if (!sw || !sh) {
+        URL.revokeObjectURL(loaded.url);
+        throw Object.assign(new Error('Dimensi sumber tidak valid.'), { code: 'LOCAL_ESRGAN_INVALID_INPUT' });
     }
-    URL.revokeObjectURL(loaded.url);
-    return nxCanvasToUrl(canvas);
+    const profile = window.__NEXORA_PERFORMANCE__ || {};
+    const patchSize = profile.lowPower ? 32 : (profile.mobileLike ? 48 : 64);
+    const padding = 4;
+    try {
+        const upscaler = await nxEnsureLocalEsrgan();
+        const dataUrl = await upscaler.upscale(img, {
+            output: 'base64',
+            patchSize,
+            padding,
+            awaitNextFrame: true,
+            signal,
+            progress: value => {
+                if (typeof onProgress !== 'function') return;
+                const raw = Number(value) || 0;
+                const percent = raw <= 1 ? raw * 100 : raw;
+                onProgress(Math.max(0, Math.min(100, percent)));
+            }
+        });
+        if (typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/')) {
+            throw Object.assign(new Error('ESRGAN mengembalikan hasil yang tidak valid.'), { code: 'LOCAL_ESRGAN_EMPTY_RESULT' });
+        }
+        const objectUrl = await nxObjectUrlFromDataUrl(dataUrl);
+        return await nxNormalizeExact2x(objectUrl, sw, sh);
+    } finally {
+        URL.revokeObjectURL(loaded.url);
+    }
 }
 
-// API lokal stabil untuk feature module lazy-loaded seperti Big Image.
-// Hanya fungsi yang diperlukan yang diekspos; tidak ada secret/provider key.
 window.NexoraLocalEnhance = nxLocalEnhance;
+window.NexoraLocalEnhanceInfo = () => ({
+    engine: 'LOCAL ESRGAN',
+    model: 'ESRGAN Slim 2x',
+    backend: window.tf && typeof window.tf.getBackend === 'function' ? window.tf.getBackend() : 'pending',
+    scale: 2,
+    tiled: true
+});
 
 let nxBgRemovalModulePromise = null;
 async function nxLoadBgRemovalModule() {
@@ -1540,7 +1619,7 @@ function catalogListTools() {
 }
 
 window.NexoraToolCatalog = Object.freeze({
-    version: '6.3.17',
+    version: '6.3.18',
     has: catalogHasTool,
     list: catalogListTools
 });

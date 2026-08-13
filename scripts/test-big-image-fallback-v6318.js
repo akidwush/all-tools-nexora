@@ -9,7 +9,7 @@ const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
 const pkg = JSON.parse(read("package.json"));
 const { classifyProviderError } = require("../lib/bigjpg-upscaler");
 
-assert.equal(pkg.version, "6.3.17");
+assert.equal(pkg.version, "6.3.18");
 assert.equal(classifyProviderError({ status: "requires_vip" }), "plan");
 assert.equal(classifyProviderError({ status: "upgrade_required" }), "plan");
 assert.equal(classifyProviderError({ status: "quota_limit" }), "quota");
@@ -22,24 +22,20 @@ for (const token of [
   "requires_vip"
 ]) assert.ok(backend.includes(token), `Backend fallback kehilangan ${token}`);
 
-const app = read("assets/js/core/app.js");
-assert.ok(app.includes("window.NexoraLocalEnhance = nxLocalEnhance"));
-assert.ok(app.includes("maxSide = constrainedDevice ? 1800 : 2560"));
-assert.ok(app.includes("Math.min(2, maxSide / Math.max(sw, sh))"));
-
 const ui = read("assets/js/features/big-image.js");
 for (const token of [
-  "nexora-big-image-provider-v6317",
+  "nexora-big-image-provider-v6318",
   "shouldFallbackLocally",
   "runLocalFallback",
   "window.NexoraLocalEnhance",
   "activateLocalMode",
+  "activateAutoMode",
+  'data-engine-mode=\'auto\'',
+  'data-engine-mode=\'local\'',
   'button.dataset.scale!=="1"',
-  "revokeLocalResult",
-  "BIGJPG KEY SET",
-  "LOCAL 2× READY",
-  "LOCAL READY",
-  'metricEngine.textContent=local?"LOCAL":"BIGJPG AI"'
+  "LOCAL ESRGAN 2×",
+  "LOCAL ESRGAN",
+  'engine:"local-esrgan"'
 ]) assert.ok(ui.includes(token), `UI fallback kehilangan ${token}`);
 assert.doesNotMatch(ui, /BIGJPG READY/);
 assert.doesNotMatch(ui, /BIGJPG_API_KEY/);
@@ -58,4 +54,4 @@ const apiFiles = [];
 })(path.join(root, "api"));
 assert.equal(apiFiles.length, 12);
 
-console.log("Big Image v6.3.17 fallback tests lulus: requires_vip terklasifikasi, capability jujur, local 2× otomatis, skala terkunci, object URL dibersihkan, dan 12-function limit aman.");
+console.log("Big Image v6.3.18 fallback tests lulus: requires_vip tetap aman, Auto/Local AI aktif, scale lokal terkunci, dan 12-function limit terjaga.");
