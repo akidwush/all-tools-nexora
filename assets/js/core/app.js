@@ -929,48 +929,135 @@ function nxCanvasToUrl(canvas) {
 
 const NX_LOCAL_ESRGAN_ASSETS = Object.freeze({
     tensorflow: '/assets/vendor/tfjs/tf.min.js',
+    tensorflowFallback: 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js',
     upscaler: '/assets/vendor/upscaler/upscaler.min.js',
-    model: '/assets/vendor/esrgan-slim/x2/model.json'
+    upscalerFallback: 'https://cdn.jsdelivr.net/npm/upscaler@1.0.0/dist/browser/umd/upscaler.min.js',
+    model: '/assets/vendor/esrgan-slim/x2/model.json',
+    modelFallback: 'https://cdn.jsdelivr.net/npm/@upscalerjs/esrgan-slim@1.0.0-beta.10/models/x2/model.json',
+    revision: '6318-hf2'
 });
 
 let nxEsrganReadyPromise = null;
 let nxEsrganInstance = null;
+let nxEsrganVendorSource = 'pending';
+let nxEsrganModelSource = 'pending';
+
+function nxVendorRequestUrl(src) {
+    if (!src || !src.startsWith('/')) return src;
+    const join = src.includes('?') ? '&' : '?';
+    return `${src}${join}nxv=${NX_LOCAL_ESRGAN_ASSETS.revision}`;
+}
+
+function nxForgetVendorScript(src) {
+    const script = document.querySelector(`script[data-nexora-vendor="${src}"]`);
+    if (script && script.parentNode) script.parentNode.removeChild(script);
+}
 
 function nxLoadVendorScript(src, ready) {
-    if (typeof ready === 'function' && ready()) return Promise.resolve();
+    if (typeof ready === 'function' && ready()) return Promise.resolve(src);
     const existing = document.querySelector(`script[data-nexora-vendor="${src}"]`);
     if (existing && existing.__nxPromise) return existing.__nxPromise;
     const script = existing || document.createElement('script');
-    script.src = src;
+    const requestUrl = nxVendorRequestUrl(src);
+    script.src = requestUrl;
     script.async = true;
     script.dataset.nexoraVendor = src;
-    script.crossOrigin = 'anonymous';
+    if (/^https?:\/\//i.test(requestUrl)) script.crossOrigin = 'anonymous';
     script.__nxPromise = new Promise((resolve, reject) => {
         script.addEventListener('load', () => {
-            if (typeof ready !== 'function' || ready()) resolve();
-            else reject(new Error(`Vendor AI tidak mengekspos API yang diharapkan: ${src}`));
+            if (typeof ready !== 'function' || ready()) resolve(src);
+            else reject(Object.assign(new Error(`Vendor AI tidak mengekspos API yang diharapkan: ${src}`), { code: 'LOCAL_VENDOR_API_MISSING', vendor: src }));
         }, { once: true });
-        script.addEventListener('error', () => reject(new Error(`Aset vendor AI gagal dimuat: ${src}`)), { once: true });
+        script.addEventListener('error', () => reject(Object.assign(new Error(`Aset vendor AI gagal dimuat: ${src}`), { code: 'LOCAL_VENDOR_LOAD_FAILED', vendor: src })), { once: true });
     });
     if (!existing) document.head.appendChild(script);
     return script.__nxPromise;
+}
+
+async function nxLoadVendorWithFallback(primary, fallback, ready, label) {
+    let primaryError = null;
+    try {
+        await nxLoadVendorScript(primary, ready);
+        return { source: 'local', url: primary };
+    } catch (error) {
+        primaryError = error;
+        nxForgetVendorScript(primary);
+    }
+    try {
+        await nxLoadVendorScript(fallback, ready);
+        return { source: 'cdn', url: fallback, primaryError };
+    } catch (fallbackError) {
+        nxForgetVendorScript(fallback);
+        const error = new Error(`${label || 'Vendor AI'} gagal dimuat dari aset lokal dan CDN cadangan.`);
+        error.code = 'LOCAL_VENDOR_ALL_SOURCES_FAILED';
+        error.primaryError = primaryError;
+        error.fallbackError = fallbackError;
+        throw error;
+    }
+}
+
+async function nxProbeEsrganModel(url) {
+    const response = await fetch(nxVendorRequestUrl(url), { cache: 'no-store', credentials: 'omit' });
+    if (!response.ok) throw new Error(`Model ESRGAN HTTP ${response.status}`);
+    const type = String(response.headers.get('content-type') || '').toLowerCase();
+    if (type && !type.includes('json') && !type.includes('octet-stream') && !type.includes('text/plain')) {
+        throw new Error(`Model ESRGAN memiliki Content-Type tidak valid: ${type}`);
+    }
+    const model = await response.json();
+    if (!model || !model.modelTopology || !Array.isArray(model.weightsManifest)) throw new Error('model.json ESRGAN tidak valid.');
+    const paths = model.weightsManifest.flatMap(row => Array.isArray(row.paths) ? row.paths : []);
+    if (!paths.length) throw new Error('weightsManifest ESRGAN kosong.');
+    return nxVendorRequestUrl(url);
+}
+
+async function nxResolveEsrganModelPath() {
+    try {
+        const path = await nxProbeEsrganModel(NX_LOCAL_ESRGAN_ASSETS.model);
+        nxEsrganModelSource = 'local';
+        return path;
+    } catch (localError) {
+        try {
+            const path = await nxProbeEsrganModel(NX_LOCAL_ESRGAN_ASSETS.modelFallback);
+            nxEsrganModelSource = 'cdn';
+            return path;
+        } catch (fallbackError) {
+            const error = new Error('Model ESRGAN lokal dan CDN cadangan sama-sama tidak tersedia.');
+            error.code = 'LOCAL_ESRGAN_MODEL_UNAVAILABLE';
+            error.localError = localError;
+            error.fallbackError = fallbackError;
+            throw error;
+        }
+    }
 }
 
 async function nxEnsureLocalEsrgan() {
     if (nxEsrganInstance) return nxEsrganInstance;
     if (nxEsrganReadyPromise) return nxEsrganReadyPromise;
     nxEsrganReadyPromise = (async () => {
-        await nxLoadVendorScript(NX_LOCAL_ESRGAN_ASSETS.tensorflow, () => Boolean(window.tf && window.tf.ready));
+        const tfVendor = await nxLoadVendorWithFallback(
+            NX_LOCAL_ESRGAN_ASSETS.tensorflow,
+            NX_LOCAL_ESRGAN_ASSETS.tensorflowFallback,
+            () => Boolean(window.tf && typeof window.tf.ready === 'function' && typeof window.tf.setBackend === 'function'),
+            'TensorFlow.js'
+        );
+        nxEsrganVendorSource = tfVendor.source;
         await window.tf.setBackend('webgl');
         await window.tf.ready();
         if (window.tf.getBackend() !== 'webgl') {
             throw Object.assign(new Error('WebGL tidak tersedia untuk ESRGAN lokal.'), { code: 'LOCAL_ESRGAN_WEBGL_UNAVAILABLE' });
         }
-        await nxLoadVendorScript(NX_LOCAL_ESRGAN_ASSETS.upscaler, () => typeof window.Upscaler === 'function');
+        const upscalerVendor = await nxLoadVendorWithFallback(
+            NX_LOCAL_ESRGAN_ASSETS.upscaler,
+            NX_LOCAL_ESRGAN_ASSETS.upscalerFallback,
+            () => typeof window.Upscaler === 'function',
+            'UpscalerJS'
+        );
+        if (upscalerVendor.source === 'cdn') nxEsrganVendorSource = 'cdn';
+        const modelPath = await nxResolveEsrganModelPath();
         nxEsrganInstance = new window.Upscaler({
             model: {
                 scale: 2,
-                path: NX_LOCAL_ESRGAN_ASSETS.model,
+                path: modelPath,
                 preprocess: input => window.tf.tidy(() => window.tf.mul(input, 1 / 255)),
                 postprocess: output => window.tf.tidy(() => output.clipByValue(0, 255))
             }
@@ -1058,7 +1145,10 @@ window.NexoraLocalEnhanceInfo = () => ({
     model: 'ESRGAN Slim 2x',
     backend: window.tf && typeof window.tf.getBackend === 'function' ? window.tf.getBackend() : 'pending',
     scale: 2,
-    tiled: true
+    tiled: true,
+    vendorSource: nxEsrganVendorSource,
+    modelSource: nxEsrganModelSource,
+    runtimeRevision: NX_LOCAL_ESRGAN_ASSETS.revision
 });
 
 let nxBgRemovalModulePromise = null;
