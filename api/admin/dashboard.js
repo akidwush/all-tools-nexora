@@ -1,5 +1,6 @@
 const { databaseRequest } = require("../../lib/database");
-const { publicSession, requireAdmin } = require("../../lib/admin-auth");
+const { publicSession, requireAdmin, verifyMutationRequest } = require("../../lib/admin-auth");
+const { recordAdminAudit } = require("../../lib/admin-audit");
 const { TOOL_CATALOG, normalizeCachedRows, summarizeHealth } = require("../../lib/tool-health");
 
 function send(response, status, payload) {
@@ -8,9 +9,87 @@ function send(response, status, payload) {
   return response.status(status).json(payload);
 }
 
+function booleanValue(value, fallback = true) {
+  if (value === true || value === "true" || value === 1 || value === "1") return true;
+  if (value === false || value === "false" || value === 0 || value === "0") return false;
+  return fallback;
+}
+
+function heroVideoUrl(value) {
+  const text = String(value || "").replace(/[\u0000-\u001f\u007f]/g, "").trim().slice(0, 1000);
+  if (!text) return null;
+  if (/^\/(?!\/)/.test(text)) return text;
+  let parsed;
+  try { parsed = new URL(text); }
+  catch { return null; }
+  if (parsed.protocol !== "https:" || parsed.username || parsed.password) return null;
+  return parsed.toString();
+}
+
+function objectValue(value) {
+  return value && typeof value === "object" && !Array.isArray(value) ? value : {};
+}
+
+async function updateHeroVideo(request, response) {
+  const session = await requireAdmin(request, response, { edit: true });
+  if (!verifyMutationRequest(request)) return send(response, 403, { ok: false, error: "CSRF_REJECTED" });
+  const body = objectValue(request.body);
+  if (body.key !== "site" || !body.heroVideo || typeof body.heroVideo !== "object" || Array.isArray(body.heroVideo)) {
+    return send(response, 400, { ok: false, error: "INVALID_SETTINGS_PAYLOAD", message: "Payload pengaturan video tidak valid." });
+  }
+
+  const currentRows = await databaseRequest("app_settings?select=key,value,is_public,updated_at&key=eq.site&limit=1", { method: "GET" });
+  const current = Array.isArray(currentRows) ? currentRows[0] || null : null;
+  const currentValue = objectValue(current && current.value);
+  const previousHero = objectValue(currentValue.heroVideo);
+  const enabled = booleanValue(body.heroVideo.enabled, previousHero.enabled !== false);
+  const url = heroVideoUrl(body.heroVideo.url);
+  if (enabled && !url) {
+    return send(response, 400, { ok: false, error: "INVALID_HERO_VIDEO_URL", message: "Video aktif wajib memakai URL HTTPS langsung yang valid." });
+  }
+
+  const nextHero = { enabled, url: url || String(previousHero.url || "") };
+  const nextValue = { ...currentValue, heroVideo: nextHero };
+  const rows = await databaseRequest("app_settings?on_conflict=key", {
+    method: "POST",
+    headers: { Prefer: "resolution=merge-duplicates,return=representation" },
+    body: JSON.stringify({ key: "site", value: nextValue, is_public: true, updated_at: new Date().toISOString() })
+  });
+  const item = Array.isArray(rows) ? rows[0] || null : null;
+  if (!item) return send(response, 500, { ok: false, error: "SETTINGS_UPDATE_FAILED" });
+
+  const auditLogged = await recordAdminAudit({
+    request,
+    session,
+    action: "settings.hero_video.update",
+    entityType: "app_setting",
+    entityId: "site",
+    summary: "Video header publik diperbarui",
+    before: { heroVideo: previousHero },
+    after: { heroVideo: nextHero }
+  });
+  return send(response, 200, { ok: true, data: item, auditLogged });
+}
+
 module.exports = async function handler(request, response) {
+  if (request.method === "OPTIONS") {
+    response.setHeader("Allow", "GET, PATCH, OPTIONS");
+    return response.status(204).end();
+  }
+  if (request.method === "PATCH") {
+    try { return await updateHeroVideo(request, response); }
+    catch (error) {
+      const status = Number(error.status || 500);
+      console.error("[admin-dashboard-settings]", error.code || "UNKNOWN_ERROR");
+      return send(response, status, {
+        ok: false,
+        error: error.code || "ADMIN_SETTINGS_FAILED",
+        message: status === 401 ? "Sesi admin berakhir." : status === 403 ? "Akses ditolak." : "Pengaturan video belum dapat disimpan."
+      });
+    }
+  }
   if (request.method !== "GET") {
-    response.setHeader("Allow", "GET");
+    response.setHeader("Allow", "GET, PATCH, OPTIONS");
     return send(response, 405, { ok: false, error: "METHOD_NOT_ALLOWED" });
   }
 

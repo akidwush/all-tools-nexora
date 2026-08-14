@@ -1,7 +1,65 @@
-/* Nexora v6.3.13 — adaptive hero video without mobile scroll decode jank. */
+/* Nexora v6.3.18 HF3 — adaptive, database-configurable hero video. */
 (function(){
   "use strict";
   if(window.__NEXORA_PERFORMANCE__) return;
+
+  var DEFAULT_HERO_VIDEO_URL="https://c.termai.cc/v164/HCYk.mp4";
+  var HERO_SETTINGS_CACHE_KEY="nexora_hero_settings_v1";
+  var HERO_SETTINGS_TIMEOUT_MS=1800;
+
+  function safeHeroUrl(value,fallback){
+    var text=String(value||"").trim();
+    if(!text)return fallback;
+    try{
+      var parsed=new URL(text,location.href);
+      if(parsed.username||parsed.password)return fallback;
+      if(parsed.protocol==="https:"||parsed.origin===location.origin)return parsed.href;
+    }catch(_){ }
+    return fallback;
+  }
+
+  function normalizeHeroConfig(value,fallback){
+    var source=value&&typeof value==="object"?value:{};
+    return {
+      enabled:source.enabled!==false,
+      url:safeHeroUrl(source.url,fallback||DEFAULT_HERO_VIDEO_URL)
+    };
+  }
+
+  function readCachedHeroConfig(fallback){
+    try{
+      var cached=JSON.parse(localStorage.getItem(HERO_SETTINGS_CACHE_KEY)||"null");
+      if(cached&&cached.value)return normalizeHeroConfig(cached.value,fallback);
+    }catch(_){ }
+    return normalizeHeroConfig(null,fallback);
+  }
+
+  function writeCachedHeroConfig(config){
+    try{localStorage.setItem(HERO_SETTINGS_CACHE_KEY,JSON.stringify({value:config,updatedAt:Date.now()}));}catch(_){ }
+  }
+
+  async function loadHeroConfig(fallback){
+    var cached=readCachedHeroConfig(fallback);
+    var controller=typeof AbortController==="function"?new AbortController():null;
+    var timer=controller?setTimeout(function(){controller.abort();},HERO_SETTINGS_TIMEOUT_MS):null;
+    try{
+      var response=await fetch("/api/database?resource=settings",{
+        method:"GET",cache:"no-store",credentials:"same-origin",
+        headers:{Accept:"application/json"},signal:controller?controller.signal:undefined
+      });
+      if(!response.ok)return cached;
+      var payload=await response.json();
+      var rows=Array.isArray(payload&&payload.data)?payload.data:[];
+      var site=rows.find(function(item){return item&&item.key==="site";});
+      var config=normalizeHeroConfig(site&&site.value&&site.value.heroVideo,fallback);
+      writeCachedHeroConfig(config);
+      return config;
+    }catch(_){
+      return cached;
+    }finally{
+      if(timer)clearTimeout(timer);
+    }
+  }
 
   var connection=navigator.connection||navigator.mozConnection||navigator.webkitConnection;
   var reduced=false;
@@ -28,6 +86,11 @@
   document.documentElement.classList.add("nx-hero-video-"+heroMode);
   if(lowPower) document.documentElement.classList.add("nx-low-power");
 
+  var heroElement=document.querySelector("[data-nx-hero]");
+  var heroVideo=heroElement&&heroElement.querySelector("video[data-src]");
+  var initialHeroUrl=heroVideo&&heroVideo.dataset.src||DEFAULT_HERO_VIDEO_URL;
+  var heroConfigPromise=loadHeroConfig(initialHeroUrl);
+
   function schedule(task,options){
     options=options||{};
     if(typeof requestIdleCallback==="function") return requestIdleCallback(task,{timeout:Number(options.timeout||1800)});
@@ -42,11 +105,23 @@
     setTimeout(function(){if(splash&&splash.parentNode)splash.remove();},lowPower?360:760);
   }
 
-  function initHeroVideo(){
-    var hero=document.querySelector("[data-nx-hero]");
-    var video=hero&&hero.querySelector("video[data-src]");
+  async function initHeroVideo(){
+    var hero=heroElement||document.querySelector("[data-nx-hero]");
+    var video=heroVideo||(hero&&hero.querySelector("video[data-src]"));
     var toggle=hero&&hero.querySelector("[data-nx-hero-toggle]");
-    if(!hero||!video||heroMode==="disabled")return;
+    if(!hero||!video)return;
+
+    var heroConfig=await heroConfigPromise;
+    var effectiveHeroMode=heroConfig.enabled?heroMode:"disabled";
+    if(effectiveHeroMode==="disabled"){
+      document.documentElement.classList.remove("nx-hero-video-auto","nx-hero-video-manual");
+      document.documentElement.classList.add("nx-hero-video-disabled");
+      video.removeAttribute("src");
+      video.load();
+      if(toggle)toggle.hidden=true;
+      return;
+    }
+    video.dataset.src=heroConfig.url;
 
     var source=String(video.dataset.src||"");
     if(!source)return;
@@ -82,15 +157,15 @@
     }
 
     function canAutoPlay(){
-      return heroMode==="auto"&&visible&&!document.hidden&&ready;
+      return effectiveHeroMode==="auto"&&visible&&!document.hidden&&ready;
     }
 
     function syncPlayback(){
       if(canAutoPlay()){
         video.play().then(updateToggle).catch(updateToggle);
-      }else if(heroMode==="auto"){
+      }else if(effectiveHeroMode==="auto"){
         pauseVideo();
-      }else if(heroMode==="manual"&&(!visible||document.hidden||scrollLocked)){
+      }else if(effectiveHeroMode==="manual"&&(!visible||document.hidden||scrollLocked)){
         pauseVideo();
       }
     }
@@ -116,7 +191,7 @@
     if(toggle){
       toggle.hidden=false;
       toggle.addEventListener("click",function(){
-        if(heroMode!=="manual")return;
+        if(effectiveHeroMode!=="manual")return;
         ensureLoaded();
         scrollLocked=false;
         if(!video.paused){
@@ -149,7 +224,7 @@
     document.addEventListener("visibilitychange",syncPlayback);
     window.addEventListener("pagehide",pauseVideo);
 
-    if(heroMode==="manual"){
+    if(effectiveHeroMode==="manual"){
       var scrollTicking=false;
       window.addEventListener("scroll",function(){
         if(scrollTicking)return;
@@ -177,6 +252,7 @@
     lowPower:lowPower,
     mobileLike:mobileLike,
     heroMode:heroMode,
+    heroSettings:heroConfigPromise,
     schedule:schedule
   };
 })();
