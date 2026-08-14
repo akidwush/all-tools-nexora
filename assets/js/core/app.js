@@ -3130,6 +3130,100 @@ function renderTiktokQuote(body) {
 }
 
 
+function nxEvaluateMathExpression(expression) {
+    const source = String(expression ?? '')
+        .trim()
+        .replace(/[\u00d7x]/gi, '*')
+        .replace(/\u00f7/g, '/')
+        .replace(/,/g, '.');
+
+    if (!source || source.length > 160 || /[^0-9+\-*/%^().\s]/.test(source)) {
+        throw new Error('INVALID_EXPRESSION');
+    }
+
+    let index = 0;
+    const skipSpaces = () => {
+        while (/\s/.test(source[index] || '')) index += 1;
+    };
+
+    const parseNumber = () => {
+        skipSpaces();
+        const match = source.slice(index).match(/^(?:\d+(?:\.\d*)?|\.\d+)/);
+        if (!match) throw new Error('NUMBER_EXPECTED');
+        index += match[0].length;
+        const value = Number(match[0]);
+        if (!Number.isFinite(value)) throw new Error('INVALID_NUMBER');
+        return value;
+    };
+
+    const parsePrimary = () => {
+        skipSpaces();
+        if (source[index] !== '(') return parseNumber();
+        index += 1;
+        const value = parseExpression();
+        skipSpaces();
+        if (source[index] !== ')') throw new Error('PARENTHESIS_EXPECTED');
+        index += 1;
+        return value;
+    };
+
+    const parsePower = () => {
+        let value = parsePrimary();
+        skipSpaces();
+        if (source[index] === '^') {
+            index += 1;
+            value = Math.pow(value, parseUnary());
+        }
+        return value;
+    };
+
+    const parseUnary = () => {
+        skipSpaces();
+        if (source[index] === '+') {
+            index += 1;
+            return parseUnary();
+        }
+        if (source[index] === '-') {
+            index += 1;
+            return -parseUnary();
+        }
+        return parsePower();
+    };
+
+    const parseTerm = () => {
+        let value = parseUnary();
+        while (true) {
+            skipSpaces();
+            const operator = source[index];
+            if (!['*', '/', '%'].includes(operator)) break;
+            index += 1;
+            const right = parseUnary();
+            if (operator === '*') value *= right;
+            else if (operator === '/') value /= right;
+            else value %= right;
+        }
+        return value;
+    };
+
+    const parseExpression = () => {
+        let value = parseTerm();
+        while (true) {
+            skipSpaces();
+            const operator = source[index];
+            if (operator !== '+' && operator !== '-') break;
+            index += 1;
+            const right = parseTerm();
+            value = operator === '+' ? value + right : value - right;
+        }
+        return value;
+    };
+
+    const result = parseExpression();
+    skipSpaces();
+    if (index !== source.length || !Number.isFinite(result)) throw new Error('INVALID_RESULT');
+    return Object.is(result, -0) ? 0 : result;
+}
+
 function renderCalc(body) {
     body.innerHTML = `
         <h2><i class="fas fa-calculator"></i> Calculator</h2>
@@ -3137,36 +3231,103 @@ function renderCalc(body) {
         <button class="v-btn" id="calcBtn"><i class="fas fa-equals"></i> Hitung</button>
         <div id="calcResult"></div>
     `;
-    document.getElementById('calcBtn').onclick = () => {
+    const input = document.getElementById('calcInput');
+    const button = document.getElementById('calcBtn');
+    const result = document.getElementById('calcResult');
+    const calculate = () => {
         try {
-            const val = document.getElementById('calcInput').value;
-            const res = Function('"use strict"; return (' + val + ')')();
-            document.getElementById('calcResult').innerHTML = `<div class="result-box" style="font-weight:600;font-size:18px;color:#c084fc;">= ${res}</div>`;
+            const value = nxEvaluateMathExpression(input.value);
+            const output = document.createElement('div');
+            output.className = 'result-box';
+            output.style.cssText = 'font-weight:600;font-size:18px;color:#c084fc;';
+            output.textContent = '= ' + new Intl.NumberFormat('id-ID', { maximumFractionDigits: 12 }).format(value);
+            result.replaceChildren(output);
         } catch {
-            document.getElementById('calcResult').innerHTML = `<div class="result-box" style="color:#ef4444;">Format tidak valid.</div>`;
+            const output = document.createElement('div');
+            output.className = 'result-box';
+            output.style.color = '#ef4444';
+            output.textContent = 'Format tidak valid. Gunakan angka, kurung, dan operator + - \u00d7 \u00f7 % ^.';
+            result.replaceChildren(output);
         }
     };
+    button.addEventListener('click', calculate);
+    input.addEventListener('keydown', event => {
+        if (event.key === 'Enter') calculate();
+    });
+}
+
+function nxSecureRandomString(length, pool) {
+    const cryptoApi = window.crypto;
+    if (!cryptoApi || typeof cryptoApi.getRandomValues !== 'function') {
+        throw new Error('SECURE_RANDOM_UNAVAILABLE');
+    }
+    const size = Math.max(8, Math.min(128, Number(length) || 14));
+    const alphabet = String(pool || '');
+    const unbiasedLimit = 256 - (256 % alphabet.length);
+    let output = '';
+    while (output.length < size) {
+        const bytes = new Uint8Array(Math.min(64, (size - output.length) * 2));
+        cryptoApi.getRandomValues(bytes);
+        for (const byte of bytes) {
+            if (byte >= unbiasedLimit) continue;
+            output += alphabet[byte % alphabet.length];
+            if (output.length === size) break;
+        }
+    }
+    return output;
 }
 
 function renderPwgen(body) {
     body.innerHTML = `
         <h2><i class="fas fa-key"></i> Password Generator</h2>
         <label>Panjang: <span id="lengthVal" style="font-weight:bold;color:#c084fc;">14</span></label>
-        <input type="range" id="pwLen" min="8" max="32" value="14" style="width:100%;margin:10px 0;accent-color:#7c3aed;" oninput="document.getElementById('lengthVal').innerText=this.value">
+        <input type="range" id="pwLen" min="8" max="32" value="14" style="width:100%;margin:10px 0;accent-color:#7c3aed;">
         <button class="v-btn" id="genPwBtn"><i class="fas fa-shield-alt"></i> Generate</button>
-        <div id="pwResult"></div>
+        <div id="pwResult" aria-live="polite"></div>
     `;
+    const lengthInput = document.getElementById('pwLen');
+    const lengthValue = document.getElementById('lengthVal');
+    lengthInput.addEventListener('input', () => { lengthValue.textContent = lengthInput.value; });
     document.getElementById('genPwBtn').onclick = () => {
-        const len = parseInt(document.getElementById('pwLen').value);
+        const len = parseInt(lengthInput.value, 10);
         const pool = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()";
-        let out = "";
-        for (let i = 0; i < len; i++) out += pool.charAt(Math.floor(Math.random() * pool.length));
-        document.getElementById('pwResult').innerHTML = `
-            <div class="result-box">
-                <input type="text" class="v-input" readonly value="${out}" style="text-align:center;font-family:monospace;font-size:16px;background:rgba(168,85,247,0.04);">
-                <button class="v-btn" onclick="navigator.clipboard.writeText('${out}'); alert('Disalin!');" style="margin-top:8px;background:rgba(168,85,247,0.12);">Salin</button>
-            </div>
-        `;
+        const target = document.getElementById('pwResult');
+        try {
+            const password = nxSecureRandomString(len, pool);
+            const box = document.createElement('div');
+            box.className = 'result-box';
+            const output = document.createElement('input');
+            output.type = 'text';
+            output.className = 'v-input';
+            output.readOnly = true;
+            output.value = password;
+            output.style.cssText = 'text-align:center;font-family:monospace;font-size:16px;background:rgba(168,85,247,0.04);';
+            const copy = document.createElement('button');
+            copy.type = 'button';
+            copy.className = 'v-btn';
+            copy.style.cssText = 'margin-top:8px;background:rgba(168,85,247,0.12);';
+            copy.textContent = 'Salin';
+            copy.addEventListener('click', async () => {
+                try {
+                    if (!navigator.clipboard || typeof navigator.clipboard.writeText !== 'function') throw new Error('CLIPBOARD_UNAVAILABLE');
+                    await navigator.clipboard.writeText(password);
+                    copy.textContent = 'Tersalin!';
+                    setTimeout(() => { copy.textContent = 'Salin'; }, 1400);
+                } catch {
+                    output.focus();
+                    output.select();
+                    copy.textContent = 'Pilih lalu salin';
+                }
+            });
+            box.append(output, copy);
+            target.replaceChildren(box);
+        } catch {
+            const error = document.createElement('div');
+            error.className = 'result-box';
+            error.style.color = '#ef4444';
+            error.textContent = 'Generator acak aman tidak tersedia di browser ini.';
+            target.replaceChildren(error);
+        }
     };
 }
 

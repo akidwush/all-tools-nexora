@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-  <link href="../assets/css/admin.css?v=6.3.18" rel="stylesheet">
+  <link href="../assets/css/admin.css?v=6.3.18-hf3" rel="stylesheet">
   <link href="../assets/css/visual-qa.css?v=6.3.18" rel="stylesheet">
 </head>
 <body class="admin-dashboard-page">
@@ -69,7 +69,15 @@
               <div class="compact-list" id="recentFeedback"></div>
             </article>
             <article class="panel-card">
-              <div class="panel-head"><div><p class="eyebrow">DATABASE</p><h2>Konfigurasi Situs</h2></div></div>
+              <div class="panel-head"><div><p class="eyebrow">TAMPILAN PUBLIK</p><h2>Video Header</h2></div><span class="read-only-badge" id="heroVideoPermissionBadge">Memuat...</span></div>
+              <form class="hero-video-settings" id="heroVideoSettingsForm">
+                <label><span>URL video langsung (HTTPS)</span><input id="heroVideoUrl" maxlength="1000" type="url" inputmode="url" autocomplete="url" placeholder="https://cdn.example.com/banner.mp4" required></label>
+                <label class="switch-row"><span><b>Aktifkan video header</b><small>Desktop diputar otomatis tanpa suara; HP memakai tombol putar dan perangkat lemah menampilkan background ringan.</small></span><input id="heroVideoEnabled" type="checkbox" checked></label>
+                <p class="hero-video-hint"><i class="fa-solid fa-gauge-high"></i> Gunakan MP4/WebM terkompresi, durasi pendek, dan ukuran ideal di bawah 5 MB agar tetap ringan.</p>
+                <button class="primary-button" id="saveHeroVideoButton" type="submit"><i class="fa-solid fa-floppy-disk"></i> Simpan Video Header</button>
+                <p class="modal-message" id="heroVideoMessage" role="status"></p>
+              </form>
+              <div class="panel-head settings-secondary-head"><div><p class="eyebrow">DATABASE</p><h2>Konfigurasi Tersimpan</h2></div></div>
               <div class="settings-list" id="settingsList"></div>
             </article>
           </div>
@@ -283,7 +291,7 @@
   </div>
 
   <div class="toast-stack" id="toastStack" aria-live="polite"></div>
-  <script src="../assets/js/admin/dashboard.js?v=6.3.18" defer></script>
+  <script src="../assets/js/admin/dashboard.js?v=6.3.18-hf3" defer></script>
   <script src="../assets/js/admin/visual-qa.js?v=6.3.18" defer></script>
   <script src="../assets/js/admin/functional-audit.js?v=6.3.18" defer></script>
 </body>

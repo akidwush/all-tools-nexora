@@ -11,7 +11,8 @@ assert(performanceJs.includes('heroMode=lowPower?"disabled":(mobileLike?"manual"
 assert(performanceJs.includes('IntersectionObserver'));
 assert(performanceJs.includes('window.scrollY>24'));
 assert(performanceJs.includes('pauseVideo()'));
-assert(performanceJs.includes('heroMode==="manual"'));
+assert(performanceJs.includes('effectiveHeroMode==="manual"'));
+assert(performanceJs.includes('/api/database?resource=settings'));
 assert(!performanceJs.includes('else document.documentElement.classList.add("nx-anime-banner-enabled")'));
 assert(!coreCss.includes('nx-anime-banner-enabled'));
 assert(coreCss.includes('nx-hero-video-manual'));

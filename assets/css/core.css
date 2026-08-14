@@ -1520,3 +1520,14 @@ html.nx-hero-video-disabled .nx-hero-video-toggle{display:none!important}
 #ttRoomOverlay .dl-media-item img,
 #ttRoomOverlay .dl-media-item video{max-height:52svh;}
 @media (max-width:380px){#ttRoomOverlay .dl-media-grid{grid-template-columns:minmax(0,1fr);}}
+
+/* Nexora HF3 — smooth interaction without permanent compositor layers. */
+@media (hover:hover) and (pointer:fine){
+  .tools-card{transition:transform .24s cubic-bezier(.2,.75,.25,1),border-color .2s ease,box-shadow .24s ease}
+  .tools-card:hover{transform:translateY(-3px)}
+  .nav-tab,.nx-public-wa-card,.nx-top-menu-button,.nx-all-tools-more{transition:transform .2s cubic-bezier(.2,.75,.25,1),border-color .2s ease,background-color .2s ease,box-shadow .2s ease}
+}
+html.nx-low-power .tools-card,html.nx-low-power .nav-tab,html.nx-low-power .nx-public-wa-card{transition-duration:.08s!important}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}

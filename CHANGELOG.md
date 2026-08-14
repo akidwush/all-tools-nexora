@@ -1,5 +1,19 @@
 # Changelog
 
+## 6.3.18 HF3 — 2026-08-14
+
+### Perbaikan fungsi
+
+- Mengganti kalkulator berbasis `Function(...)` yang diblokir CSP dengan parser matematika aman untuk operator `+ - × ÷ % ^` dan tanda kurung.
+- Mengganti `Math.random()` pada Password Generator dengan `crypto.getRandomValues()` serta tombol salin tanpa inline JavaScript.
+- Menambahkan pengaturan URL/aktif-nonaktif video header dari dashboard admin, validasi HTTPS, audit log, public settings endpoint yang sudah ada, dan migration Supabase `016_hero_video_settings.sql`.
+
+### Performa dan animasi
+
+- Video header membaca konfigurasi secara async dengan timeout pendek dan cache fallback, tetap manual pada HP, serta nonaktif pada perangkat/jaringan lemah.
+- Membatasi transisi ke properti compositor-friendly, mematikan efek berat pada low-power mode, dan menghormati `prefers-reduced-motion` secara menyeluruh.
+- Menambahkan cache-bust HF3 untuk runtime, CSS publik, dan dashboard admin yang berubah.
+
 ## 6.3.18 — 2026-08-13
 
 ### Big Image Local AI

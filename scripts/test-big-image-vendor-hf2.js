@@ -22,7 +22,7 @@ for (const token of [
   "modelSource: nxEsrganModelSource",
 ]) assert.ok(app.includes(token), `Runtime Local ESRGAN kehilangan ${token}`);
 
-assert.ok(index.includes("assets/js/core/app.js?v=6.3.18-hf2"), "cache key app.js belum hf2");
+assert.ok(index.includes("assets/js/core/app.js?v=6.3.18-hf3"), "cache key app.js belum memuat hotfix terbaru");
 assert.equal(pkg.scripts.prebuild, "node scripts/prepare-ai-vendor.js", "prebuild vendor AI belum aktif");
 
 for (const token of [
@@ -36,4 +36,4 @@ for (const token of [
   "Node.js 18+",
 ]) assert.ok(prepare.includes(token), `Build vendor recovery kehilangan ${token}`);
 
-console.log("Big Image hf2 lulus: vendor AI diprovisi saat Vercel prebuild dan runtime ESRGAN memakai cache-bust hf2.");
+console.log("Big Image hf2 lulus: vendor AI diprovisi saat Vercel prebuild dan runtime ESRGAN tetap dimuat oleh cache-bust terbaru.");

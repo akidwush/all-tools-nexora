@@ -64,6 +64,8 @@ Untuk instalasi baru, jalankan `database/schema.sql` melalui Supabase SQL Editor
 
 Untuk database lama, jalankan migration yang belum pernah diterapkan dari `database/migrations/` sesuai urutan nomor. Backup database terlebih dahulu.
 
+Migration `database/migrations/016_hero_video_settings.sql` mengaktifkan pengaturan video header. Setelah migration dijalankan, buka **Dashboard Admin → Ringkasan Sistem → Video Header**, isi URL MP4/WebM HTTPS langsung, lalu simpan. Pengaturan tersimpan di `app_settings.site.heroVideo` dan dibaca halaman publik tanpa mengekspos service-role key.
+
 Big Image memerlukan `database/migrations/015_big_image_bigjpg.sql`. Migration tersebut membuat tabel job dan bucket `big-image-inputs` privat. Atur `BIGJPG_API_KEY` serta `BIGJPG_JOB_SECRET` di Vercel, lalu redeploy. Batas per-IP/global dapat disesuaikan melalui `BIGJPG_HOURLY_IP_LIMIT` dan `BIGJPG_DAILY_TASK_LIMIT`. Bigjpg tetap menjadi engine utama; jika task API ditolak karena `requires_vip`, kuota, autentikasi, timeout, atau infrastruktur cloud, UI beralih jujur ke enhancer lokal hingga 2×.
 
 ## Pemeriksaan dan build
@@ -79,6 +81,8 @@ npm run build
 - `npm run build` menjalankan kedua pemeriksaan lalu membuat `public/` dari source frontend.
 
 Deploy ke Vercel menggunakan konfigurasi `vercel.json`. Seluruh secret harus diatur sebagai environment variable server-side.
+
+Video header mempertahankan mode hemat: desktop dapat memutar video muted saat terlihat, HP memakai kontrol manual, dan perangkat dengan Save Data, reduced motion, RAM/CPU rendah, atau jaringan 2G otomatis memakai background statis agar scrolling tetap ringan.
 
 ## Batas dan keamanan
 
