@@ -1,0 +1,33 @@
+(function(){
+  'use strict';
+  const $ = selector => document.querySelector(selector);
+  const esc = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' }[char]));
+  let profile = { skills: [], projects: [], socials: [] };
+  let editable = false;
+  function cookie(name) { const value = document.cookie.split(';').map(item => item.trim()).find(item => item.startsWith(name + '=')); return value ? decodeURIComponent(value.slice(name.length + 1)) : ''; }
+  function id(type) { return `${type}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`; }
+  function rows(type) { return profile[type] || []; }
+  function setEditable() { document.querySelectorAll('#developerProfileForm input, #developerProfileForm textarea, #developerProfileForm button').forEach(element => { element.disabled = !editable; }); }
+  function render(type) {
+    const host = $('#dev' + type[0].toUpperCase() + type.slice(1));
+    if (!host) return;
+    host.innerHTML = rows(type).map((item, index) => `<article class="developer-item" data-dev-type="${type}" data-dev-index="${index}"><div class="developer-item-fields">${type === 'skills' ? `<input data-k="title" maxlength="80" value="${esc(item.title)}" placeholder="Judul"><input data-k="icon" maxlength="100" value="${esc(item.icon)}" placeholder="fa-solid fa-code"><textarea data-k="description" maxlength="360" rows="2" placeholder="Deskripsi">${esc(item.description)}</textarea>` : type === 'projects' ? `<input data-k="title" maxlength="100" value="${esc(item.title)}" placeholder="Judul project"><input data-k="url" type="url" maxlength="1000" value="${esc(item.url)}" placeholder="URL project"><input data-k="imageUrl" type="url" maxlength="1000" value="${esc(item.imageUrl)}" placeholder="URL gambar"><textarea data-k="description" maxlength="500" rows="2" placeholder="Deskripsi">${esc(item.description)}</textarea>` : `<input data-k="platform" maxlength="60" value="${esc(item.platform)}" placeholder="Platform"><input data-k="icon" maxlength="100" value="${esc(item.icon)}" placeholder="fa-brands fa-github"><input data-k="url" type="url" maxlength="1000" value="${esc(item.url)}" placeholder="https://...">`}</div><div class="developer-item-actions"><label><input data-k="isVisible" type="checkbox" ${item.isVisible !== false ? 'checked' : ''}> Tampil</label><button data-dev-move="-1" type="button" aria-label="Pindahkan ke atas">↑</button><button data-dev-move="1" type="button" aria-label="Pindahkan ke bawah">↓</button><button data-dev-delete type="button">Hapus</button></div></article>`).join('');
+    setEditable();
+  }
+  function readMain() { ['Name','Label','Role','Headline','Bio','AvatarUrl','AvatarAlt','StatusLabel','Footer'].forEach(key => { profile[key[0].toLowerCase() + key.slice(1)] = $('#dev' + key).value.trim(); }); profile.statusOnline = $('#devStatusOnline').checked; profile.isPublished = $('#devPublished').checked; ['skills','projects','socials'].forEach(type => rows(type).forEach((item, index) => { item.sortOrder = (index + 1) * 10; })); return profile; }
+  function fill(value) { profile = { skills: [], projects: [], socials: [], ...(value || {}) }; ['Name','Label','Role','Headline','Bio','AvatarUrl','AvatarAlt','StatusLabel','Footer'].forEach(key => { $('#dev' + key).value = profile[key[0].toLowerCase() + key.slice(1)] || ''; }); $('#devStatusOnline').checked = profile.statusOnline !== false; $('#devPublished').checked = profile.isPublished !== false; ['skills','projects','socials'].forEach(render); }
+  async function load() { try { const response = await fetch('/api/admin/dashboard', { credentials: 'same-origin', cache: 'no-store' }); const data = await response.json(); if (!response.ok) throw new Error(data.message || 'Gagal memuat profil'); editable = Boolean(data.session?.permissions?.editTools); fill({ ...data.developerProfile?.data, isPublished: data.developerProfile?.is_published !== false }); setEditable(); } catch (error) { $('#developerProfileMessage').textContent = error.message; $('#developerProfileMessage').className = 'modal-message is-error'; } }
+  document.addEventListener('nexora:developer-section-open', load);
+  document.addEventListener('click', event => {
+    if (!editable) return;
+    const add = event.target.closest('[data-dev-add]');
+    if (add) { const type = add.dataset.devAdd; rows(type).push(type === 'skills' ? { id:id(type), title:'', icon:'fa-solid fa-code', description:'', isVisible:true } : type === 'projects' ? { id:id(type), title:'', description:'', imageUrl:'', url:'', isVisible:true } : { id:id(type), platform:'', icon:'fa-solid fa-link', url:'', isVisible:true }); render(type); return; }
+    const item = event.target.closest('.developer-item'); if (!item) return;
+    const type = item.dataset.devType, index = Number(item.dataset.devIndex);
+    if (event.target.closest('[data-dev-delete]')) { if (confirm('Hapus item ini?')) { rows(type).splice(index, 1); render(type); } return; }
+    const move = event.target.closest('[data-dev-move]'); if (move) { const next = index + Number(move.dataset.devMove); if (rows(type)[next]) { [rows(type)[index], rows(type)[next]] = [rows(type)[next], rows(type)[index]]; render(type); } }
+  });
+  function syncItem(event) { if (!editable) return; const item = event.target.closest('.developer-item'); if (!item) return; const value = rows(item.dataset.devType)[Number(item.dataset.devIndex)]; if (value && event.target.dataset.k) value[event.target.dataset.k] = event.target.type === 'checkbox' ? event.target.checked : event.target.value; }
+  document.addEventListener('input', syncItem); document.addEventListener('change', syncItem);
+  $('#developerProfileForm').addEventListener('submit', async event => { event.preventDefault(); if (!editable) return; const button = $('#saveDeveloperProfile'), message = $('#developerProfileMessage'); button.disabled = true; message.textContent = ''; try { const response = await fetch('/api/admin/dashboard', { method:'PATCH', credentials:'same-origin', headers:{ 'Content-Type':'application/json', 'X-CSRF-Token':cookie('nx_admin_csrf') }, body:JSON.stringify({ key:'developer_profile', profile:readMain(), isPublished:profile.isPublished }) }); const data = await response.json(); if (!response.ok) throw new Error(data.message || data.error || 'Gagal menyimpan'); fill({ ...data.data.data, isPublished:data.data.is_published }); message.textContent = 'About Developer berhasil disimpan.'; message.className = 'modal-message is-success'; } catch (error) { message.textContent = error.message; message.className = 'modal-message is-error'; } finally { button.disabled = false; } });
+})();

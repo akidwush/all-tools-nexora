@@ -30,6 +30,64 @@ function objectValue(value) {
   return value && typeof value === "object" && !Array.isArray(value) ? value : {};
 }
 
+function safeText(value, max, fallback = "") {
+  return String(value == null ? fallback : value).replace(/[\u0000-\u001f\u007f]/g, "").trim().slice(0, max);
+}
+
+function safeExternalUrl(value) {
+  const text = safeText(value, 1000);
+  if (!text) return "";
+  try {
+    const parsed = new URL(text);
+    return parsed.protocol === "https:" && !parsed.username && !parsed.password ? parsed.toString() : "";
+  } catch { return ""; }
+}
+
+function safeIcon(value) {
+  const icon = safeText(value, 100, "fa-solid fa-circle");
+  return /^[a-z0-9 _-]+$/i.test(icon) ? icon : "fa-solid fa-circle";
+}
+
+function safeProfileItems(value, type) {
+  const rows = Array.isArray(value) ? value.slice(0, 30) : [];
+  return rows.map((row, index) => {
+    const item = objectValue(row);
+    const base = { id: safeText(item.id, 80, `${type}-${index + 1}`).replace(/[^a-z0-9_-]/gi, "-") || `${type}-${index + 1}`, isVisible: booleanValue(item.isVisible, true), sortOrder: Math.max(-10000, Math.min(10000, Number(item.sortOrder) || (index + 1) * 10)) };
+    if (type === "skills") return { ...base, icon: safeIcon(item.icon), title: safeText(item.title, 80), description: safeText(item.description, 360) };
+    if (type === "projects") return { ...base, title: safeText(item.title, 100), description: safeText(item.description, 500), imageUrl: safeExternalUrl(item.imageUrl), url: safeExternalUrl(item.url) };
+    return { ...base, platform: safeText(item.platform, 60), icon: safeIcon(item.icon), url: safeExternalUrl(item.url) };
+  }).filter((item) => type === "skills" ? item.title : type === "projects" ? item.title : item.platform && item.url);
+}
+
+function normalizeDeveloperProfile(value) {
+  const profile = objectValue(value);
+  return {
+    name: safeText(profile.name, 80, "Dika") || "Dika",
+    label: safeText(profile.label, 80, "All Tools Nexora") || "All Tools Nexora",
+    role: safeText(profile.role, 100), headline: safeText(profile.headline, 140), bio: safeText(profile.bio, 1600),
+    avatarUrl: safeExternalUrl(profile.avatarUrl), avatarAlt: safeText(profile.avatarAlt, 160, "Avatar developer"),
+    statusOnline: booleanValue(profile.statusOnline, true), statusLabel: safeText(profile.statusLabel, 80, "System online") || "System online",
+    footer: safeText(profile.footer, 240), skills: safeProfileItems(profile.skills, "skills"),
+    projects: safeProfileItems(profile.projects, "projects"), socials: safeProfileItems(profile.socials, "socials")
+  };
+}
+
+async function updateDeveloperProfile(request, response) {
+  const session = await requireAdmin(request, response, { edit: true });
+  if (!verifyMutationRequest(request)) return send(response, 403, { ok: false, error: "CSRF_REJECTED" });
+  const body = objectValue(request.body);
+  if (body.key !== "developer_profile" || !body.profile || typeof body.profile !== "object" || Array.isArray(body.profile)) return send(response, 400, { ok: false, error: "INVALID_DEVELOPER_PROFILE" });
+  const currentRows = await databaseRequest("developer_profiles?select=id,data,is_published&id=eq.primary&limit=1", { method: "GET" });
+  const current = Array.isArray(currentRows) ? currentRows[0] || null : null;
+  const data = normalizeDeveloperProfile(body.profile);
+  const isPublished = booleanValue(body.isPublished, current ? current.is_published : true);
+  const rows = await databaseRequest("developer_profiles?on_conflict=id", { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=representation" }, body: JSON.stringify({ id: "primary", data, is_published: isPublished }) });
+  const item = Array.isArray(rows) ? rows[0] || null : null;
+  if (!item) return send(response, 500, { ok: false, error: "DEVELOPER_PROFILE_SAVE_FAILED" });
+  const auditLogged = await recordAdminAudit({ request, session, action: "developer_profile.update", entityType: "developer_profile", entityId: "primary", summary: "Profil About Developer diperbarui", before: current ? { isPublished: current.is_published } : {}, after: { isPublished } });
+  return send(response, 200, { ok: true, data: item, auditLogged });
+}
+
 async function updateHeroVideo(request, response) {
   const session = await requireAdmin(request, response, { edit: true });
   if (!verifyMutationRequest(request)) return send(response, 403, { ok: false, error: "CSRF_REJECTED" });
@@ -77,7 +135,11 @@ module.exports = async function handler(request, response) {
     return response.status(204).end();
   }
   if (request.method === "PATCH") {
-    try { return await updateHeroVideo(request, response); }
+    try {
+      const body = objectValue(request.body);
+      if (body.key === "developer_profile") return await updateDeveloperProfile(request, response);
+      return await updateHeroVideo(request, response);
+    }
     catch (error) {
       const status = Number(error.status || 500);
       console.error("[admin-dashboard-settings]", error.code || "UNKNOWN_ERROR");
@@ -95,12 +157,13 @@ module.exports = async function handler(request, response) {
 
   try {
     const session = await requireAdmin(request, response);
-    const [tools, feedbackRows, recentFeedback, healthRows, settings] = await Promise.all([
+    const [tools, feedbackRows, recentFeedback, healthRows, settings, developerProfile] = await Promise.all([
       databaseRequest("tools?select=id,name,description,category,badge,icon,external_url,is_active,sort_order,updated_at&order=sort_order.asc,name.asc", { method: "GET" }),
       databaseRequest("feedback?select=id,status&limit=500", { method: "GET" }),
       databaseRequest("feedback?select=id,name,category,message,status,admin_reply,created_at,updated_at&order=created_at.desc&limit=8", { method: "GET" }),
       databaseRequest("tool_health?select=tool_id,tool_name,category,status,target_type,http_status,latency_ms,success_rate,total_checks,successful_checks,consecutive_failures,last_error,last_checked_at,last_success_at,metadata,updated_at&order=tool_name.asc", { method: "GET" }),
-      databaseRequest("app_settings?select=key,value,is_public,updated_at&order=key.asc", { method: "GET" })
+      databaseRequest("app_settings?select=key,value,is_public,updated_at&order=key.asc", { method: "GET" }),
+      databaseRequest("developer_profiles?select=id,data,is_published,updated_at&id=eq.primary&limit=1", { method: "GET" })
     ]);
 
     const feedback = Array.isArray(feedbackRows) ? feedbackRows : [];
@@ -146,7 +209,8 @@ module.exports = async function handler(request, response) {
       },
       recentFeedback: Array.isArray(recentFeedback) ? recentFeedback : [],
       health: normalizedHealth,
-      settings: Array.isArray(settings) ? settings : []
+      settings: Array.isArray(settings) ? settings : [],
+      developerProfile: Array.isArray(developerProfile) ? developerProfile[0] || null : null
     });
   } catch (error) {
     const status = Number(error.status || 500);

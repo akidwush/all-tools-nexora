@@ -3,7 +3,7 @@
   const state={session:null,dashboard:null,tools:[],socials:[],analytics:null,feedback:[],feedbackMeta:null,audit:[],activeSection:"overview",editingTool:null,editingSocial:null,editingFeedback:null,heroSettingsDirty:false};
   const $=(selector,root=document)=>root.querySelector(selector);
   const $$=(selector,root=document)=>Array.from(root.querySelectorAll(selector));
-  const headings={overview:"Ringkasan Sistem",tools:"Manajemen Tools",socials:"Sosial Media",analytics:"Analytics Penggunaan",health:"Tool Health Monitoring",feedback:"Feedback Pengguna",visual:"Runtime & Visual QA",functional:"Functional Audit",audit:"Audit Log Admin"};
+  const headings={overview:"Ringkasan Sistem",tools:"Manajemen Tools",socials:"Sosial Media",developer:"About Developer",analytics:"Analytics Penggunaan",health:"Tool Health Monitoring",feedback:"Feedback Pengguna",visual:"Runtime & Visual QA",functional:"Functional Audit",audit:"Audit Log Admin"};
   let feedbackTimer=null;
 
   function escapeHtml(value){return String(value??"").replace(/[&<>'"]/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[char]));}
@@ -28,6 +28,7 @@
     $("#pageHeading").textContent=headings[section]||"Dashboard";
     if(section==="tools")renderTools();
     if(section==="socials")renderSocials();
+    if(section==="developer")document.dispatchEvent(new CustomEvent("nexora:developer-section-open"));
     if(section==="analytics"&&!state.analytics)await loadAnalytics();
     if(section==="feedback"&&!state.feedbackMeta)await loadFeedback(1);
     if(section==="audit"&&!state.audit.length)await loadAudit();

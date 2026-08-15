@@ -27,6 +27,7 @@
         <button class="admin-nav-item is-active" data-section="overview" type="button"><i class="fa-solid fa-grid-2"></i><span>Ringkasan</span></button>
         <button class="admin-nav-item" data-section="tools" type="button"><i class="fa-solid fa-screwdriver-wrench"></i><span>Tools</span></button>
         <button class="admin-nav-item" data-section="socials" type="button"><i class="fa-solid fa-share-nodes"></i><span>Sosial Media</span></button>
+        <button class="admin-nav-item" data-section="developer" type="button"><i class="fa-solid fa-user-astronaut"></i><span>About Developer</span></button>
         <button class="admin-nav-item" data-section="analytics" type="button"><i class="fa-solid fa-chart-line"></i><span>Analytics</span></button>
         <button class="admin-nav-item" data-section="feedback" type="button"><i class="fa-regular fa-message"></i><span>Feedback</span></button>
         <button class="admin-nav-item" data-section="health" type="button"><i class="fa-solid fa-heart-pulse"></i><span>Health</span></button>
@@ -101,6 +102,22 @@
           </div>
           <div class="social-admin-grid tool-admin-grid" id="socialAdminGrid"></div>
           <div class="empty-state" id="socialEmpty" hidden><i class="fa-solid fa-link-slash"></i><b>Data sosial belum tersedia</b><span>Jalankan migration 006_social_links.sql di Supabase.</span></div>
+        </section>
+
+        <section class="admin-section" data-panel="developer">
+          <div class="section-toolbar"><div class="toolbar-title"><p class="eyebrow">PUBLIC PROFILE</p><b>About Developer</b></div><a class="secondary-button" href="/about" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Preview</a></div>
+          <form id="developerProfileForm" class="developer-profile-form">
+            <div class="developer-form-grid">
+              <label><span>Nama developer</span><input id="devName" maxlength="80" required></label><label><span>Label kecil</span><input id="devLabel" maxlength="80"></label><label><span>Role</span><input id="devRole" maxlength="100"></label><label><span>Headline</span><input id="devHeadline" maxlength="140"></label>
+              <label class="form-span"><span>Bio</span><textarea id="devBio" maxlength="1600" rows="5"></textarea></label><label><span>URL avatar HTTPS</span><input id="devAvatarUrl" type="url" maxlength="1000" placeholder="https://..."></label><label><span>Alt avatar</span><input id="devAvatarAlt" maxlength="160"></label>
+              <label><span>Label status</span><input id="devStatusLabel" maxlength="80"></label><label class="toggle-field"><span>Status online</span><input id="devStatusOnline" type="checkbox"><b></b></label><label class="form-span"><span>Footer</span><input id="devFooter" maxlength="240"></label>
+            </div>
+            <div class="developer-list-head"><h2>Keahlian</h2><button data-dev-add="skills" class="secondary-button" type="button">+ Tambah</button></div><div id="devSkills" class="developer-list"></div>
+            <div class="developer-list-head"><h2>Project</h2><button data-dev-add="projects" class="secondary-button" type="button">+ Tambah</button></div><div id="devProjects" class="developer-list"></div>
+            <div class="developer-list-head"><h2>Social media</h2><button data-dev-add="socials" class="secondary-button" type="button">+ Tambah</button></div><div id="devSocials" class="developer-list"></div>
+            <label class="switch-row"><span><b>Publikasikan profil</b><small>Hanya profil published yang dapat dibaca halaman publik.</small></span><input id="devPublished" type="checkbox"></label>
+            <p id="developerProfileMessage" class="modal-message" role="status"></p><button id="saveDeveloperProfile" class="primary-button" type="submit"><i class="fa-solid fa-floppy-disk"></i> Simpan About Developer</button>
+          </form>
         </section>
 
         <section class="admin-section" data-panel="analytics">
@@ -212,6 +229,7 @@
       <header><div><p class="eyebrow">MENU LAINNYA</p><h2>Administrasi</h2></div><button id="closeAdminMore" type="button" aria-label="Tutup menu"><i class="fa-solid fa-xmark"></i></button></header>
       <div class="admin-more-grid">
         <button data-section="socials" type="button"><i class="fa-solid fa-share-nodes"></i><span>Sosial Media</span></button>
+        <button data-section="developer" type="button"><i class="fa-solid fa-user-astronaut"></i><span>About Developer</span></button>
         <button data-section="health" type="button"><i class="fa-solid fa-heart-pulse"></i><span>Tool Health</span></button>
         <button data-section="functional" type="button"><i class="fa-solid fa-list-check"></i><span>Functional Audit</span></button>
         <button data-section="visual" type="button"><i class="fa-solid fa-camera-retro"></i><span>Visual QA</span></button>
@@ -292,6 +310,7 @@
 
   <div class="toast-stack" id="toastStack" aria-live="polite"></div>
   <script src="../assets/js/admin/dashboard.js?v=6.3.18-hf3" defer></script>
+  <script src="../assets/js/admin/developer-profile.js?v=6.3.18-step3" defer></script>
   <script src="../assets/js/admin/visual-qa.js?v=6.3.18" defer></script>
   <script src="../assets/js/admin/functional-audit.js?v=6.3.18" defer></script>
 </body>
