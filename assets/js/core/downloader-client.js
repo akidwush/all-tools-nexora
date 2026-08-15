@@ -13,6 +13,9 @@
   function friendly(error){
     if(error&&error.name==="AbortError")return "Permintaan sebelumnya dibatalkan.";
     if(error&&error.code==="REQUEST_TIMEOUT")return "Provider melewati batas waktu. Coba lagi beberapa saat lagi.";
+    if(error&&error.code==="UPSTREAM_ALL_FAILED")return error.message||"Semua provider sedang gagal. Coba lagi beberapa saat.";
+    if(error&&error.code==="UPSTREAM_TIMEOUT")return "Semua provider melewati batas waktu. Coba lagi beberapa saat.";
+    if(error&&error.code==="TERABOX_PASSWORD_REQUIRED")return "Link Terabox memerlukan kode ekstraksi yang benar.";
     if(error&&error.status===429)return "Terlalu banyak permintaan. Tunggu sebentar lalu coba lagi.";
     if(error&&error.status===422)return error.message||"Media tidak ditemukan, kedaluwarsa, privat, atau memerlukan login.";
     if(error&&error.status>=500)return error.message||"Provider sedang bermasalah. Coba lagi nanti.";
@@ -24,7 +27,9 @@
     var external=options&&options.signal,onAbort=function(){controller.abort();};
     if(external){if(external.aborted)controller.abort();else external.addEventListener("abort",onAbort,{once:true});}
     try{
-      var data=await window.NexoraFetchJson("/api/downloader",{method:"POST",credentials:"same-origin",cache:"no-store",headers:{"Accept":"application/json","Content-Type":"application/json"},body:JSON.stringify({provider:provider,url:url}),signal:controller.signal,nexoraTimeoutMs:22000,nexoraRetries:0});
+      var payload={provider:provider,url:url},password=String(options&&options.password||"").replace(/[\u0000-\u001f\u007f]/g,"").trim().slice(0,64);
+      if(password)payload.password=password;
+      var data=await window.NexoraFetchJson("/api/downloader",{method:"POST",credentials:"same-origin",cache:"no-store",headers:{"Accept":"application/json","Content-Type":"application/json"},body:JSON.stringify(payload),signal:controller.signal,nexoraTimeoutMs:30000,nexoraRetries:0});
       if(!data||data.ok!==true||!data.data)throw new Error(data&&data.message||"Respons downloader tidak lengkap.");return data;
     }catch(error){if(error&&error.name!=="AbortError")error.message=friendly(error);throw error;}
     finally{if(external)external.removeEventListener("abort",onAbort);if(active[provider]===controller)delete active[provider];}

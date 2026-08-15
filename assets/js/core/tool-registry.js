@@ -7,7 +7,7 @@
     ["instagram","Instagram","api",null,"renderInstagram","https://all-tools-nexora.vercel.app/api/downloader"],
     ["tiktok","TikTok","api","tiktok","renderTiktok","https://all-tools-nexora.vercel.app/api/downloader"],
     ["youtube","YouTube Metadata","hybrid",null,"renderYoutube","https://all-tools-nexora.vercel.app/api/downloader"],
-    ["spotify","Spotify Metadata","hybrid",null,"renderSpotify","https://all-tools-nexora.vercel.app/api/downloader"],
+    ["spotify","Spotify Downloader","api",null,"renderSpotify","https://all-tools-nexora.vercel.app/api/downloader"],
     ["fakebankjago","Fake Bank Jago","api","download-pack","renderFakeBankJago","https://api.nexray.eu.cc/"],
     ["brat","BRAT Generator","api",null,"renderBrat","https://api.siputzx.my.id/"],
     ["iqc","IQC Generator","api","generator-pack","renderIqc2","https://api.nexray.eu.cc/"],

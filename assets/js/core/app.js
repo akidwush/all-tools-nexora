@@ -1563,7 +1563,7 @@ let toolsData = {
         { id: 'terabox', icon: 'fa-solid fa-box-open', name: 'Terabox Downloader', desc: 'Ambil file dari link share Terabox', badge: 'FILE' },{ id: 'instagram', icon: 'fa-brands fa-instagram', name: 'Instagram', desc: 'Download video & foto', badge: 'HD' },
         { id: 'tiktok', icon: 'fa-brands fa-tiktok', name: 'TikTok', desc: 'Video, foto & audio', badge: 'MP4/MP3/JPG' },
         { id: 'youtube', icon: 'fa-brands fa-youtube', name: 'YouTube Metadata', desc: 'Metadata dan tautan resmi YouTube', badge: 'RESMI' },
-        { id: 'spotify', icon: 'fa-brands fa-spotify', name: 'Spotify Metadata', desc: 'Metadata dan tautan resmi Spotify', badge: 'RESMI' }
+        { id: 'spotify', icon: 'fa-brands fa-spotify', name: 'Spotify Downloader', desc: 'Audio provider dengan fallback resmi', badge: 'MP3' }
     ],
     maker: [{ id: 'fakebankjago', icon: 'fa-solid fa-building-columns', name: 'Fake Bank Jago', desc: 'Generator visual saldo Bank Jago', badge: 'SIMULASI' },{ id: 'brat', icon: 'fa-solid fa-wand-magic-sparkles', name: 'BRAT Generator', desc: 'Static + animated GIF', badge: 'GIF' },
         { id: 'iqc', icon: 'fa-solid fa-image', name: 'IQC Generator', desc: 'Buat gambar IQC — Operator, Image & Dark', badge: '3 STYLE' },
@@ -2465,49 +2465,8 @@ function nxFindTitle(obj) {
 }
 
 function renderSpotify(body) {
-    body.innerHTML = `
-        <h2><i class="fa-brands fa-spotify"></i> Spotify Downloader</h2>
-        <p style="color:#8b7ab8;font-size:13px;margin-bottom:12px;">Tempel link track Spotify, lalu ambil file audio.</p>
-        <input type="url" id="spUrl" class="v-input" placeholder="https://open.spotify.com/track/...">
-        <button class="v-btn" id="spBtn"><i class="fa-brands fa-spotify"></i> Ambil Lagu</button>
-        <div id="spResult"></div>
-    `;
-    const run = async () => {
-        const url = document.getElementById('spUrl').value.trim();
-        const target = document.getElementById('spResult');
-        const btn = document.getElementById('spBtn');
-        if (!url) return alert('Tempel link Spotify dulu!');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengambil...';
-        target.innerHTML = `<div class="dl-loading"><div class="dl-spin"></div><p>Mencari lagu...</p></div>`;
-        try {
-            const spApi = 'https://api.ikyyxd.my.id/download/spotifydl?url=' + encodeURIComponent(url);
-            const { data } = await nxFetchJsonWithBackup('ikyyxd', nxBackupSources('IkyyXD', spApi), { headers: { 'Accept': 'application/json' } });
-            const link = nxFindHttp(data, ['download', 'downloadUrl', 'download_url', 'audio', 'mp3', 'file', 'link', 'url']);
-            if (!link) throw new Error('Link download tidak ditemukan');
-            const title = nxFindTitle(data) || 'Spotify Track';
-            target.innerHTML = `
-                <div class="dl-option" style="margin-top:14px;">
-                    <div class="dl-option-info">
-                        <div class="dl-option-icon mp3"><i class="fa-brands fa-spotify"></i></div>
-                        <div>
-                            <div class="dl-option-title">${nxEscape(title)}</div>
-                            <div class="dl-option-desc">Audio Spotify siap download</div>
-                        </div>
-                    </div>
-                    <button class="dl-dl-btn mp3" id="spDl">&#8595; MP3</button>
-                </div>
-            `;
-            document.getElementById('spDl').onclick = () => nxDownloadUrl(link, 'spotify_track.mp3', { tool: 'Spotify', type: 'MP3', title });
-        } catch (e) {
-            target.innerHTML = `<div class="dl-error"><i class="fas fa-triangle-exclamation"></i><br><br>Gagal mengambil lagu.<br><span style="font-size:11px;opacity:.7;">${nxEscape(e.message)}</span></div>`;
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa-brands fa-spotify"></i> Ambil Lagu';
-        }
-    };
-    document.getElementById('spBtn').onclick = run;
-    document.getElementById('spUrl').addEventListener('keydown', e => { if (e.key === 'Enter') run(); });
+    if (typeof window.NexoraDownloaderRenderSpotify === 'function') return window.NexoraDownloaderRenderSpotify(body);
+    body.innerHTML = '<div class="dl-error">Modul Spotify belum selesai dimuat. Tutup lalu buka kembali tool ini.</div>';
 }
 
 function renderBrat(body) {

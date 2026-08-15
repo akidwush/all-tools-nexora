@@ -53,6 +53,24 @@
     bindRun(input,button,run);
   }
   window.renderYoutube=function(body){renderOfficial(body,"youtube","YouTube","fa-youtube","https://youtu.be/...");};
-  window.renderSpotify=function(body){renderOfficial(body,"spotify","Spotify","fa-spotify","https://open.spotify.com/track/...");};
+  function renderSpotify(body){
+    body.innerHTML='<h2><i class="fa-brands fa-spotify"></i> Spotify Downloader</h2><p class="nx-downloader-lead">Unduh audio bila provider tersedia; jika gagal, Nexora tetap menampilkan metadata dan tautan Spotify resmi.</p><input type="url" class="v-input" data-spotify-input placeholder="https://open.spotify.com/track/..." autocomplete="url" spellcheck="false"><button class="v-btn" data-spotify-button type="button"><i class="fas fa-download"></i> Proses Track</button><div data-spotify-result aria-live="polite"></div>';
+    var input=body.querySelector("[data-spotify-input]"),button=body.querySelector("[data-spotify-button]"),target=body.querySelector("[data-spotify-result]");
+    async function run(){
+      var url=input.value.trim();if(!url){target.innerHTML=errorHtml("Tempel URL track Spotify terlebih dahulu.");input.focus();return;}
+      button.disabled=true;button.innerHTML='<i class="fas fa-spinner fa-spin"></i> Memproses...';target.innerHTML='<div class="dl-loading"><div class="dl-spin"></div><p>Mencoba provider audio...</p></div>';
+      try{
+        var result=await window.NexoraDownloader.request("spotify",url),data=result.data,media=Array.isArray(data.media)?data.media:[];
+        var intro=(data.thumbnail?'<img class="nx-downloader-preview" src="'+esc(data.thumbnail)+'" alt="Cover Spotify">':'')+'<div class="dl-title">'+esc(data.title||"Spotify Track")+'</div>'+(data.author?'<div class="dl-author-name">'+esc(data.author)+'</div>':'');
+        if(!media.length){target.innerHTML='<article class="nx-official-result">'+intro+'<div><p class="nx-capability-notice"><i class="fas fa-circle-info"></i> '+esc(data.notice||"Provider audio sedang tidak tersedia; gunakan tautan resmi.")+'</p><a class="v-btn nx-official-link" href="'+esc(data.officialUrl)+'" target="_blank" rel="noopener noreferrer"><i class="fas fa-arrow-up-right-from-square"></i> Buka di Spotify</a></div></article>';return;}
+        target.innerHTML=intro+'<p class="nx-capability-notice"><i class="fas fa-circle-info"></i> '+esc(data.notice||"Audio provider tersedia.")+'</p><div class="dl-options">'+media.map(function(item,index){return '<div class="dl-option"><div class="dl-option-info"><div class="dl-option-icon"><i class="fas fa-music"></i></div><div><div class="dl-option-title">'+esc(item.type||"MP3")+'</div><div class="dl-option-desc">'+esc(item.quality||"Audio")+'</div></div></div><button class="dl-dl-btn" type="button" data-spotify-media="'+index+'">Simpan</button></div>';}).join("")+'</div><p class="nx-capability-notice" data-download-status hidden></p>';
+        target.querySelectorAll("[data-spotify-media]").forEach(function(node){node.addEventListener("click",async function(){var item=media[Number(node.dataset.spotifyMedia)],status=target.querySelector("[data-download-status]"),old=node.innerHTML;node.disabled=true;node.innerHTML='<i class="fas fa-spinner fa-spin"></i>';if(status){status.hidden=false;status.textContent="Memvalidasi audio...";}try{await trigger(item.url,item.filename,{tool:"Spotify",type:item.type||"MP3",title:data.title});if(status)status.textContent="Download tervalidasi dan sedang dimulai.";}catch(error){if(status)status.textContent="Download gagal: "+(error&&error.message?error.message:"provider tidak dapat dijangkau");}finally{node.disabled=false;node.innerHTML=old;}});});
+      }catch(error){if(error&&error.name!=="AbortError")target.innerHTML=errorHtml(error.message||"Spotify gagal diproses.");}
+      finally{button.disabled=false;button.innerHTML='<i class="fas fa-download"></i> Proses Track';}
+    }
+    bindRun(input,button,run);
+  }
+  window.renderSpotify=renderSpotify;
+  window.NexoraDownloaderRenderSpotify=renderSpotify;
   window.NexoraDownloaderRenderOfficial=renderOfficial;
 })();

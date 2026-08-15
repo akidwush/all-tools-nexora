@@ -1,5 +1,18 @@
 # Changelog
 
+## 6.3.18 HF6 — 2026-08-15
+
+### Downloader recovery
+
+- Mengganti single point of failure Instagram, Terabox, dan Spotify dengan provider cascade, timeout per sumber, circuit breaker, cache pendek, serta endpoint fallback yang dapat diatur lewat environment server.
+- Menambahkan fallback daftar file Terabox resmi dan kode ekstraksi opsional; kegagalan direct-link tidak lagi menghilangkan seluruh hasil.
+- Mengaktifkan Spotify best-effort MP3 melalui backend dengan fallback metadata/tautan resmi, sekaligus menghapus endpoint browser lama yang tidak konsisten.
+- Mengganti health check URL palsu dengan probe layanan nyata dan menampilkan capability berdasarkan hasil aktual, bukan klaim statis.
+
+### Rilis atomik
+
+- Menambahkan regression test HF6 dan paket kumulatif siap Termux yang memvalidasi staging, checksum, test, build, lalu rollback semua file/commit bila satu tahap apply atau deploy gagal.
+
 ## 6.3.18 HF5 — 2026-08-15
 
 ### Mobile dan routing

@@ -393,85 +393,15 @@
   };
 
   window.renderSpotify=function(body){
-    body.innerHTML=`
-      <div class="nx-source-tool" style="--nx-accent:#4ade80;--nx-accent-2:#16a34a;--nx-accent-rgb:74,222,128">
-        <section class="nx-source-intro">
-          <span class="nx-source-intro-icon"><i class="fa-brands fa-spotify"></i></span>
-          <div><h2>Spotify Downloader</h2><p>Endpoint, struktur respons, dan proses download mengikuti implementasi Nexus Tools yang kamu kirim.</p></div>
-        </section>
-        <section class="nx-source-card nx-source-form">
-          <div class="nx-source-field"><label>URL Track Spotify</label><input id="nxSpUrl" type="url" placeholder="https://open.spotify.com/track/..."></div>
-          <button class="nx-source-btn" id="nxSpGenerate" type="button"><i class="fa-brands fa-spotify"></i> Download Lagu</button>
-          <div class="nx-source-loader" id="nxSpLoader">Mengambil data lagu</div>
-          <div class="nx-source-status" id="nxSpStatus"></div>
-          <div class="nx-spotify-result" id="nxSpResult">
-            <div class="nx-spotify-track">
-              <span class="nx-spotify-cover"><i class="fa-brands fa-spotify"></i></span>
-              <div style="min-width:0"><b id="nxSpTitle">Unknown Title</b><span>Audio Spotify siap diunduh</span></div>
-            </div>
-            <button class="nx-source-btn secondary" id="nxSpDownload" type="button"><i class="fa-solid fa-download"></i> Download MP3</button>
-          </div>
-          <div class="nx-source-note">Endpoint sumber: api.ikyyxd.my.id/download/spotifydl</div>
-        </section>
-      </div>`;
-
-    let currentDownloadUrl="", currentFilename="spotify_track.mp3";
-    const findDownload=data=>{
-      if(!data || typeof data!=="object") return "";
-      return data.download || data.link || data.url ||
-        (data.result && (data.result.download || data.result.link || data.result.url)) ||
-        (data.data && (data.data.download || data.data.link || data.data.url)) || "";
-    };
-    const findTitle=data=>{
-      if(!data || typeof data!=="object") return "Unknown Title";
-      return data.title || data.name || data.song ||
-        (data.result && (data.result.title || data.result.name)) ||
-        (data.data && (data.data.title || data.data.name)) || "Unknown Title";
-    };
-    const run=async()=>{
-      const url=(document.getElementById("nxSpUrl").value||"").trim();
-      const button=document.getElementById("nxSpGenerate");
-      const loader=document.getElementById("nxSpLoader");
-      const result=document.getElementById("nxSpResult");
-      if(!url){setSpotifyStatus("Masukkan URL Spotify terlebih dahulu.","error");return;}
-      button.disabled=true;loader.classList.add("show");result.classList.remove("show");clearSpotifyStatus();
-      try{
-        const apiUrl=`https://api.ikyyxd.my.id/download/spotifydl?url=${encodeURIComponent(url)}`;
-        const response=await window.NexoraFetch(apiUrl,{method:"GET",headers:{"Accept":"application/json"}});
-        if(!response.ok){
-          const raw=await response.text();
-          let message="HTTP "+response.status;
-          try{const parsed=JSON.parse(raw);message=parsed.message||parsed.error||message;}catch(ignore){}
-          throw new Error(message);
-        }
-        const data=await response.json();
-        const link=findDownload(data);
-        const title=findTitle(data);
-        if(!link) throw new Error("Link download tidak ditemukan");
-        currentDownloadUrl=link;
-        currentFilename=nxFilename(title,"spotify_track")+".mp3";
-        document.getElementById("nxSpTitle").textContent=title;
-        result.classList.add("show");
-        setSpotifyStatus(`${title} siap diunduh.`,"success");
-      }catch(error){
-        setSpotifyStatus("Gagal mengambil lagu: "+error.message,"error");
-      }finally{
-        loader.classList.remove("show");button.disabled=false;
-      }
-    };
-    document.getElementById("nxSpGenerate").onclick=run;
-    document.getElementById("nxSpUrl").addEventListener("keydown",e=>{if(e.key==="Enter") run();});
-    document.getElementById("nxSpDownload").onclick=()=>{
-      if(!currentDownloadUrl){setSpotifyStatus("Generate lagu terlebih dahulu.","error");return;}
-      nxDownloadSource(currentDownloadUrl,currentFilename);
-    };
+    if(typeof window.NexoraDownloaderRenderSpotify==="function") return window.NexoraDownloaderRenderSpotify(body);
+    body.innerHTML='<div class="nx-source-status show error">Modul Spotify belum selesai dimuat. Buka kembali tool ini.</div>';
   };
 })();
 
-/* Keep Spotify capability truthful when this shared source module is lazy-loaded. */
+/* Restore the canonical server-side Spotify cascade after this legacy module loads. */
 (function(){
-  if(typeof window.NexoraDownloaderRenderOfficial!=="function") return;
+  if(typeof window.NexoraDownloaderRenderSpotify!=="function") return;
   window.renderSpotify=function(body){
-    return window.NexoraDownloaderRenderOfficial(body,"spotify","Spotify","fa-spotify","https://open.spotify.com/track/...");
+    return window.NexoraDownloaderRenderSpotify(body);
   };
 })();

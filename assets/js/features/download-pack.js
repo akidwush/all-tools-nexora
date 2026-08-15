@@ -162,6 +162,10 @@
               placeholder="https://www.terabox.com/s/..."
             >
           </div>
+          <div class="nx-source-field">
+            <label>Kode Ekstraksi <small>(opsional)</small></label>
+            <input id="nxTbPassword" type="text" maxlength="64" placeholder="Isi jika link memakai kode">
+          </div>
 
           <button
             class="nx-source-btn"
@@ -196,6 +200,8 @@
       document.getElementById("nxTbUrl");
     const button =
       document.getElementById("nxTbFetch");
+    const passwordInput =
+      document.getElementById("nxTbPassword");
     const loader =
       document.getElementById("nxTbLoader");
     const listNode =
@@ -219,11 +225,14 @@
       clearSourceStatus("nxTbStatus");
 
       try{
-        const response = await window.NexoraDownloader.request("terabox",url);
+        const response = await window.NexoraDownloader.request("terabox",url,{password:String(passwordInput.value||"").trim()});
         const files = (response.data.media || []).map(item => ({
           name:item.filename,
           sizeFormatted:item.size,
           downloadUrl:item.url,
+          officialUrl:item.officialUrl || response.data.officialUrl,
+          downloadable:item.downloadable !== false && Boolean(item.url),
+          isDirectory:Boolean(item.isDirectory),
           thumb:item.thumbnail,
           duration:item.duration,
           quality:item.quality
@@ -237,9 +246,7 @@
 
         setSourceStatus(
           "nxTbStatus",
-          "Ditemukan " +
-          files.length +
-          " file dari link Terabox.",
+          (response.data.notice || ("Ditemukan " + files.length + " file dari link Terabox.")),
           "success"
         );
 
@@ -267,15 +274,15 @@
             </span>
             <span class="nx-cloud-info">
               <b>${esc(file.name)}</b>
-              <span>${esc(extra || "File siap diunduh")}</span>
+              <span>${esc(extra || (file.downloadable ? "File siap diunduh" : "Buka melalui Terabox resmi"))}</span>
             </span>
             <button
               class="nx-cloud-download"
               type="button"
-              title="Download ${esc(file.name)}"
-              aria-label="Download ${esc(file.name)}"
+              title="${file.downloadable ? "Download" : "Buka"} ${esc(file.name)}"
+              aria-label="${file.downloadable ? "Download" : "Buka"} ${esc(file.name)}"
             >
-              <i class="fa-solid fa-download"></i>
+              <i class="fa-solid fa-${file.downloadable ? "download" : "arrow-up-right-from-square"}"></i>
             </button>
           `;
 
@@ -288,6 +295,11 @@
 
               const downloadButton = event.currentTarget;
               const previousHtml = downloadButton.innerHTML;
+              if(!file.downloadable){
+                openUrl(file.officialUrl || url);
+                setSourceStatus("nxTbStatus","Direct-link sedang tidak tersedia; Terabox resmi telah dibuka.","");
+                return;
+              }
               downloadButton.disabled = true;
               downloadButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
               setSourceStatus("nxTbStatus","Memvalidasi file melalui server download aman...","");
