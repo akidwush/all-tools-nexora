@@ -83,12 +83,14 @@ async function main() {
   assert.match(index, /viewport-fit=cover/);
 
   const css = read("assets/css/core.css") + read("assets/css/components.css");
-  assert.match(css, /--nx-vv-height/);
-  assert.match(css, /#nxUniversalRoom[\s\S]*var\(--nx-vv-height/);
+  assert.doesNotMatch(css, /--nx-vv-(?:width|height|left|top)/);
+  assert.match(css, /#nxUniversalRoom[\s\S]*inset:0!important/);
   assert.match(css, /overflow-x:\s*clip/);
 
   const stability = read("assets/js/core/stability.js");
   assert.match(stability, /visualViewport\.addEventListener\(["']resize["']/);
+  assert.match(stability, /NexoraViewportRecovery/);
+  assert.match(stability, /function safeReload\(\)/);
   assert.doesNotMatch(stability, /event\.preventDefault\(\);\s*event\.stopPropagation\(\);/);
 
   const lazy = read("assets/js/core/lazy-loader.js");

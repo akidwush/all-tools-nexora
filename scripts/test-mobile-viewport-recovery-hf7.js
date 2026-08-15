@@ -1,0 +1,28 @@
+"use strict";
+
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const read = file => fs.readFileSync(file, "utf8");
+
+const html = read("index.html");
+const css = read("assets/css/core.css") + read("assets/css/components.css");
+const stability = read("assets/js/core/stability.js");
+const ai = read("assets/js/core/personal-ai.js");
+
+assert.doesNotMatch(css + stability, /--nx-vv-(?:width|height|left|top)/, "overlay tidak boleh mengikuti offset/ukuran pinch visualViewport");
+assert.match(css, /#nxUniversalRoom[\s\S]*inset:0!important;width:auto!important;height:auto!important/);
+assert.match(css, /overscroll-behavior-y:auto/, "pull-to-refresh browser harus diizinkan");
+assert.match(css, /touch-action:pan-x pan-y pinch-zoom/, "scroll dan pinch zoom harus diizinkan");
+assert.match(css, /#nxSafeReload\{display:none;position:fixed;z-index:2147483000/);
+assert.match(stability, /Math\.abs\(scale-1\)>0\.025/);
+assert.match(stability, /function reconcileScrollLock\(forceUnlock\)/);
+assert.match(stability, /body\.style\.removeProperty\("overflow"\)/);
+assert.match(stability, /target\.hash=""/);
+assert.match(stability, /searchParams\.set\("nx_reload"/);
+assert.doesNotMatch(stability, /new MutationObserver/);
+assert.match(stability, /document\.addEventListener\("click"/);
+assert.match(ai, /if\(Math\.abs\(scale-1\)>0\.025\)return/);
+assert.match(html, /core\.css\?v=6\.3\.18-hf7-mobile1/);
+assert.match(html, /stability\.js\?v=6\.3\.18-hf5-hf7-mobile1/);
+
+console.log("HF7 mobile recovery lulus: pinch zoom stabil, scroll lock pulih, pull-to-refresh aktif, dan refresh aman tersedia.");

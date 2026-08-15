@@ -7,17 +7,17 @@
   var lastAudit=null;
   var statusPromise=null;
 
+  /* visualViewport mengecil dan mengubah offset ketika pengguna melakukan
+     pinch-zoom. Nilai tersebut tidak boleh dipakai sebagai geometri overlay:
+     pada Chrome Android hasilnya adalah overlay bergeser dan area layar hitam.
+     Di sini viewport hanya dipakai untuk mendeteksi zoom dan tinggi keyboard. */
   function syncVisualViewport(){
     var viewport=window.visualViewport;
-    var width=Math.ceil(viewport?viewport.width:window.innerWidth);
-    var height=Math.ceil(viewport?viewport.height:window.innerHeight);
-    var left=Math.max(0,Math.round(viewport?viewport.offsetLeft:0));
-    var top=Math.max(0,Math.round(viewport?viewport.offsetTop:0));
-    var root=document.documentElement.style;
-    root.setProperty("--nx-vv-width",width+"px");
-    root.setProperty("--nx-vv-height",height+"px");
-    root.setProperty("--nx-vv-left",left+"px");
-    root.setProperty("--nx-vv-top",top+"px");
+    var scale=Number(viewport&&viewport.scale||1);
+    var zooming=Math.abs(scale-1)>0.025;
+    var root=document.documentElement;
+    root.classList.toggle("nx-pinch-zoom",zooming);
+    root.style.setProperty("--nx-keyboard-vh",Math.round(!zooming&&viewport?viewport.height:window.innerHeight)+"px");
   }
   var viewportFrame=0;
   function scheduleViewportSync(){
@@ -31,6 +31,94 @@
     window.visualViewport.addEventListener("resize",scheduleViewportSync,{passive:true});
     window.visualViewport.addEventListener("scroll",scheduleViewportSync,{passive:true});
   }
+
+  var overlayRules=[
+    {bodyClass:"nx-universal-room-open",selector:"#nxUniversalRoom.is-open"},
+    {bodyClass:"tt-room-open",selector:"#ttRoomOverlay.on"},
+    {bodyClass:"nx-getcode-open",selector:"#nxGetCodeOverlay.on"},
+    {bodyClass:"nx-deploy-open",selector:"#deployOverlay.on"},
+    {bodyClass:"nx-about-dev-open",selector:".nx-about-dev-room.is-open"},
+    {bodyClass:"nx-ai-open",selector:"#nxPersonalAi.is-open"},
+    {bodyClass:"admin-more-open",selector:".admin-more-sheet.is-open,.admin-more-drawer.is-open"}
+  ];
+  var transientOverlaySelector=".tool-viewer.active,.nx-health-dialog.is-open,.nse-modal.is-open:not([hidden]),.modal-backdrop:not([hidden])";
+  var recoveryFrame=0;
+
+  function elementIsRendered(selector){
+    return Array.prototype.some.call(document.querySelectorAll(selector),function(node){
+      if(node.hidden||node.getAttribute("aria-hidden")==="true")return false;
+      var style=window.getComputedStyle?window.getComputedStyle(node):null;
+      return !style||style.display!=="none"&&style.visibility!=="hidden";
+    });
+  }
+  function reconcileScrollLock(forceUnlock){
+    var body=document.body;
+    if(!body)return false;
+    var locked=false;
+    overlayRules.forEach(function(rule){
+      var open=elementIsRendered(rule.selector);
+      if(body.classList.contains(rule.bodyClass)&&!open)body.classList.remove(rule.bodyClass);
+      if(open)locked=true;
+    });
+    if(elementIsRendered(transientOverlaySelector))locked=true;
+    if(forceUnlock)locked=false;
+    if(locked){
+      if(body.style.overflow!=="hidden")body.style.overflow="hidden";
+    }else{
+      body.style.removeProperty("overflow");
+      document.documentElement.style.removeProperty("overflow");
+    }
+    return locked;
+  }
+  function scheduleRecovery(){
+    if(recoveryFrame)return;
+    recoveryFrame=requestAnimationFrame(function(){recoveryFrame=0;reconcileScrollLock(false);});
+  }
+  function safeReload(){
+    reconcileScrollLock(true);
+    var target;
+    try{
+      target=new URL(location.href);
+      target.hash="";
+      target.searchParams.set("nx_reload",Date.now().toString(36));
+      sessionStorage.setItem("nexora_safe_reload",String(Date.now()));
+      location.replace(target.href);
+    }catch(_error){location.reload();}
+  }
+  function ensureReloadFallback(){
+    var button=document.getElementById("nxSafeReload");
+    if(button)return button;
+    button=document.createElement("button");
+    button.id="nxSafeReload";
+    button.type="button";
+    button.setAttribute("aria-label","Muat ulang aman dan pulihkan layar");
+    button.title="Refresh aman";
+    button.innerHTML='<i class="fas fa-rotate-right" aria-hidden="true"></i><span>Refresh</span>';
+    button.addEventListener("click",safeReload);
+    document.body.appendChild(button);
+    return button;
+  }
+  function cleanReloadMarker(){
+    try{
+      var current=new URL(location.href);
+      if(!current.searchParams.has("nx_reload"))return;
+      current.searchParams.delete("nx_reload");
+      history.replaceState(history.state,"",current.pathname+current.search+current.hash);
+    }catch(_error){}
+  }
+  function initializeRecovery(){
+    cleanReloadMarker();
+    ensureReloadFallback();
+    reconcileScrollLock(false);
+  }
+  window.addEventListener("pageshow",function(){setTimeout(scheduleRecovery,0);});
+  window.addEventListener("hashchange",scheduleRecovery,{passive:true});
+  window.addEventListener("popstate",scheduleRecovery,{passive:true});
+  document.addEventListener("visibilitychange",function(){if(!document.hidden)scheduleRecovery();});
+  document.addEventListener("click",function(){scheduleRecovery();setTimeout(scheduleRecovery,360);},true);
+  document.addEventListener("keydown",function(event){if(event.key==="Escape")setTimeout(scheduleRecovery,360);},true);
+  document.addEventListener("nexora:tool-room-open",scheduleRecovery);
+  document.addEventListener("nexora:tool-room-close",function(){setTimeout(scheduleRecovery,360);});
 
   function clean(value,max){return String(value==null?"":value).replace(/[\u0000-\u001f\u007f]/g," ").trim().slice(0,max||500);}
   function toolIdFromCard(card){
@@ -227,9 +315,10 @@
       schedule(function(){loadHealth(false);},{timeout:1800});
     }
   }
-  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",initializeStatus,{once:true});
-  else initializeStatus();
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",function(){initializeRecovery();initializeStatus();},{once:true});
+  else{initializeRecovery();initializeStatus();}
 
-  window.NexoraStability={version:"6.3.18",audit:audit,loadHealth:loadHealth,applyCardStatus:applyCardStatus,notify:notify,fetchJson:fetchJson,getLastAudit:function(){return lastAudit;},getHealth:function(id){return healthMap[id]||null;}};
+  window.NexoraViewportRecovery={reconcile:reconcileScrollLock,reload:safeReload};
+  window.NexoraStability={version:"6.3.20-hf7",audit:audit,loadHealth:loadHealth,applyCardStatus:applyCardStatus,notify:notify,fetchJson:fetchJson,reconcileScrollLock:reconcileScrollLock,safeReload:safeReload,getLastAudit:function(){return lastAudit;},getHealth:function(id){return healthMap[id]||null;}};
   window.dispatchEvent(new CustomEvent("nexora:stability-ready"));
 })();

@@ -1457,8 +1457,8 @@ html.nx-hero-video-disabled .video-banner video{display:none!important}
   --nx-shadow:0 22px 64px rgba(0,0,0,.36);--nx-shadow-lift:0 30px 72px rgba(0,0,0,.46);--nx-space-1:8px;--nx-space-2:12px;--nx-space-3:20px;--nx-space-4:30px;
   --nx-transition:220ms cubic-bezier(.2,.72,.2,1)
 }
-html{min-height:100%;background-color:#050509;color-scheme:dark;overscroll-behavior-y:none}
-body{position:relative;min-height:100vh;min-height:100dvh;background-color:#050509;background-image:linear-gradient(180deg,#050509 0,#090812 34rem,#07070c 72rem,#0b0912 100%);color:var(--nx-text);overscroll-behavior-y:none}
+html{min-height:100%;background-color:#050509;color-scheme:dark;overscroll-behavior-y:auto}
+body{position:relative;min-height:100vh;min-height:100dvh;background-color:#050509;background-image:linear-gradient(180deg,#050509 0,#090812 34rem,#07070c 72rem,#0b0912 100%);color:var(--nx-text);overscroll-behavior-y:auto;touch-action:pan-x pan-y pinch-zoom}
 .bg-glow{position:fixed;inset:0;z-index:0;overflow:hidden;background:radial-gradient(ellipse at 50% -10%,rgba(188,140,255,.14),transparent 42%),linear-gradient(180deg,rgba(255,255,255,.012),transparent 45%);animation:none;opacity:1}
 .nx-membrane{position:absolute;display:block;pointer-events:none;opacity:.92;filter:saturate(115%);transform:translate3d(0,0,0);animation:nxMembraneDrift var(--nx-drift,28s) ease-in-out infinite alternate}
 .nx-membrane::after{content:"";position:absolute;inset:7%;border:1px solid rgba(221,245,255,.14);clip-path:inherit;transform:translate3d(3%,2%,0)}
@@ -1597,17 +1597,23 @@ body{position:relative;min-height:100vh;min-height:100dvh;background-color:#0505
 #ttRoomOverlay .dl-media-item img,
 #ttRoomOverlay .dl-media-item video{max-height:52svh;}
 
-/* v6.3.19 — Android pinch-zoom/orientation viewport recovery. */
+/* v6.3.20 HF7 — layout viewport tetap stabil selama pinch-zoom Android. */
 html,body{width:100%;max-width:100%;overflow-x:clip;background-color:#050509}
-body{min-height:max(100vh,var(--nx-vv-height,100dvh));background-repeat:no-repeat;background-size:100% 100%}
-.bg-glow{top:var(--nx-vv-top,0);left:var(--nx-vv-left,0);right:auto;bottom:auto;width:var(--nx-vv-width,100vw);height:var(--nx-vv-height,100dvh);min-width:100%;min-height:100%;transform:translateZ(0)}
+body{min-height:100vh;min-height:100dvh;background-repeat:no-repeat;background-size:100% auto}
+.bg-glow{inset:0;width:auto;height:auto;min-width:100%;min-height:100%;transform:none}
 img,video,canvas,svg,iframe{max-inline-size:100%}
 #nxUniversalRoom,#ttRoomOverlay,#nxGetCodeOverlay,#deployOverlay,.nx-about-dev-room,.tool-viewer,.nx-health-dialog,.nse-modal{
-  top:var(--nx-vv-top,0)!important;left:var(--nx-vv-left,0)!important;right:auto!important;bottom:auto!important;
-  width:var(--nx-vv-width,100vw)!important;height:var(--nx-vv-height,100dvh)!important;max-width:none!important;max-height:none!important
+  inset:0!important;width:auto!important;height:auto!important;max-width:none!important;max-height:none!important
 }
+html.nx-pinch-zoom .bg-glow{position:absolute;inset:0;contain:paint}
 @supports not (overflow:clip){html,body{overflow-x:hidden}}
 @media (max-width:380px){#ttRoomOverlay .dl-media-grid{grid-template-columns:minmax(0,1fr);}}
+
+/* Refresh alternatif tetap dapat disentuh walau sebuah overlay/scroll lock macet. */
+#nxSafeReload{display:none;position:fixed;z-index:2147483000;left:12px;bottom:max(12px,env(safe-area-inset-bottom));align-items:center;justify-content:center;gap:7px;min-width:48px;min-height:48px;padding:0 12px;border:1px solid rgba(189,247,255,.3);border-radius:15px;background:rgba(13,14,22,.94);box-shadow:0 12px 34px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.08);color:#eafcff;font:750 9px/1 Poppins,sans-serif;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+#nxSafeReload i{font-size:13px;color:#bdf7ff}
+.nx-ai-launcher.is-left~#nxSafeReload{left:auto;right:12px}
+@media (max-width:900px),(pointer:coarse){#nxSafeReload{display:inline-flex}}
 
 /* Nexora HF3 — smooth interaction without permanent compositor layers. */
 @media (hover:hover) and (pointer:fine){

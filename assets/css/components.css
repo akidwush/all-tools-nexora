@@ -930,12 +930,9 @@ body.nx-about-dev-open{
 }
 #nxUniversalRoom{
   position:fixed;
-  top:var(--nx-vv-top,0);
-  left:var(--nx-vv-left,0);
-  right:auto;
-  bottom:auto;
-  width:var(--nx-vv-width,100vw);
-  height:var(--nx-vv-height,100dvh);
+  inset:0;
+  width:auto;
+  height:auto;
   max-width:none;
   z-index:2147482900;
   display:none;
