@@ -98,9 +98,10 @@ async function main() {
     clientFactory: async () => ({ models: { generateContent: async (request) => new Promise((resolve, reject) => request.config.abortSignal.addEventListener("abort", () => reject(Object.assign(new Error("aborted"), { name: "AbortError" })), { once: true })) } })
   }), (error) => error.code === "GEMINI_TIMEOUT" && error.status === 504);
 
+  delete process.env.GEMINI_API_KEY;
+  await assert.rejects(() => generateGeminiReply({ settings: DEFAULT_SETTINGS, message: "Halo" }), (error) => error.code === "GEMINI_NOT_CONFIGURED" && error.status === 503);
   if (previousKey === undefined) delete process.env.GEMINI_API_KEY;
   else process.env.GEMINI_API_KEY = previousKey;
-  await assert.rejects(() => generateGeminiReply({ settings: DEFAULT_SETTINGS, message: "Halo" }), (error) => error.code === "GEMINI_NOT_CONFIGURED" && error.status === 503);
 
   console.log("Personal AI checks passed: secure Gemini backend, safe public config, admin controls, Markdown DOM rendering, rate limit, invalid-key and timeout handling.");
 }
