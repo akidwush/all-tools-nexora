@@ -14,18 +14,19 @@
   function compactNumber(value){return new Intl.NumberFormat("id-ID",{notation:Number(value)>=10000?"compact":"standard",maximumFractionDigits:1}).format(Number(value)||0);}
   function safeAccent(value){return /^#[0-9a-f]{6}$/i.test(String(value||""))?String(value):"#a855f7";}
   function toast(text,type="success"){const el=document.createElement("div");el.className=`toast ${type}`;el.textContent=text;$("#toastStack").appendChild(el);setTimeout(()=>el.remove(),3400);}
-  async function api(url,options={}){const response=await fetch(url,{cache:"no-store",credentials:"same-origin",...options});const data=await response.json().catch(()=>({}));if(response.status===401){location.replace("/admin/login");throw new Error("Sesi berakhir.");}if(!response.ok||data.ok===false)throw new Error(data.message||data.error||"Permintaan gagal.");return data;}
+  async function api(url,options={}){const controller=new AbortController();const external=options.signal;const abort=()=>controller.abort();if(external){if(external.aborted)controller.abort();else external.addEventListener("abort",abort,{once:true});}const timer=setTimeout(()=>controller.abort(),15000);try{const response=await fetch(url,{cache:"no-store",credentials:"same-origin",...options,signal:controller.signal});const data=await response.json().catch(()=>({}));if(response.status===401){location.replace("/admin/login");throw new Error("Sesi berakhir.");}if(!response.ok||data.ok===false)throw new Error(data.message||data.error||"Permintaan gagal.");return data;}catch(error){if(error?.name==="AbortError"&&!external?.aborted)throw new Error("Server dashboard melewati batas waktu. Coba lagi.");throw error;}finally{clearTimeout(timer);if(external)external.removeEventListener("abort",abort);}}
   function canEdit(){return Boolean(state.session?.permissions?.editTools);}
   function statusLabel(value){return ({new:"Baru",reviewing:"Ditinjau",resolved:"Selesai",rejected:"Ditolak"})[value]||value||"-";}
   function metricCard(icon,label,value,caption,tone){return `<article class="metric-card" style="--accent:${tone.bg};--accent-text:${tone.text}"><span class="metric-icon"><i class="${icon}"></i></span><span>${escapeHtml(label)}</span><strong>${escapeHtml(compactNumber(value))}</strong><small>${escapeHtml(caption)}</small></article>`;}
 
-  async function switchSection(section){
+  async function switchSection(section,updateRoute=true){
     closeAdminMore();
     state.activeSection=section;
     $$('[data-panel]').forEach(panel=>panel.classList.toggle("is-active",panel.dataset.panel===section));
     $$('[data-section]').forEach(button=>button.classList.toggle("is-active",button.dataset.section===section));
     const moreButton=$("[data-admin-more]");if(moreButton)moreButton.classList.toggle("is-active",["ai","socials","health","functional","visual","audit"].includes(section));
     $("#pageHeading").textContent=headings[section]||"Dashboard";
+    if(updateRoute){try{history.replaceState({nxAdminSection:section},"",section==="overview"?"/admin":"/admin#section-"+encodeURIComponent(section));}catch(_){}}
     if(section==="tools")renderTools();
     if(section==="socials")renderSocials();
     if(section==="developer")document.dispatchEvent(new CustomEvent("nexora:developer-section-open"));
@@ -169,8 +170,9 @@
       const session=await api("/api/admin/auth");if(!session.authenticated){location.replace("/admin/login");return;}state.session=session;renderSession();
       const [dashboard,tools,socials,analytics]=await Promise.all([api("/api/admin/dashboard"),api("/api/admin/tools"),api("/api/admin/socials").catch(()=>({data:[]})),api("/api/admin/analytics?days=7").catch(()=>({data:null}))]);
       state.dashboard=dashboard;state.tools=tools.data||[];state.socials=socials.data||[];state.analytics=analytics.data||null;
-      renderOverview();renderHealth();renderTools();renderSocials();if(state.analytics)renderAnalytics();bind();$("#adminApp").hidden=false;$("#adminLoader").hidden=true;refreshAdminHealth(true);
-    }catch(error){console.error(error);toast(error.message||"Dashboard gagal dimuat.","error");setTimeout(()=>location.replace("/admin/login"),1400);}
+      renderOverview();renderHealth();renderTools();renderSocials();if(state.analytics)renderAnalytics();bind();$("#adminApp").hidden=false;$("#adminLoader").hidden=true;const match=String(location.hash||"").match(/^#section-([a-z]+)$/);const initial=match&&headings[match[1]]?match[1]:"overview";await switchSection(initial,false);refreshAdminHealth(true);
+    }catch(error){console.error(error);const loader=$("#adminLoader");if(loader){loader.hidden=false;loader.innerHTML='<div class="admin-recovery"><i class="fa-solid fa-triangle-exclamation"></i><b>Dashboard belum dapat dimuat</b><p></p><button type="button">Coba Lagi</button><a href="/">Kembali ke website</a></div>';loader.querySelector("p").textContent=error.message||"Dashboard gagal dimuat.";loader.querySelector("button").addEventListener("click",()=>{loader.innerHTML='<span></span><p>Memuat ulang dashboard...</p>';boot();},{once:true});}}
   }
+  window.addEventListener("popstate",()=>{const match=String(location.hash||"").match(/^#section-([a-z]+)$/);switchSection(match&&headings[match[1]]?match[1]:"overview",false);});
   boot();
 })();

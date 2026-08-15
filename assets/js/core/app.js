@@ -1979,7 +1979,7 @@ document.addEventListener('keydown', function(e) {
 function renderInstagram(body) {
     const fmtNum = n => n >= 1e6 ? (n/1e6).toFixed(1)+'M' : n >= 1e3 ? (n/1e3).toFixed(1)+'K' : (n||0).toString();
     const fmtSz  = b => b >= 1e6 ? (b/1e6).toFixed(1)+' MB' : b >= 1e3 ? (b/1e3).toFixed(0)+' KB' : (b||0)+' B';
-    const dlT = (u, nm) => { recordDownload('Instagram', nm && nm.endsWith('.mp4') ? 'MP4' : 'JPG', u, nm, 'Instagram Media'); const a=document.createElement('a'); a.href=u; a.target='_blank'; a.download=nm; a.dataset.historyRecorded='1'; document.body.appendChild(a); a.click(); a.remove(); };
+    const dlT = (u, nm) => nxDownloadUrl(u, nm, { tool: 'Instagram', type: nm && nm.endsWith('.mp4') ? 'MP4' : 'JPG', title: 'Instagram Media' });
 
     body.innerHTML = `
         <h2><i class="fa-brands fa-instagram"></i> Instagram Downloader</h2>
@@ -2059,7 +2059,7 @@ function renderTiktok(body) {
     const fmtNum = n => n >= 1e6 ? (n/1e6).toFixed(1)+'M' : n >= 1e3 ? (n/1e3).toFixed(1)+'K' : (n||0).toString();
     const fmtSz  = b => b >= 1e6 ? (b/1e6).toFixed(1)+' MB' : b >= 1e3 ? (b/1e3).toFixed(0)+' KB' : (b||0)+' B';
     const fmtDur = s => { const m=Math.floor(s/60),ss=s%60; return m+'m '+(ss<10?'0':'')+ss+'s'; };
-    const dlTrigger = (u, n2) => { recordDownload('TikTok', n2 && n2.endsWith('.mp3') ? 'MP3' : (n2 && n2.endsWith('.jpg') ? 'JPG' : 'MP4'), u, n2, 'TikTok Media'); const a=document.createElement('a'); a.href=u; a.target='_blank'; a.download=n2; a.dataset.historyRecorded='1'; document.body.appendChild(a); a.click(); a.remove(); };
+    const dlTrigger = (u, n2) => nxDownloadUrl(u, n2, { tool: 'TikTok', type: n2 && n2.endsWith('.mp3') ? 'MP3' : (n2 && n2.endsWith('.jpg') ? 'JPG' : 'MP4'), title: 'TikTok Media' });
 
     body.innerHTML = `
         <h2><i class="fa-brands fa-tiktok"></i> TikTok Downloader</h2>
@@ -2381,7 +2381,7 @@ async function nxDownloadUrl(url, filename, meta) {
     const type = cleanName.split('.').pop().toUpperCase();
     const tool = (meta && meta.tool) || 'Tools';
     const declaredType = String((meta && meta.type) || type || 'FILE').toUpperCase();
-    const proxyDownload = ['instagram', 'terabox'].includes(String(tool).toLowerCase()) && /^https:\/\//i.test(String(url || ''));
+    const proxyDownload = ['instagram', 'terabox', 'tiktok'].includes(String(tool).toLowerCase()) && /^https:\/\//i.test(String(url || ''));
 
     if (!proxyDownload) {
         recordDownload(tool, declaredType, url, cleanName, (meta && meta.title) || cleanName);

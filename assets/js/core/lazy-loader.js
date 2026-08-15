@@ -53,7 +53,7 @@
   function absolute(url){ return new URL(url, document.baseURI).href; }
   function versioned(url){
     var separator = String(url).indexOf('?')===-1 ? '?' : '&';
-    var version = /(?:tiktok|download-pack|source-features)\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-dl2' : ASSET_VERSION;
+    var version = /(?:tiktok|download-pack|source-features)\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-hf5-dl3' : ASSET_VERSION;
     return String(url)+separator+'v='+encodeURIComponent(version);
   }
 
@@ -156,7 +156,16 @@
     try{
       await ensureModule(moduleName);
       var special=invokeSpecial(toolId,event);
-      if(special!==null) return special;
+      if(special!==null){
+        if(toolId==='tiktok'){
+          try{
+            var targetHash='#tool-'+encodeURIComponent(toolId);
+            if(location.hash===targetHash) history.replaceState({nxLazyTool:toolId},'',location.href);
+            else history.pushState({nxLazyTool:toolId},'',location.href.split('#')[0]+targetHash);
+          }catch(_routeError){}
+        }
+        return special;
+      }
       /* Selalu kembali ke dispatcher yang ditangkap sebelum lazy-loader.
          Memanggil window.showTool di sini dapat membuat rekursi bila modul stabilitas
          atau script lain membungkus dispatcher setelah halaman siap. */
@@ -177,6 +186,28 @@
   }
   window.showTool=lazyShowTool;
 
+  function routeToolId(){
+    var match=String(location.hash||'').match(/^#tool-([^/?#]+)$/);
+    if(!match)return '';
+    try{return decodeURIComponent(match[1]).trim().toLowerCase();}catch(_){return '';}
+  }
+
+  var restoringRoute=false;
+  async function restoreRoute(){
+    var toolId=routeToolId();
+    if(!toolId||restoringRoute)return false;
+    var registry=window.NexoraToolRegistry;
+    var known=Boolean(toolModules[toolId])||Boolean(registry&&typeof registry.get==='function'&&registry.get(toolId))||Boolean(window.NexoraToolCatalog&&window.NexoraToolCatalog.has(toolId));
+    if(!known)return false;
+    restoringRoute=true;
+    try{
+      var routeCard=Array.prototype.find.call(document.querySelectorAll('[data-tool-id]'),function(card){return String(card.getAttribute('data-tool-id')||'').toLowerCase()===toolId;})||null;
+      if(toolModules[toolId]) await openLazyTool(toolId,null,routeCard);
+      else if(typeof baseShowTool==='function') baseShowTool.call(window,toolId);
+      return true;
+    }finally{restoringRoute=false;}
+  }
+
   function intercept(event){
     var card=event.target && event.target.closest ? event.target.closest('.tools-card,.tool-card,.featured-card,[data-tool-id]') : null;
     var toolId=toolIdFromCard(card);
@@ -195,6 +226,17 @@
     event.preventDefault(); event.stopPropagation();
     openLazyTool(toolId,event,card);
   },true);
+
+  window.addEventListener('popstate',function(){
+    var toolId=routeToolId();
+    if(toolId) setTimeout(restoreRoute,0);
+    else if(typeof window.closeTiktokRoom==='function') window.closeTiktokRoom(false);
+  });
+  window.addEventListener('pageshow',function(event){
+    if(event.persisted) setTimeout(restoreRoute,0);
+  });
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){setTimeout(restoreRoute,0);},{once:true});
+  else setTimeout(restoreRoute,0);
 
   window.NexoraModules={
     ensure:ensureModule,

@@ -346,7 +346,7 @@
       '</div>';
     document.body.appendChild(overlay);
     content=document.getElementById('ttRoomContent');
-    document.getElementById('ttRoomBack').addEventListener('click', closeTiktokRoom);
+    document.getElementById('ttRoomBack').addEventListener('click', function(){ closeTiktokRoom(true); });
     document.dispatchEvent(new CustomEvent('nexora:tiktok-room-built',{detail:{overlay:overlay}}));
   }
 
@@ -366,8 +366,11 @@
     if(input) setTimeout(function(){ try{ input.focus(); }catch(e){} },180);
   }
 
-  function closeTiktokRoom(){
+  function closeTiktokRoom(useHistory){
     if(!overlay) return;
+    if(useHistory!==false && history.state && history.state.nxLazyTool==='tiktok' && /^#tool-tiktok$/.test(location.hash)){
+      try{ history.back(); return; }catch(_historyError){}
+    }
     if(typeof window.cleanupTiktokRuntime==='function') window.cleanupTiktokRuntime(overlay);
     overlay.classList.remove('on');
     setTimeout(function(){

@@ -36,19 +36,21 @@
       return;
     }
     setLoading(true);
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),15000);
     try{
       const response=await fetch("/api/admin/auth",{
         method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({email:email.value.trim(),password:password.value})
+        body:JSON.stringify({email:email.value.trim(),password:password.value}),signal:controller.signal
       });
       const data=await response.json().catch(()=>({}));
       if(!response.ok||!data.ok) throw new Error(data.message||"Login gagal.");
       setMessage("Login berhasil. Membuka dashboard...","success");
       location.replace("/admin");
     }catch(error){
-      setMessage(error.message||"Login gagal.","error");
+      setMessage(error&&error.name==="AbortError"?"Server login melewati batas waktu. Coba lagi.":(error.message||"Login gagal."),"error");
       setLoading(false);
-    }
+    }finally{clearTimeout(timer);}
   });
   sessionCheck();
 })();

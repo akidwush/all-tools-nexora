@@ -507,6 +507,7 @@
   var roomBody = null;
   var currentToolId = '';
   var restoreScrollY = 0;
+  var restoreBodyOverflow = '';
   var closeTimer = 0;
   var historyLock = false;
 
@@ -625,6 +626,7 @@ instagram:  {renderer:'renderInstagram',   category:'downloader', icon:'fa-brand
     room.classList.remove('is-visible');
     currentToolId = toolId;
     restoreScrollY = window.scrollY || window.pageYOffset || 0;
+    if(!room.classList.contains('is-open')) restoreBodyOverflow = document.body.style.overflow || '';
     closeLegacyViewer();
     applyMeta(meta);
     cleanupRoomBody();
@@ -650,7 +652,11 @@ instagram:  {renderer:'renderInstagram',   category:'downloader', icon:'fa-brand
 
     if(!history.state || history.state.nxUniversalTool !== toolId){
       historyLock = true;
-      try{ history.pushState({nxUniversalTool:toolId},'',location.href.split('#')[0]+'#tool-'+encodeURIComponent(toolId)); }catch(e){}
+      try{
+        var roomUrl=location.href.split('#')[0]+'#tool-'+encodeURIComponent(toolId);
+        if(location.hash==='#tool-'+encodeURIComponent(toolId)) history.replaceState({nxUniversalTool:toolId},'',roomUrl);
+        else history.pushState({nxUniversalTool:toolId},'',roomUrl);
+      }catch(e){}
       setTimeout(function(){ historyLock=false; },0);
     }
     return true;
@@ -665,7 +671,7 @@ instagram:  {renderer:'renderInstagram',   category:'downloader', icon:'fa-brand
     roomBody.innerHTML = '';
     currentToolId = '';
     document.body.classList.remove('nx-universal-room-open');
-    document.body.style.overflow = 'auto';
+    document.body.style.overflow = restoreBodyOverflow;
     try{ window.scrollTo(0,restoreScrollY); }catch(e){}
   }
 
@@ -693,6 +699,10 @@ instagram:  {renderer:'renderInstagram',   category:'downloader', icon:'fa-brand
 
   window.addEventListener('popstate',function(){
     if(historyLock) return;
+    var match=String(location.hash||'').match(/^#tool-([^/?#]+)$/);
+    var routeTool='';
+    try{routeTool=match?decodeURIComponent(match[1]):'';}catch(_error){routeTool='';}
+    if(room && room.classList.contains('is-open') && routeTool===currentToolId) return;
     if(room && room.classList.contains('is-open')) closeRoom(false);
   });
 

@@ -2,7 +2,7 @@
   "use strict";
   if(window.NexoraDownloader) return;
   var active=Object.create(null);
-  var hosts={terabox:["terabox.com","teraboxapp.com","1024tera.com","dubox.com","teraboxlink.com"],instagram:["instagram.com","instagr.am"],tiktok:["tiktok.com"],youtube:["youtube.com","youtu.be"],spotify:["spotify.com","spotify.link"]};
+  var hosts={terabox:["terabox.com","terabox.app","teraboxapp.com","1024tera.com","1024terabox.com","dubox.com","teraboxlink.com","freeterabox.com","terafileshare.com","4funbox.com","mirrobox.com","nephobox.com"],instagram:["instagram.com","instagr.am"],tiktok:["tiktok.com"],youtube:["youtube.com","youtu.be"],spotify:["spotify.com","spotify.link"]};
   function matchesHost(host,list){host=String(host||"").toLowerCase().replace(/\.$/,"");return list.some(function(suffix){return host===suffix||host.endsWith("."+suffix);});}
   function validate(provider,value){
     var parsed;try{parsed=new URL(String(value||"").trim());}catch(_){throw new Error("URL tidak valid.");}

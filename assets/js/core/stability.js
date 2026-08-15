@@ -7,6 +7,31 @@
   var lastAudit=null;
   var statusPromise=null;
 
+  function syncVisualViewport(){
+    var viewport=window.visualViewport;
+    var width=Math.ceil(viewport?viewport.width:window.innerWidth);
+    var height=Math.ceil(viewport?viewport.height:window.innerHeight);
+    var left=Math.max(0,Math.round(viewport?viewport.offsetLeft:0));
+    var top=Math.max(0,Math.round(viewport?viewport.offsetTop:0));
+    var root=document.documentElement.style;
+    root.setProperty("--nx-vv-width",width+"px");
+    root.setProperty("--nx-vv-height",height+"px");
+    root.setProperty("--nx-vv-left",left+"px");
+    root.setProperty("--nx-vv-top",top+"px");
+  }
+  var viewportFrame=0;
+  function scheduleViewportSync(){
+    if(viewportFrame)return;
+    viewportFrame=requestAnimationFrame(function(){viewportFrame=0;syncVisualViewport();});
+  }
+  syncVisualViewport();
+  window.addEventListener("resize",scheduleViewportSync,{passive:true});
+  window.addEventListener("orientationchange",scheduleViewportSync,{passive:true});
+  if(window.visualViewport){
+    window.visualViewport.addEventListener("resize",scheduleViewportSync,{passive:true});
+    window.visualViewport.addEventListener("scroll",scheduleViewportSync,{passive:true});
+  }
+
   function clean(value,max){return String(value==null?"":value).replace(/[\u0000-\u001f\u007f]/g," ").trim().slice(0,max||500);}
   function toolIdFromCard(card){
     if(!card) return "";
@@ -83,7 +108,7 @@
         if(badge.textContent!==badgeText) badge.textContent=badgeText;
         badge.setAttribute("aria-label","Status fitur: "+badgeText);
       }
-      if(status==="offline") card.setAttribute("aria-disabled","true"); else card.removeAttribute("aria-disabled");
+      card.removeAttribute("aria-disabled");
     });
   }
   async function loadHealth(force){
@@ -181,10 +206,7 @@
     var id=toolIdFromCard(card); if(!id) return;
     var meta=registry&&registry.get(id);
     var status=cardStatus(id);
-    if(status==="offline"){
-      event.preventDefault();event.stopPropagation();if(typeof event.stopImmediatePropagation==="function")event.stopImmediatePropagation();
-      notify((meta&&meta.name)||"Fitur sedang bermasalah","Dependensi fitur tidak dapat dijangkau. Coba lagi nanti atau cek status Health.","error");
-    }
+    if(status==="offline") notify((meta&&meta.name)||"Status provider belum pasti","Pemeriksaan terakhir gagal, tetapi fitur tetap dibuka agar dapat mencoba provider secara langsung.","warning");
   },true);
   document.addEventListener("nexora:tool-error",function(event){
     var detail=event.detail||{};

@@ -1596,6 +1596,17 @@ body{position:relative;min-height:100vh;min-height:100dvh;background-color:#0505
 #ttRoomOverlay .dl-media-grid{width:100%;grid-template-columns:repeat(2,minmax(0,1fr));}
 #ttRoomOverlay .dl-media-item img,
 #ttRoomOverlay .dl-media-item video{max-height:52svh;}
+
+/* v6.3.19 — Android pinch-zoom/orientation viewport recovery. */
+html,body{width:100%;max-width:100%;overflow-x:clip;background-color:#050509}
+body{min-height:max(100vh,var(--nx-vv-height,100dvh));background-repeat:no-repeat;background-size:100% 100%}
+.bg-glow{top:var(--nx-vv-top,0);left:var(--nx-vv-left,0);right:auto;bottom:auto;width:var(--nx-vv-width,100vw);height:var(--nx-vv-height,100dvh);min-width:100%;min-height:100%;transform:translateZ(0)}
+img,video,canvas,svg,iframe{max-inline-size:100%}
+#nxUniversalRoom,#ttRoomOverlay,#nxGetCodeOverlay,#deployOverlay,.nx-about-dev-room,.tool-viewer,.nx-health-dialog,.nse-modal{
+  top:var(--nx-vv-top,0)!important;left:var(--nx-vv-left,0)!important;right:auto!important;bottom:auto!important;
+  width:var(--nx-vv-width,100vw)!important;height:var(--nx-vv-height,100dvh)!important;max-width:none!important;max-height:none!important
+}
+@supports not (overflow:clip){html,body{overflow-x:hidden}}
 @media (max-width:380px){#ttRoomOverlay .dl-media-grid{grid-template-columns:minmax(0,1fr);}}
 
 /* Nexora HF3 — smooth interaction without permanent compositor layers. */
