@@ -38,7 +38,7 @@ const publicDatabase = fs.readFileSync(path.join(root, "lib/public-database.js")
 const socialLinksClient = fs.readFileSync(path.join(root, "assets/js/core/social-links.js"), "utf8");
 assert.equal(publicDatabase.includes("accent_color,is_active,sort_order"), true, "API publik harus mengirim is_active");
 assert.equal(socialLinksClient.includes("row.is_active === false"), true, "loader sosial harus menerima respons aktif yang tidak menyertakan is_active");
-assert.equal(index.includes('id="nxPublicWhatsApp"'), true, "CTA WhatsApp publik harus tersedia");
-assert.equal(index.match(/data-social-key="whatsapp_channel"/g).length >= 3, true, "Saluran WhatsApp harus terlihat di beberapa lokasi publik");
-assert.equal(index.match(/data-social-key="whatsapp_access"/g).length >= 2, true, "Akses WhatsApp harus memiliki tombol publik permanen");
-console.log("Nexora v6.2.1 tests lulus: data sosial tampil dan CTA WhatsApp publik tersedia.");
+assert.equal(index.includes('id="nxPublicWhatsApp"'), false, "CTA WhatsApp ganda di bawah hero harus dihapus");
+assert.equal((index.match(/data-social-key="whatsapp_channel"/g) || []).length >= 2, true, "Saluran WhatsApp harus tetap tersedia di menu dan notifikasi");
+assert.equal((index.match(/data-social-key="whatsapp_access"/g) || []).length >= 1, true, "Akses WhatsApp harus tetap tersedia di area akses tools");
+console.log("Nexora v6.2.1 tests lulus: data sosial tetap aktif tanpa kartu WhatsApp ganda di bawah hero.");

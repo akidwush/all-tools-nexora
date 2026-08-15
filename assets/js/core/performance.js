@@ -82,7 +82,9 @@
     reduced
   );
 
-  var heroMode=lowPower?"disabled":(mobileLike?"manual":"auto");
+  // The hero is a primary visual, not an optional mobile enhancement. Keep the
+  // same muted inline video eligible for autoplay on every device.
+  var heroMode="auto";
   document.documentElement.classList.add("nx-hero-video-"+heroMode);
   if(lowPower) document.documentElement.classList.add("nx-low-power");
 
@@ -129,8 +131,7 @@
     var loaded=false;
     var ready=false;
     var visible=false;
-    var manualPlaying=false;
-    var scrollLocked=false;
+    var autoplayRejected=false;
 
     function updateToggle(){
       if(!toggle)return;
@@ -152,7 +153,6 @@
 
     function pauseVideo(){
       if(!video.paused)video.pause();
-      manualPlaying=false;
       updateToggle();
     }
 
@@ -162,10 +162,16 @@
 
     function syncPlayback(){
       if(canAutoPlay()){
-        video.play().then(updateToggle).catch(updateToggle);
+        video.play().then(function(){
+          autoplayRejected=false;
+          if(toggle)toggle.hidden=true;
+          updateToggle();
+        }).catch(function(){
+          autoplayRejected=true;
+          if(toggle)toggle.hidden=false;
+          updateToggle();
+        });
       }else if(effectiveHeroMode==="auto"){
-        pauseVideo();
-      }else if(effectiveHeroMode==="manual"&&(!visible||document.hidden||scrollLocked)){
         pauseVideo();
       }
     }
@@ -189,18 +195,20 @@
     },{once:true});
 
     if(toggle){
-      toggle.hidden=false;
+      toggle.hidden=true;
       toggle.addEventListener("click",function(){
-        if(effectiveHeroMode!=="manual")return;
         ensureLoaded();
-        scrollLocked=false;
         if(!video.paused){
           pauseVideo();
           return;
         }
-        manualPlaying=true;
-        video.play().then(updateToggle).catch(function(){
-          manualPlaying=false;
+        video.play().then(function(){
+          autoplayRejected=false;
+          toggle.hidden=true;
+          updateToggle();
+        }).catch(function(){
+          autoplayRejected=true;
+          toggle.hidden=false;
           updateToggle();
         });
       });
@@ -224,20 +232,6 @@
     document.addEventListener("visibilitychange",syncPlayback);
     window.addEventListener("pagehide",pauseVideo);
 
-    if(effectiveHeroMode==="manual"){
-      var scrollTicking=false;
-      window.addEventListener("scroll",function(){
-        if(scrollTicking)return;
-        scrollTicking=true;
-        requestAnimationFrame(function(){
-          scrollTicking=false;
-          if(window.scrollY>24){
-            scrollLocked=true;
-            if(manualPlaying||!video.paused)pauseVideo();
-          }
-        });
-      },{passive:true});
-    }
   }
 
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",removeSplash,{once:true});

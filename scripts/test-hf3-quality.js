@@ -51,7 +51,7 @@ for (const token of ["public.app_settings", "heroVideo", "is_public = true", "no
 }
 
 assert(adminHtml.includes("dashboard.js?v=6.3.18-hf3"));
-assert(read("index.html").includes("performance.js?v=6.3.18-hf3"));
+assert(read("index.html").includes("performance.js?v=6.3.18-lr1"));
 assert(read("index.html").includes("app.js?v=6.3.18-hf3"));
 
 console.log("Nexora HF3 quality tests lulus: kalkulator CSP-safe, password Web Crypto, video hero admin, cache bust, dan migration valid.");

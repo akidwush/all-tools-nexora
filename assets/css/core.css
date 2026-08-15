@@ -1374,7 +1374,7 @@ body {
 .tab-content:not(.active){content-visibility:hidden}
 .tab-content.active{content-visibility:visible;contain-intrinsic-size:none}
 html.nx-low-power .bg-glow{animation:none;opacity:.72}
-html.nx-low-power .video-banner video{display:none}
+html.nx-low-power .video-banner video{display:block}
 html.nx-low-power .video-banner{min-height:150px}
 html.nx-low-power .splash-screen{animation-delay:.18s;animation-duration:.12s}
 html.nx-low-power .nx-ring:nth-child(n+3){display:none}
@@ -1382,7 +1382,7 @@ html.nx-low-power *{scroll-behavior:auto!important}
 @media (max-width:768px){
   .bg-glow{animation:none;opacity:.76}
   .video-banner{width:100%;min-height:148px;max-height:190px;border-radius:0 0 20px 20px}
-  .video-banner video{display:none}
+  .video-banner video{display:block}
   .container{padding-top:8px}
   .user-card,.nx-health-summary,.nx-public-wa-card,.tools-card,.nav-tabs,.nx-top-menu-panel{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
   .tools-card{box-shadow:0 8px 24px rgba(0,0,0,.18)}
@@ -1440,8 +1440,7 @@ html.nx-low-power *{scroll-behavior:auto!important}
     display:block!important;
     object-fit:cover;
   }
-  html.nx-hero-video-disabled .video-banner video,
-  html.nx-low-power .video-banner video{display:none!important}
+  html.nx-hero-video-disabled .video-banner video{display:none!important}
 }
 
 /* v6.3.5 — stable public scrolling on touch devices */
@@ -1482,6 +1481,17 @@ html.nx-hero-video-disabled .nx-hero-video-toggle{display:none!important}
   .video-banner video{will-change:auto!important}
   .nx-hero-video-toggle{display:flex}
 }
+
+/* ===== Liquid Reactor foundation — public catalog only ===== */
+:root{--nx-ink:#07070b;--nx-graphite:#101016;--nx-panel:#14131c;--nx-panel-raised:#1a1824;--nx-violet:#8b5cf6;--nx-plasma:#b58cff;--nx-cyan:#b9f5ff;--nx-text:#f1eff7;--nx-muted:#b6b0c4;--nx-faint:#817a91;--nx-line:rgba(218,211,240,.14);--nx-line-strong:rgba(204,184,255,.26);--nx-radius-sm:12px;--nx-radius-md:18px;--nx-radius-lg:26px;--nx-shadow:0 18px 46px rgba(0,0,0,.28);--nx-shadow-lift:0 24px 54px rgba(0,0,0,.38);--nx-space-1:8px;--nx-space-2:12px;--nx-space-3:18px;--nx-space-4:26px;--nx-transition:180ms cubic-bezier(.2,.7,.2,1)}
+body{background:var(--nx-ink);color:var(--nx-text)}
+.bg-glow{background:none;animation:none;overflow:hidden;opacity:1}.bg-glow::before,.bg-glow::after{content:"";position:absolute;pointer-events:none;opacity:.7}.bg-glow::before{width:min(74vw,980px);height:440px;right:-18vw;top:160px;background:radial-gradient(ellipse at 38% 42%,rgba(139,92,246,.13),transparent 61%);clip-path:polygon(0 22%,42% 0,100% 16%,78% 58%,36% 100%,4% 72%);animation:nxMembraneDrift 30s ease-in-out infinite alternate}.bg-glow::after{width:min(62vw,760px);height:360px;left:-24vw;bottom:7vh;background:radial-gradient(ellipse at 64% 48%,rgba(185,245,255,.055),transparent 65%);clip-path:polygon(4% 17%,68% 0,100% 38%,85% 83%,31% 100%,0 61%);animation:nxMembraneDrift 36s ease-in-out -12s infinite alternate-reverse}@keyframes nxMembraneDrift{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(3vw,-2vh,0) scale(1.06)}}
+.video-banner{width:min(calc(100% - 32px),1180px);min-height:clamp(210px,34vw,430px);max-height:none;margin:0 auto;border:1px solid var(--nx-line-strong);border-top-color:rgba(235,229,255,.38);border-radius:0 0 var(--nx-radius-lg) var(--nx-radius-lg);background:#0b0a10;box-shadow:var(--nx-shadow)}.video-banner video{display:block!important;object-fit:cover}.video-overlay{padding:22px 28px 20px;background:linear-gradient(180deg,rgba(7,7,11,.02) 20%,rgba(7,7,11,.18) 54%,rgba(7,7,11,.72) 100%)}.video-overlay h1{color:var(--nx-text);background:none;-webkit-text-fill-color:currentColor;font-size:clamp(1.25rem,3vw,2.35rem);line-height:1.1;text-shadow:none;letter-spacing:.035em}.video-overlay h1 span{margin-top:7px;color:var(--nx-cyan);font-size:.34em;font-weight:700;letter-spacing:.18em;opacity:.78}.nx-hero-video-toggle{width:38px;height:38px;right:16px;bottom:16px;border-color:var(--nx-line-strong);border-radius:12px;background:rgba(12,12,17,.86)}
+.container{max-width:1200px;padding:var(--nx-space-3) 16px 52px}#userCard{margin:0 0 var(--nx-space-3)!important}.user-card{padding:15px 18px;border:1px solid var(--nx-line);border-top-color:rgba(236,232,246,.18);border-radius:var(--nx-radius-md);background:var(--nx-panel);box-shadow:var(--nx-shadow);backdrop-filter:none}.user-avatar{width:44px;height:44px;border-radius:14px;background:#262039;color:var(--nx-cyan);box-shadow:none}.user-info{gap:8px 18px}.user-info .item{min-height:28px;color:var(--nx-muted);font-size:12px}.user-info .item .label{color:var(--nx-faint);font-size:9px;font-weight:700}.user-info .item .value{color:var(--nx-text);font-weight:600}.user-info .item i{color:var(--nx-plasma)}
+#navTabs{margin:0 0 var(--nx-space-4)!important;padding:0 0 12px!important;border-bottom-color:var(--nx-line);scroll-padding-inline:4px}.nav-tabs{gap:9px}.nav-tab{min-height:44px;padding:10px 16px;border-color:var(--nx-line);border-radius:var(--nx-radius-sm);background:#111018;color:var(--nx-muted);font-size:12px;font-weight:700;transition:transform var(--nx-transition),border-color var(--nx-transition),background var(--nx-transition),color var(--nx-transition)}.nav-tab:hover{transform:translateY(-1px);border-color:var(--nx-line-strong);background:#1a1824;color:var(--nx-text)}.nav-tab.active{border-color:rgba(185,245,255,.42);background:#28213b;color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.14)}
+.section-title{margin-bottom:14px;color:var(--nx-muted);font-size:12px;letter-spacing:.13em}.section-title .line{background:linear-gradient(90deg,var(--nx-line-strong),transparent 72%)}.tools-grid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}.tools-card{min-height:152px;padding:18px 15px 14px;border:1px solid var(--nx-line);border-top-color:rgba(236,232,246,.21);border-radius:var(--nx-radius-md);background:var(--nx-panel);box-shadow:0 10px 28px rgba(0,0,0,.18);color:var(--nx-text);gap:9px}.tools-card::before{content:"";position:absolute;z-index:-1;top:0;left:0;width:58%;height:1px;background:linear-gradient(90deg,rgba(185,245,255,.62),rgba(181,140,255,.2),transparent)}.tools-card:hover{transform:translateY(-3px);border-color:var(--nx-line-strong);background:var(--nx-panel-raised);box-shadow:var(--nx-shadow-lift)}.tools-card .icon{color:var(--nx-plasma);font-size:26px}.tools-card:hover .icon{color:var(--nx-cyan);transform:none}.tools-card h4{color:var(--nx-text);font-size:12px;font-weight:700}.tools-card p{color:var(--nx-muted);font-size:10px;line-height:1.45}.tools-card .arrow{color:var(--nx-faint)}.badge{padding:3px 8px;border:1px solid rgba(181,140,255,.22);background:#211b30;color:#d9c6ff;font-size:8px;font-weight:700}.nx-card-readiness{min-height:22px;border-color:rgba(226,232,240,.22);background:#17151e;color:#d9d4e3;font-size:7px}.tools-card[data-nx-tool-status="ready"] .nx-card-readiness{border-color:rgba(74,222,128,.48);background:#10251d;color:#a7f3d0}.tools-card[data-nx-tool-status="degraded"] .nx-card-readiness,.tools-card[data-nx-tool-status="restricted"] .nx-card-readiness{border-color:rgba(251,191,36,.52);background:#2b210d;color:#fde68a}
+@media (max-width:768px){.video-banner{width:100%;min-height:clamp(188px,53vw,300px);border-radius:0 0 20px 20px}.video-overlay{padding:16px}.container{padding-top:14px}.user-card{padding:14px;gap:12px}.nav-tab{min-height:44px;padding-inline:14px}.tools-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}.tools-card{min-height:128px!important;padding:15px 10px 12px!important;border-radius:15px!important}.tools-card .icon{font-size:22px!important}.tools-card p{font-size:9px!important}}
+@media (max-width:390px){.container{padding-inline:12px}.video-overlay h1{font-size:1.14rem}.user-info{gap:5px 10px}.tools-grid{gap:8px!important}.tools-card{min-height:122px!important;padding-inline:8px!important}}@media (prefers-reduced-motion:reduce){.bg-glow::before,.bg-glow::after{animation:none}}
 
 /* Nexora v6.3.8 — always-on TikTok media containment.  The TikTok feature
    stylesheet is lazy-loaded; these low-cost guards keep a stale/missing
