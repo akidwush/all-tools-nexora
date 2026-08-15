@@ -53,7 +53,7 @@
   function absolute(url){ return new URL(url, document.baseURI).href; }
   function versioned(url){
     var separator = String(url).indexOf('?')===-1 ? '?' : '&';
-    var version = /(?:tiktok|download-pack|source-features)\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-dl1' : ASSET_VERSION;
+    var version = /(?:tiktok|download-pack|source-features)\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-dl2' : ASSET_VERSION;
     return String(url)+separator+'v='+encodeURIComponent(version);
   }
 

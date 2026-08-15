@@ -25,8 +25,7 @@
 
   function downloadUrl(url,filename,meta){
     if(typeof nxDownloadUrl === "function"){
-      nxDownloadUrl(url,filename,meta);
-      return;
+      return nxDownloadUrl(url,filename,meta);
     }
 
     const anchor = document.createElement("a");
@@ -37,6 +36,7 @@
     document.body.appendChild(anchor);
     anchor.click();
     anchor.remove();
+    return Promise.resolve(true);
   }
 
   function setSourceStatus(id,message,type){
@@ -281,20 +281,33 @@
 
           item
             .querySelector("button")
-            .addEventListener("click",() => {
+            .addEventListener("click",async event => {
               const fallbackName =
                 "terabox_file_" +
                 (index + 1);
 
-              downloadUrl(
-                file.downloadUrl,
-                file.name || fallbackName,
-                {
-                  tool:"Terabox",
-                  type:"FILE",
-                  title:file.name || fallbackName
-                }
-              );
+              const downloadButton = event.currentTarget;
+              const previousHtml = downloadButton.innerHTML;
+              downloadButton.disabled = true;
+              downloadButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+              setSourceStatus("nxTbStatus","Memvalidasi file melalui server download aman...","");
+              try{
+                await downloadUrl(
+                  file.downloadUrl,
+                  file.name || fallbackName,
+                  {
+                    tool:"Terabox",
+                    type:"FILE",
+                    title:file.name || fallbackName
+                  }
+                );
+                setSourceStatus("nxTbStatus","File tervalidasi dan download sedang dimulai.","success");
+              }catch(error){
+                setSourceStatus("nxTbStatus","Download gagal: "+(error && error.message ? error.message : "server tidak dapat menjangkau file"),"error");
+              }finally{
+                downloadButton.disabled = false;
+                downloadButton.innerHTML = previousHtml;
+              }
             });
 
           listNode.appendChild(item);

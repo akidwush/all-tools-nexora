@@ -17,6 +17,8 @@ function jsonResponse(payload, status = 200, headers = {}) {
 
 async function main() {
   assert.match(validateProviderUrl("terabox", "https://www.terabox.com/s/abc"), /terabox\.com/);
+  assert.match(validateProviderUrl("terabox", "https://terabox.app/s/abc"), /terabox\.app/);
+  assert.match(validateProviderUrl("terabox", "https://www.1024terabox.com/s/abc"), /1024terabox\.com/);
   assert.match(validateProviderUrl("instagram", "https://instagr.am/p/abc"), /instagr\.am/);
   assert.match(validateProviderUrl("tiktok", "https://vm.tiktok.com/abc"), /vm\.tiktok\.com/);
   assert.match(validateProviderUrl("youtube", "https://youtu.be/abc"), /youtu\.be/);

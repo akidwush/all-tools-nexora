@@ -2352,18 +2352,60 @@ function nxCanvasDownload(canvas, filename) {
     a.remove();
 }
 
-function nxDownloadUrl(url, filename, meta) {
-    const cleanName = filename || 'download';
-    const type = cleanName.split('.').pop().toUpperCase();
-    recordDownload((meta && meta.tool) || 'Tools', (meta && meta.type) || type || 'File', url, cleanName, (meta && meta.title) || cleanName);
+function nxTriggerDownload(url, filename, markHistory, openInNewTab) {
     const a = document.createElement('a');
     a.href = url;
-    a.target = '_blank';
-    a.download = cleanName;
-    a.dataset.historyRecorded = '1';
+    a.download = filename;
+    a.style.display = 'none';
+    if (openInNewTab) {
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+    }
+    if (markHistory) a.dataset.historyRecorded = '1';
     document.body.appendChild(a);
     a.click();
-    a.remove();
+    setTimeout(() => { try { a.remove(); } catch (_) {} }, 1000);
+}
+
+function nxMediaDownloadEndpoint(url, filename, type, probe) {
+    const params = new URLSearchParams();
+    params.set('url', url);
+    params.set('filename', filename);
+    params.set('type', type);
+    if (probe) params.set('probe', '1');
+    return '/api/media-download?' + params.toString();
+}
+
+async function nxDownloadUrl(url, filename, meta) {
+    const cleanName = filename || 'download';
+    const type = cleanName.split('.').pop().toUpperCase();
+    const tool = (meta && meta.tool) || 'Tools';
+    const declaredType = String((meta && meta.type) || type || 'FILE').toUpperCase();
+    const proxyDownload = ['instagram', 'terabox'].includes(String(tool).toLowerCase()) && /^https:\/\//i.test(String(url || ''));
+
+    if (!proxyDownload) {
+        recordDownload(tool, declaredType, url, cleanName, (meta && meta.title) || cleanName);
+        nxTriggerDownload(url, cleanName, true, true);
+        return true;
+    }
+
+    const probeUrl = nxMediaDownloadEndpoint(url, cleanName, declaredType, true);
+    const streamUrl = nxMediaDownloadEndpoint(url, cleanName, declaredType, false);
+    const request = window.NexoraFetch || window.fetch.bind(window);
+    const response = await request(probeUrl, {
+        cache: 'no-store',
+        credentials: 'same-origin',
+        nexoraTimeoutMs: 24000,
+        nexoraRetries: 0
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok || !payload.ok || !payload.ready) {
+        throw new Error(payload.message || ('Server download merespons HTTP ' + response.status));
+    }
+
+    nxTriggerDownload(streamUrl, payload.filename || cleanName, true, false);
+    recordDownload(tool, declaredType, url, payload.filename || cleanName, (meta && meta.title) || cleanName);
+    return true;
 }
 
 function nxShowCanvas(targetId, canvas, filename) {

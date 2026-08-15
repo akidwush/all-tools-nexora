@@ -4,6 +4,7 @@
   function trigger(url,filename,meta){
     if(typeof window.nxDownloadUrl==="function")return window.nxDownloadUrl(url,filename,meta);
     var link=document.createElement("a");link.href=url;link.target="_blank";link.rel="noopener noreferrer";link.download=filename;document.body.appendChild(link);link.click();link.remove();
+    return Promise.resolve(true);
   }
   function errorHtml(message){return '<div class="dl-error" role="alert"><i class="fas fa-triangle-exclamation"></i><br><br>'+esc(message)+'</div>';}
   function bindRun(input,button,run){button.addEventListener("click",run);input.addEventListener("keydown",function(event){if(event.key==="Enter"){event.preventDefault();run();}});}
@@ -20,8 +21,17 @@
         target.innerHTML=(data.thumbnail?'<img class="nx-downloader-preview" src="'+esc(data.thumbnail)+'" alt="Preview Instagram">':'')+
           '<div class="dl-title">'+esc(data.title||"Instagram Media")+'</div>'+(data.author?'<div class="dl-author-name">@'+esc(data.author)+'</div>':'')+
           (data.caption?'<div class="dl-caption"><div class="dl-caption-label">Caption</div><div class="dl-caption-text">'+esc(data.caption)+'</div></div>':'')+
-          '<div class="dl-section-label"><i class="fas fa-download"></i> Format tersedia</div><div class="dl-options">'+media.map(function(item,index){return '<div class="dl-option"><div class="dl-option-info"><div class="dl-option-icon '+(item.type==="MP4"?"mp4":"std")+'"><i class="fas fa-'+(item.type==="MP4"?"video":"image")+'"></i></div><div><div class="dl-option-title">'+esc(item.type)+" "+(media.length>1?"#"+(index+1):"")+'</div><div class="dl-option-desc">'+esc(item.quality||"Media publik")+'</div></div></div><button class="dl-dl-btn" type="button" data-media="'+index+'">Simpan</button></div>';}).join("")+'</div>';
-        target.querySelectorAll("[data-media]").forEach(function(node){node.addEventListener("click",function(){var item=media[Number(node.dataset.media)];trigger(item.url,item.filename,{tool:"Instagram",type:item.type,title:data.title});});});
+          '<div class="dl-section-label"><i class="fas fa-download"></i> Format tersedia</div><div class="dl-options">'+media.map(function(item,index){return '<div class="dl-option"><div class="dl-option-info"><div class="dl-option-icon '+(item.type==="MP4"?"mp4":"std")+'"><i class="fas fa-'+(item.type==="MP4"?"video":"image")+'"></i></div><div><div class="dl-option-title">'+esc(item.type)+" "+(media.length>1?"#"+(index+1):"")+'</div><div class="dl-option-desc">'+esc(item.quality||"Media publik")+'</div></div></div><button class="dl-dl-btn" type="button" data-media="'+index+'">Simpan</button></div>';}).join("")+'</div><p class="nx-capability-notice" data-download-status hidden></p>';
+        target.querySelectorAll("[data-media]").forEach(function(node){node.addEventListener("click",async function(){
+          var item=media[Number(node.dataset.media)],status=target.querySelector("[data-download-status]"),old=node.innerHTML;
+          node.disabled=true;node.innerHTML='<i class="fas fa-spinner fa-spin"></i> Memeriksa';
+          if(status){status.hidden=false;status.textContent="Memvalidasi file melalui server download aman...";}
+          try{
+            await trigger(item.url,item.filename,{tool:"Instagram",type:item.type,title:data.title});
+            if(status)status.textContent="Download tervalidasi dan sedang dimulai.";
+          }catch(error){if(status)status.textContent="Download gagal: "+(error&&error.message?error.message:"server tidak dapat menjangkau file");}
+          finally{node.disabled=false;node.innerHTML=old;}
+        });});
       }catch(error){if(error&&error.name!=="AbortError")target.innerHTML=errorHtml(error.message||"Instagram gagal diproses.");}
       finally{button.disabled=false;button.innerHTML='<i class="fas fa-download"></i> Ambil Media';}
     }
