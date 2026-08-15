@@ -150,6 +150,7 @@ async function main() {
   for (const token of ["renderSpaceExplorer", "/api/space-explorer", "drawRadar", "Mars Rover Photos API yang sudah diarsipkan", "body.__nxCleanup"]) assert.ok(ui.includes(token));
   assert.ok(!ui.includes("NASA_API_KEY"));
   assert.ok(!ui.includes("DEMO_KEY"));
+  assert.match(ui, /function closeModal\(\)\{[\s\S]*?document\.body\.style\.overflow='';\}/, "menutup modal harus membuka kembali scroll halaman");
   const css = read("assets/css/features/space-explorer.css");
   for (const token of ["nse-orbit-scene", "nse-radar-layout", "@media(max-width:430px)", "prefers-reduced-motion"]) assert.ok(css.includes(token));
   assert.ok(read("database/migrations/010_nasa_space_explorer.sql").includes("on conflict (id) do update"));

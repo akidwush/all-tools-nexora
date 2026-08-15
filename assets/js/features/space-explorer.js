@@ -125,7 +125,7 @@
       if(item.detailsUrl){var link=create('a','nse-source-link','Buka detail resmi NASA');link.href=item.detailsUrl;link.target='_blank';link.rel='noopener noreferrer';modalCopy.appendChild(link);}
       modal.hidden=false;requestAnimationFrame(function(){modal.classList.add('is-open');});document.body.style.overflow='hidden';
     }
-    function closeModal(){modal.classList.remove('is-open');setTimeout(function(){modal.hidden=true;modalMedia.innerHTML='';modalCopy.innerHTML='';},180);document.body.style.overflow='hidden';}
+    function closeModal(){modal.classList.remove('is-open');setTimeout(function(){modal.hidden=true;modalMedia.innerHTML='';modalCopy.innerHTML='';},180);document.body.style.overflow='';}
     function renderApod(data){
       stage.innerHTML='';stage.appendChild(providerBar(data));
       var head=sectionHead('ASTRONOMY PICTURE OF THE DAY','Jendela semesta hari ini','Satu observasi pilihan NASA, lengkap dengan cerita ilmiah di baliknya.');
