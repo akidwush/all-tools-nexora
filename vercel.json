@@ -62,6 +62,10 @@
       "destination": "/api/tool-health?mode=media-download"
     },
     {
+      "source": "/api/downloader",
+      "destination": "/api/tool-health?mode=downloader"
+    },
+    {
       "source": "/api/sitegrabber",
       "destination": "/api/tool-health?mode=sitegrabber"
     },

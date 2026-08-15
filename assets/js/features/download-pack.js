@@ -219,57 +219,18 @@
       clearSourceStatus("nxTbStatus");
 
       try{
-        const endpoint =
-          "https://api.nexray.eu.cc/downloader/terabox?url=" +
-          encodeURIComponent(url);
-
-        const response = await window.NexoraFetch(endpoint,{
-          method:"GET",
-          headers:{
-            "Accept":"application/json,text/plain,*/*"
-          }
-        });
-
-        if(!response.ok){
-          throw new Error(
-            "Server API bermasalah (HTTP " +
-            response.status +
-            ")."
-          );
-        }
-
-        const data = await response.json();
-
-        if(
-          data &&
-          (
-            data.success === false ||
-            data.status === false
-          )
-        ){
-          throw new Error(
-            data.message ||
-            "File tidak ditemukan atau link tidak valid."
-          );
-        }
-
-        const files =
-          normalizeTeraboxFiles(data);
+        const response = await window.NexoraDownloader.request("terabox",url);
+        const files = (response.data.media || []).map(item => ({
+          name:item.filename,
+          sizeFormatted:item.size,
+          downloadUrl:item.url,
+          thumb:item.thumbnail,
+          duration:item.duration,
+          quality:item.quality
+        }));
 
         if(!files.length){
-          const raw = esc(
-            JSON.stringify(data,null,2)
-          );
-
-          listNode.innerHTML = `
-            <details class="nx-source-status show error">
-              <summary>Format file tidak ditemukan — lihat respons API</summary>
-              <pre style="white-space:pre-wrap;word-break:break-all;max-height:240px;overflow:auto;margin-top:8px;">${raw}</pre>
-            </details>
-          `;
-
           throw new Error(
-            data.message ||
             "File tidak ditemukan pada respons server."
           );
         }
@@ -339,6 +300,7 @@
           listNode.appendChild(item);
         });
       }catch(error){
+        if(error && error.name === "AbortError") return;
         setSourceStatus(
           "nxTbStatus",
           "Gagal mengambil file: " +

@@ -198,14 +198,8 @@
       target.className='';
       target.innerHTML='<div class="tt-panel"><div class="dl-loading"><div class="dl-spin"></div><p>Mengambil data dan membuat preview...</p></div></div>';
       try{
-        var tikApi='https://www.tikwm.com/api/?url='+encodeURIComponent(url)+'&hd=1';
-        var tikBackup='https://tikwm.com/api/?url='+encodeURIComponent(url)+'&hd=1';
-        var fetched=await window.nxFetchJsonWithBackup(
-          'tikwm',
-          window.nxBackupSources('TikWM', tikApi, [{name:'TikWM Backup',url:tikBackup}]),
-          requestController ? {signal:requestController.signal} : undefined
-        );
-        var json=fetched.data;
+        var fetched=await window.NexoraDownloader.request('tiktok',url,requestController ? {signal:requestController.signal} : undefined);
+        var json=window.NexoraDownloader.legacyTikTok(fetched);
         var d=json && json.data;
         if(!d) throw new Error('Data TikTok tidak ditemukan');
         var caption=d.title||'';

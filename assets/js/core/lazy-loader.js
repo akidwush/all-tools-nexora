@@ -29,7 +29,7 @@
     sertifikat:'source-features',fakedev:'source-features',
     promptgenerate:'imported-tools',fakeovo:'imported-tools',quotegenerator:'imported-tools',carifakta:'imported-tools',mltools:'imported-tools',
     iqc:'generator-pack',winquotes:'generator-pack',nokiamsg:'generator-pack',
-    terabox:'download-pack',fakebankjago:'download-pack',spotify:'download-pack',
+    terabox:'download-pack',fakebankjago:'download-pack',
     unbanwa:'unban-whatsapp',vdeploy:'deploy-center',webencryption:'web-encryption'
   };
 
@@ -53,7 +53,8 @@
   function absolute(url){ return new URL(url, document.baseURI).href; }
   function versioned(url){
     var separator = String(url).indexOf('?')===-1 ? '?' : '&';
-    return String(url)+separator+'v='+encodeURIComponent(ASSET_VERSION);
+    var version = /(?:tiktok|download-pack|source-features)\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-dl1' : ASSET_VERSION;
+    return String(url)+separator+'v='+encodeURIComponent(version);
   }
 
   function loadStyle(url){

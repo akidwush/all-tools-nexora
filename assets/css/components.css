@@ -1646,3 +1646,14 @@ html.nx-low-power .nx-wa-notif-glow,html.nx-low-power .nx-public-wa-icon,html.nx
   #nx-wa-notif::before,#nx-wa-notif::after{animation:none!important}
   #nx-wa-notif-icon,#nx-wa-notif-badge-dot{animation:none!important;box-shadow:none!important}
 }
+/* Downloader request states and official-provider capability cards. */
+.nx-downloader-lead{margin:0 0 14px;color:var(--nx-text-muted,#aaa0bd);font-size:.875rem;line-height:1.65}
+.nx-downloader-preview{display:block;width:100%;max-height:300px;margin:14px 0;object-fit:cover;border:1px solid rgba(255,255,255,.1);border-radius:14px;background:#09080d}
+.nx-official-result{display:grid;grid-template-columns:minmax(0,180px) minmax(0,1fr);gap:16px;align-items:start;margin-top:16px;padding:16px;border:1px solid rgba(255,255,255,.1);border-radius:16px;background:#111016;overflow:hidden}
+.nx-official-result .nx-downloader-preview{margin:0;aspect-ratio:16/9;max-height:none}
+.nx-capability-notice{display:flex;gap:9px;align-items:flex-start;margin:12px 0;color:#c7bed5;font-size:.82rem;line-height:1.55}
+.nx-capability-notice i{margin-top:3px;color:#9eeeff}
+.nx-official-link{display:inline-flex!important;width:auto!important;min-height:44px;margin-top:4px;text-decoration:none}
+#instaBtn,#ytFetchBtn,#spBtn,[data-official-button],#nxTbFetch,#ttBtn{min-height:44px;margin-top:8px}
+#instaResult,#ytResult,#spResult,[data-official-result]{min-width:0;overflow-wrap:anywhere}
+@media(max-width:560px){.nx-official-result{grid-template-columns:minmax(0,1fr);padding:13px}.nx-official-result .nx-downloader-preview{max-height:220px}.dl-option{min-width:0}.dl-option-info{min-width:0}.dl-option-title,.dl-option-desc{overflow-wrap:anywhere}.dl-dl-btn,.nx-cloud-download{min-width:44px;min-height:44px}}

@@ -196,12 +196,12 @@ getUserInfo();
 const apiStatusChecks = [
     {
         id:'tikwm', name:'TikWM',
-        hosts:['tikwm.com','www.tikwm.com'], tools:['tiktok']
+        hosts:['tikwm.com','www.tikwm.com'], tools:[]
     },
     {
         id:'nexray', name:'NexRay',
         hosts:['api.nexray.eu.cc'],
-        tools:['instagram','youtube','iqc','fakedana','fakelobby','terabox','fakebankjago']
+        tools:['iqc','fakedana','fakelobby','fakebankjago']
     },
     {
         id:'siputzx', name:'Siputzx',
@@ -209,7 +209,7 @@ const apiStatusChecks = [
     },
     {
         id:'ikyyxd', name:'IkyyXD',
-        hosts:['api.ikyyxd.my.id'], tools:['spotify','fakedev']
+        hosts:['api.ikyyxd.my.id'], tools:['fakedev']
     },
     {
         id:'nanzz', name:'Nanzz',
@@ -1476,7 +1476,7 @@ function renderDownloadHistory() {
         btn.classList.toggle('active', btn.dataset.historyFilter === downloadHistoryFilter);
     });
     if (!filtered.length) {
-        host.innerHTML = `<div class="history-empty">${list.length ? 'Tidak ada history untuk filter ini.' : 'Belum ada riwayat. Download dari TikTok/YouTube/Spotify nanti muncul di sini.'}</div>`;
+        host.innerHTML = `<div class="history-empty">${list.length ? 'Tidak ada history untuk filter ini.' : 'Belum ada riwayat. Download berhasil dari Terabox, Instagram, atau TikTok akan muncul di sini.'}</div>`;
         return;
     }
     host.innerHTML = filtered.slice(0, 12).map(item => {
@@ -1562,8 +1562,8 @@ let toolsData = {
         
         { id: 'terabox', icon: 'fa-solid fa-box-open', name: 'Terabox Downloader', desc: 'Ambil file dari link share Terabox', badge: 'FILE' },{ id: 'instagram', icon: 'fa-brands fa-instagram', name: 'Instagram', desc: 'Download video & foto', badge: 'HD' },
         { id: 'tiktok', icon: 'fa-brands fa-tiktok', name: 'TikTok', desc: 'Video, foto & audio', badge: 'MP4/MP3/JPG' },
-        { id: 'youtube', icon: 'fa-brands fa-youtube', name: 'YouTube', desc: 'Video & audio', badge: 'MP4/MP3' },
-        { id: 'spotify', icon: 'fa-brands fa-spotify', name: 'Spotify Downloader', desc: 'Cari lagu, preview audio dan unduh Spotify ke MP3', badge: 'MP3' }
+        { id: 'youtube', icon: 'fa-brands fa-youtube', name: 'YouTube Metadata', desc: 'Metadata dan tautan resmi YouTube', badge: 'RESMI' },
+        { id: 'spotify', icon: 'fa-brands fa-spotify', name: 'Spotify Metadata', desc: 'Metadata dan tautan resmi Spotify', badge: 'RESMI' }
     ],
     maker: [{ id: 'fakebankjago', icon: 'fa-solid fa-building-columns', name: 'Fake Bank Jago', desc: 'Generator visual saldo Bank Jago', badge: 'SIMULASI' },{ id: 'brat', icon: 'fa-solid fa-wand-magic-sparkles', name: 'BRAT Generator', desc: 'Static + animated GIF', badge: 'GIF' },
         { id: 'iqc', icon: 'fa-solid fa-image', name: 'IQC Generator', desc: 'Buat gambar IQC — Operator, Image & Dark', badge: '3 STYLE' },
@@ -1997,24 +1997,22 @@ function renderInstagram(body) {
         btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengambil...';
         target.innerHTML = `<div class="dl-loading"><div class="dl-spin"></div><p>Mengambil info media...</p></div>`;
         try {
-            const instaApi = 'https://api.nexray.eu.cc/downloader/instagram?url=' + encodeURIComponent(url);
-            const { data } = await nxFetchJsonWithBackup('nexray', nxBackupSources('Nexray', instaApi));
-            const raw = data.result || data.data || [];
-            const mediaList = Array.isArray(raw) ? raw : (raw ? [raw] : []);
-            const validMedia = mediaList.filter(m => m && (m.url || m.video || m.image));
+            const response = await window.NexoraDownloader.request('instagram', url);
+            const data = response.data;
+            const validMedia = Array.isArray(data.media) ? data.media.filter(m => m && m.url) : [];
             if (!validMedia.length) throw new Error('Tidak ada media ditemukan');
             const caption  = data.caption || '';
-            const username = data.username || data.owner || '';
-            const likes    = data.likes || data.like_count || 0;
-            const comments = data.comments || data.comment_count || 0;
-            const isVideo  = validMedia[0] && (validMedia[0].type === 'video' || !!validMedia[0].video);
+            const username = data.author || '';
+            const likes    = data.stats && data.stats.likes || 0;
+            const comments = data.stats && data.stats.comments || 0;
+            const isVideo  = validMedia[0] && validMedia[0].type === 'MP4';
             let mediaHTML = '';
             if (validMedia.length === 1) {
-                const m = validMedia[0]; const src2 = m.url||m.video||m.image||'';
+                const m = validMedia[0]; const src2 = m.url||'';
                 mediaHTML = isVideo ? `<video controls style="width:100%;border-radius:14px;max-height:300px;background:#0a0012;" src="${src2}"></video>` : `<img src="${src2}" style="width:100%;border-radius:14px;max-height:360px;object-fit:cover;">`;
             } else {
                 mediaHTML = '<div class="dl-media-grid">' + validMedia.slice(0,6).map((m,i) => {
-                    const s2=m.url||m.video||m.image||''; const isV=m.type==='video'||!!m.video;
+                    const s2=m.url||''; const isV=m.type==='MP4';
                     return `<div class="dl-media-item">${isV?`<video src="${s2}" style="width:100%;height:130px;object-fit:cover;"></video>`:`<img src="${s2}" alt="M${i+1}">`}<button class="dl-item-dl" onclick="(function(){var a=document.createElement('a');a.href='${s2}';a.target='_blank';a.download='insta_${i+1}.${isV?'mp4':'jpg'}';document.body.appendChild(a);a.click();a.remove();})()"><i class="fas fa-download"></i></button></div>`;
                 }).join('') + '</div>';
             }
@@ -2022,18 +2020,18 @@ function renderInstagram(body) {
                 <div class="dl-header">
                     <div class="dl-thumb-placeholder"><i class="fa-brands fa-instagram"></i></div>
                     <div class="dl-header-info">
-                        ${username ? `<div class="dl-author"><span class="dl-author-name">@${username}</span></div>` : ''}
-                        <div class="dl-title">${caption ? caption.slice(0,80)+(caption.length>80?'...':'') : 'Instagram Media'}</div>
+                        ${username ? `<div class="dl-author"><span class="dl-author-name">@${nxEscape(username)}</span></div>` : ''}
+                        <div class="dl-title">${caption ? nxEscape(caption.slice(0,80)+(caption.length>80?'...':'')) : 'Instagram Media'}</div>
                         <span class="dl-badge ${isVideo?'hd':'music'}"><i class="fas fa-${isVideo?'video':'image'}"></i> ${validMedia.length>1?validMedia.length+' Media':isVideo?'Video/Reels':'Foto'}</span>
                     </div>
                 </div>
                 ${(likes||comments) ? `<div class="dl-stats" style="grid-template-columns:repeat(2,1fr);"><div class="dl-stat"><span class="st-val">${fmtNum(likes)}</span><span class="st-lbl"><i class="fas fa-heart"></i> Likes</span></div><div class="dl-stat"><span class="st-val">${fmtNum(comments)}</span><span class="st-lbl"><i class="fas fa-comment"></i> Komen</span></div></div>` : ''}
                 <div style="margin:14px 0;">${mediaHTML}</div>
-                ${caption ? `<div class="dl-caption"><div class="dl-caption-label">Caption</div><div class="dl-caption-text">${caption}</div><div class="dl-caption-actions"><button class="dl-copy-btn" id="instaCopyCapBtn"><i class="fas fa-copy"></i> Copy Caption</button></div></div>` : ''}
+                ${caption ? `<div class="dl-caption"><div class="dl-caption-label">Caption</div><div class="dl-caption-text">${nxEscape(caption)}</div><div class="dl-caption-actions"><button class="dl-copy-btn" id="instaCopyCapBtn"><i class="fas fa-copy"></i> Copy Caption</button></div></div>` : ''}
                 <hr class="dl-divider">
                 <div class="dl-section-label"><i class="fas fa-download"></i> Download Media</div>
                 <div class="dl-options">${validMedia.slice(0,4).map((m,i) => {
-                    const s2=m.url||m.video||m.image||''; const isV=m.type==='video'||!!m.video; const sz=m.size?' &bull; '+fmtSz(m.size):'';
+                    const s2=m.url||''; const isV=m.type==='MP4'; const sz=m.size?' &bull; '+fmtSz(m.size):'';
                     return `<div class="dl-option"><div class="dl-option-info"><div class="dl-option-icon ${isV?'mp4':'std'}"><i class="fas fa-${isV?'video':'image'}"></i></div><div><div class="dl-option-title">${isV?'Video':'Foto'} ${validMedia.length>1?'#'+(i+1):''}</div><div class="dl-option-desc">${isV?'MP4':'JPG'}${sz}</div></div></div><button class="dl-dl-btn ${isV?'mp4':'std'}" data-url="${s2}" data-name="insta_${i+1}.${isV?'mp4':'jpg'}">&#8595; Simpan</button></div>`;
                 }).join('')}</div>
             `;
@@ -2047,9 +2045,11 @@ function renderInstagram(body) {
             }
             target.querySelectorAll('[data-url]').forEach(btn2 => { btn2.onclick = () => dlT(btn2.dataset.url, btn2.dataset.name); });
         } catch (e) {
-            target.innerHTML = `<div class="dl-error"><i class="fas fa-triangle-exclamation"></i><br><br>Gagal mengambil media.<br><span style="font-size:11px;opacity:.7;">${e.message}</span></div>`;
+            if (e && e.name === 'AbortError') return;
+            target.innerHTML = `<div class="dl-error"><i class="fas fa-triangle-exclamation"></i><br><br>Gagal mengambil media.<br><span style="font-size:11px;opacity:.7;">${nxEscape(e.message)}</span></div>`;
+        } finally {
+            btn.disabled = false; btn.innerHTML = '<i class="fas fa-download"></i> Ambil Media';
         }
-        btn.disabled = false; btn.innerHTML = '<i class="fas fa-download"></i> Ambil Media';
     };
     document.getElementById('instaBtn').onclick = run;
     document.getElementById('instaUrl').addEventListener('keydown', e => { if (e.key === 'Enter') run(); });
@@ -2077,9 +2077,8 @@ function renderTiktok(body) {
         btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengambil...';
         target.innerHTML = `<div class="dl-loading"><div class="dl-spin"></div><p>Menghubungi server...</p></div>`;
         try {
-            const tikApi = 'https://www.tikwm.com/api/?url=' + encodeURIComponent(url) + '&hd=1';
-            const tikBackup = 'https://tikwm.com/api/?url=' + encodeURIComponent(url) + '&hd=1';
-            const { data: json } = await nxFetchJsonWithBackup('tikwm', nxBackupSources('TikWM', tikApi, [{ name: 'TikWM Backup', url: tikBackup }]));
+            const fetched = await window.NexoraDownloader.request('tiktok', url);
+            const json = window.NexoraDownloader.legacyTikTok(fetched);
             const d = json && json.data;
             if (!d) throw new Error('Data tidak ditemukan');
             const caption  = d.title || '';

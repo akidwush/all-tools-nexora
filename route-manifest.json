@@ -16,6 +16,7 @@
     "/api/audit",
     "/api/tool-health",
     "/api/media-download",
+    "/api/downloader",
     "/api/sitegrabber",
     "/api/crypto-market",
     "/api/web-intelligence",

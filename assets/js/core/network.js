@@ -46,5 +46,11 @@
     throw lastError||new Error("Permintaan jaringan gagal.");
   }
   window.NexoraFetch=request;
-  window.NexoraFetchJson=async function(input,init){var response=await request(input,init);var data=await response.json().catch(function(){return {};});if(!response.ok){var error=new Error(data.message||data.error||("HTTP "+response.status));error.status=response.status;error.payload=data;throw error;}return data;};
+  window.NexoraFetchJson=async function(input,init){
+    var response=await request(input,init),text="",data={};
+    try{text=await response.text();}catch(_){text="";}
+    if(text){try{data=JSON.parse(text);}catch(_){var parseError=new Error(response.ok?"Server mengembalikan respons non-JSON.":("HTTP "+response.status));parseError.status=response.status;parseError.code="INVALID_JSON_RESPONSE";throw parseError;}}
+    if(!response.ok){var error=new Error(data.message||data.error||("HTTP "+response.status));error.status=response.status;error.code=data.error||("HTTP_"+response.status);error.payload=data;throw error;}
+    return data;
+  };
 })();

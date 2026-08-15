@@ -467,3 +467,11 @@
     };
   };
 })();
+
+/* Keep Spotify capability truthful when this shared source module is lazy-loaded. */
+(function(){
+  if(typeof window.NexoraDownloaderRenderOfficial!=="function") return;
+  window.renderSpotify=function(body){
+    return window.NexoraDownloaderRenderOfficial(body,"spotify","Spotify","fa-spotify","https://open.spotify.com/track/...");
+  };
+})();

@@ -3,11 +3,11 @@
   if(window.NexoraToolRegistry) return;
 
   var rows = [
-    ["terabox","Terabox Downloader","api","download-pack","renderTerabox","https://api.nexray.eu.cc/"],
-    ["instagram","Instagram","api",null,"renderInstagram","https://api.nexray.eu.cc/"],
-    ["tiktok","TikTok","api","tiktok","renderTiktok","https://www.tikwm.com/"],
-    ["youtube","YouTube","api",null,"renderYoutube","https://api.nexray.eu.cc/"],
-    ["spotify","Spotify Downloader","api","download-pack","renderSpotify","https://api.nexray.eu.cc/"],
+    ["terabox","Terabox Downloader","api","download-pack","renderTerabox","https://all-tools-nexora.vercel.app/api/downloader"],
+    ["instagram","Instagram","api",null,"renderInstagram","https://all-tools-nexora.vercel.app/api/downloader"],
+    ["tiktok","TikTok","api","tiktok","renderTiktok","https://all-tools-nexora.vercel.app/api/downloader"],
+    ["youtube","YouTube Metadata","hybrid",null,"renderYoutube","https://all-tools-nexora.vercel.app/api/downloader"],
+    ["spotify","Spotify Metadata","hybrid",null,"renderSpotify","https://all-tools-nexora.vercel.app/api/downloader"],
     ["fakebankjago","Fake Bank Jago","api","download-pack","renderFakeBankJago","https://api.nexray.eu.cc/"],
     ["brat","BRAT Generator","api",null,"renderBrat","https://api.siputzx.my.id/"],
     ["iqc","IQC Generator","api","generator-pack","renderIqc2","https://api.nexray.eu.cc/"],

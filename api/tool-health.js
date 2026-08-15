@@ -1,5 +1,6 @@
 const crypto = require("node:crypto");
 const { handleMediaDownload } = require("../lib/media-download");
+const { handleDownloader } = require("../lib/downloader-service");
 const { handleSiteGrabber } = require("../lib/sitegrabber-proxy");
 const { handleCryptoMarket } = require("../lib/crypto-market");
 const { handleSpaceExplorer } = require("../lib/space-explorer");
@@ -70,6 +71,9 @@ module.exports = async function handler(request, response) {
   const url = new URL(request.url || "/api/tool-health", origin);
   if (url.searchParams.get("mode") === "media-download") {
     return handleMediaDownload(request, response, url);
+  }
+  if (url.searchParams.get("mode") === "downloader") {
+    return handleDownloader(request, response, url);
   }
   if (url.searchParams.get("mode") === "sitegrabber") {
     return handleSiteGrabber(request, response, url);
