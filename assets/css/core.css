@@ -1458,7 +1458,7 @@ html.nx-hero-video-disabled .video-banner video{display:none!important}
   --nx-transition:220ms cubic-bezier(.2,.72,.2,1)
 }
 html{min-height:100%;background-color:#050509;color-scheme:dark;overscroll-behavior-y:auto}
-body{position:relative;min-height:100vh;min-height:100dvh;background-color:#050509;background-image:linear-gradient(180deg,#050509 0,#090812 34rem,#07070c 72rem,#0b0912 100%);color:var(--nx-text);overscroll-behavior-y:auto;touch-action:pan-x pan-y pinch-zoom}
+body{position:relative;min-height:100vh;min-height:100dvh;background-color:#050509;background-image:linear-gradient(180deg,#050509 0,#090812 34rem,#07070c 72rem,#0b0912 100%);color:var(--nx-text);overscroll-behavior-y:auto;touch-action:pan-x pan-y}
 .bg-glow{position:fixed;inset:0;z-index:0;overflow:hidden;background:radial-gradient(ellipse at 50% -10%,rgba(188,140,255,.14),transparent 42%),linear-gradient(180deg,rgba(255,255,255,.012),transparent 45%);animation:none;opacity:1}
 .nx-membrane{position:absolute;display:block;pointer-events:none;opacity:.92;filter:saturate(115%);transform:translate3d(0,0,0);animation:nxMembraneDrift var(--nx-drift,28s) ease-in-out infinite alternate}
 .nx-membrane::after{content:"";position:absolute;inset:7%;border:1px solid rgba(221,245,255,.14);clip-path:inherit;transform:translate3d(3%,2%,0)}

@@ -32,6 +32,15 @@
     window.visualViewport.addEventListener("scroll",scheduleViewportSync,{passive:true});
   }
 
+  function blockPageZoom(event){event.preventDefault();}
+  ["gesturestart","gesturechange","gestureend"].forEach(function(type){
+    document.addEventListener(type,blockPageZoom,{passive:false});
+  });
+  document.addEventListener("touchmove",function(event){
+    if(event.touches&&event.touches.length>1)event.preventDefault();
+  },{passive:false});
+  document.addEventListener("dblclick",blockPageZoom,{passive:false});
+
   var overlayRules=[
     {bodyClass:"nx-universal-room-open",selector:"#nxUniversalRoom.is-open"},
     {bodyClass:"tt-room-open",selector:"#ttRoomOverlay.on"},

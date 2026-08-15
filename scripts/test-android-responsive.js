@@ -11,7 +11,7 @@ const performance = read("assets/js/core/performance.js");
 const reactor = read("assets/js/core/liquid-reactor.js");
 
 assert.match(core, /html\{min-height:100%;background-color:#050509;color-scheme:dark;overscroll-behavior-y:auto\}/);
-assert.match(core, /body\{[^}]*min-height:100dvh[^}]*background-color:#050509[^}]*overscroll-behavior-y:auto[^}]*touch-action:pan-x pan-y pinch-zoom/);
+assert.match(core, /body\{[^}]*min-height:100dvh[^}]*background-color:#050509[^}]*overscroll-behavior-y:auto[^}]*touch-action:pan-x pan-y/);
 assert.match(core, /@media \(min-width:768px\) and \(max-width:1023px\)\{\.tools-grid\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
 assert.match(core, /@media \(min-width:320px\) and \(max-width:767px\)\{[\s\S]*?\.tools-grid\{display:grid;grid-template-columns:repeat\(3,minmax\(0,1fr\)\)!important/);
 assert.match(components, /@media\(min-width:320px\) and \(max-width:767px\)\{[\s\S]*?\.tools-grid\{display:grid;grid-template-columns:repeat\(3,minmax\(0,1fr\)\)!important/);
