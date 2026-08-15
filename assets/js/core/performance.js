@@ -110,38 +110,35 @@
   async function initHeroVideo(){
     var hero=heroElement||document.querySelector("[data-nx-hero]");
     var video=heroVideo||(hero&&hero.querySelector("video[data-src]"));
-    var toggle=hero&&hero.querySelector("[data-nx-hero-toggle]");
     if(!hero||!video)return;
 
     var heroConfig=await heroConfigPromise;
     var effectiveHeroMode=heroConfig.enabled?heroMode:"disabled";
     if(effectiveHeroMode==="disabled"){
-      document.documentElement.classList.remove("nx-hero-video-auto","nx-hero-video-manual");
+      document.documentElement.classList.remove("nx-hero-video-auto");
       document.documentElement.classList.add("nx-hero-video-disabled");
       video.removeAttribute("src");
       video.load();
-      if(toggle)toggle.hidden=true;
       return;
     }
     video.dataset.src=heroConfig.url;
 
-    var source=String(video.dataset.src||"");
+    var source=String(video.dataset.src||DEFAULT_HERO_VIDEO_URL);
     if(!source)return;
 
     var loaded=false;
     var ready=false;
-    var visible=false;
-    var autoplayRejected=false;
+    var autoplayBlocked=false;
+    var interactionRetryArmed=false;
+    var interactionRetryUsed=false;
 
-    function updateToggle(){
-      if(!toggle)return;
-      var playing=!video.paused&&!video.ended;
-      toggle.classList.toggle("is-playing",playing);
-      toggle.setAttribute("aria-label",playing?"Jeda banner anime":"Putar banner anime");
-      toggle.setAttribute("aria-pressed",playing?"true":"false");
-      var icon=toggle.querySelector("i");
-      if(icon)icon.className=playing?"fas fa-pause":"fas fa-play";
-    }
+    video.autoplay=true;
+    video.muted=true;
+    video.defaultMuted=true;
+    video.loop=true;
+    video.playsInline=true;
+    video.controls=false;
+    video.removeAttribute("controls");
 
     function ensureLoaded(){
       if(loaded)return;
@@ -151,91 +148,60 @@
       video.load();
     }
 
-    function pauseVideo(){
-      if(!video.paused)video.pause();
-      updateToggle();
-    }
-
-    function canAutoPlay(){
-      return effectiveHeroMode==="auto"&&!document.hidden&&ready;
-    }
-
-    function syncPlayback(){
-      if(canAutoPlay()){
-        video.play().then(function(){
-          autoplayRejected=false;
-          if(toggle)toggle.hidden=true;
-          updateToggle();
-        }).catch(function(){
-          autoplayRejected=true;
-          if(toggle)toggle.hidden=false;
-          updateToggle();
-        });
-      }else if(effectiveHeroMode==="auto"&&document.hidden){
-        pauseVideo();
+    function armInteractionRetry(){
+      if(interactionRetryArmed||interactionRetryUsed)return;
+      interactionRetryArmed=true;
+      var events=["pointerdown","touchstart","keydown"];
+      function cleanup(){
+        interactionRetryArmed=false;
+        events.forEach(function(type){document.removeEventListener(type,retry);});
       }
+      function retry(){
+        cleanup();
+        interactionRetryUsed=true;
+        if(document.hidden)return;
+        Promise.resolve(video.play()).then(function(){autoplayBlocked=false;}).catch(function(){ });
+      }
+      events.forEach(function(type){document.addEventListener(type,retry,{once:true,passive:true});});
+    }
+
+    function ensurePlayback(){
+      if(!ready||document.hidden||autoplayBlocked)return;
+      Promise.resolve(video.play()).then(function(){autoplayBlocked=false;}).catch(function(){
+        autoplayBlocked=true;
+        armInteractionRetry();
+      });
     }
 
     video.addEventListener("loadeddata",function(){
       ready=true;
       hero.classList.add("is-video-ready");
-      updateToggle();
-      syncPlayback();
+      ensurePlayback();
     },{once:true});
 
-    video.addEventListener("play",updateToggle);
-    video.addEventListener("pause",updateToggle);
     video.addEventListener("error",function(){
-      pauseVideo();
-      video.removeAttribute("src");
-      video.load();
       hero.classList.remove("is-video-ready");
       hero.classList.add("is-video-error");
-      if(toggle)toggle.hidden=true;
     },{once:true});
 
-    if(toggle){
-      toggle.hidden=true;
-      toggle.addEventListener("click",function(){
-        ensureLoaded();
-        if(!video.paused){
-          pauseVideo();
-          return;
-        }
-        video.play().then(function(){
-          autoplayRejected=false;
-          toggle.hidden=true;
-          updateToggle();
-        }).catch(function(){
-          autoplayRejected=true;
-          toggle.hidden=false;
-          updateToggle();
-        });
-      });
-    }
-
     function onVisibility(entry){
-      visible=Boolean(entry&&entry.isIntersecting&&entry.intersectionRatio>=0.35);
-      if(visible)ensureLoaded();
-      syncPlayback();
+      if(entry&&entry.isIntersecting)ensureLoaded();
     }
 
     // The hero is part of the product identity: load it once and keep the same
     // element playing while filters, rooms, and internal pages are opened.
     ensureLoaded();
-    syncPlayback();
 
     if("IntersectionObserver" in window){
-      var observer=new IntersectionObserver(function(entries){onVisibility(entries[0]);},{threshold:[0,0.35,0.7]});
+      var observer=new IntersectionObserver(function(entries){onVisibility(entries[0]);},{threshold:[0,0.35]});
       observer.observe(hero);
     }else{
-      visible=true;
       ensureLoaded();
-      syncPlayback();
     }
 
-    document.addEventListener("visibilitychange",syncPlayback);
-    window.addEventListener("pagehide",pauseVideo);
+    document.addEventListener("visibilitychange",function(){
+      if(!document.hidden&&!autoplayBlocked)ensurePlayback();
+    });
 
   }
 

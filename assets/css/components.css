@@ -1585,9 +1585,9 @@ body.nx-health-lock{overflow:hidden}
   #nxUniversalRoom .nx-room-hero{padding:14px!important;border-radius:18px!important}
   #nxUniversalRoom input,#nxUniversalRoom textarea,#nxUniversalRoom select{font-size:16px!important}
 }
-@media(max-width:360px){
-  .tools-grid{gap:7px!important}
-  .tools-card{min-height:112px!important;padding-inline:7px!important}
+@media(max-width:370px){
+  .tools-grid{grid-template-columns:1fr!important;gap:9px!important}
+  .tools-card{min-height:168px!important;padding-inline:14px!important}
 }
 
 

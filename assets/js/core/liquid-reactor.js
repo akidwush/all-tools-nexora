@@ -72,7 +72,7 @@
     var prior=flipState;
     flipState=null;
     positionIndicator();
-    if(reduced)return;
+    if(reduced||coarse)return;
     var incoming=cards();
     var byId=new Map(prior.items.map(function(item){return [item.id,item];}));
     var reactor=document.createElement('div');
@@ -173,13 +173,14 @@
   }
   function setupAperture(){
     var hero=document.querySelector('[data-nx-hero]');
-    if(!hero||reduced)return;
+    if(!hero||reduced||coarse)return;
     hero.classList.add('nx-aperture-reveal');
     var finish=function(){hero.classList.remove('nx-aperture-reveal');hero.classList.add('nx-aperture-complete');};
     hero.addEventListener('animationend',finish,{once:true});
     setTimeout(finish,1250);
   }
   function setupRoomEvents(){
+    if(coarse)return;
     window.addEventListener('nexora:tool-room-open',function(){
       var room=document.getElementById('nxUniversalRoom');
       var origin=window.__NEXORA_LIQUID_ORIGIN__;
