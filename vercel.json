@@ -50,6 +50,14 @@
   "outputDirectory": "public",
   "rewrites": [
     {
+      "source": "/api/ai/chat",
+      "destination": "/api/health?mode=ai-chat"
+    },
+    {
+      "source": "/api/admin/ai",
+      "destination": "/api/admin/dashboard?mode=personal-ai"
+    },
+    {
       "source": "/api/database",
       "destination": "/api/health?mode=database"
     },

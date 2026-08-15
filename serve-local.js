@@ -60,6 +60,7 @@ const API_ROUTES = Object.freeze({
   "/api/svg-alight": { file: "api/tool-health.js", mode: "svg-alight" },
   "/api/big-image": { file: "api/tool-health.js", mode: "big-image" },
   "/api/vdeploy": { file: "api/health.js", mode: "vdeploy" },
+  "/api/ai/chat": { file: "api/health.js", mode: "ai-chat" },
   "/api/admin/auth": { file: "api/admin/auth.js" },
   "/api/admin/dashboard": { file: "api/admin/dashboard.js" },
   "/api/admin/tools": { file: "api/admin/tools.js" },
@@ -67,7 +68,8 @@ const API_ROUTES = Object.freeze({
   "/api/admin/feedback": { file: "api/admin/feedback.js" },
   "/api/admin/audit": { file: "api/admin/audit.js" },
   "/api/admin/visual": { file: "api/admin/visual.js" },
-  "/api/admin/socials": { file: "api/admin/socials.js" }
+  "/api/admin/socials": { file: "api/admin/socials.js" },
+  "/api/admin/ai": { file: "api/admin/dashboard.js", mode: "personal-ai" }
 });
 
 function normalizeApiPath(pathname) {
@@ -81,6 +83,7 @@ function bodyLimit(pathname, requestUrl) {
   if (pathname === "/api/ocr-intelligence" || mode === "ocr-intelligence") return 1_600_000;
   if (mode === "image-vectorizer" || mode === "big-image") return 4_200_000;
   if (pathname === "/api/audit") return 230_000;
+  if (pathname === "/api/ai/chat" || pathname === "/api/admin/ai") return 80_000;
   return 550_000;
 }
 

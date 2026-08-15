@@ -12,6 +12,9 @@
     "prebuild": "node scripts/prepare-ai-vendor.js"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@google/genai": "2.17.1"
   }
 }

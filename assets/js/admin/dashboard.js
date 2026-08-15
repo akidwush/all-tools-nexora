@@ -3,7 +3,7 @@
   const state={session:null,dashboard:null,tools:[],socials:[],analytics:null,feedback:[],feedbackMeta:null,audit:[],activeSection:"overview",editingTool:null,editingSocial:null,editingFeedback:null,heroSettingsDirty:false};
   const $=(selector,root=document)=>root.querySelector(selector);
   const $$=(selector,root=document)=>Array.from(root.querySelectorAll(selector));
-  const headings={overview:"Ringkasan Sistem",tools:"Manajemen Tools",socials:"Sosial Media",developer:"About Developer",analytics:"Analytics Penggunaan",health:"Tool Health Monitoring",feedback:"Feedback Pengguna",visual:"Runtime & Visual QA",functional:"Functional Audit",audit:"Audit Log Admin"};
+  const headings={overview:"Ringkasan Sistem",tools:"Manajemen Tools",ai:"Pengaturan Personal AI",socials:"Sosial Media",developer:"About Developer",analytics:"Analytics Penggunaan",health:"Tool Health Monitoring",feedback:"Feedback Pengguna",visual:"Runtime & Visual QA",functional:"Functional Audit",audit:"Audit Log Admin"};
   let feedbackTimer=null;
 
   function escapeHtml(value){return String(value??"").replace(/[&<>'"]/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[char]));}
@@ -24,7 +24,7 @@
     state.activeSection=section;
     $$('[data-panel]').forEach(panel=>panel.classList.toggle("is-active",panel.dataset.panel===section));
     $$('[data-section]').forEach(button=>button.classList.toggle("is-active",button.dataset.section===section));
-    const moreButton=$("[data-admin-more]");if(moreButton)moreButton.classList.toggle("is-active",["socials","health","functional","visual","audit"].includes(section));
+    const moreButton=$("[data-admin-more]");if(moreButton)moreButton.classList.toggle("is-active",["ai","socials","health","functional","visual","audit"].includes(section));
     $("#pageHeading").textContent=headings[section]||"Dashboard";
     if(section==="tools")renderTools();
     if(section==="socials")renderSocials();
@@ -33,6 +33,7 @@
     if(section==="feedback"&&!state.feedbackMeta)await loadFeedback(1);
     if(section==="audit"&&!state.audit.length)await loadAudit();
     if(section==="visual")document.dispatchEvent(new CustomEvent("nexora:visual-section-open"));
+    if(section==="ai")document.dispatchEvent(new CustomEvent("nexora:ai-section-open"));
     if(section==="functional")document.dispatchEvent(new CustomEvent("nexora:functional-section-open"));
     window.scrollTo({top:0,behavior:window.matchMedia("(max-width:760px)").matches?"auto":"smooth"});
   }

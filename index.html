@@ -48,7 +48,7 @@
 
 
 
-<link href="assets/css/core.css?v=6.3.18-lr4a-rsp5-session2" rel="stylesheet"/><link href="assets/css/components.css?v=6.3.18-lr4-dl1-rsp2" rel="stylesheet"/><link as="script" href="assets/js/core/app.js?v=6.3.18-lr4-dl1" rel="preload"/></head>
+<link href="assets/css/core.css?v=6.3.18-lr4a-rsp5-session2" rel="stylesheet"/><link href="assets/css/components.css?v=6.3.18-lr4-dl1-rsp2" rel="stylesheet"/><link href="assets/css/personal-ai.css?v=6.3.18-ai1" rel="stylesheet"/><link as="script" href="assets/js/core/app.js?v=6.3.18-lr4-dl1" rel="preload"/></head>
 <body><noscript>All Tools Nexora membutuhkan JavaScript untuk menjalankan fitur.</noscript>
 <div class="splash-screen" id="splash">
 <div class="nx-grid"></div>
@@ -463,4 +463,12 @@
 
 
 
-<script src="assets/js/core/network.js?v=6.3.18-dl1"></script><script src="assets/js/core/performance.js?v=6.3.18-lr4-rsp1"></script><script src="assets/js/core/app.js?v=6.3.18-lr4-dl1"></script><script src="assets/js/core/social-links.js?v=6.3.18"></script><script src="assets/js/core/shell.js?v=6.3.18-lr4-dl1"></script><script src="assets/js/core/liquid-reactor.js?v=6.3.18-lr4-rsp2-cursor2"></script><script src="assets/branding.js?v=6.3.18"></script><script src="assets/js/core/tool-health.js?v=6.3.18"></script><script src="assets/js/core/analytics.js?v=6.3.18"></script><script src="assets/js/core/tool-registry.js?v=6.3.18-dl1"></script><script src="assets/js/core/stability.js?v=6.3.18"></script><script src="assets/js/core/lazy-loader.js?v=6.3.18-dl1"></script></body></html>
+<button class="nx-ai-launcher" id="nxAiLauncher" type="button" aria-controls="nxPersonalAi" aria-expanded="false"><span class="nx-ai-launcher-orb"><i class="fa-solid fa-wand-magic-sparkles"></i></span><span class="nx-ai-launcher-copy"><b id="nxAiLauncherName">Nexora AI</b><small>Personal AI</small></span></button>
+<section class="nx-ai-panel" id="nxPersonalAi" role="dialog" aria-modal="false" aria-label="Personal AI Nexora" aria-hidden="true">
+  <header class="nx-ai-head"><span class="nx-ai-avatar" id="nxAiAvatar"><i class="fa-solid fa-wand-magic-sparkles"></i></span><div class="nx-ai-identity"><b id="nxAiName">Nexora AI</b><span id="nxAiTagline">Personal intelligence · Liquid Reactor</span><span class="nx-ai-online" id="nxAiOnline"><i></i><span>ONLINE</span></span></div><div class="nx-ai-head-actions"><button class="nx-ai-icon-button" id="nxAiNew" type="button" aria-label="Percakapan baru" title="Percakapan baru"><i class="fa-solid fa-rotate-right"></i></button><button class="nx-ai-icon-button" id="nxAiClose" type="button" aria-label="Tutup Personal AI"><i class="fa-solid fa-xmark"></i></button></div></header>
+  <div class="nx-ai-state" id="nxAiState" role="status"></div>
+  <div class="nx-ai-messages" id="nxAiMessages" aria-live="polite" aria-relevant="additions"></div>
+  <div class="nx-ai-suggestions" id="nxAiSuggestions" aria-label="Saran pertanyaan"></div>
+  <form class="nx-ai-compose" id="nxAiForm"><div class="nx-ai-input-wrap"><textarea class="nx-ai-input" id="nxAiInput" rows="1" maxlength="4000" placeholder="Tulis pesan untuk Personal AI…" aria-label="Pesan untuk Personal AI"></textarea><button class="nx-ai-send" id="nxAiSend" type="submit" aria-label="Kirim pesan"><i class="fa-solid fa-arrow-up"></i></button></div><div class="nx-ai-compose-meta"><span>Gemini · respons dapat keliru</span><button class="nx-ai-stop" id="nxAiStop" type="button" hidden><i class="fa-solid fa-stop"></i> Hentikan respons</button></div></form>
+</section>
+<script src="assets/js/core/network.js?v=6.3.18-dl1"></script><script src="assets/js/core/performance.js?v=6.3.18-lr4-rsp1"></script><script src="assets/js/core/app.js?v=6.3.18-lr4-dl1"></script><script src="assets/js/core/social-links.js?v=6.3.18"></script><script src="assets/js/core/shell.js?v=6.3.18-lr4-dl1"></script><script src="assets/js/core/liquid-reactor.js?v=6.3.18-lr4-rsp2-cursor2"></script><script src="assets/branding.js?v=6.3.18"></script><script src="assets/js/core/tool-health.js?v=6.3.18"></script><script src="assets/js/core/analytics.js?v=6.3.18"></script><script src="assets/js/core/tool-registry.js?v=6.3.18-dl1"></script><script src="assets/js/core/stability.js?v=6.3.18"></script><script src="assets/js/core/lazy-loader.js?v=6.3.18-dl1"></script><script src="assets/js/core/personal-ai.js?v=6.3.18-ai1"></script></body></html>

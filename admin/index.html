@@ -13,6 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <link href="../assets/css/admin.css?v=6.3.18-hf3" rel="stylesheet">
+  <link href="../assets/css/admin-ai.css?v=6.3.18-ai1" rel="stylesheet">
   <link href="../assets/css/visual-qa.css?v=6.3.18" rel="stylesheet">
 </head>
 <body class="admin-dashboard-page">
@@ -26,6 +27,7 @@
       <nav class="admin-nav" aria-label="Navigasi admin">
         <button class="admin-nav-item is-active" data-section="overview" type="button"><i class="fa-solid fa-grid-2"></i><span>Ringkasan</span></button>
         <button class="admin-nav-item" data-section="tools" type="button"><i class="fa-solid fa-screwdriver-wrench"></i><span>Tools</span></button>
+        <button class="admin-nav-item" data-section="ai" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Personal AI</span></button>
         <button class="admin-nav-item" data-section="socials" type="button"><i class="fa-solid fa-share-nodes"></i><span>Sosial Media</span></button>
         <button class="admin-nav-item" data-section="developer" type="button"><i class="fa-solid fa-user-astronaut"></i><span>About Developer</span></button>
         <button class="admin-nav-item" data-section="analytics" type="button"><i class="fa-solid fa-chart-line"></i><span>Analytics</span></button>
@@ -102,6 +104,23 @@
           </div>
           <div class="social-admin-grid tool-admin-grid" id="socialAdminGrid"></div>
           <div class="empty-state" id="socialEmpty" hidden><i class="fa-solid fa-link-slash"></i><b>Data sosial belum tersedia</b><span>Jalankan migration 006_social_links.sql di Supabase.</span></div>
+        </section>
+
+        <section class="admin-section" data-panel="ai">
+          <div class="section-toolbar"><div class="toolbar-title"><p class="eyebrow">GEMINI CONTROL</p><b>Pengaturan Personal AI</b></div><a class="secondary-button" href="/" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Website</a></div>
+          <div class="ai-admin-statuses"><span class="ai-status-chip" id="aiApiStatus"><i></i><span>Memeriksa Gemini API</span></span><span class="ai-status-chip" id="aiPublishStatus"><i></i><span>Memeriksa publikasi</span></span><span class="ai-status-chip" id="aiActiveStatus"><i></i><span>Memeriksa status</span></span></div>
+          <div class="ai-admin-shell">
+            <article class="ai-admin-card">
+              <form class="ai-settings-form" id="aiSettingsForm">
+                <section class="ai-form-section"><h3>Identitas dan status</h3><label class="ai-toggle"><span><b>Aktifkan Personal AI</b><small>Pengunjung hanya dapat mengirim pesan ketika konfigurasi sudah dipublikasikan.</small></span><input id="aiEnabled" type="checkbox"></label><label class="ai-field"><span>Nama AI</span><input id="aiName" maxlength="80" required></label><label class="ai-field"><span>Avatar AI (HTTPS)</span><input id="aiAvatar" type="url" maxlength="1000" placeholder="https://..."></label><label class="ai-field is-wide"><span>Label atau tagline</span><input id="aiTagline" maxlength="140"></label><label class="ai-field is-wide"><span>Pesan pembuka</span><textarea id="aiWelcome" maxlength="1000" rows="3"></textarea></label></section>
+                <section class="ai-form-section"><h3>Perilaku dan konteks</h3><label class="ai-field is-wide"><span>System instruction / personality</span><textarea id="aiSystem" maxlength="8000" rows="6"></textarea></label><label class="ai-field is-wide"><span>Tugas utama AI</span><textarea id="aiTask" maxlength="1500" rows="3"></textarea></label><label class="ai-field"><span>Bahasa utama</span><input id="aiLanguage" maxlength="60"></label><label class="ai-field"><span>Gaya bahasa</span><input id="aiLanguageStyle" maxlength="1000"></label><label class="ai-field is-wide"><span>Informasi khusus tentang website</span><textarea id="aiWebsiteContext" maxlength="12000" rows="6"></textarea></label><label class="ai-field is-wide"><span>Topik yang tidak boleh dijawab (satu per baris)</span><textarea id="aiBlockedTopics" maxlength="3000" rows="4"></textarea></label></section>
+                <section class="ai-form-section"><h3>Model dan kualitas respons</h3><label class="ai-field"><span>Model Gemini</span><select id="aiModel"></select></label><label class="ai-field"><span>Panjang jawaban</span><select id="aiResponseLength"><option value="short">Ringkas</option><option value="balanced">Seimbang</option><option value="detailed">Mendetail</option></select></label><label class="ai-field"><span>Tingkat keramahan</span><span class="ai-field-row"><input id="aiFriendliness" type="range" min="0" max="100" step="1"><output id="aiFriendlinessValue">75%</output></span></label><label class="ai-field"><span>Kreativitas / temperature</span><span class="ai-field-row"><input id="aiTemperature" type="range" min="0" max="2" step="0.05"><output id="aiTemperatureValue">0.65</output></span></label><label class="ai-field"><span>Batas token output</span><input id="aiMaxTokens" type="number" min="128" max="8192" step="1"></label><label class="ai-field"><span>Posisi tombol pembuka</span><select id="aiPosition"><option value="right">Kanan</option><option value="left">Kiri</option></select></label></section>
+                <section class="ai-form-section"><h3>Prompt dan pesan sistem</h3><label class="ai-field is-wide"><span>Suggested prompts (satu per baris, maksimal 6)</span><textarea id="aiPrompts" maxlength="1000" rows="4"></textarea></label><label class="ai-field is-wide"><span>Pesan ketika dinonaktifkan</span><input id="aiDisabledMessage" maxlength="300"></label><label class="ai-field is-wide"><span>Pesan error untuk pengunjung</span><input id="aiErrorMessage" maxlength="300"></label><label class="ai-field"><span>Warna aksen AI</span><input id="aiAccent" type="color" value="#b98cff"></label></section>
+                <div class="ai-admin-actions"><button class="primary-button" id="aiSaveDraft" type="submit"><i class="fa-solid fa-floppy-disk"></i> Simpan Draft</button><button class="secondary-button" id="aiPreviewButton" type="button"><i class="fa-regular fa-eye"></i> Preview</button><button class="secondary-button" id="aiTestButton" type="button"><i class="fa-solid fa-vial"></i> Test AI</button><button class="primary-button" id="aiPublishButton" type="button"><i class="fa-solid fa-satellite-dish"></i> Publish</button><button class="ghost-button" id="aiResetButton" type="button"><i class="fa-solid fa-arrow-rotate-left"></i> Reset Default</button></div><p class="ai-admin-message" id="aiAdminMessage" role="status"></p>
+              </form>
+            </article>
+            <aside class="ai-admin-side"><article class="ai-preview" id="aiPreview"><header class="ai-preview-head"><span class="ai-preview-avatar" id="aiPreviewAvatar"><i class="fa-solid fa-wand-magic-sparkles"></i></span><div><b id="aiPreviewName">Nexora AI</b><span id="aiPreviewTagline">Personal intelligence</span></div></header><div class="ai-preview-body"><div class="ai-preview-message" id="aiPreviewMessage">Pesan pembuka Personal AI.</div><div class="ai-preview-prompts" id="aiPreviewPrompts"></div></div></article><article class="ai-admin-card ai-test-box"><div class="panel-head"><div><p class="eyebrow">SERVER TEST</p><h2>Test AI dengan Draft</h2></div></div><textarea id="aiTestPrompt" maxlength="4000">Perkenalkan dirimu secara singkat.</textarea><pre class="ai-test-result" id="aiTestResult">Hasil pengujian akan muncul di sini. Draft tidak dipublikasikan saat diuji.</pre></article></aside>
+          </div>
         </section>
 
         <section class="admin-section" data-panel="developer">
@@ -229,6 +248,7 @@
       <header><div><p class="eyebrow">MENU LAINNYA</p><h2>Administrasi</h2></div><button id="closeAdminMore" type="button" aria-label="Tutup menu"><i class="fa-solid fa-xmark"></i></button></header>
       <div class="admin-more-grid">
         <button data-section="socials" type="button"><i class="fa-solid fa-share-nodes"></i><span>Sosial Media</span></button>
+        <button data-section="ai" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Personal AI</span></button>
         <button data-section="developer" type="button"><i class="fa-solid fa-user-astronaut"></i><span>About Developer</span></button>
         <button data-section="health" type="button"><i class="fa-solid fa-heart-pulse"></i><span>Tool Health</span></button>
         <button data-section="functional" type="button"><i class="fa-solid fa-list-check"></i><span>Functional Audit</span></button>
@@ -312,6 +332,7 @@
   <script src="../assets/js/admin/dashboard.js?v=6.3.18-hf3" defer></script>
   <script src="../assets/js/admin/developer-profile.js?v=6.3.18-step3" defer></script>
   <script src="../assets/js/admin/visual-qa.js?v=6.3.18" defer></script>
+  <script src="../assets/js/admin/personal-ai.js?v=6.3.18-ai1" defer></script>
   <script src="../assets/js/admin/functional-audit.js?v=6.3.18" defer></script>
 </body>
 </html>

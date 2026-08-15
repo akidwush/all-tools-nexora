@@ -2,6 +2,7 @@ const { handleVDeploy } = require("../lib/vdeploy");
 const publicDatabaseHandler = require("../lib/public-database");
 const { getDatabaseConfig, pingDatabase } = require("../lib/database");
 const { readCachedToolHealth, normalizeCachedRows, summarizeHealth } = require("../lib/tool-health");
+const handlePersonalAi = require("../lib/personal-ai-http");
 
 function send(response, status, payload, headOnly) {
   response.setHeader("Cache-Control", "no-store, max-age=0");
@@ -13,6 +14,7 @@ function send(response, status, payload, headOnly) {
 
 module.exports = async function handler(request, response) {
   const requestUrl = new URL(request.url || "/api/health", `http://${request.headers.host || "localhost"}`);
+  if (requestUrl.searchParams.get("mode") === "ai-chat") return handlePersonalAi(request, response);
   if (requestUrl.searchParams.get("mode") === "database") {
     return publicDatabaseHandler(request, response);
   }

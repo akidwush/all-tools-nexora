@@ -23,6 +23,7 @@
     "/api/space-explorer",
     "/api/ocr-intelligence",
     "/api/vdeploy",
+    "/api/ai/chat",
     "/api/admin/auth",
     "/api/admin/dashboard",
     "/api/admin/tools",
@@ -32,6 +33,7 @@
     "/api/admin/audit",
     "/api/admin/visual",
     "/api/admin/socials",
+    "/api/admin/ai",
     "/api/svg-alight",
     "/api/big-image"
   ]

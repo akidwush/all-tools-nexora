@@ -2,6 +2,7 @@ const { databaseRequest } = require("../../lib/database");
 const { publicSession, requireAdmin, verifyMutationRequest } = require("../../lib/admin-auth");
 const { recordAdminAudit } = require("../../lib/admin-audit");
 const { TOOL_CATALOG, normalizeCachedRows, summarizeHealth } = require("../../lib/tool-health");
+const handleAdminPersonalAi = require("../../lib/admin-personal-ai-http");
 
 function send(response, status, payload) {
   response.setHeader("Cache-Control", "no-store, max-age=0");
@@ -130,6 +131,8 @@ async function updateHeroVideo(request, response) {
 }
 
 module.exports = async function handler(request, response) {
+  const requestUrl = new URL(request.url || "/api/admin/dashboard", `http://${request.headers.host || "localhost"}`);
+  if (requestUrl.searchParams.get("mode") === "personal-ai") return handleAdminPersonalAi(request, response);
   if (request.method === "OPTIONS") {
     response.setHeader("Allow", "GET, PATCH, OPTIONS");
     return response.status(204).end();
