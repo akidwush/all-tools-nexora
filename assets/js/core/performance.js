@@ -157,7 +157,7 @@
     }
 
     function canAutoPlay(){
-      return effectiveHeroMode==="auto"&&visible&&!document.hidden&&ready;
+      return effectiveHeroMode==="auto"&&!document.hidden&&ready;
     }
 
     function syncPlayback(){
@@ -171,7 +171,7 @@
           if(toggle)toggle.hidden=false;
           updateToggle();
         });
-      }else if(effectiveHeroMode==="auto"){
+      }else if(effectiveHeroMode==="auto"&&document.hidden){
         pauseVideo();
       }
     }
@@ -219,6 +219,11 @@
       if(visible)ensureLoaded();
       syncPlayback();
     }
+
+    // The hero is part of the product identity: load it once and keep the same
+    // element playing while filters, rooms, and internal pages are opened.
+    ensureLoaded();
+    syncPlayback();
 
     if("IntersectionObserver" in window){
       var observer=new IntersectionObserver(function(entries){onVisibility(entries[0]);},{threshold:[0,0.35,0.7]});

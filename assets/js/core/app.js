@@ -1636,7 +1636,7 @@ let allVisibleCount = ALL_PAGE_SIZE;
 let allRenderedCount = 0;
 let allLoadPending = false;
 
-function toolCardMarkup(item, isExternal = false) {
+function toolCardMarkup(item, isExternal = false, category = '') {
     const escapeToolHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
     const safeId = escapeToolHtml(item.id);
     const safeIcon = escapeToolHtml(item.icon || 'fa-solid fa-cube');
@@ -1652,14 +1652,13 @@ function toolCardMarkup(item, isExternal = false) {
             (item.link ?
                 `onclick="window.open(decodeURIComponent('${safeLink}'),'_blank','noopener,noreferrer')"` :
                 `onclick="showTool('${safeId}')"`))));
+    const safeCategory = escapeToolHtml(category || (isExternal ? 'external' : 'tools'));
+    const format = isExternal ? 'LINK' : (category === 'downloader' ? 'MEDIA' : category === 'maker' ? 'CREATE' : category === 'vault' ? 'VAULT' : 'UTILITY');
     return `
-        <div class="tools-card" data-tool-id="${safeId}" role="button" tabindex="0" aria-label="Buka ${escapeToolHtml(item.name)}" ${clickAttr}>
-            <div class="icon"><i class="${safeIcon}"></i></div>
-            <h4>${escapeToolHtml(item.name)}</h4>
-            <p>${escapeToolHtml(item.desc)}</p>
-            ${item.badge ? `<span class="badge">${escapeToolHtml(item.badge)}</span>` : ''}
-            <span class="nx-card-readiness" data-nx-status-slot="true"></span>
-            <div class="arrow"><i class="fas fa-arrow-right"></i></div>
+        <div class="tools-card" data-tool-id="${safeId}" data-nx-category="${safeCategory}" data-nx-format="${format}" role="button" tabindex="0" aria-label="Buka ${escapeToolHtml(item.name)}" ${clickAttr}>
+            <div class="nx-card-top"><div class="icon"><i class="${safeIcon}"></i></div>${item.badge ? `<span class="badge">${escapeToolHtml(item.badge)}</span>` : ''}</div>
+            <div class="nx-card-copy"><h4>${escapeToolHtml(item.name)}</h4><p>${escapeToolHtml(item.desc)}</p></div>
+            <div class="nx-card-footer"><span class="nx-card-readiness" data-nx-status-slot="true"></span><span class="nx-card-format">${format}</span><div class="arrow"><i class="fas fa-arrow-right"></i></div></div>
         </div>
     `;
 }
@@ -1668,7 +1667,11 @@ function renderGrid(containerId, items, isExternal = false, options = {}) {
     const container = document.getElementById(containerId);
     if (!container) return;
     const template = document.createElement('template');
-    template.innerHTML = items.map(item => toolCardMarkup(item, isExternal)).join('');
+    const category = options.category || (isExternal ? 'external' : containerId.replace(/Grid$/i, '').toLowerCase());
+    template.innerHTML = items.map(item => toolCardMarkup(item, isExternal, category === 'all' ? (() => {
+        const match = Object.entries(toolsData).find(([, rows]) => Array.isArray(rows) && rows.includes(item));
+        return match ? match[0] : 'tools';
+    })() : category)).join('');
     const fragment = template.content.cloneNode(true);
     if (options.append) {
         container.appendChild(fragment);
@@ -1767,7 +1770,7 @@ function renderAllToolsGrid(reset = false) {
     const visible = allTools.slice(0, allVisibleCount);
     const appendOnly = !reset && allRenderedCount > 0 && visible.length >= allRenderedCount;
     const nextItems = appendOnly ? visible.slice(allRenderedCount) : visible;
-    renderGrid('allGrid', nextItems, false, { append: appendOnly });
+    renderGrid('allGrid', nextItems, false, { append: appendOnly, category: 'all' });
     allRenderedCount = visible.length;
     ensureAllLoadMore();
     document.dispatchEvent(new CustomEvent('nexora:tools-rendered', {

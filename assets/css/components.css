@@ -760,18 +760,6 @@ body.nx-about-dev-open{
   from { transform: translateX(-50%) translateY(0) scale(1);         opacity: 1; filter: blur(0);  }
   to   { transform: translateX(-50%) translateY(-110px) scale(0.92); opacity: 0; filter: blur(8px); }
 }
-@keyframes nxWaShimmer {
-  0%   { background-position: -200% center; }
-  100% { background-position: 200% center; }
-}
-@keyframes nxWaGlowPulse {
-  0%, 100% { box-shadow: 0 0 14px 2px rgba(37,211,102,0.35), 0 0 0 0 rgba(37,211,102,0.18); }
-  50%       { box-shadow: 0 0 26px 5px rgba(37,211,102,0.6),  0 0 0 6px rgba(37,211,102,0.07); }
-}
-@keyframes nxWaFloat {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-3px); }
-}
 #nx-wa-notif {
   position: fixed;
   top: 18px;
@@ -779,23 +767,17 @@ body.nx-about-dev-open{
   transform: translateX(-50%) translateY(-110px);
   z-index: 2147483646;
   pointer-events: none;
-  /* Liquid glass core */
-  background: linear-gradient(135deg,
-    rgba(255,255,255,0.13) 0%,
-    rgba(255,255,255,0.06) 40%,
-    rgba(37,211,102,0.07) 70%,
-    rgba(255,255,255,0.10) 100%);
-  backdrop-filter: blur(28px) saturate(1.8) brightness(1.12);
-  -webkit-backdrop-filter: blur(28px) saturate(1.8) brightness(1.12);
-  border: 1px solid rgba(255,255,255,0.22);
-  border-top: 1.5px solid rgba(255,255,255,0.38);
-  border-left: 1.5px solid rgba(255,255,255,0.28);
-  border-radius: 24px;
+  background: linear-gradient(145deg,rgba(27,25,37,.97),rgba(12,13,18,.97));
+  backdrop-filter: blur(14px) saturate(1.15);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  border: 1px solid rgba(219,214,238,.18);
+  border-top: 1px solid rgba(238,252,255,.34);
+  border-left: 1px solid rgba(184,140,255,.25);
+  border-radius: 18px;
   box-shadow:
-    0 8px 40px rgba(0,0,0,0.32),
-    0 2px 0 0 rgba(255,255,255,0.18) inset,
-    0 -1px 0 0 rgba(0,0,0,0.08) inset,
-    0 0 60px rgba(37,211,102,0.08);
+    0 18px 48px rgba(0,0,0,.4),
+    0 1px 0 rgba(255,255,255,.08) inset,
+    0 0 34px rgba(102,70,154,.12);
   padding: 13px 18px 13px 14px;
   display: flex;
   align-items: center;
@@ -812,15 +794,8 @@ body.nx-about-dev-open{
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: 24px;
-  background: linear-gradient(105deg,
-    transparent 20%,
-    rgba(255,255,255,0.13) 40%,
-    rgba(255,255,255,0.22) 50%,
-    rgba(255,255,255,0.08) 60%,
-    transparent 80%);
-  background-size: 200% 100%;
-  animation: nxWaShimmer 3.5s linear infinite;
+  border-radius: 18px;
+  background: linear-gradient(105deg,rgba(255,255,255,.08),transparent 28% 72%,rgba(37,211,102,.05));
   pointer-events: none;
   z-index: 1;
 }
@@ -830,8 +805,8 @@ body.nx-about-dev-open{
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 50%;
-  border-radius: 24px 24px 60% 60% / 24px 24px 40% 40%;
-  background: linear-gradient(180deg, rgba(255,255,255,0.14) 0%, transparent 100%);
+  border-radius: 18px 18px 60% 60% / 18px 18px 40% 40%;
+  background: linear-gradient(180deg,rgba(255,255,255,.07),transparent);
   pointer-events: none;
   z-index: 1;
 }
@@ -845,17 +820,17 @@ body.nx-about-dev-open{
 #nx-wa-notif-icon {
   width: 48px;
   height: 48px;
-  border-radius: 50%;
-  background: linear-gradient(145deg, #25D366 0%, #128C7E 100%);
+  border-radius: 15px;
+  background: linear-gradient(145deg,#1b2d24,#111b16);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  animation: nxWaGlowPulse 2.2s ease-in-out infinite, nxWaFloat 3s ease-in-out infinite;
-  box-shadow: 0 4px 16px rgba(37,211,102,0.45), inset 0 1px 0 rgba(255,255,255,0.3);
+  animation: none;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.1);
   position: relative;
   z-index: 2;
-  border: 1px solid rgba(255,255,255,0.25);
+  border: 1px solid rgba(37,211,102,.28);
 }
 #nx-wa-notif-icon svg { width:26px; height:26px; fill:#fff; drop-shadow(0 1px 2px rgba(0,0,0,0.3)); }
 #nx-wa-notif-text {
@@ -877,8 +852,8 @@ body.nx-about-dev-open{
   width: 6px; height: 6px;
   border-radius: 50%;
   background: #25D366;
-  box-shadow: 0 0 6px #25D366;
-  animation: nxWaGlowPulse 1.4s ease-in-out infinite;
+  box-shadow: 0 0 7px rgba(37,211,102,.45);
+  animation: none;
 }
 #nx-wa-notif-badge-text {
   font-size: 8px;
@@ -1103,7 +1078,7 @@ body.nx-about-dev-open{
 #nxUniversalRoom .nx-room-wrap{
   width:min(1260px,100%);
   margin:0 auto;
-  animation:nxRoomEnter .42s cubic-bezier(.16,1,.3,1) both;
+  animation:none;
 }
 @keyframes nxRoomEnter{
   from{opacity:0;transform:translateY(18px) scale(.985)}
@@ -1661,11 +1636,13 @@ html.nx-low-power .nx-wa-notif-glow,html.nx-low-power .nx-public-wa-icon,html.nx
 /* v6.3.5 — do not promote the transient WhatsApp popup on touch screens. */
 @media (pointer: coarse), (max-width:768px), (prefers-reduced-motion:reduce){
   #nx-wa-notif{
-    display:none!important;
-    animation:none!important;
+    width:calc(100% - 24px);
+    min-width:0;
+    max-width:390px;
+    top:10px;
     backdrop-filter:none!important;
     -webkit-backdrop-filter:none!important;
   }
-  #nx-wa-notif::before,#nx-wa-notif::after{display:none!important;animation:none!important}
+  #nx-wa-notif::before,#nx-wa-notif::after{animation:none!important}
   #nx-wa-notif-icon,#nx-wa-notif-badge-dot{animation:none!important;box-shadow:none!important}
 }

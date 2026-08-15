@@ -1,0 +1,35 @@
+"use strict";
+
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
+const root = path.resolve(__dirname, "..");
+const read = file => fs.readFileSync(path.join(root, file), "utf8");
+const html = read("index.html");
+const core = read("assets/css/core.css");
+const components = read("assets/css/components.css");
+const app = read("assets/js/core/app.js");
+const motion = read("assets/js/core/liquid-reactor.js");
+const performance = read("assets/js/core/performance.js");
+const about = read("assets/css/about.css");
+
+for (const attribute of ["autoplay", "muted", "loop", "playsinline"]) assert.match(html, new RegExp(`<video[^>]*${attribute}`, "i"));
+assert.match(html, /nx-membrane-a/);
+assert.match(html, /LIVE REACTOR/);
+assert.doesNotMatch(html, /nx-public-wa-actions/);
+assert.match(core, /grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+assert.match(core, /\.tab-content \{[\s\S]*?animation: none;/);
+assert.match(core, /nx-card-rgb/);
+assert.match(core, /nx-mercury-indicator\.is-moving/);
+assert.match(core, /nxMembraneDrift/);
+assert.match(app, /data-nx-category/);
+assert.match(app, /nx-card-format/);
+assert.match(motion, /data-nx-edge/);
+assert.match(motion, /nexora:tools-rendered/);
+assert.match(motion, /visibilitychange/);
+assert.match(performance, /ensureLoaded\(\);\s*syncPlayback\(\);/);
+assert.doesNotMatch(performance, /effectiveHeroMode==="auto"&&visible/);
+assert.doesNotMatch(components, /#nx-wa-notif\{\s*display:none!important/);
+assert.match(about, /aboutMembrane/);
+assert.match(about, /about-card:nth-child/);
+console.log("Liquid Reactor Step 4 visual-rescue checks passed.");

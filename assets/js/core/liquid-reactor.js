@@ -13,6 +13,7 @@
   var pointerX=0;
   var pointerY=0;
   var catalogVisible=true;
+  var indicatorTimer=0;
 
   function raf(callback){return window.requestAnimationFrame?window.requestAnimationFrame(callback):setTimeout(callback,16);}
   function activeTab(){return nav&&nav.querySelector('.nav-tab.active');}
@@ -26,6 +27,15 @@
     indicator.style.width=Math.round(tabBox.width)+'px';
     indicator.style.height=Math.round(tabBox.height)+'px';
   }
+  function moveIndicator(){
+    if(!indicator)return;
+    positionIndicator();
+    indicator.classList.remove('is-moving');
+    void indicator.offsetWidth;
+    indicator.classList.add('is-moving');
+    clearTimeout(indicatorTimer);
+    indicatorTimer=setTimeout(function(){indicator.classList.remove('is-moving');},620);
+  }
   function setupNavigation(){
     if(!nav)return;
     indicator=document.createElement('span');
@@ -35,6 +45,7 @@
     positionIndicator();
     window.addEventListener('resize',positionIndicator,{passive:true});
     nav.addEventListener('scroll',positionIndicator,{passive:true});
+    nav.addEventListener('click',function(event){if(event.target.closest('.nav-tab'))raf(moveIndicator);});
     nav.addEventListener('keydown',function(event){
       if(!/^Arrow(Left|Right)$/.test(event.key))return;
       var tabs=Array.prototype.slice.call(nav.querySelectorAll('.nav-tab'));
@@ -112,10 +123,28 @@
       var observer=new IntersectionObserver(function(entries){catalogVisible=Boolean(entries[0]&&entries[0].isIntersecting);if(!catalogVisible)clearPointer();},{threshold:0.02});
       if(nav)observer.observe(nav);
     }
+    document.addEventListener('nexora:tools-rendered',function(event){
+      var detail=event.detail||{};
+      var active=document.querySelector('.tab-content.active .section-title');
+      if(!active)return;
+      var meta=active.querySelector('.nx-catalog-meta');
+      if(!meta){
+        meta=document.createElement('span');
+        meta.className='nx-catalog-meta';
+        meta.innerHTML='<span>reactor catalog</span><b class="nx-catalog-count">0</b>';
+        active.appendChild(meta);
+      }
+      var count=meta.querySelector('.nx-catalog-count');
+      if(count)count.textContent=String(Number(detail.count)||0);
+    });
+    raf(function(){
+      var initial=cards().length;
+      document.dispatchEvent(new CustomEvent('nexora:tools-rendered',{detail:{count:initial,total:initial,tab:'all'}}));
+    });
   }
   function clearPointer(){
     if(pointerFrame){cancelAnimationFrame(pointerFrame);pointerFrame=0;}
-    if(pointerCard){pointerCard.classList.remove('nx-liquid-active');pointerCard.style.removeProperty('--nx-tilt-x');pointerCard.style.removeProperty('--nx-tilt-y');pointerCard.style.removeProperty('--nx-spec-x');pointerCard.style.removeProperty('--nx-spec-y');pointerCard=null;}
+    if(pointerCard){pointerCard.classList.remove('nx-liquid-active');pointerCard.removeAttribute('data-nx-edge');pointerCard.style.removeProperty('--nx-tilt-x');pointerCard.style.removeProperty('--nx-tilt-y');pointerCard.style.removeProperty('--nx-spec-x');pointerCard.style.removeProperty('--nx-spec-y');pointerCard=null;}
   }
   function setupCards(){
     if(coarse||reduced)return;
@@ -134,6 +163,9 @@
         pointerCard.style.setProperty('--nx-tilt-y',((px-.5)*2.2).toFixed(2)+'deg');
         pointerCard.style.setProperty('--nx-spec-x',(px*100).toFixed(1)+'%');
         pointerCard.style.setProperty('--nx-spec-y',(py*100).toFixed(1)+'%');
+        var edges={left:px,right:1-px,top:py,bottom:1-py};
+        var nearest=Object.keys(edges).reduce(function(best,key){return edges[key]<edges[best]?key:best;},'left');
+        pointerCard.setAttribute('data-nx-edge',nearest);
       });
     },{passive:true});
     document.addEventListener('pointerout',function(event){if(pointerCard&&!pointerCard.contains(event.relatedTarget))clearPointer();},{passive:true});
@@ -164,7 +196,10 @@
       setTimeout(function(){room.classList.remove('nx-liquid-room-exit');},260);
     });
   }
-  function init(){setupAperture();setupNavigation();setupGrid();setupCards();setupRoomEvents();}
+  function setupVisibility(){
+    document.addEventListener('visibilitychange',function(){document.documentElement.classList.toggle('nx-reactor-paused',document.hidden);});
+  }
+  function init(){setupAperture();setupNavigation();setupGrid();setupCards();setupRoomEvents();setupVisibility();}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
   window.__NEXORA_LIQUID_REACTOR__={version:'1.0.0',reducedMotion:reduced};
 })();

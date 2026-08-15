@@ -22,7 +22,7 @@ for (const token of [
   "modelSource: nxEsrganModelSource",
 ]) assert.ok(app.includes(token), `Runtime Local ESRGAN kehilangan ${token}`);
 
-assert.ok(index.includes("assets/js/core/app.js?v=6.3.18-hf3"), "cache key app.js belum memuat hotfix terbaru");
+assert.ok(index.includes("assets/js/core/app.js?v=6.3.18-lr4"), "cache key app.js belum memuat visual rescue terbaru");
 assert.equal(pkg.scripts.prebuild, "node scripts/prepare-ai-vendor.js", "prebuild vendor AI belum aktif");
 
 for (const token of [
