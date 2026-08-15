@@ -641,6 +641,7 @@ instagram:  {renderer:'renderInstagram',   category:'downloader', icon:'fa-brand
 
     room.classList.add('is-open');
     room.setAttribute('aria-hidden','false');
+    try{ window.dispatchEvent(new CustomEvent('nexora:tool-room-open',{detail:{toolId:toolId}})); }catch(_error){}
     document.body.classList.add('nx-universal-room-open');
     document.body.style.overflow = 'hidden';
     var scroller = document.getElementById('nxUniversalRoomScroll');
@@ -673,6 +674,7 @@ instagram:  {renderer:'renderInstagram',   category:'downloader', icon:'fa-brand
     if(useHistory && history.state && history.state.nxUniversalTool){
       try{ history.back(); return; }catch(e){}
     }
+    try{ window.dispatchEvent(new CustomEvent('nexora:tool-room-close',{detail:{toolId:currentToolId}})); }catch(_error){}
     room.classList.remove('is-visible');
     clearTimeout(closeTimer);
     closeTimer = setTimeout(finishClose,280);
