@@ -18,9 +18,11 @@ assert.match(components, /@media\(min-width:320px\) and \(max-width:767px\)\{[\s
 assert.doesNotMatch(core + components, /@media[^\{]*(?:370|400|600|767)px[^\{]*\{[\s\S]{0,500}?\.tools-grid\{grid-template-columns:(?:1fr|repeat\(2,)/);
 assert.match(components, /\.tools-card\{min-width:0!important;min-height:146px!important;height:100%;padding:8px!important;border-radius:13px!important/);
 assert.match(components, /\.tools-card p\{display:none!important\}/);
-assert.match(core, /\.user-card\{display:flex;flex-wrap:nowrap[^}]*height:94px[^}]*max-height:105px/);
-assert.match(core, /\.user-info\{display:flex;[^}]*flex-flow:row nowrap[^}]*overflow-x:auto[^}]*scrollbar-width:none/);
-assert.match(core, /\.user-info \.item\{[^}]*height:44px;min-height:44px/);
+assert.match(core, /\.user-card\{display:grid;grid-template-columns:repeat\(3,minmax\(0,1fr\)\);grid-template-rows:repeat\(2,minmax\(0,1fr\)\)[^}]*height:74px[^}]*max-height:74px/);
+assert.match(core, /\.user-info\{display:contents;[^}]*overflow:visible;mask-image:none;-webkit-mask-image:none/);
+assert.match(core, /\.user-info \.item\{display:grid;grid-template-columns:17px minmax\(0,1fr\)[^}]*min-width:0;width:100%;height:100%;min-height:0/);
+const mobileSessionRules = core.match(/@media \(max-width:768px\)\{[\s\S]*?\n\}/)?.[0] || "";
+assert.doesNotMatch(mobileSessionRules, /overflow-x:(?:auto|scroll)|flex-flow:row nowrap|min-width:max-content|width:max-content|scroll-snap-type/);
 assert.match(core, /\.video-banner\{[^}]*aspect-ratio:16\/9/);
 assert.match(core, /\.nx-membrane\{animation:none!important;filter:none!important/);
 assert.match(reactor, /if\(reduced\|\|coarse\)return;/);
