@@ -49,6 +49,14 @@
         "assets/js/features/web-intelligence.js"
       ]
     },
+    "ip-intelligence": {
+      "css": [
+        "assets/css/features/ip-intelligence.css"
+      ],
+      "js": [
+        "assets/js/features/ip-intelligence.js"
+      ]
+    },
     "space-explorer": {
       "css": [
         "assets/css/features/space-explorer.css"
@@ -158,6 +166,7 @@
     "virusscan": "virus-scan",
     "cryptomarket": "crypto-market",
     "webintel": "web-intelligence",
+    "ipintel": "ip-intelligence",
     "spaceexplorer": "space-explorer",
     "ocrintel": "ocr-intelligence",
     "imagevectorizer": "image-vectorizer",

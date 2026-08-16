@@ -86,6 +86,10 @@
       "destination": "/api/audit?mode=web-intelligence"
     },
     {
+      "source": "/api/ip-intelligence",
+      "destination": "/api/tool-health?mode=ip-intelligence"
+    },
+    {
       "source": "/api/space-explorer",
       "destination": "/api/tool-health?mode=space-explorer"
     },
