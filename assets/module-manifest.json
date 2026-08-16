@@ -157,6 +157,14 @@
       "js": [
         "assets/js/features/svg-alight.js"
       ]
+    },
+    "bmkg-open-data": {
+      "css": [
+        "assets/css/features/bmkg-open-data.css"
+      ],
+      "js": [
+        "assets/js/features/bmkg-open-data.js"
+      ]
     }
   },
   "tools": {
@@ -187,6 +195,7 @@
     "unbanwa": "unban-whatsapp",
     "vdeploy": "deploy-center",
     "webencryption": "web-encryption",
-    "svgalight": "svg-alight"
+    "svgalight": "svg-alight",
+    "bmkg": "bmkg-open-data"
   }
 }

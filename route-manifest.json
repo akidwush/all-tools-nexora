@@ -21,6 +21,7 @@
     "/api/crypto-market",
     "/api/web-intelligence",
     "/api/ip-intelligence",
+    "/api/bmkg",
     "/api/space-explorer",
     "/api/ocr-intelligence",
     "/api/vdeploy",

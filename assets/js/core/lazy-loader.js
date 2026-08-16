@@ -10,6 +10,7 @@
     'crypto-market': {css:['assets/css/features/crypto-market.css'],js:['assets/js/features/crypto-market.js']},
     'web-intelligence': {css:['assets/css/features/web-intelligence.css'],js:['assets/js/features/web-intelligence.js']},
     'ip-intelligence': {css:['assets/css/features/ip-intelligence.css'],js:['assets/js/features/ip-intelligence.js']},
+    'bmkg-open-data': {css:['assets/css/features/bmkg-open-data.css'],js:['assets/js/features/bmkg-open-data.js']},
     'space-explorer': {css:['assets/css/features/space-explorer.css'],js:['assets/js/features/space-explorer.js']},
     'ocr-intelligence': {css:['assets/css/features/ocr-intelligence.css'],js:['assets/js/features/ocr-intelligence.js']},
     'image-vectorizer': {css:['assets/css/features/image-vectorizer.css'],js:['assets/js/features/image-vectorizer.js']},
@@ -26,7 +27,7 @@
   };
 
   var toolModules = {
-    getcode:'get-code',tiktok:'tiktok',ttquote:'tiktok-quote',virusscan:'virus-scan',cryptomarket:'crypto-market',webintel:'web-intelligence',ipintel:'ip-intelligence',spaceexplorer:'space-explorer',ocrintel:'ocr-intelligence',svgalight:'svg-alight',imagevectorizer:'image-vectorizer',bigimage:'big-image',comicreader:'comic-reader',
+    getcode:'get-code',tiktok:'tiktok',ttquote:'tiktok-quote',virusscan:'virus-scan',cryptomarket:'crypto-market',webintel:'web-intelligence',ipintel:'ip-intelligence',bmkg:'bmkg-open-data',spaceexplorer:'space-explorer',ocrintel:'ocr-intelligence',svgalight:'svg-alight',imagevectorizer:'image-vectorizer',bigimage:'big-image',comicreader:'comic-reader',
     sertifikat:'source-features',fakedev:'source-features',
     promptgenerate:'imported-tools',fakeovo:'imported-tools',quotegenerator:'imported-tools',carifakta:'imported-tools',mltools:'imported-tools',
     iqc:'generator-pack',winquotes:'generator-pack',nokiamsg:'generator-pack',
@@ -35,7 +36,7 @@
   };
 
   var labels = {
-    'get code html':'getcode','tiktok':'tiktok','quote tiktok nexus':'ttquote','virus scan':'virusscan','crypto market scanner':'cryptomarket','nexora web intelligence':'webintel','ip & asn intelligence':'ipintel','ip asn intelligence':'ipintel','space explorer':'spaceexplorer','nexora ocr intelligence':'ocrintel','ocr intelligence':'ocrintel','svg → alight xml':'svgalight','svg alight xml':'svgalight','anime vector atelier':'svgalight','nexora image vectorizer':'imagevectorizer','image vectorizer':'imagevectorizer','big image':'bigimage','bigjpg upscaler':'bigimage','baca komik full':'comicreader',
+    'get code html':'getcode','tiktok':'tiktok','quote tiktok nexus':'ttquote','virus scan':'virusscan','crypto market scanner':'cryptomarket','nexora web intelligence':'webintel','ip & asn intelligence':'ipintel','ip asn intelligence':'ipintel','bmkg indonesia':'bmkg','bmkg':'bmkg','space explorer':'spaceexplorer','nexora ocr intelligence':'ocrintel','ocr intelligence':'ocrintel','svg → alight xml':'svgalight','svg alight xml':'svgalight','anime vector atelier':'svgalight','nexora image vectorizer':'imagevectorizer','image vectorizer':'imagevectorizer','big image':'bigimage','bigjpg upscaler':'bigimage','baca komik full':'comicreader',
     'sertifikat custom':'sertifikat','fakedev':'fakedev','prompt generator':'promptgenerate','fake ovo':'fakeovo',
     'quote generator':'quotegenerator','carifakta':'carifakta','ml tools':'mltools','iqc generator':'iqc',
     'windows quotes':'winquotes','nokia message':'nokiamsg','terabox downloader':'terabox','fake bank jago':'fakebankjago',

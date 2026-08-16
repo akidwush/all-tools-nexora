@@ -90,6 +90,10 @@
       "destination": "/api/tool-health?mode=ip-intelligence"
     },
     {
+      "source": "/api/bmkg",
+      "destination": "/api/tool-health?mode=bmkg-open-data"
+    },
+    {
       "source": "/api/space-explorer",
       "destination": "/api/tool-health?mode=space-explorer"
     },

@@ -1586,6 +1586,7 @@ let toolsData = {
         { id: 'cryptomarket', icon: 'fa-solid fa-chart-line', name: 'Crypto Market Scanner', desc: 'Pantau harga, volume, market cap dan pergerakan crypto', badge: 'LIVE' },
         { id: 'webintel', icon: 'fa-solid fa-satellite-dish', name: 'Nexora Web Intelligence', desc: 'Audit SEO, security, performa, aksesibilitas dan teknologi website', badge: 'INTEL' },
         { id: 'ipintel', icon: 'fa-solid fa-network-wired', name: 'IP & ASN Intelligence', desc: 'Lookup IPv4/IPv6, ASN, organisasi, negara dan benua via IPinfo Lite', badge: 'IPINFO' },
+        { id: 'bmkg', icon: 'fa-solid fa-cloud-sun-rain', name: 'BMKG Indonesia', desc: 'Gempa terkini, prakiraan cuaca 3 hari dan peringatan dini cuaca dari BMKG', badge: 'BMKG' },
         { id: 'spaceexplorer', icon: 'fa-solid fa-user-astronaut', name: 'Space Explorer', desc: 'APOD, galeri Mars, asteroid dekat Bumi dan cuaca antariksa NASA', badge: 'NASA' },
         { id: 'ocrintel', icon: 'fa-solid fa-file-lines', name: 'Nexora OCR Intelligence', desc: 'Ekstrak teks dari gambar dan PDF, analisis dokumen, lalu buat searchable PDF', badge: 'OCR' },
         { id: 'svgalight', icon: 'fa-solid fa-wand-magic-sparkles', name: 'SVG → Alight XML', desc: 'Konversi SVG ke XML Alight Motion dengan 4 mode: Lossless, Accurate, Balanced, Lightweight', badge: 'ANIME XML' },
@@ -1924,6 +1925,7 @@ function showTool(toolId) {
         case 'cryptomarket': renderCryptoMarket(body); break;
         case 'webintel': renderWebIntelligence(body); break;
         case 'ipintel': renderIpIntelligence(body); break;
+        case 'bmkg': renderBmkgIndonesia(body); break;
         case 'spaceexplorer': renderSpaceExplorer(body); break;
         case 'ocrintel': renderOcrIntelligence(body); break;
         case 'svgalight': renderSvgAlight(body); break;

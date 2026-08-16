@@ -9,6 +9,7 @@ const { handleSvgToXml } = require("../lib/svgtoxml-proxy");
 const { handleFreeConvertVectorizer } = require("../lib/freeconvert-vectorizer");
 const { handleBigImage } = require("../lib/bigjpg-upscaler");
 const { handleIpIntelligence } = require("../lib/ipinfo-intelligence");
+const { handleBmkgOpenData } = require("../lib/bmkg-open-data");
 const {
   TOOL_CATALOG,
   getHealthConfig,
@@ -102,6 +103,9 @@ module.exports = async function handler(request, response) {
 
   if (url.searchParams.get("mode") === "ip-intelligence") {
     return handleIpIntelligence(request, response, url);
+  }
+  if (url.searchParams.get("mode") === "bmkg-open-data") {
+    return handleBmkgOpenData(request, response, url);
   }
 
   if (request.method !== "GET" && request.method !== "POST") {

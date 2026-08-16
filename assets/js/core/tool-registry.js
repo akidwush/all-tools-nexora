@@ -29,6 +29,7 @@
     ["cryptomarket","Crypto Market Scanner","api","crypto-market","renderCryptoMarket","https://api.coingecko.com/"],
     ["webintel","Nexora Web Intelligence","hybrid","web-intelligence","renderWebIntelligence","https://pagespeedonline.googleapis.com/"],
     ["ipintel","IP & ASN Intelligence","api","ip-intelligence","renderIpIntelligence","https://api.ipinfo.io/"],
+    ["bmkg","BMKG Indonesia","api","bmkg-open-data","renderBmkgIndonesia","https://data.bmkg.go.id/"],
     ["spaceexplorer","Space Explorer","api","space-explorer","renderSpaceExplorer","https://api.nasa.gov/"],
     ["ocrintel","Nexora OCR Intelligence","api","ocr-intelligence","renderOcrIntelligence","https://api.ocr.space/"],
     ["svgalight","SVG → Alight XML","api","svg-alight","renderSvgAlight","https://svgtoxml.vercel.app/"],
