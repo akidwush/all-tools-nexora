@@ -83,41 +83,7 @@
     if(recoveryFrame)return;
     recoveryFrame=requestAnimationFrame(function(){recoveryFrame=0;reconcileScrollLock(false);});
   }
-  function safeReload(){
-    reconcileScrollLock(true);
-    var target;
-    try{
-      target=new URL(location.href);
-      target.hash="";
-      target.searchParams.set("nx_reload",Date.now().toString(36));
-      sessionStorage.setItem("nexora_safe_reload",String(Date.now()));
-      location.replace(target.href);
-    }catch(_error){location.reload();}
-  }
-  function ensureReloadFallback(){
-    var button=document.getElementById("nxSafeReload");
-    if(button)return button;
-    button=document.createElement("button");
-    button.id="nxSafeReload";
-    button.type="button";
-    button.setAttribute("aria-label","Muat ulang aman dan pulihkan layar");
-    button.title="Refresh aman";
-    button.innerHTML='<i class="fas fa-rotate-right" aria-hidden="true"></i><span>Refresh</span>';
-    button.addEventListener("click",safeReload);
-    document.body.appendChild(button);
-    return button;
-  }
-  function cleanReloadMarker(){
-    try{
-      var current=new URL(location.href);
-      if(!current.searchParams.has("nx_reload"))return;
-      current.searchParams.delete("nx_reload");
-      history.replaceState(history.state,"",current.pathname+current.search+current.hash);
-    }catch(_error){}
-  }
   function initializeRecovery(){
-    cleanReloadMarker();
-    ensureReloadFallback();
     reconcileScrollLock(false);
   }
   window.addEventListener("pageshow",function(){setTimeout(scheduleRecovery,0);});
@@ -327,7 +293,7 @@
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",function(){initializeRecovery();initializeStatus();},{once:true});
   else{initializeRecovery();initializeStatus();}
 
-  window.NexoraViewportRecovery={reconcile:reconcileScrollLock,reload:safeReload};
-  window.NexoraStability={version:"6.3.20-hf7",audit:audit,loadHealth:loadHealth,applyCardStatus:applyCardStatus,notify:notify,fetchJson:fetchJson,reconcileScrollLock:reconcileScrollLock,safeReload:safeReload,getLastAudit:function(){return lastAudit;},getHealth:function(id){return healthMap[id]||null;}};
+  window.NexoraViewportRecovery={reconcile:reconcileScrollLock};
+  window.NexoraStability={version:"6.3.21-hf8",audit:audit,loadHealth:loadHealth,applyCardStatus:applyCardStatus,notify:notify,fetchJson:fetchJson,reconcileScrollLock:reconcileScrollLock,getLastAudit:function(){return lastAudit;},getHealth:function(id){return healthMap[id]||null;}};
   window.dispatchEvent(new CustomEvent("nexora:stability-ready"));
 })();

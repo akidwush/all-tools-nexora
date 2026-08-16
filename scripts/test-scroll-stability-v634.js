@@ -27,8 +27,8 @@ assert.match(stability, /Status slots are rendered with the card/);
 assert.doesNotMatch(stability, /new MutationObserver/);
 assert.doesNotMatch(stability, /card\.appendChild\(badge\)/);
 
-assert.match(shell, /function shouldSuppress\(\)/);
-assert.match(shell, /pointer: coarse/);
+assert.doesNotMatch(shell, /function shouldSuppress\(\)|maxTouchPoints|pointer: coarse/);
+assert.match(shell, /WhatsApp notification on desktop and touch devices/);
 assert.doesNotMatch(componentsCss, /#nx-wa-notif\{\s*display:none!important/);
 assert.match(componentsCss, /#nx-wa-notif-icon,#nx-wa-notif-badge-dot\{animation:none!important;box-shadow:none!important\}/);
 assert.match(componentsCss, /prefers-reduced-motion:reduce/);

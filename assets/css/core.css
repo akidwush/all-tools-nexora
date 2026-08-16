@@ -637,7 +637,7 @@ body {
 
 .footer {
     text-align: center;
-    padding: 30px 0 10px;
+    padding: 30px 0 max(24px,env(safe-area-inset-bottom));
     color: #4a3a6a;
     font-size: 11px;
     border-top: 1px solid rgba(168, 85, 247, 0.04);
@@ -647,6 +647,14 @@ body {
 .footer i {
     color: #7c3aed;
 }
+
+.nx-footer-brand{display:flex;align-items:center;justify-content:center;gap:5px}
+.nx-footer-socials{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:9px;margin-top:14px}
+.nx-footer-socials[hidden]{display:none!important}
+.nx-footer-social-link{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:44px;min-height:44px;padding:0 13px;border:1px solid color-mix(in srgb,var(--nx-social-accent,#a855f7) 38%,transparent);border-radius:999px;background:color-mix(in srgb,var(--nx-social-accent,#a855f7) 9%,#0d0d14);box-shadow:inset 0 1px 0 rgba(255,255,255,.05);color:#d8cfdf;text-decoration:none;font-size:9px;font-weight:750;transition:transform .18s ease,border-color .18s ease,background .18s ease;touch-action:manipulation}
+.nx-footer-social-link i{color:var(--nx-social-accent,#a855f7);font-size:15px}
+.nx-footer-social-link:hover,.nx-footer-social-link:focus-visible{transform:translateY(-2px);border-color:var(--nx-social-accent,#a855f7);outline:none}
+@media(max-width:600px){.nx-footer-social-link{width:44px;padding:0}.nx-footer-social-link span{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}}
 
 .tool-viewer {
     display: none;
@@ -1608,12 +1616,6 @@ img,video,canvas,svg,iframe{max-inline-size:100%}
 html.nx-pinch-zoom .bg-glow{position:absolute;inset:0;contain:paint}
 @supports not (overflow:clip){html,body{overflow-x:hidden}}
 @media (max-width:380px){#ttRoomOverlay .dl-media-grid{grid-template-columns:minmax(0,1fr);}}
-
-/* Refresh alternatif tetap dapat disentuh walau sebuah overlay/scroll lock macet. */
-#nxSafeReload{display:none;position:fixed;z-index:2147483000;left:12px;bottom:max(12px,env(safe-area-inset-bottom));align-items:center;justify-content:center;gap:7px;min-width:48px;min-height:48px;padding:0 12px;border:1px solid rgba(189,247,255,.3);border-radius:15px;background:rgba(13,14,22,.94);box-shadow:0 12px 34px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.08);color:#eafcff;font:750 9px/1 Poppins,sans-serif;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-#nxSafeReload i{font-size:13px;color:#bdf7ff}
-.nx-ai-launcher.is-left~#nxSafeReload{left:auto;right:12px}
-@media (max-width:900px),(pointer:coarse){#nxSafeReload{display:inline-flex}}
 
 /* Nexora HF3 — smooth interaction without permanent compositor layers. */
 @media (hover:hover) and (pointer:fine){

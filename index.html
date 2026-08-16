@@ -47,7 +47,7 @@
 
 
 
-<link href="assets/css/core.css?v=6.3.18-hf71-zoomlock1" rel="stylesheet"/><link href="assets/css/components.css?v=6.3.18-lr4-hf7-mobile1" rel="stylesheet"/><link href="assets/css/personal-ai.css?v=6.3.18-ai1-hf7-mobile1" rel="stylesheet"/><link as="script" href="assets/js/core/app.js?v=6.3.18-lr4-hf5-download1-hf6-dl4" rel="preload"/></head>
+<link href="assets/css/core.css?v=6.3.18-hf8-public-controls1" rel="stylesheet"/><link href="assets/css/components.css?v=6.3.18-hf8-public-controls1" rel="stylesheet"/><link href="assets/css/personal-ai.css?v=6.3.18-hf8-drag1" rel="stylesheet"/><link as="script" href="assets/js/core/app.js?v=6.3.18-lr4-hf5-download1-hf6-dl4" rel="preload"/></head>
 <body><noscript>All Tools Nexora membutuhkan JavaScript untuk menjalankan fitur.</noscript>
 <div class="splash-screen" id="splash">
 <div class="nx-grid"></div>
@@ -81,7 +81,7 @@
 </span>
 <span class="nx-top-nav-text">
 <b>Menu Informasi</b>
-<span>About Dev · Report Bug · Saluran WhatsApp</span>
+<span>About Dev · Report Bug · Informasi</span>
 </span>
 </div>
 <div class="nx-top-menu" id="nxTopMenu">
@@ -139,25 +139,6 @@
 <i class="fa-solid fa-arrow-right"></i>
 </span>
 </button>
-<button class="nx-top-menu-item" hidden id="nxTopMenuWhatsApp" style="
-        --nx-menu-color:#25d366;
-        --nx-menu-rgb:37,211,102;
-      " type="button">
-<span class="nx-top-menu-item-icon" style="color:#25d366;border-color:rgba(37,211,102,.18);background:rgba(37,211,102,.06)">
-<i class="fa-brands fa-whatsapp"></i>
-</span>
-<span class="nx-top-menu-item-copy">
-<b>Gabung Saluran WhatsApp</b>
-<span>
-          Ikuti update fitur, project baru,
-          dan informasi All Tools Nexora.
-        </span>
-</span>
-<span class="nx-top-menu-item-arrow" style="color:#25d366;background:rgba(37,211,102,.05)">
-<i class="fa-solid fa-arrow-up-right-from-square"></i>
-</span>
-</button>
-<span class="nx-top-menu-social-links" id="nxTopMenuSocialLinks"></span>
 </nav>
 </div>
 </div>
@@ -295,9 +276,10 @@
 <!-- Rendered from the catalog data by assets/js/core/app.js. -->
 </div>
 </div>
-<div class="footer">
-<i class="fas fa-bolt"></i> All Tools Nexora · Developer Dika
-        </div>
+<footer class="footer">
+<div class="nx-footer-brand"><i class="fas fa-bolt"></i> All Tools Nexora · Developer Dika</div>
+<nav aria-label="Sosial media All Tools Nexora" class="nx-footer-socials" hidden id="nxFooterSocialLinks"></nav>
+</footer>
 </div>
 <div aria-hidden="true" class="nx-about-dev-room" id="nxAboutDevRoom">
 <header class="nx-about-dev-head">
@@ -405,9 +387,9 @@
 </div>
 
 <!-- WhatsApp Channel Notification - Liquid Glass -->
-
-<a data-social-key="whatsapp_channel" hidden href="#" id="nx-wa-notif" rel="noopener" target="_blank">
-<button id="nx-wa-notif-close" onclick="event.preventDefault();event.stopPropagation();var n=document.getElementById('nx-wa-notif');n.classList.remove('show');n.classList.add('hide');" title="Tutup">✕</button>
+<aside aria-label="Notifikasi saluran WhatsApp" aria-live="polite" hidden id="nx-wa-notif">
+<button aria-label="Tutup notifikasi WhatsApp" id="nx-wa-notif-close" title="Tutup" type="button">✕</button>
+<a data-social-key="whatsapp_channel" hidden href="#" id="nx-wa-notif-link" rel="noopener noreferrer" target="_blank">
 <div id="nx-wa-notif-icon">
 <svg viewbox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M16 2.938C8.832 2.938 3.063 8.707 3.063 15.875c0 2.27.613 4.396 1.68 6.236L2.938 29.063l7.178-1.78a12.87 12.87 0 0 0 5.884 1.405c7.168 0 12.938-5.77 12.938-12.938C29.063 8.707 23.168 2.938 16 2.938zm0 23.624a10.638 10.638 0 0 1-5.43-1.487l-.39-.232-4.26 1.058 1.082-3.958-.254-.406A10.59 10.59 0 0 1 5.313 15.875C5.313 9.954 10.08 5.188 16 5.188S26.75 9.954 26.75 15.875 21.92 26.563 16 26.563zm5.82-7.963c-.317-.16-1.877-.926-2.168-1.033-.292-.106-.504-.16-.716.16s-.822 1.033-1.008 1.245c-.185.213-.37.24-.688.08-.317-.16-1.34-.494-2.553-1.576-.943-.842-1.58-1.882-1.765-2.2-.185-.317-.02-.49.14-.648.143-.142.317-.37.476-.556.16-.185.213-.317.32-.53.107-.212.053-.398-.027-.556-.08-.16-.716-1.726-.98-2.363-.258-.62-.52-.536-.716-.547l-.609-.01c-.213 0-.557.08-.848.398-.292.317-1.113 1.087-1.113 2.65s1.14 3.074 1.3 3.287c.16.213 2.245 3.427 5.44 4.806.76.328 1.353.524 1.816.67.763.243 1.458.209 2.006.127.611-.091 1.877-.768 2.142-1.51.265-.742.265-1.378.185-1.51-.08-.133-.292-.213-.61-.37z"></path></svg>
 </div>
@@ -421,9 +403,7 @@
 </div>
 <div id="nx-wa-notif-arrow">›</div>
 </a>
-
-
-&gt;
+</aside>
 
 
 
@@ -470,4 +450,4 @@
   <div class="nx-ai-suggestions" id="nxAiSuggestions" aria-label="Saran pertanyaan"></div>
   <form class="nx-ai-compose" id="nxAiForm"><div class="nx-ai-input-wrap"><textarea class="nx-ai-input" id="nxAiInput" rows="1" maxlength="4000" placeholder="Tulis pesan untuk Personal AI…" aria-label="Pesan untuk Personal AI"></textarea><button class="nx-ai-send" id="nxAiSend" type="submit" aria-label="Kirim pesan"><i class="fa-solid fa-arrow-up"></i></button></div><div class="nx-ai-compose-meta"><span>Gemini · respons dapat keliru</span><button class="nx-ai-stop" id="nxAiStop" type="button" hidden><i class="fa-solid fa-stop"></i> Hentikan respons</button></div></form>
 </section>
-<script src="assets/js/core/network.js?v=6.3.18-dl1"></script><script src="assets/js/core/performance.js?v=6.3.18-lr4-rsp1"></script><script src="assets/js/core/app.js?v=6.3.18-lr4-hf5-download1-hf6-dl4"></script><script src="assets/js/core/downloader-renderers.js?v=6.3.18-hf5-download1-hf6-dl4"></script><script src="assets/js/core/social-links.js?v=6.3.18"></script><script src="assets/js/core/shell.js?v=6.3.18-lr4-hf5-route1-hf6-dl4"></script><script src="assets/js/core/liquid-reactor.js?v=6.3.18-lr4-rsp2-cursor2"></script><script src="assets/branding.js?v=6.3.18"></script><script src="assets/js/core/tool-health.js?v=6.3.18"></script><script src="assets/js/core/analytics.js?v=6.3.18"></script><script src="assets/js/core/tool-registry.js?v=6.3.18-dl1-hf6-dl4"></script><script src="assets/js/core/stability.js?v=6.3.18-hf71-zoomlock1"></script><script src="assets/js/core/lazy-loader.js?v=6.3.18-lr4-hf5-route1-hf6-dl4"></script><script src="assets/js/core/personal-ai.js?v=6.3.18-ai1-hf7-mobile1"></script></body></html>
+<script src="assets/js/core/network.js?v=6.3.18-dl1"></script><script src="assets/js/core/performance.js?v=6.3.18-lr4-rsp1"></script><script src="assets/js/core/app.js?v=6.3.18-lr4-hf5-download1-hf6-dl4"></script><script src="assets/js/core/downloader-renderers.js?v=6.3.18-hf5-download1-hf6-dl4"></script><script src="assets/js/core/social-links.js?v=6.3.18-hf8-footer1"></script><script src="assets/js/core/shell.js?v=6.3.18-hf8-wa-popup1"></script><script src="assets/js/core/liquid-reactor.js?v=6.3.18-lr4-rsp2-cursor2"></script><script src="assets/branding.js?v=6.3.18"></script><script src="assets/js/core/tool-health.js?v=6.3.18"></script><script src="assets/js/core/analytics.js?v=6.3.18"></script><script src="assets/js/core/tool-registry.js?v=6.3.18-dl1-hf6-dl4"></script><script src="assets/js/core/stability.js?v=6.3.18-hf8-no-refresh1"></script><script src="assets/js/core/lazy-loader.js?v=6.3.18-lr4-hf5-route1-hf6-dl4"></script><script src="assets/js/core/personal-ai.js?v=6.3.18-hf8-drag1"></script></body></html>

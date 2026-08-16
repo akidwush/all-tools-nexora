@@ -116,11 +116,6 @@
       "nxTopMenuFeedback"
     );
 
-  const whatsapp =
-    document.getElementById(
-      "nxTopMenuWhatsApp"
-    );
-
   if(
     !menu ||
     !button ||
@@ -272,17 +267,6 @@
             "saranide"
           );
         }
-      }
-    );
-  }
-
-  if(whatsapp){
-    whatsapp.addEventListener(
-      "click",
-      () => {
-        closeMenu();
-        const target = whatsapp.dataset.socialUrl;
-        if(target) window.open(target,"_blank","noopener,noreferrer");
       }
     );
   }
@@ -465,35 +449,29 @@
   window.isNexusLockedTool=function(){return false;};
 })();
 
-/* ===== original script 20: inline-20 ===== */
+/* ===== HF8: WhatsApp notification on desktop and touch devices ===== */
 (function(){
   var notif = document.getElementById('nx-wa-notif');
   if(!notif) return;
+  var closeButton=document.getElementById('nx-wa-notif-close');
   var scheduled=false;
-  function shouldSuppress(){
-    var reduced=false;
-    var touchLike=Boolean(typeof navigator!=="undefined"&&navigator.maxTouchPoints>0);
-    try{
-      reduced=Boolean(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-      touchLike=touchLike||Boolean(window.matchMedia&&window.matchMedia('(max-width: 768px), (pointer: coarse)').matches);
-    }catch(_){touchLike=touchLike||window.innerWidth<=768;}
-    return reduced||touchLike;
+  var showTimer=0,hideTimer=0;
+  function dismiss(){
+    clearTimeout(showTimer);clearTimeout(hideTimer);
+    notif.classList.remove('show');
+    notif.classList.add('hide');
   }
   function schedule(){
     if(scheduled||!notif.dataset.socialUrl)return;
-    if(shouldSuppress()){
-      notif.classList.remove('show','hide');
-      return;
-    }
     scheduled=true;
-    setTimeout(function(){notif.classList.add('show');},5000);
-    setTimeout(function(){
-      if(!notif.classList.contains('hide')){
-        notif.classList.remove('show');
-        notif.classList.add('hide');
-      }
-    },20000);
+    showTimer=setTimeout(function(){
+      if(notif.hidden)return;
+      notif.classList.remove('hide');
+      notif.classList.add('show');
+      hideTimer=setTimeout(dismiss,15000);
+    },3500);
   }
+  if(closeButton)closeButton.addEventListener('click',function(event){event.preventDefault();event.stopPropagation();dismiss();});
   document.addEventListener('nexora:social-links-ready',schedule,{once:true});
   schedule();
 })();

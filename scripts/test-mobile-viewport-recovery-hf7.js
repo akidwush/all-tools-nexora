@@ -14,16 +14,15 @@ assert.match(css, /#nxUniversalRoom[\s\S]*inset:0!important;width:auto!important
 assert.match(css, /overscroll-behavior-y:auto/, "pull-to-refresh browser harus diizinkan");
 assert.match(css, /touch-action:pan-x pan-y/, "scroll vertikal/horizontal harus tetap diizinkan");
 assert.doesNotMatch(css, /touch-action:pan-x pan-y pinch-zoom/, "pinch zoom harus dinonaktifkan");
-assert.match(css, /#nxSafeReload\{display:none;position:fixed;z-index:2147483000/);
+assert.doesNotMatch(css, /#nxSafeReload/, "tombol refresh alternatif harus sudah dihapus");
 assert.match(stability, /Math\.abs\(scale-1\)>0\.025/);
 assert.match(stability, /function reconcileScrollLock\(forceUnlock\)/);
 assert.match(stability, /body\.style\.removeProperty\("overflow"\)/);
-assert.match(stability, /target\.hash=""/);
-assert.match(stability, /searchParams\.set\("nx_reload"/);
+assert.doesNotMatch(stability, /safeReload|nxSafeReload|nx_reload/, "stability tidak boleh membuat ulang tombol refresh");
 assert.doesNotMatch(stability, /new MutationObserver/);
 assert.match(stability, /document\.addEventListener\("click"/);
 assert.match(ai, /if\(Math\.abs\(scale-1\)>0\.025\)return/);
-assert.match(html, /core\.css\?v=6\.3\.18-hf71-zoomlock1/);
-assert.match(html, /stability\.js\?v=6\.3\.18-hf71-zoomlock1/);
+assert.match(html, /core\.css\?v=6\.3\.18-hf8-public-controls1/);
+assert.match(html, /stability\.js\?v=6\.3\.18-hf8-no-refresh1/);
 
-console.log("HF7 mobile recovery lulus: pinch zoom stabil, scroll lock pulih, pull-to-refresh aktif, dan refresh aman tersedia.");
+console.log("HF7/HF8 mobile recovery lulus: pinch zoom stabil, scroll lock pulih, pull-to-refresh browser aktif, dan tombol refresh tambahan tidak dibuat.");

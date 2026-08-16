@@ -2,7 +2,7 @@
   "use strict";
 
   const state = { rows: [], byKey: new Map(), loaded: false };
-  const specialKeys = new Set(["whatsapp_channel", "whatsapp_access"]);
+  const footerExcludedKeys = new Set(["whatsapp_access"]);
   const CACHE_KEY = "nexora_social_links_v63";
   const CACHE_TTL = 15 * 60 * 1000;
   const FALLBACK_ROWS = [
@@ -57,23 +57,8 @@
   }
 
   function applyWhatsappChannel(item){
-    const menuButton = document.getElementById("nxTopMenuWhatsApp");
     const channelLinks = Array.from(document.querySelectorAll("[data-social-key='whatsapp_channel']"));
     const notification = document.getElementById("nx-wa-notif");
-
-    if (menuButton){
-      menuButton.hidden = !item;
-      menuButton.dataset.socialUrl = item ? item.url : "";
-      if (item){
-        menuButton.style.setProperty("--nx-menu-color", item.accentColor);
-        const label = menuButton.querySelector(".nx-top-menu-item-copy b");
-        const description = menuButton.querySelector(".nx-top-menu-item-copy span");
-        const icon = menuButton.querySelector(".nx-top-menu-item-icon i");
-        if (label) label.textContent = item.label;
-        if (description) description.textContent = item.description;
-        if (icon) icon.className = item.icon;
-      }
-    }
 
     channelLinks.forEach(link => {
       link.hidden = !item;
@@ -90,7 +75,6 @@
 
     if (notification){
       notification.hidden = !item;
-      notification.href = item ? item.url : "#";
       notification.dataset.socialUrl = item ? item.url : "";
       if (item){
         const title = document.getElementById("nx-wa-notif-title");
@@ -117,22 +101,28 @@
     });
   }
 
-  function renderAdditionalLinks(rows){
-    const host = document.getElementById("nxTopMenuSocialLinks");
+  function renderFooterLinks(rows){
+    const host = document.getElementById("nxFooterSocialLinks");
     if (!host) return;
     host.replaceChildren();
-    rows.filter(item => !specialKeys.has(item.key)).forEach(item => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "nx-top-menu-item nx-social-menu-item";
-      button.style.setProperty("--nx-menu-color", item.accentColor);
-      button.innerHTML = '<span class="nx-top-menu-item-icon"><i></i></span><span class="nx-top-menu-item-copy"><b></b><span></span></span><span class="nx-top-menu-item-arrow"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>';
-      button.querySelector("i").className = item.icon;
-      button.querySelector("b").textContent = item.label;
-      button.querySelector(".nx-top-menu-item-copy span").textContent = item.description;
-      button.addEventListener("click", () => open(item.url));
-      host.appendChild(button);
+    rows.filter(item => !footerExcludedKeys.has(item.key)).forEach(item => {
+      const link = document.createElement("a");
+      link.className = "nx-footer-social-link";
+      link.href = item.url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.title = item.label;
+      link.setAttribute("aria-label", item.label);
+      link.style.setProperty("--nx-social-accent", item.accentColor);
+      const icon = document.createElement("i");
+      icon.className = item.icon;
+      icon.setAttribute("aria-hidden", "true");
+      const label = document.createElement("span");
+      label.textContent = item.label;
+      link.append(icon, label);
+      host.appendChild(link);
     });
+    host.hidden = host.childElementCount === 0;
   }
 
   function apply(rows){
@@ -141,7 +131,7 @@
     state.loaded = true;
     applyWhatsappChannel(state.byKey.get("whatsapp_channel") || null);
     applyWhatsappAccess(state.byKey.get("whatsapp_access") || null);
-    renderAdditionalLinks(state.rows);
+    renderFooterLinks(state.rows);
     document.dispatchEvent(new CustomEvent("nexora:social-links-ready", { detail: { rows: state.rows.slice() } }));
   }
 
