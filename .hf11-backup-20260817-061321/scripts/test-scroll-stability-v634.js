@@ -27,12 +27,13 @@ assert.match(stability, /Status slots are rendered with the card/);
 assert.doesNotMatch(stability, /new MutationObserver/);
 assert.doesNotMatch(stability, /card\.appendChild\(badge\)/);
 
-assert.doesNotMatch(shell, /nx-wa-notif|WhatsApp notification on desktop and touch devices/);
-assert.doesNotMatch(componentsCss, /#nx-wa-notif/);
-assert.match(componentsCss, /nx-about-dev-room:not\(\.is-open\)/);
-assert.match(coreCss, /HF11\.1 — MOBILE TAB COMPOSITOR FIX/);
+assert.doesNotMatch(shell, /function shouldSuppress\(\)|maxTouchPoints|pointer: coarse/);
+assert.match(shell, /WhatsApp notification on desktop and touch devices/);
+assert.doesNotMatch(componentsCss, /#nx-wa-notif\{\s*display:none!important/);
+assert.match(componentsCss, /#nx-wa-notif-icon,#nx-wa-notif-badge-dot\{animation:none!important;box-shadow:none!important\}/);
+assert.match(componentsCss, /prefers-reduced-motion:reduce/);
 
 assert.equal((html.match(/class="tools-card/g) || []).length, 0);
 assert.match(html, /id="allGrid"[^>]*aria-busy="true"/);
 
-console.log('Scroll stability regression tests lulus: no card containment jump, no observer auto-reflow, room iframe tidak bocor, dan mobile tab compositor aman.');
+console.log('Scroll stability regression tests lulus: no card containment jump, no observer auto-reflow, no late badge mutation, dan WhatsApp mobile tanpa animasi compositor berulang.');

@@ -30,7 +30,7 @@ assert.match(motion, /visibilitychange/);
 assert.match(performance, /ensureLoaded\(\);/);
 assert.match(performance, /ensurePlayback\(\);/);
 assert.doesNotMatch(performance, /pauseVideo|nx-hero-video-toggle/);
-assert.doesNotMatch(components, /#nx-wa-notif/);
+assert.doesNotMatch(components, /#nx-wa-notif\{\s*display:none!important/);
 assert.match(about, /aboutMembrane/);
 assert.match(about, /about-card:nth-child/);
 console.log("Liquid Reactor Step 4 visual-rescue checks passed.");

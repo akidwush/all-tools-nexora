@@ -39,7 +39,6 @@ const socialLinksClient = fs.readFileSync(path.join(root, "assets/js/core/social
 assert.equal(publicDatabase.includes("accent_color,is_active,sort_order"), true, "API publik harus mengirim is_active");
 assert.equal(socialLinksClient.includes("row.is_active === false"), true, "loader sosial harus menerima respons aktif yang tidak menyertakan is_active");
 assert.equal(index.includes('id="nxPublicWhatsApp"'), false, "CTA WhatsApp ganda di bawah hero harus dihapus");
-assert.equal((index.match(/data-social-key="whatsapp_channel"/g) || []).length >= 1, true, "Saluran WhatsApp harus tetap tersedia sebagai link sosial/footer tanpa popup notifikasi");
-assert.equal(index.includes('id="nx-wa-notif"'), false, "Notifikasi WhatsApp transient harus dihapus dari markup");
+assert.equal((index.match(/data-social-key="whatsapp_channel"/g) || []).length >= 2, true, "Saluran WhatsApp harus tetap tersedia di menu dan notifikasi");
 assert.equal((index.match(/data-social-key="whatsapp_access"/g) || []).length >= 1, true, "Akses WhatsApp harus tetap tersedia di area akses tools");
-console.log("Nexora v6.2.1/HF11 tests lulus: data sosial tetap aktif tanpa popup WhatsApp transient.");
+console.log("Nexora v6.2.1 tests lulus: data sosial tetap aktif tanpa kartu WhatsApp ganda di bawah hero.");

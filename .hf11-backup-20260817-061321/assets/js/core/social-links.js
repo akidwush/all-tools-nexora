@@ -58,6 +58,7 @@
 
   function applyWhatsappChannel(item){
     const channelLinks = Array.from(document.querySelectorAll("[data-social-key='whatsapp_channel']"));
+    const notification = document.getElementById("nx-wa-notif");
 
     channelLinks.forEach(link => {
       link.hidden = !item;
@@ -71,6 +72,17 @@
       if (description) description.textContent = item.description;
       if (icon) icon.className = item.icon;
     });
+
+    if (notification){
+      notification.hidden = !item;
+      notification.dataset.socialUrl = item ? item.url : "";
+      if (item){
+        const title = document.getElementById("nx-wa-notif-title");
+        const description = document.getElementById("nx-wa-notif-desc");
+        if (title) title.textContent = item.label;
+        if (description) description.textContent = item.description;
+      }
+    }
   }
 
   function applyWhatsappAccess(item){

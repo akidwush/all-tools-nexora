@@ -22,13 +22,10 @@ assert.match(socials, /footerExcludedKeys = new Set\(\["whatsapp_access"\]\)/);
 assert.match(socials, /host\.hidden = host\.childElementCount === 0/);
 assert.match(core, /\.nx-footer-social-link\{/);
 
-assert.match(html, /<aside[^>]+id="nx-wa-notif"[\s\S]*?<button[^>]+id="nx-wa-notif-close"[\s\S]*?<a[^>]+id="nx-wa-notif-link"/);
-assert.doesNotMatch(html, /<a\s[^>]+id="nx-wa-notif"[\s\S]*?<button/);
-assert.match(shell, /HF8: WhatsApp notification on desktop and touch devices/);
-assert.doesNotMatch(shell, /shouldSuppress|maxTouchPoints|pointer: coarse/);
-assert.match(shell, /showTimer=setTimeout/);
-assert.match(shell, /closeButton\.addEventListener\('click'/);
-assert.match(components, /#nx-wa-notif-link\{/);
+assert.doesNotMatch(html, /id="nx-wa-notif"/);
+assert.doesNotMatch(shell, /WhatsApp notification on desktop and touch devices|showTimer=setTimeout|nx-wa-notif-close/);
+assert.doesNotMatch(socials, /getElementById\("nx-wa-notif"\)/);
+assert.doesNotMatch(components, /#nx-wa-notif/);
 
 assert.doesNotMatch(core + stability + html, /nxSafeReload|safeReload|nx_reload/);
 assert.match(stability, /NexoraViewportRecovery=\{reconcile:reconcileScrollLock\}/);
@@ -44,4 +41,4 @@ for (const [name, source] of [["social-links", socials], ["shell", shell], ["sta
   assert.doesNotThrow(() => new Function(source), `${name}.js harus valid secara sintaks`);
 }
 
-console.log("HF8 public controls lulus: sosmed di footer, Refresh hilang, AI draggable persisten, dan popup WhatsApp aktif di HP.");
+console.log("HF8/HF11 public controls lulus: sosmed di footer, Refresh hilang, AI draggable persisten, dan popup WhatsApp dihapus total.");

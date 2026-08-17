@@ -1763,24 +1763,3 @@ html.nx-low-power .tools-card,html.nx-low-power .nav-tab,html.nx-low-power .nx-p
 @media (prefers-reduced-motion:reduce){
   .custom-cursor,.custom-cursor-core,.touch-follower,.cursor-trail{display:none!important;animation:none!important}
 }
-
-
-/* =========================================================
-   HF11.1 — MOBILE TAB COMPOSITOR FIX
-   Chrome/Android can smear the animated mercury layer during fast scroll.
-   Touch devices use a static active pill; desktop keeps the reactor effect.
-   ========================================================= */
-@media (pointer:coarse),(max-width:768px){
-  #navTabs{
-    isolation:isolate;
-    overflow-x:auto!important;
-    overflow-y:hidden!important;
-    overscroll-behavior-x:contain;
-  }
-  #navTabs.nx-static-tabs .nx-mercury-indicator{display:none!important;}
-  #navTabs.nx-static-tabs .nav-tab.active{
-    background:linear-gradient(112deg,rgba(128,78,221,.62),rgba(189,247,255,.17) 52%,rgba(168,108,245,.42))!important;
-    border:1px solid rgba(189,247,255,.34)!important;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.18)!important;
-  }
-}

@@ -449,6 +449,32 @@
   window.isNexusLockedTool=function(){return false;};
 })();
 
+/* ===== HF8: WhatsApp notification on desktop and touch devices ===== */
+(function(){
+  var notif = document.getElementById('nx-wa-notif');
+  if(!notif) return;
+  var closeButton=document.getElementById('nx-wa-notif-close');
+  var scheduled=false;
+  var showTimer=0,hideTimer=0;
+  function dismiss(){
+    clearTimeout(showTimer);clearTimeout(hideTimer);
+    notif.classList.remove('show');
+    notif.classList.add('hide');
+  }
+  function schedule(){
+    if(scheduled||!notif.dataset.socialUrl)return;
+    scheduled=true;
+    showTimer=setTimeout(function(){
+      if(notif.hidden)return;
+      notif.classList.remove('hide');
+      notif.classList.add('show');
+      hideTimer=setTimeout(dismiss,15000);
+    },3500);
+  }
+  if(closeButton)closeButton.addEventListener('click',function(event){event.preventDefault();event.stopPropagation();dismiss();});
+  document.addEventListener('nexora:social-links-ready',schedule,{once:true});
+  schedule();
+})();
 
 /* ===== original script 26: nxUniversalToolRoomsScript ===== */
 (function(){

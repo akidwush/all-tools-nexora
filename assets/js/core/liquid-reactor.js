@@ -38,6 +38,7 @@
   }
   function setupNavigation(){
     if(!nav)return;
+    if(coarse){nav.classList.add('nx-static-tabs');return;}
     indicator=document.createElement('span');
     indicator.className='nx-mercury-indicator';
     indicator.setAttribute('aria-hidden','true');

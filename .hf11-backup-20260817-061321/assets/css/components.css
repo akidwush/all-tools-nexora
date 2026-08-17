@@ -592,7 +592,7 @@ body.nx-about-dev-open{
     border-color .15s ease;
 }
 
-[data-social-key][hidden],.nx-top-menu-item[hidden]{display:none!important}
+[data-social-key][hidden],.nx-top-menu-item[hidden],#nx-wa-notif[hidden]{display:none!important}
 
 .nx-top-menu-item:hover{
   border-color:rgba(255,255,255,.14);
@@ -747,6 +747,183 @@ body.nx-about-dev-open{
   .nx-access-lock-actions{grid-template-columns:1fr}
 }
 
+/* ===== original style block 16 ===== */
+@keyframes nxWaSlideIn {
+  from { transform: translateX(-50%) translateY(-110px) scale(0.92); opacity: 0; filter: blur(8px); }
+  to   { transform: translateX(-50%) translateY(0) scale(1);         opacity: 1; filter: blur(0);  }
+}
+@keyframes nxWaSlideOut {
+  from { transform: translateX(-50%) translateY(0) scale(1);         opacity: 1; filter: blur(0);  }
+  to   { transform: translateX(-50%) translateY(-110px) scale(0.92); opacity: 0; filter: blur(8px); }
+}
+#nx-wa-notif {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-110px);
+  z-index: 2147483646;
+  pointer-events: none;
+  background: linear-gradient(145deg,rgba(27,25,37,.97),rgba(12,13,18,.97));
+  backdrop-filter: blur(14px) saturate(1.15);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  border: 1px solid rgba(219,214,238,.18);
+  border-top: 1px solid rgba(238,252,255,.34);
+  border-left: 1px solid rgba(184,140,255,.25);
+  border-radius: 18px;
+  box-shadow:
+    0 18px 48px rgba(0,0,0,.4),
+    0 1px 0 rgba(255,255,255,.08) inset,
+    0 0 34px rgba(102,70,154,.12);
+  padding: 0;
+  display: block;
+  min-width: 300px;
+  max-width: 370px;
+  cursor: pointer;
+  opacity: 0;
+  text-decoration: none;
+  overflow: hidden;
+}
+#nx-wa-notif-link{
+  display:flex;
+  align-items:center;
+  gap:13px;
+  min-width:0;
+  padding:13px 42px 13px 14px;
+  color:inherit;
+  text-decoration:none;
+}
+/* Liquid shimmer highlight */
+#nx-wa-notif::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  background: linear-gradient(105deg,rgba(255,255,255,.08),transparent 28% 72%,rgba(37,211,102,.05));
+  pointer-events: none;
+  z-index: 1;
+}
+/* Frosted inner glow */
+#nx-wa-notif::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 50%;
+  border-radius: 18px 18px 60% 60% / 18px 18px 40% 40%;
+  background: linear-gradient(180deg,rgba(255,255,255,.07),transparent);
+  pointer-events: none;
+  z-index: 1;
+}
+#nx-wa-notif.show {
+  animation: nxWaSlideIn 0.54s cubic-bezier(0.22,1,0.36,1) forwards;
+  pointer-events: auto;
+}
+#nx-wa-notif.hide {
+  animation: nxWaSlideOut 0.38s cubic-bezier(0.55,0,0.55,0.2) forwards;
+}
+#nx-wa-notif-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 15px;
+  background: linear-gradient(145deg,#1b2d24,#111b16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  animation: none;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.1);
+  position: relative;
+  z-index: 2;
+  border: 1px solid rgba(37,211,102,.28);
+}
+#nx-wa-notif-icon svg { width:26px; height:26px; fill:#fff; filter:drop-shadow(0 1px 2px rgba(0,0,0,0.3)); }
+#nx-wa-notif-text {
+  flex: 1;
+  position: relative;
+  z-index: 2;
+}
+#nx-wa-notif-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(90deg, rgba(37,211,102,0.22), rgba(37,211,102,0.10));
+  border: 1px solid rgba(37,211,102,0.35);
+  border-radius: 20px;
+  padding: 1px 9px 1px 6px;
+  margin-bottom: 5px;
+}
+#nx-wa-notif-badge-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #25D366;
+  box-shadow: 0 0 7px rgba(37,211,102,.45);
+  animation: none;
+}
+#nx-wa-notif-badge-text {
+  font-size: 8px;
+  font-weight: 800;
+  color: #25D366;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  font-family: 'Inter', 'Poppins', sans-serif;
+}
+#nx-wa-notif-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.2px;
+  margin-bottom: 3px;
+  font-family: 'Inter', 'Poppins', sans-serif;
+  text-shadow: 0 1px 8px rgba(37,211,102,0.25);
+  line-height: 1.25;
+}
+#nx-wa-notif-desc {
+  font-size: 10px;
+  color: rgba(255,255,255,0.62);
+  font-family: 'Inter', 'Poppins', sans-serif;
+  font-weight: 500;
+  line-height: 1.45;
+}
+#nx-wa-notif-desc strong { color: #5ef09a; font-weight: 700; }
+#nx-wa-notif-arrow {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: rgba(37,211,102,0.15);
+  border: 1px solid rgba(37,211,102,0.3);
+  color: #25D366;
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: background 0.2s, transform 0.2s;
+}
+#nx-wa-notif:hover #nx-wa-notif-arrow {
+  background: rgba(37,211,102,0.28);
+  transform: scale(1.12);
+}
+#nx-wa-notif-close {
+  position: absolute;
+  top: 9px;
+  right: 11px;
+  z-index: 10;
+  width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 50%;
+  color: rgba(255,255,255,0.55);
+  font-size: 10px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  padding: 0;
+  line-height: 1;
+}
+#nx-wa-notif-close:hover {
+  background: rgba(255,255,255,0.22);
+  color: #fff;
+}
 
 /* ===== original style block 23 ===== */
 :root{
@@ -1474,9 +1651,22 @@ body.nx-health-lock{overflow:hidden}
 
 
 /* v6.3 low-power compositing overrides */
-html.nx-low-power .nx-public-wa-icon,html.nx-low-power .nx-health-dot{animation:none!important;box-shadow:none!important}
+html.nx-low-power .nx-wa-notif-glow,html.nx-low-power .nx-public-wa-icon,html.nx-low-power .nx-health-dot{animation:none!important;box-shadow:none!important}
 @media (max-width:768px){.nx-health-dialog,.nx-room-backdrop,.nx-access-backdrop,#nxStabilityNotice,#nxModuleToast{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}.nx-public-wa-card::before{display:none}.nx-public-wa-icon{animation:none!important}}
 
+/* v6.3.5 — do not promote the transient WhatsApp popup on touch screens. */
+@media (pointer: coarse), (max-width:768px), (prefers-reduced-motion:reduce){
+  #nx-wa-notif{
+    width:calc(100% - 24px);
+    min-width:0;
+    max-width:390px;
+    top:10px;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+  }
+  #nx-wa-notif::before,#nx-wa-notif::after{animation:none!important}
+  #nx-wa-notif-icon,#nx-wa-notif-badge-dot{animation:none!important;box-shadow:none!important}
+}
 /* Downloader request states and official-provider capability cards. */
 .nx-downloader-lead{margin:0 0 14px;color:var(--nx-text-muted,#aaa0bd);font-size:.875rem;line-height:1.65}
 .nx-downloader-preview{display:block;width:100%;max-height:300px;margin:14px 0;object-fit:cover;border:1px solid rgba(255,255,255,.1);border-radius:14px;background:#09080d}
@@ -1488,36 +1678,3 @@ html.nx-low-power .nx-public-wa-icon,html.nx-low-power .nx-health-dot{animation:
 #instaBtn,#ytFetchBtn,#spBtn,[data-official-button],#nxTbFetch,#ttBtn{min-height:44px;margin-top:8px}
 #instaResult,#ytResult,#spResult,[data-official-result]{min-width:0;overflow-wrap:anywhere}
 @media(max-width:560px){.nx-official-result{grid-template-columns:minmax(0,1fr);padding:13px}.nx-official-result .nx-downloader-preview{max-height:220px}.dl-option{min-width:0}.dl-option-info{min-width:0}.dl-option-title,.dl-option-desc{overflow-wrap:anywhere}.dl-dl-btn,.nx-cloud-download{min-width:44px;min-height:44px}}
-
-
-/* =========================================================
-   HF11.1 — MOBILE FULLSCREEN COMPOSITOR CONTAINMENT
-   Hidden iframe rooms must not remain paintable behind the main page.
-   ========================================================= */
-.nx-about-dev-room:not(.is-open){
-  display:none!important;
-  visibility:hidden!important;
-  opacity:0!important;
-  pointer-events:none!important;
-}
-.nx-about-dev-room.is-open{
-  display:grid!important;
-  visibility:visible!important;
-  opacity:1!important;
-  pointer-events:auto!important;
-}
-.nx-about-dev-stage{
-  overflow:hidden;
-  contain:layout paint;
-}
-.nx-about-dev-frame{
-  display:block;
-  contain:paint;
-  background:#050506;
-}
-@media (pointer:coarse),(max-width:768px){
-  .nx-about-dev-room,.nx-about-dev-stage,.nx-about-dev-frame{
-    -webkit-backface-visibility:hidden;
-    backface-visibility:hidden;
-  }
-}

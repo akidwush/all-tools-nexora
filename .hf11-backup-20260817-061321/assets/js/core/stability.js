@@ -178,7 +178,7 @@
     if(statusPromise&&!force) return statusPromise;
     // Browser publik tidak menyimpan HEALTH_CHECK_TOKEN. "auto" meminta backend
     // memakai cache atau menyegarkan secara aman bila data memang kedaluwarsa.
-    statusPromise=fetchJson("/api/tool-health?refresh=auto",{timeoutMs:15000}).then(function(payload){
+    statusPromise=fetchJson("/api/tool-health?refresh="+(force?"auto":"0"),{timeoutMs:15000}).then(function(payload){
       healthMap=Object.create(null);
       (payload.data||[]).forEach(function(row){healthMap[String(row.toolId||"")]=row;});
       applyCardStatus();
@@ -282,7 +282,6 @@
     notify("Koneksi fitur terganggu",detail.reason==="TIMEOUT"?"Server terlalu lama merespons. Coba kembali beberapa saat lagi.":"API atau jaringan gagal dihubungi. Status fitur telah dicatat.","error");
   });
   document.addEventListener("nexora:module-loaded",function(){setTimeout(applyCardStatus,0);});
-  window.addEventListener("online",function(){loadHealth(true);},{passive:true});
   function initializeStatus(){
     if(window.__NEXORA_TOOL_HEALTH_PAYLOAD__) consumeHealthPayload(window.__NEXORA_TOOL_HEALTH_PAYLOAD__);
     else{
@@ -295,6 +294,6 @@
   else{initializeRecovery();initializeStatus();}
 
   window.NexoraViewportRecovery={reconcile:reconcileScrollLock};
-  window.NexoraStability={version:"6.3.21-hf11.1",audit:audit,loadHealth:loadHealth,applyCardStatus:applyCardStatus,notify:notify,fetchJson:fetchJson,reconcileScrollLock:reconcileScrollLock,getLastAudit:function(){return lastAudit;},getHealth:function(id){return healthMap[id]||null;}};
+  window.NexoraStability={version:"6.3.21-hf8",audit:audit,loadHealth:loadHealth,applyCardStatus:applyCardStatus,notify:notify,fetchJson:fetchJson,reconcileScrollLock:reconcileScrollLock,getLastAudit:function(){return lastAudit;},getHealth:function(id){return healthMap[id]||null;}};
   window.dispatchEvent(new CustomEvent("nexora:stability-ready"));
 })();

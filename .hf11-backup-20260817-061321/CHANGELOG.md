@@ -1,12 +1,3 @@
-## HF11.1 — Mobile compositor recovery + health refresh
-
-- Recover: mengembalikan baseline HF8 + HF9 + HF10 yang sempat tertimpa patch HF11 lama.
-- Fix: room/iframe About Dev dan Feedback tidak lagi tetap ter-render saat tertutup.
-- Fix: tab mobile memakai indikator statis pada perangkat touch untuk mencegah noda hitam/compositor smear.
-- Fix: status health publik memakai `refresh=auto`, sehingga cache kosong/stale dapat diperiksa ulang oleh backend secara aman.
-- Remove: popup/notifikasi WhatsApp transient dihapus dari HTML, CSS, shell, dan social-links. Link sosial/footer WhatsApp tetap tersedia.
-- QA: regression suite 57/57 lulus, 46 tools, 145 JavaScript, 12/12 Vercel Functions.
-
 # Changelog
 
 ## 6.3.18 HF6 — 2026-08-15

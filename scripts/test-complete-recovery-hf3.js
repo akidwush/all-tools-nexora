@@ -34,7 +34,7 @@ assert.doesNotMatch(app, /isExternal \|\| item\.link/);
 // Status kesehatan harus dimuat walau panel health lama sudah tidak ada.
 assert.match(stability, /function initializeStatus\(\)/);
 assert.match(stability, /schedule\(function\(\)\{loadHealth\(false\);\}/);
-assert.match(stability, /force\?"auto":"0"/);
+assert.match(stability, /\/api\/tool-health\?refresh=auto/);
 assert.doesNotMatch(stability, /refresh="\+\(force\?"force"/);
 
 // Aplikasi eksternal tidak lagi mengunduh bundle lokal ratusan KB/MB.
