@@ -1,9 +1,6 @@
-/* Nexora Alight Motion Premium — direct provider GET integration */
+/* Nexora Alight Motion Premium — same-origin proxy, upstream GET */
 (function(){
   "use strict";
-
-  var MAGIC_ENDPOINT='https://api.kyzznekoo.my.id/api/alightmotion/v1/magic-link';
-  var APPLY_ENDPOINT='https://api.kyzznekoo.my.id/api/alightmotion/v1/applyPremium';
 
   function escapeHtml(value){
     return String(value == null ? "" : value).replace(/[&<>"']/g,function(char){return ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[char];});
@@ -14,48 +11,24 @@
     try{return JSON.stringify(value,null,2);}catch(_){return String(value);}
   }
 
-  function providerMessage(data,fallback){
-    var candidates=[
-      data&&data.message,
-      data&&data.msg,
-      data&&data.data&&data.data.message,
-      data&&data.result&&data.result.message,
-      data&&data.error&&data.error.message
-    ];
-    for(var i=0;i<candidates.length;i++){
-      if(typeof candidates[i]==='string'&&candidates[i].trim()) return candidates[i].trim();
-    }
-    return fallback;
-  }
-
   function validGmail(email){
     return /^[^\s@]+@gmail\.com$/i.test(String(email||'').trim());
   }
 
-  async function providerGet(action,payload){
-    var url=new URL(action==='magic-link'?MAGIC_ENDPOINT:APPLY_ENDPOINT);
-    url.searchParams.set('email',payload.email);
-    if(action==='apply-premium') url.searchParams.set('link',payload.link);
-
-    var response=await fetch(url.toString(),{
-      method:'GET',
-      cache:'no-store',
-      headers:{Accept:'application/json, text/plain;q=0.9, */*;q=0.8'}
+  async function request(action,payload){
+    var response=await fetch('/api/alight-premium',{
+      method:'POST',
+      credentials:'same-origin',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify(Object.assign({action:action},payload||{}))
     });
-
     var text=await response.text();
     var data={};
     try{data=text?JSON.parse(text):{};}catch(_){data={message:text};}
-
-    var rejected=!response.ok || data.status===false || data.ok===false || data.success===false;
-    if(rejected){
-      var message=providerMessage(data,'Provider mengembalikan HTTP '+response.status+'.');
-      throw Object.assign(new Error(message),{payload:data,status:response.status});
+    if(!response.ok||!data.ok){
+      throw Object.assign(new Error(data.message||data.error||('HTTP '+response.status)),{payload:data,status:response.status});
     }
-    return {
-      message:providerMessage(data,action==='magic-link'?'Magic link berhasil dikirim ke email Anda.':'Premium berhasil diproses.'),
-      data:data
-    };
+    return data;
   }
 
   window.renderAlightPremium=function(body){
@@ -66,14 +39,14 @@
           <div>
             <span class="nap-kicker">ALIGHT MOTION · PREMIUM WORKSPACE</span>
             <h2>Premium <b>1 Tahun</b></h2>
-            <p>Request Magic Link terlebih dahulu, kemudian Apply Premium menggunakan email dan magic link yang diterima.</p>
+            <p>Magic Link dan Apply Premium diteruskan oleh server Nexora ke dua endpoint GET provider.</p>
           </div>
-          <div class="nap-health is-ok" id="napHealth"><i class="fa-solid fa-circle-check"></i><span>DIRECT GET</span></div>
+          <div class="nap-health is-ok" id="napHealth"><i class="fa-solid fa-shield-halved"></i><span>SERVER PROXY</span></div>
         </section>
 
         <section class="nap-endpoint-note">
           <i class="fa-solid fa-link"></i>
-          <div><strong>Direct Provider API</strong><span>Request dan Apply dikirim langsung ke endpoint GET provider tanpa proxy Vercel dan tanpa API key tambahan.</span></div>
+          <div><strong>Provider GET API</strong><span>Browser tetap di origin Nexora. Server meneruskan request ke endpoint GET provider tanpa API key tambahan dan tanpa timeout buatan 20/60 detik.</span></div>
         </section>
 
         <section class="nap-grid">
@@ -121,7 +94,7 @@
     function showResult(target,type,message,data){
       target.hidden=false;
       target.className='nap-result '+(type==='ok'?'is-ok':'is-error');
-      var details=data && Object.keys(data).length ? '<details><summary>Response provider</summary><pre>'+escapeHtml(prettyPayload(data))+'</pre></details>' : '';
+      var details=data && typeof data==='object' && Object.keys(data).length ? '<details><summary>Response provider</summary><pre>'+escapeHtml(prettyPayload(data))+'</pre></details>' : '';
       target.innerHTML='<div><i class="fa-solid '+(type==='ok'?'fa-circle-check':'fa-triangle-exclamation')+'"></i><span>'+escapeHtml(message||'Selesai')+'</span></div>'+details;
     }
 
@@ -130,13 +103,13 @@
       if(!validGmail(email)){showResult(magicResult,'error','Gunakan alamat email @gmail.com yang valid.');emailOne.focus();return;}
       setBusy(magicButton,true,'Requesting…');sessionStatus.textContent='REQUESTING MAGIC LINK';magicResult.hidden=true;
       try{
-        var result=await providerGet('magic-link',{email:email});
+        var data=await request('magic-link',{email:email});
         emailTwo.value=email;
         emailTwo.dataset.synced='1';
-        showResult(magicResult,'ok',result.message,result.data);
+        showResult(magicResult,'ok',data.message||'Magic link berhasil diminta.',data.data);
         sessionStatus.textContent='MAGIC LINK REQUESTED';
         magicLink.focus();
-      }catch(error){showResult(magicResult,'error',error.message,error.payload);sessionStatus.textContent='REQUEST FAILED';}
+      }catch(error){showResult(magicResult,'error',error.message,error.payload&&error.payload.data);sessionStatus.textContent='REQUEST FAILED';}
       finally{setBusy(magicButton,false);}
     });
 
@@ -147,10 +120,10 @@
       if(!/^https:\/\//i.test(link)){showResult(applyResult,'error','Paste magic link HTTPS lengkap dari email.');magicLink.focus();return;}
       setBusy(applyButton,true,'Applying…');sessionStatus.textContent='APPLYING PREMIUM';applyResult.hidden=true;
       try{
-        var result=await providerGet('apply-premium',{email:email,link:link});
-        showResult(applyResult,'ok',result.message,result.data);
+        var data=await request('apply-premium',{email:email,link:link});
+        showResult(applyResult,'ok',data.message||'Premium berhasil diproses.',data.data);
         sessionStatus.textContent='PREMIUM APPLIED';
-      }catch(error){showResult(applyResult,'error',error.message,error.payload);sessionStatus.textContent='APPLY FAILED';}
+      }catch(error){showResult(applyResult,'error',error.message,error.payload&&error.payload.data);sessionStatus.textContent='APPLY FAILED';}
       finally{setBusy(applyButton,false);}
     });
 
