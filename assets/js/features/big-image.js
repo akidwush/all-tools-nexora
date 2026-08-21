@@ -360,7 +360,7 @@
     }
 
     async function api(payload,keepalive){
-      var response=await fetch(ENDPOINT,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(payload),cache:"no-store",keepalive:Boolean(keepalive)});
+      var response=await fetch(ENDPOINT,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(payload),cache:"no-store",keepalive:Boolean(keepalive),signal:keepalive?undefined:(state.controller&&state.controller.signal)});
       var data={};
       try{data=await response.json();}catch(_){}
       if(!response.ok||data.ok===false)throw makeApiError(response,data);

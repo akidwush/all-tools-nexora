@@ -50,13 +50,14 @@
   /* Vercel serves /assets with a one-hour browser cache.  A module can
      therefore otherwise keep the previous CSS/JS after a successful deploy. */
   var ASSET_VERSION = '6.3.18';
+  var ASSET_PATCH = 'hf13';
   var baseShowTool = typeof window.showTool === 'function' ? window.showTool : null;
   var activeCard = null;
 
   function absolute(url){ return new URL(url, document.baseURI).href; }
   function versioned(url){
     var separator = String(url).indexOf('?')===-1 ? '?' : '&';
-    var version = /(?:tiktok|download-pack|source-features)\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-hf6-dl4' : ASSET_VERSION;
+    var version = /(?:big-image|svg-alight)\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-'+ASSET_PATCH : (/(?:tiktok|download-pack|source-features)\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-hf6-dl4' : ASSET_VERSION);
     return String(url)+separator+'v='+encodeURIComponent(version);
   }
 

@@ -18,8 +18,10 @@ assert.match(visual, /@font-face/);
 for (const token of ['POST', 'PATCH', 'DELETE', 'TOOL_ID_EXISTS', 'BUILTIN_TOOL_PROTECTED', 'metadata', 'external-link', 'verifyMutationRequest']) assert.ok(toolsApi.includes(token), `Tools API harus memuat ${token}`);
 for (const token of ['addToolButton', 'openNewToolEditor', 'data-delete-tool', 'method:creating?"POST":"PATCH"', 'method:"DELETE"']) assert.ok(dashboard.includes(token), `Dashboard harus memuat ${token}`);
 for (const token of ['ID unik', 'Tambah Tool', 'editToolId', 'URL eksternal']) assert.ok(html.includes(token), `HTML admin harus memuat ${token}`);
-assert.match(app, /if\s*\(!base\s*&&\s*!row\.external_url\)\s*continue/);
-assert.match(app, /custom: !base/);
+assert.match(app, /const databaseById = new Map/);
+assert.match(app, /if \(row\?\.is_active === false\) continue/);
+assert.match(app, /for \(const row of databaseById\.values\(\)\)/);
+assert.match(app, /custom: true/);
 assert.match(app, /decodeURIComponent\('/);
 assert.match(app, /escapeToolHtml/);
 

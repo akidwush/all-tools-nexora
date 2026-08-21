@@ -14,10 +14,11 @@ assert.match(core, /html\{min-height:100%;background-color:#050509;color-scheme:
 assert.match(core, /body\{[^}]*min-height:100dvh[^}]*background-color:#050509[^}]*overscroll-behavior-y:auto[^}]*touch-action:pan-x pan-y/);
 assert.match(core, /@media \(min-width:768px\) and \(max-width:1023px\)\{\.tools-grid\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
 assert.match(core, /@media \(min-width:320px\) and \(max-width:767px\)\{[\s\S]*?\.tools-grid\{display:grid;grid-template-columns:repeat\(3,minmax\(0,1fr\)\)!important/);
-assert.match(components, /@media\(min-width:320px\) and \(max-width:767px\)\{[\s\S]*?\.tools-grid\{display:grid;grid-template-columns:repeat\(3,minmax\(0,1fr\)\)!important/);
+assert.doesNotMatch(components, /@media\(min-width:320px\) and \(max-width:767px\)\{[\s\S]*?\.tools-grid/);
 assert.doesNotMatch(core + components, /@media[^\{]*(?:370|400|600|767)px[^\{]*\{[\s\S]{0,500}?\.tools-grid\{grid-template-columns:(?:1fr|repeat\(2,)/);
-assert.match(components, /\.tools-card\{min-width:0!important;min-height:146px!important;height:100%;padding:8px!important;border-radius:13px!important/);
-assert.match(components, /\.tools-card p\{display:none!important\}/);
+assert.match(core, /\.tools-card\{min-width:0!important;min-height:146px!important;height:100%;padding:8px!important;border-radius:13px!important/);
+assert.match(core, /\.tools-card p\{display:none!important\}/);
+assert.doesNotMatch(components, /\.tools-card\{min-width:0!important;min-height:146px!important/);
 assert.match(core, /\.user-card\{display:grid;grid-template-columns:repeat\(3,minmax\(0,1fr\)\);grid-template-rows:repeat\(2,minmax\(0,1fr\)\)[^}]*height:74px[^}]*max-height:74px/);
 assert.match(core, /\.user-info\{display:contents;[^}]*overflow:visible;mask-image:none;-webkit-mask-image:none/);
 assert.match(core, /\.user-info \.item\{display:grid;grid-template-columns:17px minmax\(0,1fr\)[^}]*min-width:0;width:100%;height:100%;min-height:0/);

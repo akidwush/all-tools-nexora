@@ -1834,32 +1834,50 @@ async function applyDatabaseToolConfiguration() {
                 badge: 'PNG'
             }
         };
-        for (const row of rows) {
-            const base = baseById.get(String(row.id));
-            if (!base && !row.external_url) continue;
-            const category = allowedCategories.has(row.category) ? row.category : (base?.category || 'external');
-            const publicOverride = publicOverrides[String(row.id)] || null;
+        // The source catalogue is authoritative for bundled tools. Replacing it
+        // wholesale with database rows made new releases silently lose tools
+        // whenever Supabase was one migration behind (47 tools became 45).
+        const databaseById = new Map(rows.map(row => [String(row.id || ''), row]));
+        let bundledOrder = 0;
+        for (const base of baseById.values()) {
+            const row = databaseById.get(base.id) || null;
+            databaseById.delete(base.id);
+            if (row?.is_active === false) continue;
+            const category = allowedCategories.has(row?.category) ? row.category : base.category;
+            const publicOverride = publicOverrides[base.id] || null;
             nextTools[category].push({
-                ...(base || {}),
+                ...base,
                 category,
-                id: String(row.id || base?.id || ''),
-                name: publicOverride?.name || row.name || base?.name || row.id,
-                desc: publicOverride?.description || row.description || base?.desc || '',
-                badge: publicOverride?.badge || row.badge || '',
-                icon: row.icon || base?.icon || 'fa-solid fa-arrow-up-right-from-square',
-                link: row.external_url || base?.link,
-                sortOrder: Number(row.sort_order || 0),
-                custom: !base
+                id: base.id,
+                name: publicOverride?.name || row?.name || base.name,
+                desc: publicOverride?.description || row?.description || base.desc || '',
+                badge: publicOverride?.badge || row?.badge || base.badge || '',
+                icon: row?.icon || base.icon || 'fa-solid fa-arrow-up-right-from-square',
+                link: row?.external_url || base.link,
+                sortOrder: Number.isFinite(Number(row?.sort_order)) ? Number(row.sort_order) : bundledOrder,
+                custom: false
             });
+            bundledOrder += 1;
         }
-        const databaseIds = new Set(rows.map(row => String(row.id || '')));
-        const requiredLocalIds = ['alightpremium'];
-        for (const id of requiredLocalIds) {
-            if (databaseIds.has(id)) continue;
-            const base = baseById.get(id);
-            if (!base) continue;
-            const category = allowedCategories.has(base.category) ? base.category : 'tools';
-            nextTools[category].push({ ...base, category, sortOrder: Number(base.sortOrder || 71) });
+
+        // Database-only rows are allowed for external tools, but never create a
+        // dead internal card without a bundled implementation.
+        for (const row of databaseById.values()) {
+            if (!row || row.is_active === false || !row.external_url) continue;
+            const id = String(row.id || '').trim();
+            if (!id) continue;
+            const category = allowedCategories.has(row.category) ? row.category : 'external';
+            nextTools[category].push({
+                category,
+                id,
+                name: row.name || id,
+                desc: row.description || '',
+                badge: row.badge || '',
+                icon: row.icon || 'fa-solid fa-arrow-up-right-from-square',
+                link: row.external_url,
+                sortOrder: Number.isFinite(Number(row.sort_order)) ? Number(row.sort_order) : 999,
+                custom: true
+            });
         }
         for (const category of Object.keys(nextTools)) {
             nextTools[category].sort((left, right) => (left.sortOrder - right.sortOrder) || left.name.localeCompare(right.name, 'id'));
