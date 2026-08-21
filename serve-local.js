@@ -60,6 +60,8 @@ const API_ROUTES = Object.freeze({
   "/api/space-explorer": { file: "api/tool-health.js", mode: "space-explorer" },
   "/api/ocr-intelligence": { file: "api/tool-health.js", mode: "ocr-intelligence" },
   "/api/svg-alight": { file: "api/tool-health.js", mode: "svg-alight" },
+  "/api/alight-premium/magic-link": { file: "api/tool-health.js", mode: "alight-premium", action: "magic-link" },
+  "/api/alight-premium/apply-premium": { file: "api/tool-health.js", mode: "alight-premium", action: "apply-premium" },
   "/api/alight-premium": { file: "api/tool-health.js", mode: "alight-premium" },
   "/api/big-image": { file: "api/tool-health.js", mode: "big-image" },
   "/api/vdeploy": { file: "api/health.js", mode: "vdeploy" },
@@ -124,6 +126,7 @@ async function readBody(request, limit) {
 async function runApi(route, request, response, requestUrl) {
   try {
     if (route.mode) requestUrl.searchParams.set("mode", route.mode);
+    if (route.action) requestUrl.searchParams.set("action", route.action);
     request.url = `${requestUrl.pathname}${requestUrl.search}`;
     request.query = Object.fromEntries(requestUrl.searchParams.entries());
     if (!["GET", "HEAD", "OPTIONS"].includes(request.method || "GET")) {

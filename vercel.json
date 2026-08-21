@@ -45,6 +45,19 @@
           "value": "no-store"
         }
       ]
+    },
+    {
+      "source": "/api/alight-premium/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        },
+        {
+          "key": "x-vercel-enable-rewrite-caching",
+          "value": "0"
+        }
+      ]
     }
   ],
   "outputDirectory": "public",
@@ -106,6 +119,14 @@
       "destination": "/api/tool-health?mode=svg-alight"
     },
     {
+      "source": "/api/alight-premium/magic-link",
+      "destination": "https://api.kyzznekoo.my.id/api/alightmotion/v1/magic-link"
+    },
+    {
+      "source": "/api/alight-premium/apply-premium",
+      "destination": "https://api.kyzznekoo.my.id/api/alightmotion/v1/applyPremium"
+    },
+    {
       "source": "/api/alight-premium",
       "destination": "/api/tool-health?mode=alight-premium"
     },
@@ -117,10 +138,5 @@
       "source": "/api/vdeploy",
       "destination": "/api/health?mode=vdeploy"
     }
-  ],
-  "functions": {
-    "api/tool-health.js": {
-      "maxDuration": 300
-    }
-  }
+  ]
 }

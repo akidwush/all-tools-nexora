@@ -1,6 +1,9 @@
-/* Nexora Alight Motion Premium — same-origin proxy, upstream GET */
+/* Nexora Alight Motion Premium — same-origin GET via Vercel external rewrite */
 (function(){
   "use strict";
+
+  var MAGIC_ROUTE='/api/alight-premium/magic-link';
+  var APPLY_ROUTE='/api/alight-premium/apply-premium';
 
   function escapeHtml(value){
     return String(value == null ? "" : value).replace(/[&<>"']/g,function(char){return ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[char];});
@@ -11,24 +14,57 @@
     try{return JSON.stringify(value,null,2);}catch(_){return String(value);}
   }
 
+  function providerMessage(data,fallback){
+    var candidates=[
+      data&&data.message,
+      data&&data.msg,
+      data&&data.data&&data.data.message,
+      data&&data.result&&data.result.message,
+      data&&data.error&&data.error.message
+    ];
+    for(var i=0;i<candidates.length;i++){
+      if(typeof candidates[i]==='string'&&candidates[i].trim()) return candidates[i].trim();
+    }
+    return fallback;
+  }
+
   function validGmail(email){
     return /^[^\s@]+@gmail\.com$/i.test(String(email||'').trim());
   }
 
-  async function request(action,payload){
-    var response=await fetch('/api/alight-premium',{
-      method:'POST',
-      credentials:'same-origin',
-      headers:{'Content-Type':'application/json','Accept':'application/json'},
-      body:JSON.stringify(Object.assign({action:action},payload||{}))
-    });
+  async function providerGet(action,payload){
+    var route=action==='magic-link'?MAGIC_ROUTE:APPLY_ROUTE;
+    var url=new URL(route,window.location.origin);
+    url.searchParams.set('email',payload.email);
+    if(action==='apply-premium') url.searchParams.set('link',payload.link);
+
+    var response;
+    try{
+      response=await fetch(url.toString(),{
+        method:'GET',
+        cache:'no-store',
+        credentials:'same-origin',
+        headers:{Accept:'application/json, text/plain;q=0.9, */*;q=0.8'}
+      });
+    }catch(error){
+      throw Object.assign(new Error('Gateway Nexora tidak dapat menghubungi provider.'),{payload:{networkError:error&&error.message?error.message:String(error)}});
+    }
+
     var text=await response.text();
     var data={};
     try{data=text?JSON.parse(text):{};}catch(_){data={message:text};}
-    if(!response.ok||!data.ok){
-      throw Object.assign(new Error(data.message||data.error||('HTTP '+response.status)),{payload:data,status:response.status});
+
+    var rejected=!response.ok || data.status===false || data.ok===false || data.success===false;
+    if(rejected){
+      var message=providerMessage(data,'Provider mengembalikan HTTP '+response.status+'.');
+      throw Object.assign(new Error(message),{payload:data,status:response.status});
     }
-    return data;
+
+    return {
+      message:providerMessage(data,action==='magic-link'?'Magic Link berhasil dikirim.':'Premium berhasil diproses.'),
+      data:data,
+      status:response.status
+    };
   }
 
   window.renderAlightPremium=function(body){
@@ -39,14 +75,14 @@
           <div>
             <span class="nap-kicker">ALIGHT MOTION · PREMIUM WORKSPACE</span>
             <h2>Premium <b>1 Tahun</b></h2>
-            <p>Magic Link dan Apply Premium diteruskan oleh server Nexora ke dua endpoint GET provider.</p>
+            <p>Dua endpoint GET provider diteruskan oleh Vercel Edge tanpa melewati Node serverless proxy.</p>
           </div>
-          <div class="nap-health is-ok" id="napHealth"><i class="fa-solid fa-shield-halved"></i><span>SERVER PROXY</span></div>
+          <div class="nap-health is-ok" id="napHealth"><i class="fa-solid fa-route"></i><span>EDGE GET</span></div>
         </section>
 
         <section class="nap-endpoint-note">
-          <i class="fa-solid fa-link"></i>
-          <div><strong>Provider GET API</strong><span>Browser tetap di origin Nexora. Server meneruskan request ke endpoint GET provider tanpa API key tambahan dan tanpa timeout buatan 20/60 detik.</span></div>
+          <i class="fa-solid fa-shuffle"></i>
+          <div><strong>Same-Origin Edge Rewrite</strong><span>Browser tetap mengakses domain Nexora; Vercel meneruskan query GET langsung ke provider. Tidak ada API key tambahan, CORS browser, atau timeout buatan proxy Node.</span></div>
         </section>
 
         <section class="nap-grid">
@@ -103,13 +139,13 @@
       if(!validGmail(email)){showResult(magicResult,'error','Gunakan alamat email @gmail.com yang valid.');emailOne.focus();return;}
       setBusy(magicButton,true,'Requesting…');sessionStatus.textContent='REQUESTING MAGIC LINK';magicResult.hidden=true;
       try{
-        var data=await request('magic-link',{email:email});
+        var result=await providerGet('magic-link',{email:email});
         emailTwo.value=email;
         emailTwo.dataset.synced='1';
-        showResult(magicResult,'ok',data.message||'Magic link berhasil diminta.',data.data);
+        showResult(magicResult,'ok',result.message,result.data);
         sessionStatus.textContent='MAGIC LINK REQUESTED';
         magicLink.focus();
-      }catch(error){showResult(magicResult,'error',error.message,error.payload&&error.payload.data);sessionStatus.textContent='REQUEST FAILED';}
+      }catch(error){showResult(magicResult,'error',error.message,error.payload);sessionStatus.textContent='REQUEST FAILED';}
       finally{setBusy(magicButton,false);}
     });
 
@@ -120,10 +156,10 @@
       if(!/^https:\/\//i.test(link)){showResult(applyResult,'error','Paste magic link HTTPS lengkap dari email.');magicLink.focus();return;}
       setBusy(applyButton,true,'Applying…');sessionStatus.textContent='APPLYING PREMIUM';applyResult.hidden=true;
       try{
-        var data=await request('apply-premium',{email:email,link:link});
-        showResult(applyResult,'ok',data.message||'Premium berhasil diproses.',data.data);
+        var result=await providerGet('apply-premium',{email:email,link:link});
+        showResult(applyResult,'ok',result.message,result.data);
         sessionStatus.textContent='PREMIUM APPLIED';
-      }catch(error){showResult(applyResult,'error',error.message,error.payload&&error.payload.data);sessionStatus.textContent='APPLY FAILED';}
+      }catch(error){showResult(applyResult,'error',error.message,error.payload);sessionStatus.textContent='APPLY FAILED';}
       finally{setBusy(applyButton,false);}
     });
 

@@ -37,6 +37,8 @@
     "/api/admin/socials",
     "/api/admin/ai",
     "/api/svg-alight",
+    "/api/alight-premium/magic-link",
+    "/api/alight-premium/apply-premium",
     "/api/alight-premium",
     "/api/big-image"
   ]

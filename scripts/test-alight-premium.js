@@ -7,47 +7,53 @@ const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 
 const manifest = JSON.parse(read("assets/module-manifest.json"));
 const routes = JSON.parse(read("route-manifest.json"));
-const vercelText = read("vercel.json");
-const vercel = JSON.parse(vercelText);
-const proxy = read("lib/alight-premium-proxy.js");
+const vercel = JSON.parse(read("vercel.json"));
 const ui = read("assets/js/features/alight-premium.js");
 const css = read("assets/css/features/alight-premium.css");
-const api = read("api/tool-health.js");
 const local = read("serve-local.js");
 const registry = read("assets/js/core/tool-registry.js");
 const shell = read("assets/js/core/shell.js");
 const app = read("assets/js/core/app.js");
-const env = read(".env.example");
+const proxy = read("lib/alight-premium-proxy.js");
+
+const magicSource = "/api/alight-premium/magic-link";
+const applySource = "/api/alight-premium/apply-premium";
+const magicDest = "https://api.kyzznekoo.my.id/api/alightmotion/v1/magic-link";
+const applyDest = "https://api.kyzznekoo.my.id/api/alightmotion/v1/applyPremium";
 
 assert.equal(manifest.tools.alightpremium, "alight-premium");
 assert.ok(manifest.modules["alight-premium"].js.includes("assets/js/features/alight-premium.js"));
 assert.ok(manifest.modules["alight-premium"].css.includes("assets/css/features/alight-premium.css"));
-assert.ok(routes.apiRoutes.includes("/api/alight-premium"));
-assert.ok(vercel.rewrites.some((row) => row.source === "/api/alight-premium" && /mode=alight-premium/.test(row.destination)));
-assert.equal(vercel.functions?.["api/tool-health.js"]?.maxDuration, 300);
-assert.ok(ui.includes("fetch('/api/alight-premium'"));
-assert.ok(ui.includes("method:'POST'"));
-assert.ok(ui.includes("@gmail\\.com"));
-assert.ok(!ui.includes("https://api.kyzznekoo.my.id/api/alightmotion/v1/magic-link"));
-assert.ok(!ui.includes("https://api.kyzznekoo.my.id/api/alightmotion/v1/applyPremium"));
-assert.ok(proxy.includes('method: "GET"'));
-assert.ok(proxy.includes('url.searchParams.set("email"'));
-assert.ok(proxy.includes('url.searchParams.set("link"'));
-assert.ok(!proxy.includes("new AbortController"));
-assert.ok(!proxy.includes("signal:"));
-assert.ok(!proxy.includes("ALIGHT_PREMIUM_TIMEOUT_MS"));
-assert.ok(!proxy.includes("ALIGHT_PREMIUM_API_KEY"));
-assert.ok(proxy.includes("providerRejected"));
-assert.ok(proxy.includes("MAX_MAGIC_LINK_LENGTH = 8192"));
-assert.ok(!env.includes("ALIGHT_PREMIUM_API_KEY="));
-assert.ok(!env.includes("ALIGHT_PREMIUM_TIMEOUT_MS="));
+
+for (const route of ["/api/alight-premium", magicSource, applySource]) assert.ok(routes.apiRoutes.includes(route), `${route} harus ada di route-manifest`);
+assert.ok(vercel.rewrites.some((row) => row.source === magicSource && row.destination === magicDest), "magic-link harus external rewrite");
+assert.ok(vercel.rewrites.some((row) => row.source === applySource && row.destination === applyDest), "applyPremium harus external rewrite");
+assert.ok(vercel.rewrites.some((row) => row.source === "/api/alight-premium" && /mode=alight-premium/.test(row.destination)), "health route Alight harus tetap tersedia");
+
+assert.ok(ui.includes("var MAGIC_ROUTE='/api/alight-premium/magic-link'"));
+assert.ok(ui.includes("var APPLY_ROUTE='/api/alight-premium/apply-premium'"));
+assert.ok(ui.includes("method:'GET'"));
+assert.ok(ui.includes("url.searchParams.set('email'"));
+assert.ok(ui.includes("url.searchParams.set('link'"));
+assert.ok(!ui.includes("method:'POST'"));
+assert.ok(!ui.includes("https://api.kyzznekoo.my.id"), "browser tidak boleh fetch provider secara cross-origin");
+assert.ok(!ui.includes("AbortController"));
+
+assert.ok(local.includes('"/api/alight-premium/magic-link"'));
+assert.ok(local.includes('"/api/alight-premium/apply-premium"'));
+assert.ok(local.includes("if (route.action) requestUrl.searchParams.set(\"action\", route.action);"));
+
+assert.ok(proxy.includes('const https = require("node:https")'));
+assert.ok(proxy.includes("family: 4"));
+assert.ok(!proxy.includes("await fetch("));
+assert.ok(!proxy.includes("AbortController"));
+
 assert.ok(ui.includes("renderAlightPremium"));
 assert.ok(ui.includes("Apply Premium 1 Tahun"));
 assert.ok(css.includes(".nap"));
-assert.ok(api.includes('mode") === "alight-premium"'));
-assert.ok(local.includes('"/api/alight-premium"'));
 assert.ok(registry.includes('["alightpremium","Alight Motion Premium 1 Tahun"'));
 assert.ok(shell.includes("alightpremium:{renderer:'renderAlightPremium'"));
 assert.ok(app.includes("id: 'alightpremium'"));
 assert.ok(app.includes("case 'alightpremium': renderAlightPremium(body); break;"));
-console.log("Alight Motion Premium stable-proxy tests lulus: browser same-origin, upstream GET, tanpa API key/AbortController, provider status divalidasi, magic link tidak dipotong diam-diam, maxDuration Vercel 300 detik.");
+
+console.log("Alight Motion Premium edge-rewrite tests lulus: browser GET same-origin, Vercel external rewrite ke dua endpoint provider, tanpa CORS/browser direct dan tanpa Node serverless pada production flow.");
