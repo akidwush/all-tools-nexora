@@ -1,10 +1,10 @@
 # All Tools Nexora
 
-All Tools Nexora v6.3.18 adalah website toolkit statis dengan 44 tool, lazy-loaded feature modules, dashboard admin, Supabase, dan 12 Vercel Functions. Source frontend tetap tanpa framework dan tidak memiliki dependency npm produksi.
+All Tools Nexora v6.3.18 adalah website toolkit statis dengan 46 tool, lazy-loaded feature modules, dashboard admin, Supabase, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend Personal AI memakai dependency `@google/genai`.
 
 ## Menjalankan secara lokal
 
-Node.js 18 atau lebih baru diperlukan.
+Node.js 20 atau lebih baru diperlukan.
 
 ```bash
 cp .env.example .env
@@ -52,7 +52,7 @@ Salin `.env.example` dan isi hanya layanan yang digunakan. Variable utama:
 
 - Database/admin: `SUPABASE_URL`, `SUPABASE_SECRET_KEY` atau `SUPABASE_SERVICE_ROLE_KEY`, serta `FEEDBACK_HASH_SALT`.
 - Operasional: `HEALTH_CHECK_TOKEN` dan pengaturan timeout/cache opsional.
-- Tool eksternal: `COINGECKO_API_KEY`, `GOOGLE_PAGESPEED_API_KEY`, `GOOGLE_SAFE_BROWSING_API_KEY`, `NASA_API_KEY`, `OCR_SPACE_API_KEY`, `FREECONVERT_API_KEY`, `BIGJPG_API_KEY`, dan `SVGTOXML_API_KEY`.
+- Tool eksternal: `COINGECKO_API_KEY`, `GOOGLE_PAGESPEED_API_KEY`, `GOOGLE_SAFE_BROWSING_API_KEY`, `NASA_API_KEY`, `OCR_SPACE_API_KEY`, `FREECONVERT_API_KEY`, `BIGJPG_API_KEY`, `SVGTOXML_API_KEY`, dan `GEMINI_API_KEY` untuk Personal AI.
 - SiteGrabber: `SITEGRABBER_API_BASE_URL` dan `SITEGRABBER_API_KEY`.
 - Deploy Center: `NEXUS_DEPLOY_ACCESS_KEY`, kemudian token `VERCEL_TOKEN` atau `NETLIFY_TOKEN`.
 

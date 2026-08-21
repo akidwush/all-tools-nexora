@@ -60,6 +60,7 @@ const API_ROUTES = Object.freeze({
   "/api/space-explorer": { file: "api/tool-health.js", mode: "space-explorer" },
   "/api/ocr-intelligence": { file: "api/tool-health.js", mode: "ocr-intelligence" },
   "/api/svg-alight": { file: "api/tool-health.js", mode: "svg-alight" },
+  "/api/alight-premium": { file: "api/tool-health.js", mode: "alight-premium" },
   "/api/big-image": { file: "api/tool-health.js", mode: "big-image" },
   "/api/vdeploy": { file: "api/health.js", mode: "vdeploy" },
   "/api/ai/chat": { file: "api/health.js", mode: "ai-chat" },

@@ -100,13 +100,6 @@
   }
   window.NexoraScheduleIdle=schedule;
 
-  function removeSplash(){
-    var splash=document.getElementById("splash");
-    if(!splash)return;
-    splash.style.pointerEvents="none";
-    setTimeout(function(){if(splash&&splash.parentNode)splash.remove();},lowPower?360:760);
-  }
-
   async function initHeroVideo(){
     var hero=heroElement||document.querySelector("[data-nx-hero]");
     var video=heroVideo||(hero&&hero.querySelector("video[data-src]"));
@@ -205,8 +198,6 @@
 
   }
 
-  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",removeSplash,{once:true});
-  else removeSplash();
 
   window.addEventListener("load",function(){
     schedule(initHeroVideo,{timeout:2200});

@@ -1590,6 +1590,7 @@ let toolsData = {
         { id: 'spaceexplorer', icon: 'fa-solid fa-user-astronaut', name: 'Space Explorer', desc: 'APOD, galeri Mars, asteroid dekat Bumi dan cuaca antariksa NASA', badge: 'NASA' },
         { id: 'ocrintel', icon: 'fa-solid fa-file-lines', name: 'Nexora OCR Intelligence', desc: 'Ekstrak teks dari gambar dan PDF, analisis dokumen, lalu buat searchable PDF', badge: 'OCR' },
         { id: 'svgalight', icon: 'fa-solid fa-wand-magic-sparkles', name: 'SVG → Alight XML', desc: 'Konversi SVG ke XML Alight Motion dengan 4 mode: Lossless, Accurate, Balanced, Lightweight', badge: 'ANIME XML' },
+        { id: 'alightpremium', icon: 'fa-solid fa-bolt', name: 'Alight Motion Premium 1 Tahun', desc: 'Request magic link lalu proses aktivasi Premium melalui API reseller', badge: '1 YEAR' },
         { id: 'imagevectorizer', icon: 'fa-solid fa-bezier-curve', name: 'Nexora Image Vectorizer', desc: 'Ubah PNG atau JPG menjadi SVG melalui FreeConvert Cloud', badge: 'SVG' },
         { id: 'bigimage', icon: 'fa-solid fa-up-right-and-down-left-from-center', name: 'Big Image', desc: 'Upscale ilustrasi dan foto 2×–16× melalui Bigjpg AI', badge: 'BIGJPG AI' },
         { id: 'calc', icon: 'fa-solid fa-calculator', name: 'Calculator', desc: 'Hitung cepat', badge: 'Math' },
@@ -1851,6 +1852,15 @@ async function applyDatabaseToolConfiguration() {
                 custom: !base
             });
         }
+        const databaseIds = new Set(rows.map(row => String(row.id || '')));
+        const requiredLocalIds = ['alightpremium'];
+        for (const id of requiredLocalIds) {
+            if (databaseIds.has(id)) continue;
+            const base = baseById.get(id);
+            if (!base) continue;
+            const category = allowedCategories.has(base.category) ? base.category : 'tools';
+            nextTools[category].push({ ...base, category, sortOrder: Number(base.sortOrder || 71) });
+        }
         for (const category of Object.keys(nextTools)) {
             nextTools[category].sort((left, right) => (left.sortOrder - right.sortOrder) || left.name.localeCompare(right.name, 'id'));
         }
@@ -1929,6 +1939,7 @@ function showTool(toolId) {
         case 'spaceexplorer': renderSpaceExplorer(body); break;
         case 'ocrintel': renderOcrIntelligence(body); break;
         case 'svgalight': renderSvgAlight(body); break;
+        case 'alightpremium': renderAlightPremium(body); break;
         case 'imagevectorizer': renderImageVectorizer(body); break;
         case 'bigimage': renderBigImage(body); break;
         case 'promptgenerate': renderPromptGenerator(body); break;

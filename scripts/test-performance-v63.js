@@ -23,5 +23,7 @@ assert.match(perf,/nx-low-power/);
 assert.match(health,/refresh=0/);
 assert.match(stability,/nexora:tool-health-loaded/);
 assert.match(health,/__NEXORA_TOOL_HEALTH_PAYLOAD__/);
-assert.match(css,/animation:nxSplashOut \.22s ease \.62s forwards/);
+assert.doesNotMatch(html,/id=["']splash["']|splash-screen/);
+assert.doesNotMatch(css,/nxSplashOut|splash-screen|splash-title|splash-sub/);
+assert.doesNotMatch(perf,/removeSplash/);
 console.log("Nexora v6.3 performance tests lulus: instant catalog, deferred network, lightweight mobile mode, and lazy hero video.");

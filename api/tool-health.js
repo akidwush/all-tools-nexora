@@ -6,6 +6,7 @@ const { handleCryptoMarket } = require("../lib/crypto-market");
 const { handleSpaceExplorer } = require("../lib/space-explorer");
 const { handleOcrIntelligence } = require("../lib/ocr-intelligence");
 const { handleSvgToXml } = require("../lib/svgtoxml-proxy");
+const { handleAlightPremium } = require("../lib/alight-premium-proxy");
 const { handleFreeConvertVectorizer } = require("../lib/freeconvert-vectorizer");
 const { handleBigImage } = require("../lib/bigjpg-upscaler");
 const { handleIpIntelligence } = require("../lib/ipinfo-intelligence");
@@ -91,6 +92,9 @@ module.exports = async function handler(request, response) {
   }
   if (url.searchParams.get("mode") === "svg-alight") {
     return handleSvgToXml(request, response, url);
+  }
+  if (url.searchParams.get("mode") === "alight-premium") {
+    return handleAlightPremium(request, response, url);
   }
 
   if (url.searchParams.get("mode") === "image-vectorizer") {

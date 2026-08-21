@@ -106,6 +106,10 @@
       "destination": "/api/tool-health?mode=svg-alight"
     },
     {
+      "source": "/api/alight-premium",
+      "destination": "/api/tool-health?mode=alight-premium"
+    },
+    {
       "source": "/api/big-image",
       "destination": "/api/tool-health?mode=big-image"
     },

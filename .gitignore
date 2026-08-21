@@ -9,3 +9,4 @@ dist/
 *.log
 
 public/
+.hf*-backup-*

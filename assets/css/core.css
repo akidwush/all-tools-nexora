@@ -36,169 +36,6 @@ body {
     100% { opacity: 1; }
 }
 
-/* ====== NEXUS BOOT SPLASH ====== */
-.splash-screen {
-    position: fixed; inset: 0; z-index: 9999;
-    background: #030008;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    overflow: hidden;
-    animation: nxSplashOut 0.65s ease-in 4.35s forwards;
-}
-.splash-screen::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(168,85,247,0.022) 3px, rgba(168,85,247,0.022) 4px);
-    pointer-events: none; z-index: 1;
-    animation: nxScanMove 5s linear infinite;
-}
-.splash-screen::after {
-    content: ''; position: absolute; inset: 0;
-    background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,8,0.82) 100%);
-    pointer-events: none; z-index: 1;
-}
-@keyframes nxScanMove {
-    from { background-position: 0 0; }
-    to   { background-position: 0 160px; }
-}
-@keyframes nxSplashOut {
-    0%   { opacity:1; filter:brightness(1) blur(0px); }
-    35%  { opacity:1; filter:brightness(3.5) blur(1px); }
-    70%  { opacity:0.6; filter:brightness(6) blur(6px); }
-    100% { opacity:0; filter:brightness(9) blur(18px); pointer-events:none; visibility:hidden; }
-}
-.nx-grid {
-    position: absolute; inset: -80px; z-index: 0;
-    background-image:
-        linear-gradient(rgba(124,58,237,0.065) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(124,58,237,0.065) 1px, transparent 1px);
-    background-size: 54px 54px;
-    opacity: 0;
-    animation: nxGridIn 1s ease 0.05s forwards;
-}
-@keyframes nxGridIn {
-    0%   { opacity:0; transform:perspective(900px) rotateX(10deg) scale(1.12); }
-    100% { opacity:1; transform:perspective(900px) rotateX(0deg) scale(1); }
-}
-.nx-rings { position:absolute; top:50%; left:50%; pointer-events:none; z-index:2; }
-.nx-ring {
-    position:absolute; border-radius:50%;
-    transform:translate(-50%,-50%) scale(0);
-    animation: nxRingExpand 1.7s cubic-bezier(0.16,1,0.3,1) forwards;
-}
-.nx-ring:nth-child(1){width:88px; height:88px; border:2px solid rgba(168,85,247,0.85); box-shadow:0 0 20px rgba(168,85,247,0.45),inset 0 0 14px rgba(168,85,247,0.12); animation-delay:0.1s;}
-.nx-ring:nth-child(2){width:200px;height:200px;border:1.5px solid rgba(168,85,247,0.5); animation-delay:0.24s;}
-.nx-ring:nth-child(3){width:340px;height:340px;border:1px solid rgba(168,85,247,0.28); animation-delay:0.38s;}
-.nx-ring:nth-child(4){width:500px;height:500px;border:1px solid rgba(168,85,247,0.13); animation-delay:0.52s;}
-.nx-ring:nth-child(5){width:680px;height:680px;border:1px solid rgba(168,85,247,0.055);animation-delay:0.66s;}
-@keyframes nxRingExpand {
-    0%  { transform:translate(-50%,-50%) scale(0); opacity:1; }
-    52% { transform:translate(-50%,-50%) scale(1); opacity:0.9; }
-    100%{ transform:translate(-50%,-50%) scale(1.06); opacity:0.22; }
-}
-.nx-orb {
-    position:absolute; top:50%; left:50%;
-    width:62px; height:62px; border-radius:50%;
-    transform:translate(-50%,-50%) scale(0);
-    background:radial-gradient(circle, #f5eeff 0%, #a855f7 32%, rgba(109,40,217,0.25) 68%, transparent 100%);
-    box-shadow:0 0 55px 18px rgba(168,85,247,0.55), 0 0 130px 45px rgba(124,58,237,0.22);
-    animation: nxOrbIn 0.6s cubic-bezier(0.16,1,0.3,1) 0.08s forwards, nxOrbPulse 1.8s ease-in-out 0.85s infinite alternate;
-    z-index:3;
-}
-@keyframes nxOrbIn {
-    0%  { transform:translate(-50%,-50%) scale(0); opacity:0; }
-    55% { transform:translate(-50%,-50%) scale(1.28); opacity:1; }
-    78% { transform:translate(-50%,-50%) scale(0.87); }
-    100%{ transform:translate(-50%,-50%) scale(1);   opacity:0.78; }
-}
-@keyframes nxOrbPulse {
-    from { box-shadow:0 0 50px 16px rgba(168,85,247,0.42), 0 0 110px 35px rgba(124,58,237,0.16); }
-    to   { box-shadow:0 0 75px 28px rgba(168,85,247,0.65), 0 0 170px 65px rgba(124,58,237,0.28); }
-}
-.nx-boot-label {
-    font-family:'Orbitron',monospace;
-    font-size:clamp(0.52rem,1.4vw,0.68rem);
-    letter-spacing:7px; color:rgba(168,85,247,0.45);
-    text-transform:uppercase; margin-bottom:12px;
-    opacity:0; z-index:4;
-    animation: nxFadeUp 0.5s ease 1.15s forwards;
-}
-.splash-title {
-    font-family:'Orbitron',monospace;
-    font-size:clamp(2rem,7vw,4.4rem); font-weight:900;
-    background:linear-gradient(135deg,#f0e6ff 0%,#c084fc 38%,#a855f7 66%,#7c3aed 100%);
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-    opacity:0; transform:scale(0.82) translateY(12px);
-    animation: nxTitleIn 0.75s cubic-bezier(0.16,1,0.3,1) 1.55s forwards;
-    filter:drop-shadow(0 0 28px rgba(168,85,247,0.38));
-    z-index:4; position:relative;
-}
-@keyframes nxTitleIn {
-    0%  { opacity:0; transform:scale(0.82) translateY(12px); letter-spacing:-.5em; }
-    50% { opacity:1; transform:scale(1.06) translateY(-3px); letter-spacing:normal; }
-    75% { transform:scale(0.97) translateY(1px); }
-    100%{ opacity:1; transform:scale(1) translateY(0); }
-}
-.splash-title::after {
-    content:attr(data-text);
-    position:absolute; left:0; top:0;
-    background:linear-gradient(135deg,#f0e6ff,#c084fc,#a855f7,#7c3aed);
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-    opacity:0;
-    animation: nxGlitchLayer 0.1s step-end 1.55s 4;
-}
-@keyframes nxGlitchLayer {
-    0%  { opacity:0; clip-path:inset(0 0 100% 0); transform:skewX(0deg) translateX(0); }
-    25% { opacity:1; clip-path:inset(15% 0 50% 0); transform:skewX(8deg) translateX(8px); }
-    50% { opacity:1; clip-path:inset(55% 0 10% 0); transform:skewX(-5deg) translateX(-6px); }
-    75% { opacity:1; clip-path:inset(30% 0 30% 0); transform:skewX(3deg) translateX(4px); }
-    100%{ opacity:0; clip-path:inset(0 0 100% 0); transform:skewX(0deg) translateX(0); }
-}
-.splash-sub {
-    font-family:'Poppins',sans-serif;
-    font-size:clamp(0.6rem,1.8vw,0.82rem);
-    letter-spacing:9px; color:rgba(168,85,247,0.42);
-    font-weight:300; text-transform:uppercase;
-    margin-top:10px; opacity:0; z-index:4;
-    animation: nxFadeUp 0.5s ease 2.55s forwards;
-}
-.nx-bar-wrap {
-    width:min(300px,62vw); margin-top:30px;
-    opacity:0; z-index:4;
-    animation: nxFadeUp 0.4s ease 2.9s forwards;
-}
-.nx-bar-track {
-    width:100%; height:2px;
-    background:rgba(168,85,247,0.1); border-radius:10px; overflow:hidden;
-    position:relative;
-}
-.nx-bar-fill {
-    height:100%; width:0%;
-    background:linear-gradient(90deg,#7c3aed,#c084fc,#e9d5ff,#c084fc,#7c3aed);
-    background-size:300% 100%;
-    border-radius:10px;
-    box-shadow:0 0 12px rgba(192,132,252,0.7);
-    animation: nxBarFill 1.1s cubic-bezier(0.25,0.46,0.45,0.94) 3.1s forwards, nxBarShimmer 0.7s linear infinite;
-}
-@keyframes nxBarFill {
-    0%  { width:0%; } 100%{ width:100%; }
-}
-@keyframes nxBarShimmer {
-    0%  { background-position:-300% 0; } 100%{ background-position:300% 0; }
-}
-.nx-status {
-    font-family:'Orbitron',monospace;
-    font-size:clamp(0.48rem,1.1vw,0.58rem);
-    letter-spacing:4px; color:rgba(110,231,183,0.75);
-    text-transform:uppercase; margin-top:14px;
-    opacity:0; z-index:4;
-    animation: nxFadeUp 0.4s ease 4.05s forwards;
-}
-@keyframes nxFadeUp {
-    from { opacity:0; transform:translateY(9px); }
-    to   { opacity:1; transform:translateY(0); }
-}
-
 .video-banner {
     position: relative;
     width: 80%;
@@ -1352,18 +1189,6 @@ body {
 
 
 /* Nexora v6.3 — public performance optimization */
-.splash-screen{animation:nxSplashOut .22s ease .62s forwards}
-.splash-screen::before{animation:none;opacity:.55}
-.nx-grid{animation:nxGridIn .35s ease .02s forwards}
-.nx-ring{animation-duration:.48s!important;animation-delay:.02s!important}
-.nx-orb{animation:nxOrbIn .34s cubic-bezier(.16,1,.3,1) .02s forwards}
-.nx-boot-label{animation:nxFadeUp .22s ease .08s forwards}
-.splash-title{animation:nxTitleIn .34s cubic-bezier(.16,1,.3,1) .12s forwards}
-.splash-title::after{animation:none}
-.splash-sub{animation:nxFadeUp .22s ease .22s forwards}
-.nx-bar-wrap{animation:nxFadeUp .2s ease .28s forwards}
-.nx-bar-fill{animation:nxBarFill .28s ease .32s forwards}
-.nx-status{animation:nxFadeUp .18s ease .44s forwards}
 .container{animation:none}
 .video-banner{background:radial-gradient(circle at 72% 20%,rgba(192,132,252,.22),transparent 38%),linear-gradient(135deg,#150525,#09010f 58%,#1a0730);min-height:180px}
 .video-banner video{opacity:0;transition:opacity .35s ease;background:#09010f}
@@ -1374,8 +1199,6 @@ body {
 html.nx-low-power .bg-glow{animation:none;opacity:.72}
 html.nx-low-power .video-banner video{display:block}
 html.nx-low-power .video-banner{min-height:150px}
-html.nx-low-power .splash-screen{animation-delay:.18s;animation-duration:.12s}
-html.nx-low-power .nx-ring:nth-child(n+3){display:none}
 html.nx-low-power *{scroll-behavior:auto!important}
 @media (max-width:768px){
   .bg-glow{animation:none;opacity:.76}
@@ -1386,8 +1209,7 @@ html.nx-low-power *{scroll-behavior:auto!important}
   .tools-card{box-shadow:0 8px 24px rgba(0,0,0,.18)}
 }
 @media (prefers-reduced-motion:reduce){
-  .splash-screen{animation:nxSplashOut .01s linear .05s forwards}
-  .bg-glow,.nx-orb,.nx-bar-fill{animation:none!important}
+  .bg-glow{animation:none!important}
 }
 
 

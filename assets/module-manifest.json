@@ -165,6 +165,14 @@
       "js": [
         "assets/js/features/bmkg-open-data.js"
       ]
+    },
+    "alight-premium": {
+      "css": [
+        "assets/css/features/alight-premium.css"
+      ],
+      "js": [
+        "assets/js/features/alight-premium.js"
+      ]
     }
   },
   "tools": {
@@ -196,6 +204,7 @@
     "vdeploy": "deploy-center",
     "webencryption": "web-encryption",
     "svgalight": "svg-alight",
-    "bmkg": "bmkg-open-data"
+    "bmkg": "bmkg-open-data",
+    "alightpremium": "alight-premium"
   }
 }

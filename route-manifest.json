@@ -37,6 +37,7 @@
     "/api/admin/socials",
     "/api/admin/ai",
     "/api/svg-alight",
+    "/api/alight-premium",
     "/api/big-image"
   ]
 }

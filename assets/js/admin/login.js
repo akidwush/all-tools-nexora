@@ -11,10 +11,6 @@
     message.textContent=text||"";
     message.className="form-message"+(type?` is-${type}`:"");
   }
-  function setLoading(loading){
-    submit.disabled=loading;
-    submit.innerHTML=loading?'<i class="fa-solid fa-spinner fa-spin"></i><span>Memverifikasi...</span>':'<span>Masuk ke Dashboard</span><i class="fa-solid fa-arrow-right"></i>';
-  }
   async function sessionCheck(){
     try{
       const response=await fetch("/api/admin/auth",{cache:"no-store",credentials:"same-origin"});
@@ -35,7 +31,7 @@
       setMessage("Periksa kembali email dan kata sandi.","error");
       return;
     }
-    setLoading(true);
+    submit.disabled=true;
     const controller=new AbortController();
     const timer=setTimeout(()=>controller.abort(),15000);
     try{
@@ -49,7 +45,7 @@
       location.replace("/admin");
     }catch(error){
       setMessage(error&&error.name==="AbortError"?"Server login melewati batas waktu. Coba lagi.":(error.message||"Login gagal."),"error");
-      setLoading(false);
+      submit.disabled=false;
     }finally{clearTimeout(timer);}
   });
   sessionCheck();
