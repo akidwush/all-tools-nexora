@@ -16,6 +16,7 @@ const local = read("serve-local.js");
 const registry = read("assets/js/core/tool-registry.js");
 const shell = read("assets/js/core/shell.js");
 const app = read("assets/js/core/app.js");
+const env = read(".env.example");
 
 assert.equal(manifest.tools.alightpremium, "alight-premium");
 assert.ok(manifest.modules["alight-premium"].js.includes("assets/js/features/alight-premium.js"));
@@ -25,9 +26,11 @@ assert.ok(vercel.rewrites.some((row) => row.source === "/api/alight-premium" && 
 assert.ok(proxy.includes('method: "GET"'));
 assert.ok(proxy.includes("/api/alightmotion/v1/magic-link"));
 assert.ok(proxy.includes("/api/alightmotion/v1/applyPremium"));
-assert.ok(proxy.includes("ALIGHT_PREMIUM_API_KEY"));
-assert.ok(proxy.includes('request.headers["x-nexora-alight-key"]'));
-assert.ok(!/ALIGHT_PREMIUM_API_KEY\s*=\s*["'][^"']{8,}/.test(proxy));
+assert.ok(!proxy.includes("ALIGHT_PREMIUM_API_KEY"));
+assert.ok(!proxy.includes("x-nexora-alight-key"));
+assert.ok(!ui.includes("napApiKey"));
+assert.ok(!ui.includes("x-nexora-alight-key"));
+assert.ok(!env.includes("ALIGHT_PREMIUM_API_KEY="));
 assert.ok(ui.includes("renderAlightPremium"));
 assert.ok(ui.includes("/api/alight-premium"));
 assert.ok(ui.includes("Apply Premium 1 Tahun"));
@@ -38,4 +41,4 @@ assert.ok(registry.includes('["alightpremium","Alight Motion Premium 1 Tahun"'))
 assert.ok(shell.includes("alightpremium:{renderer:'renderAlightPremium'"));
 assert.ok(app.includes("id: 'alightpremium'"));
 assert.ok(app.includes("case 'alightpremium': renderAlightPremium(body); break;"));
-console.log("Alight Motion Premium patch tests lulus: UI, proxy GET, user/server key, route, module, registry, dan Vercel rewrite sinkron.");
+console.log("Alight Motion Premium no-key tests lulus: dua endpoint provider GET, UI tanpa key, proxy, route, module, registry, dan Vercel rewrite sinkron.");

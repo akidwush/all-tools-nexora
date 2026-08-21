@@ -2,7 +2,7 @@
 insert into public.tools
   (id, name, description, category, badge, icon, external_url, is_active, sort_order, metadata)
 values
-  ('alightpremium', 'Alight Motion Premium 1 Tahun', 'Request magic link lalu proses aktivasi Premium melalui API reseller', 'tools', '1 YEAR', 'fa-solid fa-bolt', null, true, 69, '{"provider":"kyzznekoo","serverProxy":true,"userKeySupported":true,"features":["magic-link","apply-premium"]}'::jsonb)
+  ('alightpremium', 'Alight Motion Premium 1 Tahun', 'Request magic link lalu proses aktivasi Premium melalui API reseller', 'tools', '1 YEAR', 'fa-solid fa-bolt', null, true, 69, '{"provider":"kyzznekoo","serverProxy":true,"features":["magic-link","apply-premium"]}'::jsonb)
 on conflict (id) do update set
   name = excluded.name,
   description = excluded.description,

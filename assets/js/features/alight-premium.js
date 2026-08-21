@@ -1,4 +1,4 @@
-/* Nexora Alight Motion Premium — reseller activation workspace */
+/* Nexora Alight Motion Premium — direct two-endpoint workspace */
 (function(){
   "use strict";
 
@@ -17,17 +17,16 @@
         <section class="nap-hero">
           <div class="nap-mark"><i class="fa-solid fa-wave-square"></i></div>
           <div>
-            <span class="nap-kicker">ALIGHT MOTION · RESELLER WORKSPACE</span>
+            <span class="nap-kicker">ALIGHT MOTION · PREMIUM WORKSPACE</span>
             <h2>Premium <b>1 Tahun</b></h2>
-            <p>Request magic link, lalu proses aktivasi Premium dari satu workspace. Request provider tetap menggunakan metode GET melalui proxy server-side Nexora.</p>
+            <p>Gunakan dua endpoint provider secara berurutan: request Magic Link terlebih dahulu, lalu Apply Premium menggunakan email dan magic link yang diterima.</p>
           </div>
           <div class="nap-health" id="napHealth"><i class="fa-solid fa-circle-notch fa-spin"></i><span>Checking API</span></div>
         </section>
 
-        <section class="nap-keybox">
-          <div><i class="fa-solid fa-key"></i><div><strong>API Key</strong><span>Opsional jika ALIGHT_PREMIUM_API_KEY sudah diset di Vercel.</span></div></div>
-          <div class="nap-key-input"><input id="napApiKey" type="password" autocomplete="off" spellcheck="false" placeholder="Masukkan API key reseller"><button id="napToggleKey" type="button" aria-label="Tampilkan atau sembunyikan API key"><i class="fa-regular fa-eye"></i></button></div>
-          <small>Key yang kamu isi hanya dikirim ke endpoint Nexora saat request dan tidak disimpan ke localStorage.</small>
+        <section class="nap-endpoint-note">
+          <i class="fa-solid fa-link"></i>
+          <div><strong>Provider API siap digunakan</strong><span>Tidak ada API key/token tambahan. Nexora meneruskan request ke dua endpoint GET provider.</span></div>
         </section>
 
         <section class="nap-grid">
@@ -57,8 +56,6 @@
       </main>`;
 
     var root=body.querySelector('.nap');
-    var keyInput=root.querySelector('#napApiKey');
-    var toggleKey=root.querySelector('#napToggleKey');
     var emailOne=root.querySelector('#napEmailOne');
     var emailTwo=root.querySelector('#napEmailTwo');
     var magicLink=root.querySelector('#napMagicLink');
@@ -82,15 +79,14 @@
       target.innerHTML='<div><i class="fa-solid '+(type==='ok'?'fa-circle-check':'fa-triangle-exclamation')+'"></i><span>'+escapeHtml(message||'Selesai')+'</span></div>'+details;
     }
 
-    function headers(){
-      var value=keyInput.value.trim();
-      var result={'Content-Type':'application/json','Accept':'application/json'};
-      if(value) result['x-nexora-alight-key']=value;
-      return result;
-    }
-
     async function request(action,payload){
-      var response=await fetch('/api/alight-premium',{method:'POST',cache:'no-store',credentials:'same-origin',headers:headers(),body:JSON.stringify(Object.assign({action:action},payload||{}))});
+      var response=await fetch('/api/alight-premium',{
+        method:'POST',
+        cache:'no-store',
+        credentials:'same-origin',
+        headers:{'Content-Type':'application/json','Accept':'application/json'},
+        body:JSON.stringify(Object.assign({action:action},payload||{}))
+      });
       var text=await response.text();
       var data={};
       try{data=text?JSON.parse(text):{};}catch(_){data={message:text};}
@@ -103,8 +99,8 @@
         var response=await fetch('/api/alight-premium',{cache:'no-store',credentials:'same-origin',headers:{Accept:'application/json'}});
         var data=await response.json();
         if(!response.ok||!data.ok) throw new Error(data.message||'API offline');
-        healthBadge.className='nap-health '+(data.configured?'is-ok':'is-warn');
-        healthBadge.innerHTML=data.configured?'<i class="fa-solid fa-circle-check"></i><span>SERVER KEY READY</span>':'<i class="fa-solid fa-key"></i><span>INPUT KEY REQUIRED</span>';
+        healthBadge.className='nap-health is-ok';
+        healthBadge.innerHTML='<i class="fa-solid fa-circle-check"></i><span>API READY</span>';
       }catch(_){
         healthBadge.className='nap-health is-error';
         healthBadge.innerHTML='<i class="fa-solid fa-triangle-exclamation"></i><span>API OFFLINE</span>';
@@ -142,8 +138,7 @@
 
     emailOne.addEventListener('input',function(){if(!emailTwo.value||emailTwo.dataset.synced==='1'){emailTwo.value=emailOne.value;emailTwo.dataset.synced='1';}});
     emailTwo.addEventListener('input',function(){emailTwo.dataset.synced='0';});
-    toggleKey.addEventListener('click',function(){var visible=keyInput.type==='text';keyInput.type=visible?'password':'text';toggleKey.innerHTML='<i class="fa-regular '+(visible?'fa-eye':'fa-eye-slash')+'"></i>';});
-    root.querySelector('#napReset').addEventListener('click',function(){emailOne.value='';emailTwo.value='';magicLink.value='';keyInput.value='';magicResult.hidden=true;applyResult.hidden=true;sessionStatus.textContent='READY';emailOne.focus();});
+    root.querySelector('#napReset').addEventListener('click',function(){emailOne.value='';emailTwo.value='';magicLink.value='';magicResult.hidden=true;applyResult.hidden=true;sessionStatus.textContent='READY';emailOne.focus();});
     health();
   };
 })();
