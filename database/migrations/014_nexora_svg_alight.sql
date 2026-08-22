@@ -8,14 +8,14 @@ values
   (
     'svgalight',
     'SVG → Alight XML',
-    'Konversi SVG menjadi XML Alight Motion dengan Anime Vector Atelier',
+    'Konversi SVG ke XML Alight Motion dengan AM Optimized, Maximum Fidelity, dan audit kesamaan',
     'tools',
-    'ANIME XML',
+    'ENGINE v1.8',
     'fa-solid fa-wand-magic-sparkles',
     null,
     true,
     68,
-    '{"provider":"svgtoxml","engine":"https://svgtoxml.vercel.app","serverProxy":true,"features":["svg-to-alight-xml","anime-atelier","lossless","copy-download"]}'::jsonb
+    '{"provider":"svgtoxml","engine":"v1.8","serverProxy":true,"features":["am-optimized","maximum-fidelity","fidelity-audit","micro-detail","layer-limit","copy-download"]}'::jsonb
   )
 on conflict (id) do update set
   name = excluded.name,

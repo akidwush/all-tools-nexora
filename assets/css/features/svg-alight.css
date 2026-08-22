@@ -24,6 +24,7 @@
 .nsa-v103 .nsa-drop:hover,.nsa-v103 .nsa-drop.drag{border-color:#7cf7a5}
 .nsa-v103 .nsa-drop-icon{color:#07100b;background:linear-gradient(135deg,#8b5cf6,#a855f7 52%,#7cf7a5)}
 .nsa-v103 .nsa-progress b{background:linear-gradient(90deg,#8b5cf6,#a855f7,#7cf7a5);background-size:220% 100%;animation:nsaGradientFlow 2.8s linear infinite}
+.nsa-v108 .nsa-empty span{display:block;max-width:340px;margin-top:7px;font-size:11px;line-height:1.55}.nsa-v108 .nsa-advanced>p{line-height:1.55}.nsa-v108 .nsa-modes button:disabled{cursor:wait}.nsa-v108 .nsa-file[hidden],.nsa-v108 [hidden]{display:none!important}
 @keyframes nsaAurora{0%{transform:translate3d(-12px,-8px,0) scale(.92)}100%{transform:translate3d(22px,18px,0) scale(1.08)}}
 @keyframes nsaGradientFlow{0%{background-position:0% 50%}100%{background-position:220% 50%}}
 @keyframes nsaGradientShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}

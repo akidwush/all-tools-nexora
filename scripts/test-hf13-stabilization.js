@@ -55,7 +55,7 @@ async function main() {
   assert.match(core, /@media \(max-width:767px\)\{[\s\S]*?\.tools-card\{[\s\S]*?backdrop-filter:none!important/);
   assert.doesNotMatch(components, /@media\(min-width:320px\) and \(max-width:767px\)[\s\S]*?\.tools-grid/);
 
-  assert.match(svgAlight, /API READY/);
+  assert.match(svgAlight, /API AUTH OK/);
   assert.match(svgAlight, /Konversi melewati batas waktu 35 detik/);
   assert.match(downloader, /Probe the API contract first/);
   assert.match(downloader, /source\.endpoint\(config\.healthInput, \{\}\)/);
