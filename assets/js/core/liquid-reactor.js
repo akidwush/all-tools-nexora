@@ -177,14 +177,6 @@
     document.addEventListener('pointerout',function(event){if(pointerCard&&!pointerCard.contains(event.relatedTarget))clearPointer();},{passive:true});
     document.addEventListener('visibilitychange',function(){if(document.hidden)clearPointer();});
   }
-  function setupAperture(){
-    var hero=document.querySelector('[data-nx-hero]');
-    if(!hero||reduced||coarse)return;
-    hero.classList.add('nx-aperture-reveal');
-    var finish=function(){hero.classList.remove('nx-aperture-reveal');hero.classList.add('nx-aperture-complete');};
-    hero.addEventListener('animationend',finish,{once:true});
-    setTimeout(finish,1250);
-  }
   function setupRoomEvents(){
     if(coarse)return;
     window.addEventListener('nexora:tool-room-open',function(){
@@ -389,7 +381,7 @@
   function setupVisibility(){
     document.addEventListener('visibilitychange',function(){document.documentElement.classList.toggle('nx-reactor-paused',document.hidden);});
   }
-  function init(){setupAperture();setupNavigation();setupGrid();setupCards();setupRoomEvents();setupCursorReactor();setupVisibility();}
+  function init(){setupNavigation();setupGrid();setupCards();setupRoomEvents();setupCursorReactor();setupVisibility();}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
   window.__NEXORA_LIQUID_REACTOR__={version:'1.0.0',reducedMotion:reduced};
 })();
