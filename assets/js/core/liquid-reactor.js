@@ -213,11 +213,11 @@
   }
   function setupCursorReactor(){
     var fine=Boolean(window.matchMedia&&window.matchMedia('(pointer: fine)').matches);
-    // A touch follower updated a fixed transformed node on every scroll frame
-    // and spawned extra trail nodes. Native touch feedback is both clearer and
-    // dramatically cheaper on coarse-pointer phones.
-    if(reduced||coarse){
-      window.__NEXORA_CURSOR_REACTOR__={version:'1.1.0',enabled:false,finePointer:fine,reducedMotion:reduced,mobileStable:coarse};
+    // Reduced-motion is an explicit accessibility preference. Coarse-pointer
+    // phones still receive the lightweight touch halo: it only schedules a
+    // frame while a finger is moving and trails are strictly bounded.
+    if(reduced){
+      window.__NEXORA_CURSOR_REACTOR__={version:'1.2.0',enabled:false,finePointer:fine,reducedMotion:true,mobileTouch:false};
       return;
     }
 
@@ -390,7 +390,7 @@
     document.addEventListener('visibilitychange',function(){if(document.hidden){hideMouse();clearTimeout(holdTimer);}});
 
     window.__NEXORA_CURSOR_REACTOR__={
-      version:'1.0.0',enabled:true,finePointer:fine,reducedMotion:false,
+      version:'1.2.0',enabled:true,finePointer:fine,reducedMotion:false,mobileTouch:coarse,
       getState:function(){return {mouseVisible:mouseVisible,touchActive:activeTouchId!==null,trailCount:trailCount,frameActive:Boolean(frame)};}
     };
   }

@@ -1662,6 +1662,7 @@ html.nx-low-power .tools-card,html.nx-low-power .nav-tab,html.nx-low-power .nx-p
     border-color:rgba(var(--nx-card-rgb),.24);
     background:radial-gradient(circle at 34% 28%,rgba(255,255,255,.07),transparent 31%),linear-gradient(145deg,rgba(var(--nx-card-rgb),.09),transparent 68%);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+    transition:transform 120ms ease-out,opacity 120ms ease-out;
   }
   .tools-card .icon{
     border-color:rgba(var(--nx-card-rgb),.42);
@@ -1673,11 +1674,11 @@ html.nx-low-power .tools-card,html.nx-low-power .nav-tab,html.nx-low-power .nx-p
     border-top-color:rgba(255,255,255,.2);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 4px 8px rgba(0,0,0,.18);
   }
-  .tools-card:hover,
-  .tools-card:active{
+  .tools-card:hover{
     transform:none!important;
   }
   .tools-card:active{
+    transform:translate3d(0,1px,0) scale(.986)!important;
     border-color:rgba(var(--nx-card-rgb),.5)!important;
     box-shadow:
       0 6px 0 -5px rgba(var(--nx-card-rgb),.32),
@@ -1685,12 +1686,13 @@ html.nx-low-power .tools-card,html.nx-low-power .nav-tab,html.nx-low-power .nx-p
       inset 0 1px 0 rgba(255,255,255,.17),
       inset 0 -6px 12px rgba(0,0,0,.3)!important;
   }
+  .tools-card:active::after{
+    opacity:1;
+    transform:rotate(-18deg) translate3d(-2px,-2px,0) scale(1.08);
+  }
   .custom-cursor,
-  .custom-cursor-core,
-  .touch-follower,
-  .cursor-trail{
+  .custom-cursor-core{
     display:none!important;
-    animation:none!important;
     will-change:auto!important;
   }
   .section-title>i{

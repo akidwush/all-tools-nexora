@@ -16,7 +16,7 @@ assert.doesNotMatch(components,/#nx-wa-notif/);
 assert.match(components,/\.nx-about-dev-room:not\(\.is-open\)\{[\s\S]*display:none!important/);
 assert.match(core,/HF16 — MOBILE PAINT-STABILITY \+ STATIC 3D GLASS/);
 assert.match(core,/#navTabs\.nx-mobile-stable-tabs \.nav-tab\.active\{[\s\S]*?box-shadow:/);
-assert.match(core,/\.tools-card:active\{[\s\S]*?transform:none!important/);
+assert.match(core,/\.tools-card:active\{[\s\S]*?transform:translate3d\(0,1px,0\) scale\(\.986\)!important/);
 assert.match(motion,/nav\.classList\.add\('nx-mobile-stable-tabs'\)/);
 assert.match(motion,/if\(coarse\)\{[\s\S]*?return;/);
 assert.match(stability,/\/api\/tool-health\?refresh=auto/);

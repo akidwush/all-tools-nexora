@@ -15,7 +15,7 @@ assert.match(core, /@media \(min-width:320px\) and \(max-width:767px\)\{[\s\S]*?
 assert.match(core, /@media \(max-width:767px\)\{[\s\S]*?#navTabs\{[\s\S]*?backdrop-filter:none!important/);
 assert.match(core, /#navTabs\.nx-mobile-stable-tabs \.nav-tab\.active\{[\s\S]*?box-shadow:/);
 assert.match(core, /@media \(max-width:767px\)\{[\s\S]*?\.tools-card\{[\s\S]*?backdrop-filter:none!important;[\s\S]*?transform:none!important;[\s\S]*?transform-style:flat!important/);
-assert.match(core, /\.tools-card:active\{[\s\S]*?transform:none!important/);
+assert.match(core, /\.tools-card:active\{[\s\S]*?transform:translate3d\(0,1px,0\) scale\(\.986\)!important/);
 assert.doesNotMatch(components, /\.tools-card\{position:relative;overflow:hidden;isolation:isolate\}/);
 assert.match(motion, /nav\.classList\.add\('nx-mobile-stable-tabs'\)/);
 assert.match(motion, /if\(coarse\)return;[\s\S]*?captureFlip\(\)/);
