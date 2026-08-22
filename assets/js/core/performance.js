@@ -3,7 +3,7 @@
   "use strict";
   if(window.__NEXORA_PERFORMANCE__) return;
 
-  var DEFAULT_HERO_VIDEO_URL="https://c.termai.cc/v164/HCYk.mp4";
+  var DEFAULT_HERO_VIDEO_URL="https://files.catbox.moe/4ijdle.mp4";
   var LEGACY_HERO_SETTINGS_CACHE_KEY="nexora_hero_settings_v1";
   var HERO_SETTINGS_TIMEOUT_MS=1800;
 

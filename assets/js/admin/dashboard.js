@@ -55,7 +55,7 @@
     const settings=state.dashboard.settings||[];
     $("#settingsList").innerHTML=settings.length?settings.map(item=>`<div class="setting-item"><span class="compact-mark"></span><div><b>${escapeHtml(item.key)}</b><span>${escapeHtml(JSON.stringify(item.value))}</span></div><em class="status-pill">${item.is_public?"public":"private"}</em></div>`).join(""):'<div class="setting-item"><div><b>Belum ada pengaturan</b><span>Jalankan migration database.</span></div></div>';
     const siteSetting=settings.find(item=>item.key==="site");const hero=siteSetting?.value?.heroVideo||{};const heroUrl=$("#heroVideoUrl"),heroEnabled=$("#heroVideoEnabled"),heroButton=$("#saveHeroVideoButton"),heroBadge=$("#heroVideoPermissionBadge");
-    if(!state.heroSettingsDirty){heroUrl.value=hero.url||"https://c.termai.cc/v164/HCYk.mp4";heroEnabled.checked=hero.enabled!==false;}
+    if(!state.heroSettingsDirty){heroUrl.value=hero.url||"https://files.catbox.moe/4ijdle.mp4";heroEnabled.checked=hero.enabled!==false;}
     heroUrl.disabled=!canEdit();heroEnabled.disabled=!canEdit();heroButton.disabled=!canEdit();heroBadge.textContent=canEdit()?"Bisa diedit":"Read only";
     const totals=state.analytics?.totals;
     $("#overviewAnalytics").innerHTML=totals?`<div class="overview-analytics-value"><b>${compactNumber(totals.toolOpens)}</b><span>tool dibuka</span></div><div class="overview-analytics-pairs"><span><b>${compactNumber(totals.uniqueVisitors)}</b> pengunjung</span><span><b>${compactNumber(totals.pageViews)}</b> page view</span></div>`:'<div class="panel-loading"><i class="fa-solid fa-spinner fa-spin"></i> Memuat analytics...</div>';

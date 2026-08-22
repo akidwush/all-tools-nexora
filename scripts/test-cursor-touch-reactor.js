@@ -34,7 +34,7 @@ assert.match(css, /\.tools-card:active\{[\s\S]*?transform:translate3d\(0,1px,0\)
 assert.match(css, /\.tools-card:active::after\{[\s\S]*?scale\(1\.08\)/);
 assert.match(coreAndComponents(), /@media \(min-width:320px\) and \(max-width:767px\)[\s\S]*?grid-template-columns:repeat\(3,minmax\(0,1fr\)\)!important/);
 for (const attribute of ["autoplay", "muted", "loop", "playsinline"]) assert.match(html, new RegExp(`<video[^>]*${attribute}`, "i"));
-assert.match(html, /data-src="https:\/\/c\.termai\.cc\/v164\/HCYk\.mp4"/);
+assert.match(html, /data-src="https:\/\/files\.catbox\.moe\/4ijdle\.mp4"/);
 
 function coreAndComponents() {
   return css + "\n" + components;

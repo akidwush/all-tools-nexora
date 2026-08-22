@@ -35,7 +35,7 @@ assert.match(ai, /@media\(max-width:767px\)\{[\s\S]*?\.nx-ai-launcher-orb::after
 
 const assetVersions = {
       "core.css": "6.3.18-hf17-desktop-nav2",
-  "performance.js": "6.3.18-hf18-desktop-hero2",
+  "performance.js": "6.3.18-hf18-desktop-hero3",
   "liquid-reactor.js": "6.3.18-hf18-desktop-hero1",
   "personal-ai.css": "6.3.18-hf16-mobile-paint1"
 };

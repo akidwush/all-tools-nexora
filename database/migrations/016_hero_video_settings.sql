@@ -4,7 +4,7 @@
 insert into public.app_settings (key, value, is_public)
 values (
   'site',
-  '{"name":"All Tools Nexora","developer":"Dika","heroVideo":{"enabled":true,"url":"https://c.termai.cc/v164/HCYk.mp4"}}'::jsonb,
+  '{"name":"All Tools Nexora","developer":"Dika","heroVideo":{"enabled":true,"url":"https://files.catbox.moe/4ijdle.mp4"}}'::jsonb,
   true
 )
 on conflict (key) do update set

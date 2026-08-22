@@ -85,7 +85,7 @@ create index if not exists feedback_status_idx on public.feedback (status, creat
 create index if not exists tools_active_sort_idx on public.tools (is_active, sort_order, name);
 
 insert into public.app_settings (key, value, is_public)
-values ('site', '{"name":"All Tools Nexora","developer":"Dika","heroVideo":{"enabled":true,"url":"https://c.termai.cc/v164/HCYk.mp4"}}'::jsonb, true)
+values ('site', '{"name":"All Tools Nexora","developer":"Dika","heroVideo":{"enabled":true,"url":"https://files.catbox.moe/4ijdle.mp4"}}'::jsonb, true)
 on conflict (key) do nothing;
 
 -- ============================================================
