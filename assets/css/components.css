@@ -111,18 +111,9 @@
   z-index:4;
   margin:0 0 14px!important;
 }
-#navTabs{
-  position:relative;
-  z-index:8;
-  margin:0 0 22px!important;
-  padding-top:0!important;
-}
 @media(max-width:600px){
   #userCard{
     margin-bottom:12px!important;
-  }
-  #navTabs{
-    margin-bottom:18px!important;
   }
 }
 

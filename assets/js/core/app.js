@@ -1895,17 +1895,20 @@ function renderAll() {
     renderActiveTab(activeCatalogTab, true);
 }
 
-document.querySelectorAll('.nav-tab').forEach(tab => {
-    tab.addEventListener('click', function() {
-        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-        this.classList.add('active');
-        const target = this.dataset.tab;
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        const targetEl = document.getElementById('tab-' + target);
-        if (targetEl) targetEl.classList.add('active');
+const catalogNavigation = document.getElementById('navTabs');
+if (catalogNavigation) {
+    catalogNavigation.addEventListener('click', event => {
+        const tab = event.target.closest('.nav-tab');
+        if (!tab || !catalogNavigation.contains(tab)) return;
+        const target = tab.dataset.tab;
+        if (!target) return;
+        document.dispatchEvent(new CustomEvent('nexora:navigation-before', { detail: { tab: target } }));
+        document.querySelectorAll('.nav-tab').forEach(item => item.classList.toggle('active', item === tab));
+        document.querySelectorAll('.tab-content').forEach(panel => panel.classList.toggle('active', panel.id === 'tab-' + target));
         renderActiveTab(target, true);
+        document.dispatchEvent(new CustomEvent('nexora:navigation-changed', { detail: { tab: target } }));
     });
-});
+}
 
 // Kartu memakai elemen div agar layout lama tetap kompatibel. Jadikan seluruh
 // kartu benar-benar dapat dibuka dengan keyboard, bukan hanya terlihat seperti tombol.

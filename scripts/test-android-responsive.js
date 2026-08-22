@@ -16,7 +16,7 @@ assert.match(core, /@media \(min-width:768px\) and \(max-width:1023px\)\{\.tools
 assert.match(core, /@media \(min-width:320px\) and \(max-width:767px\)\{[\s\S]*?\.tools-grid\{display:grid;grid-template-columns:repeat\(3,minmax\(0,1fr\)\)!important/);
 assert.doesNotMatch(components, /@media\(min-width:320px\) and \(max-width:767px\)\{[\s\S]*?\.tools-grid/);
 assert.doesNotMatch(core + components, /@media[^\{]*(?:370|400|600|767)px[^\{]*\{[\s\S]{0,500}?\.tools-grid\{grid-template-columns:(?:1fr|repeat\(2,)/);
-assert.match(core, /\.tools-card\{min-width:0!important;min-height:146px!important;height:100%;padding:8px!important;border-radius:13px!important/);
+assert.match(core, /@media \(max-width:767px\)\{[\s\S]*?\.tools-card\{[\s\S]*?min-width:0!important;[\s\S]*?min-height:146px!important;[\s\S]*?height:100%;[\s\S]*?padding:8px!important;[\s\S]*?border-radius:13px!important/);
 assert.match(core, /\.tools-card p\{display:none!important\}/);
 assert.doesNotMatch(components, /\.tools-card\{min-width:0!important;min-height:146px!important/);
 assert.match(core, /\.user-card\{display:grid;grid-template-columns:repeat\(3,minmax\(0,1fr\)\);grid-template-rows:repeat\(2,minmax\(0,1fr\)\)[^}]*height:74px[^}]*max-height:74px/);

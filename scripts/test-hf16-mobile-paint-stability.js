@@ -23,7 +23,8 @@ assert.doesNotMatch(core, /\.tab-content:not\(\.active\)\{content-visibility:hid
 
 assert.match(reactor, /if\(reduced\)\{[\s\S]*?mobileTouch:false[\s\S]*?return;/);
 assert.match(reactor, /mobileTouch:coarse/);
-assert.match(reactor, /if\(coarse\)return;[\s\S]*?captureFlip\(\)/);
+assert.match(reactor, /nexora:navigation-before[\s\S]*?captureFlip\(\)/);
+assert.match(reactor, /nexora:navigation-changed[\s\S]*?animateFlip/);
 assert.match(reactor, /nav\.classList\.add\('nx-mobile-stable-tabs'\)/);
 assert.match(performance, /if\(mobileLike&&!video\.paused\)video\.pause\(\)/);
 assert.match(performance, /mobileLike&&!heroVisible/);

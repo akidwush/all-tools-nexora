@@ -65,7 +65,6 @@
     positionIndicator();
     window.addEventListener('resize',function(){positionIndicator(coarse);},{passive:true});
     nav.addEventListener('scroll',function(){positionIndicator(coarse);},{passive:true});
-    nav.addEventListener('click',function(event){if(event.target.closest('.nav-tab'))raf(moveIndicator);});
     if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){positionIndicator(coarse);});
   }
   function cards(){return Array.prototype.slice.call(document.querySelectorAll('.tab-content.active .tools-card'));}
@@ -82,7 +81,7 @@
     if(!flipState)return;
     var prior=flipState;
     flipState=null;
-    positionIndicator();
+    moveIndicator();
     if(reduced||coarse)return;
     var incoming=cards();
     var byId=new Map(prior.items.map(function(item){return [item.id,item];}));
@@ -117,16 +116,13 @@
     setTimeout(function(){reactor.remove();},620);
   }
   function setupGrid(){
+    document.addEventListener('nexora:navigation-before',function(){
+      if(!coarse)captureFlip();
+    });
+    document.addEventListener('nexora:navigation-changed',function(){
+      if(!coarse)queueMicrotask(animateFlip);
+    });
     document.addEventListener('click',function(event){
-      var tab=event.target.closest&&event.target.closest('.nav-tab');
-      if(tab&&nav&&nav.contains(tab)){
-        // Do not synchronously read every card rectangle before a mobile tab
-        // render. That forced layout was the small freeze seen between tabs.
-        if(coarse)return;
-        captureFlip();
-        queueMicrotask(animateFlip);
-        return;
-      }
       var card=event.target.closest&&event.target.closest('.tools-card');
       if(card){
         var box=card.getBoundingClientRect();

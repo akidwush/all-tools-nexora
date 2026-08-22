@@ -18,7 +18,8 @@ assert.match(core, /@media \(max-width:767px\)\{[\s\S]*?\.tools-card\{[\s\S]*?ba
 assert.match(core, /\.tools-card:active\{[\s\S]*?transform:translate3d\(0,1px,0\) scale\(\.986\)!important/);
 assert.doesNotMatch(components, /\.tools-card\{position:relative;overflow:hidden;isolation:isolate\}/);
 assert.match(motion, /nav\.classList\.add\('nx-mobile-stable-tabs'\)/);
-assert.match(motion, /if\(coarse\)return;[\s\S]*?captureFlip\(\)/);
+assert.match(motion, /nexora:navigation-before[\s\S]*?captureFlip\(\)/);
+assert.match(motion, /nexora:navigation-changed[\s\S]*?animateFlip/);
 assert.match(html, /core\.css\?v=6\.3\.18-hf16-mobile-paint1/);
 assert.match(html, /liquid-reactor\.js\?v=6\.3\.18-hf16-mobile-paint1/);
 

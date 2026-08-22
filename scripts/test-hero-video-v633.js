@@ -18,7 +18,7 @@ assert(!performanceJs.includes('autoplayRejected'));
 assert(performanceJs.includes('/api/database?resource=settings'));
 assert(!performanceJs.includes('else document.documentElement.classList.add("nx-anime-banner-enabled")'));
 assert(!coreCss.includes('nx-anime-banner-enabled'));
-assert(coreCss.includes('html.nx-low-power .video-banner video{display:block}'));
+assert(coreCss.includes('.video-banner video{display:block!important;width:100%;height:100%;object-fit:cover'));
 assert(!coreCss.includes('nx-hero-video-toggle'));
 assert(!index.includes('data-nx-hero-toggle'));
 assert(index.includes('preload="metadata"'));

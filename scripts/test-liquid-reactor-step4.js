@@ -17,7 +17,9 @@ for (const attribute of ["autoplay", "muted", "loop", "playsinline"]) assert.mat
 assert.match(html, /nx-membrane-a/);
 assert.match(html, /LIVE REACTOR/);
 assert.doesNotMatch(html, /nx-public-wa-actions/);
-assert.match(core, /\.tools-grid\{grid-template-columns:repeat\(3,minmax\(0,1fr\)\);gap:18px\}/);
+assert.match(core, /\.tools-grid\{display:grid;grid-template-columns:repeat\(3,minmax\(0,1fr\)\);gap:18px\}/);
+assert.match(app, /nexora:navigation-before/);
+assert.match(app, /nexora:navigation-changed/);
 assert.match(core, /\.tab-content \{[\s\S]*?animation: none;/);
 assert.match(core, /nx-card-rgb/);
 assert.match(core, /nx-mercury-indicator\.is-moving/);
