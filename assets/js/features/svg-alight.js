@@ -132,6 +132,48 @@
     };
   }
 
+  function stripSvgPreamble(value) {
+    var source = String(value || "").replace(/^\uFEFF/, "");
+    var changed = true;
+    while (changed) {
+      changed = false;
+      source = source.replace(/^\s+/, "");
+      var declaration = source.match(/^<\?xml[\s\S]*?\?>/i);
+      if (declaration) { source = source.slice(declaration[0].length); changed = true; continue; }
+      var comment = source.match(/^<!--[\s\S]*?-->/);
+      if (comment) { source = source.slice(comment[0].length); changed = true; continue; }
+      if (/^<!doctype\b/i.test(source)) {
+        var quote = "";
+        var subsetDepth = 0;
+        var end = -1;
+        for (var index = 9; index < source.length; index += 1) {
+          var char = source[index];
+          if (quote) { if (char === quote) quote = ""; continue; }
+          if (char === '"' || char === "'") { quote = char; continue; }
+          if (char === "[") { subsetDepth += 1; continue; }
+          if (char === "]" && subsetDepth > 0) { subsetDepth -= 1; continue; }
+          if (char === ">" && subsetDepth === 0) { end = index + 1; break; }
+        }
+        if (end < 0) return "";
+        source = source.slice(end);
+        changed = true;
+      }
+    }
+    return source.replace(/^\s+/, "");
+  }
+
+  function normalizeSvgSource(value) {
+    var source = String(value || "");
+    if (/<!ENTITY\b/i.test(source)) return "";
+    var normalized = stripSvgPreamble(source);
+    if (!/^<svg\b/i.test(normalized)) return "";
+    try {
+      var parsed = new DOMParser().parseFromString(normalized, "image/svg+xml");
+      if (!parsed.documentElement || parsed.documentElement.localName.toLowerCase() !== "svg" || parsed.querySelector("parsererror")) return "";
+    } catch (_) { return ""; }
+    return normalized;
+  }
+
   function metric(icon, label, value, sub) {
     var item = element("article", "nsa-stat");
     var glyph = element("i", icon);
@@ -317,8 +359,8 @@
       var reader = new FileReader();
       reader.onload = function () {
         if (state.destroyed) return;
-        var source = String(reader.result || "");
-        if (!/^\s*(?:<\?xml[^>]*>\s*)?<svg\b/i.test(source)) {
+        var source = normalizeSvgSource(reader.result);
+        if (!source) {
           notify("Isi file bukan dokumen SVG yang valid.", "err");
           progressLabel.textContent = "File SVG tidak valid";
           return;

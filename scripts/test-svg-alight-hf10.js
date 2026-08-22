@@ -9,7 +9,7 @@ const api=fs.readFileSync(path.join(root,'lib/svgtoxml-proxy.js'),'utf8');
 const route=fs.readFileSync(path.join(root,'api/tool-health.js'),'utf8');
 const lazy=fs.readFileSync(path.join(root,'assets/js/core/lazy-loader.js'),'utf8');
 const local=fs.readFileSync(path.join(root,'serve-local.js'),'utf8');
-const { handleSvgToXml,normalizeOptions }=require(path.join(root,'lib/svgtoxml-proxy.js'));
+const { handleSvgToXml,normalizeOptions,safeSvg,stripSvgPreamble }=require(path.join(root,'lib/svgtoxml-proxy.js'));
 
 for(const token of [
   'renderSvgAlight','/api/svg-alight',
@@ -34,6 +34,10 @@ assert.equal(lossless.nodeReduction,0);
 assert.equal(lossless.precision,8);
 assert.equal(lossless.removeStrokes,false);
 assert.equal(normalizeOptions({}).quality,'optimized');
+const corelSvg='<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n<!-- Creator: CorelDRAW X7 -->\n<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0h1v1z"/></svg>';
+assert.ok(stripSvgPreamble(corelSvg).startsWith('<svg'));
+assert.ok(safeSvg(corelSvg).startsWith('<svg'));
+assert.throws(()=>safeSvg('<!DOCTYPE svg [<!ENTITY xxe SYSTEM "file:///etc/passwd">]><svg>&xxe;</svg>'),/ENTITY/);
 
 assert.ok(route.includes('handleSvgToXml'),'route handler missing');
 assert.ok(css.includes('@media(max-width:760px)'),'mobile CSS missing');
