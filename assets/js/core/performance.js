@@ -122,6 +122,7 @@
     var loaded=false;
     var ready=false;
     var autoplayBlocked=false;
+    var heroVisible=true;
     var interactionRetryArmed=false;
     var interactionRetryUsed=false;
 
@@ -159,11 +160,15 @@
     }
 
     function ensurePlayback(){
-      if(!ready||document.hidden||autoplayBlocked)return;
+      if(!ready||document.hidden||autoplayBlocked||(mobileLike&&!heroVisible))return;
       Promise.resolve(video.play()).then(function(){autoplayBlocked=false;}).catch(function(){
         autoplayBlocked=true;
         armInteractionRetry();
       });
+    }
+
+    function suspendPlayback(){
+      if(mobileLike&&!video.paused)video.pause();
     }
 
     video.addEventListener("loadeddata",function(){
@@ -178,22 +183,26 @@
     },{once:true});
 
     function onVisibility(entry){
-      if(entry&&entry.isIntersecting)ensureLoaded();
+      heroVisible=Boolean(entry&&entry.isIntersecting);
+      if(heroVisible){ensureLoaded();ensurePlayback();}
+      else suspendPlayback();
     }
 
-    // The hero is part of the product identity: load it once and keep the same
-    // element playing while filters, rooms, and internal pages are opened.
+    // Load once so the identity frame remains available. On phones the same
+    // element is paused outside the viewport, releasing decoder/compositor
+    // pressure without reloading or resetting the video.
     ensureLoaded();
 
     if("IntersectionObserver" in window){
-      var observer=new IntersectionObserver(function(entries){onVisibility(entries[0]);},{threshold:[0,0.35]});
+      var observer=new IntersectionObserver(function(entries){onVisibility(entries[0]);},{threshold:[0,0.01,0.35]});
       observer.observe(hero);
     }else{
       ensureLoaded();
     }
 
     document.addEventListener("visibilitychange",function(){
-      if(!document.hidden&&!autoplayBlocked)ensurePlayback();
+      if(document.hidden)suspendPlayback();
+      else if(!autoplayBlocked)ensurePlayback();
     });
 
   }

@@ -40,16 +40,7 @@
   }
   function setupNavigation(){
     if(!nav)return;
-    if(coarse)nav.classList.add('nx-mobile-glass-tabs');
-    indicator=document.createElement('span');
-    indicator.className='nx-mercury-indicator';
-    indicator.setAttribute('aria-hidden','true');
-    nav.prepend(indicator);
-    positionIndicator();
-    window.addEventListener('resize',function(){positionIndicator(coarse);},{passive:true});
-    nav.addEventListener('scroll',function(){positionIndicator(coarse);},{passive:true});
-    nav.addEventListener('click',function(event){if(event.target.closest('.nav-tab'))raf(moveIndicator);});
-    nav.addEventListener('keydown',function(event){
+    function onKeyboard(event){
       if(!/^Arrow(Left|Right)$/.test(event.key))return;
       var tabs=Array.prototype.slice.call(nav.querySelectorAll('.nav-tab'));
       var index=tabs.indexOf(document.activeElement);
@@ -58,7 +49,23 @@
       var next=(index+(event.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;
       tabs[next].focus();
       tabs[next].click();
-    });
+    }
+    nav.addEventListener('keydown',onKeyboard);
+    // Android Chrome can drop painted descendants when a blurred, animated
+    // indicator shares the compositor with dozens of cards. The selected tab
+    // keeps the same glass depth through CSS, without a moving GPU layer.
+    if(coarse){
+      nav.classList.add('nx-mobile-stable-tabs');
+      return;
+    }
+    indicator=document.createElement('span');
+    indicator.className='nx-mercury-indicator';
+    indicator.setAttribute('aria-hidden','true');
+    nav.prepend(indicator);
+    positionIndicator();
+    window.addEventListener('resize',function(){positionIndicator(coarse);},{passive:true});
+    nav.addEventListener('scroll',function(){positionIndicator(coarse);},{passive:true});
+    nav.addEventListener('click',function(event){if(event.target.closest('.nav-tab'))raf(moveIndicator);});
     if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){positionIndicator(coarse);});
   }
   function cards(){return Array.prototype.slice.call(document.querySelectorAll('.tab-content.active .tools-card'));}
@@ -113,6 +120,9 @@
     document.addEventListener('click',function(event){
       var tab=event.target.closest&&event.target.closest('.nav-tab');
       if(tab&&nav&&nav.contains(tab)){
+        // Do not synchronously read every card rectangle before a mobile tab
+        // render. That forced layout was the small freeze seen between tabs.
+        if(coarse)return;
         captureFlip();
         queueMicrotask(animateFlip);
         return;
@@ -203,8 +213,11 @@
   }
   function setupCursorReactor(){
     var fine=Boolean(window.matchMedia&&window.matchMedia('(pointer: fine)').matches);
-    if(reduced){
-      window.__NEXORA_CURSOR_REACTOR__={version:'1.0.0',enabled:false,finePointer:fine,reducedMotion:true};
+    // A touch follower updated a fixed transformed node on every scroll frame
+    // and spawned extra trail nodes. Native touch feedback is both clearer and
+    // dramatically cheaper on coarse-pointer phones.
+    if(reduced||coarse){
+      window.__NEXORA_CURSOR_REACTOR__={version:'1.1.0',enabled:false,finePointer:fine,reducedMotion:reduced,mobileStable:coarse};
       return;
     }
 

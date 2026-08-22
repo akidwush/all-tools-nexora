@@ -30,7 +30,7 @@ assert.doesNotMatch(stability, /card\.appendChild\(badge\)/);
 assert.doesNotMatch(shell, /nx-wa-notif|WhatsApp notification on desktop and touch devices/);
 assert.doesNotMatch(componentsCss, /#nx-wa-notif/);
 assert.match(componentsCss, /nx-about-dev-room:not\(\.is-open\)/);
-assert.match(coreCss, /HF14 — MOBILE GLASS DEPTH RESTORATION/);
+assert.match(coreCss, /HF16 — MOBILE PAINT-STABILITY \+ STATIC 3D GLASS/);
 
 assert.equal((html.match(/class="tools-card nx-prerender-card"/g) || []).length, 12);
 assert.match(app, /container\.replaceChildren\(fragment\)/);

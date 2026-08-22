@@ -28,7 +28,8 @@ assert.match(core, /\.video-banner\{[^}]*aspect-ratio:16\/9/);
 assert.match(core, /\.nx-membrane\{animation:none!important;filter:none!important/);
 assert.match(reactor, /if\(reduced\|\|coarse\)return;/);
 assert.match(performance, /interactionRetryUsed=true/);
-assert.doesNotMatch(html + core + performance, /nx-hero-video-toggle|data-nx-hero-toggle|pauseVideo/);
+assert.doesNotMatch(html + core + performance, /nx-hero-video-toggle|data-nx-hero-toggle/);
+assert.match(performance, /function suspendPlayback\(\)/);
 for (const attribute of ["autoplay", "muted", "loop", "playsinline"]) {
   assert.match(html, new RegExp(`<video[^>]*${attribute}`, "i"));
 }

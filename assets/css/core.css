@@ -1151,8 +1151,6 @@ body {
 .video-banner video{opacity:0;transition:opacity .35s ease;background:#09010f}
 .video-banner.is-video-ready video{opacity:1}
 .nx-public-wa-card,.user-card,.nx-tool-health{contain:layout paint style}
-.tab-content:not(.active){content-visibility:hidden}
-.tab-content.active{content-visibility:visible;contain-intrinsic-size:none}
 html.nx-low-power .bg-glow{animation:none;opacity:.72}
 html.nx-low-power .video-banner video{display:block}
 html.nx-low-power .video-banner{min-height:150px}
@@ -1526,10 +1524,19 @@ html.nx-low-power .tools-card,html.nx-low-power .nav-tab,html.nx-low-power .nx-p
 }
 
 
+/* HF15 — meaningful prerender shell: content is visible before app.js. */
+.nx-noscript-shell{position:relative;z-index:3;width:min(calc(100% - 24px),760px);margin:12px auto;padding:14px 16px;border:1px solid rgba(189,247,255,.2);border-radius:16px;background:#15111e;color:#e9e2f2;box-shadow:0 12px 28px rgba(0,0,0,.35)}
+.nx-noscript-shell strong{display:block;font:700 12px/1.3 Orbitron,sans-serif;color:#bdf7ff}.nx-noscript-shell p{margin:6px 0 0;color:#b9afc4;font-size:10px;line-height:1.55}
+#allGrid[aria-busy="true"] .nx-prerender-card{pointer-events:none}
+.nx-prerender-status{display:inline-flex;align-items:center;gap:4px}.nx-prerender-status::before{content:"";width:5px;height:5px;border-radius:50%;background:#bdf7ff;box-shadow:0 0 0 3px rgba(189,247,255,.08);animation:nxPrerenderPulse 1.1s ease-in-out infinite}
+@keyframes nxPrerenderPulse{50%{opacity:.35;transform:scale(.78)}}
+@media (prefers-reduced-motion:reduce){.nx-prerender-status::before{animation:none}}
+
 /* =========================================================
-   HF14 — MOBILE GLASS DEPTH RESTORATION
-   One authoritative mobile layer. The prior HF11 static-tab fallback hid the
-   mercury indicator on touch screens and flattened the original composition.
+   HF16 — MOBILE PAINT-STABILITY + STATIC 3D GLASS
+   Depth is painted with gradients, borders and inset/outset shadows. Mobile
+   deliberately avoids per-card backdrop blur, 3D transforms and containment:
+   those combinations exhausted Android's compositor during fast scrolling.
    ========================================================= */
 @media (max-width:767px){
   body{
@@ -1538,10 +1545,23 @@ html.nx-low-power .tools-card,html.nx-low-power .nav-tab,html.nx-low-power .nx-p
       linear-gradient(180deg,#050509 0,#0a0812 34rem,#06060b 78rem,#0b0912 100%);
   }
   .bg-glow{
+    position:absolute!important;
+    contain:none!important;
     background:
       radial-gradient(ellipse at 74% 8%,rgba(162,103,255,.16),transparent 34%),
       radial-gradient(ellipse at 9% 38%,rgba(79,211,233,.075),transparent 28%),
       linear-gradient(180deg,#050509,#090812 52%,#050509);
+  }
+  .video-banner,
+  .user-card,
+  .nx-public-wa-card,
+  .nx-tool-health{
+    contain:none!important;
+  }
+  .video-banner video{
+    filter:none!important;
+    transform:none!important;
+    will-change:auto!important;
   }
   .video-banner{
     border-color:rgba(201,180,255,.34);
@@ -1551,13 +1571,15 @@ html.nx-low-power .tools-card,html.nx-low-power .nav-tab,html.nx-low-power .nx-p
   .user-card{
     border-color:rgba(211,194,248,.2);
     border-top-color:rgba(241,253,255,.4);
-    background:linear-gradient(120deg,rgba(37,28,54,.88),rgba(12,12,21,.83));
+    -webkit-backdrop-filter:none!important;
+    backdrop-filter:none!important;
+    background:
+      radial-gradient(90% 130% at 18% -30%,rgba(255,255,255,.12),transparent 43%),
+      linear-gradient(125deg,#241c35,#100f19 72%);
     box-shadow:0 13px 30px rgba(0,0,0,.4),0 5px 14px rgba(87,49,151,.14),inset 0 1px 0 rgba(255,255,255,.13),inset 0 -5px 12px rgba(0,0,0,.16);
-    -webkit-backdrop-filter:blur(14px) saturate(138%);
-    backdrop-filter:blur(14px) saturate(138%);
   }
   #navTabs{
-    isolation:isolate;
+    isolation:auto;
     margin:0 0 24px!important;
     padding:6px!important;
     gap:2px;
@@ -1568,73 +1590,67 @@ html.nx-low-power .tools-card,html.nx-low-power .nav-tab,html.nx-low-power .nx-p
     border-top-color:rgba(241,253,255,.46);
     border-bottom-color:rgba(96,62,151,.3);
     border-radius:17px;
+    -webkit-backdrop-filter:none!important;
+    backdrop-filter:none!important;
     background:
-      radial-gradient(110% 120% at 16% -25%,rgba(219,197,255,.13),transparent 43%),
-      linear-gradient(180deg,rgba(34,29,48,.94),rgba(12,12,21,.94));
+      radial-gradient(90% 125% at 16% -28%,rgba(255,255,255,.13),transparent 44%),
+      linear-gradient(180deg,#242031,#100f18);
     box-shadow:0 15px 32px rgba(0,0,0,.46),0 6px 18px rgba(81,45,139,.18),inset 0 1px 0 rgba(255,255,255,.14),inset 0 -7px 14px rgba(0,0,0,.2);
-    -webkit-backdrop-filter:blur(16px) saturate(145%);
-    backdrop-filter:blur(16px) saturate(145%);
   }
   #navTabs::before{background:linear-gradient(90deg,rgba(19,17,28,.98),transparent)}
   #navTabs::after{background:linear-gradient(-90deg,rgba(19,17,28,.98),transparent)}
-  .nav-tab{
+  #navTabs.nx-mobile-stable-tabs .nx-mercury-indicator,
+  .nx-mercury-indicator{
+    display:none!important;
+    will-change:auto!important;
+  }
+  #navTabs.nx-mobile-stable-tabs .nav-tab{
     min-height:48px;
     padding:11px 15px;
-    border:0;
+    border:1px solid transparent;
     background:transparent;
     font-size:11px;
     text-shadow:0 1px 2px rgba(0,0,0,.5);
+    transition:color 100ms linear,border-color 100ms linear,box-shadow 100ms linear!important;
   }
-  .nav-tab.active{
-    background:transparent!important;
-    border-color:transparent!important;
-    box-shadow:none!important;
-    color:#fff;
-    text-shadow:0 2px 8px rgba(5,4,10,.72);
-  }
-  .nx-mercury-indicator{
-    display:block!important;
-    top:6px;
-    left:0;
-    height:48px;
-    border:1px solid rgba(217,248,255,.56);
-    border-right-color:rgba(177,124,255,.48);
-    border-bottom-color:rgba(93,50,164,.58);
-    border-radius:12px;
+  #navTabs.nx-mobile-stable-tabs .nav-tab.active{
+    border:1px solid rgba(217,248,255,.48)!important;
+    border-right-color:rgba(177,124,255,.4)!important;
+    border-bottom-color:rgba(93,50,164,.58)!important;
     background:
-      radial-gradient(85% 150% at 24% -28%,rgba(255,255,255,.36),transparent 43%),
-      linear-gradient(118deg,rgba(112,63,207,.92),rgba(108,70,185,.8) 42%,rgba(108,217,234,.25) 66%,rgba(146,81,223,.74));
-    box-shadow:0 9px 0 -6px rgba(60,28,113,.88),0 13px 24px rgba(58,28,104,.48),0 3px 10px rgba(169,111,255,.3),inset 0 1px 0 rgba(255,255,255,.43),inset 0 -8px 15px rgba(43,18,84,.32),inset 7px 0 13px rgba(217,245,255,.08);
-    -webkit-backdrop-filter:blur(12px) saturate(158%);
-    backdrop-filter:blur(12px) saturate(158%);
-    transition:transform 360ms cubic-bezier(.2,.86,.22,1),width 360ms cubic-bezier(.2,.86,.22,1),height 360ms cubic-bezier(.2,.86,.22,1);
-    will-change:transform,width;
-  }
-  .nx-mercury-indicator.is-instant{transition:none!important}
-  .nx-mercury-indicator::before{
-    inset:8px -10px;
-    background:linear-gradient(90deg,transparent,rgba(178,111,255,.28),rgba(207,249,255,.18),transparent);
-    filter:blur(3px);
-  }
-  .nx-mercury-indicator::after{
-    inset:3px 36% 60% 8%;
-    background:linear-gradient(90deg,rgba(255,255,255,.68),rgba(210,250,255,.2));
-    box-shadow:0 1px 4px rgba(224,252,255,.16);
+      radial-gradient(90% 145% at 24% -32%,rgba(255,255,255,.34),transparent 42%),
+      linear-gradient(118deg,#7041c9,#6848ae 48%,#51427d)!important;
+    box-shadow:
+      0 8px 0 -6px #3b216a,
+      0 9px 18px rgba(42,22,75,.5),
+      inset 0 1px 0 rgba(255,255,255,.38),
+      inset 0 -7px 13px rgba(35,16,69,.32)!important;
   }
   .tools-card{
-    border-color:rgba(var(--nx-card-rgb),.34);
-    border-top-color:rgba(239,253,255,.48);
-    border-bottom-color:rgba(var(--nx-card-rgb),.18);
+    isolation:auto!important;
+    contain:none!important;
+    content-visibility:visible!important;
+    -webkit-backdrop-filter:none!important;
+    backdrop-filter:none!important;
+    transform:none!important;
+    transform-style:flat!important;
+    will-change:auto!important;
     background:
-      radial-gradient(90% 70% at 18% -12%,rgba(255,255,255,.14),transparent 46%),
-      linear-gradient(145deg,rgba(var(--nx-card-rgb),.23),transparent 47%),
-      linear-gradient(158deg,rgba(35,30,50,.96),rgba(11,11,19,.94) 72%);
-    box-shadow:0 8px 0 -5px rgba(var(--nx-card-rgb),.28),0 13px 24px rgba(0,0,0,.46),0 5px 13px rgba(var(--nx-card-rgb),.12),inset 0 1px 0 rgba(255,255,255,.2),inset 0 -7px 14px rgba(0,0,0,.24);
-    -webkit-backdrop-filter:blur(14px) saturate(146%);
-    backdrop-filter:blur(14px) saturate(146%);
-    transform:translate3d(0,0,0);
-    transform-style:preserve-3d;
-    transition:transform 120ms cubic-bezier(.2,.8,.25,1),border-color 120ms ease,box-shadow 120ms ease!important;
+      radial-gradient(90% 70% at 18% -12%,rgba(255,255,255,.145),transparent 46%),
+      linear-gradient(145deg,rgba(var(--nx-card-rgb),.24),transparent 48%),
+      linear-gradient(158deg,#252032,#0c0c14 72%)!important;
+    box-shadow:
+      0 8px 0 -5px rgba(var(--nx-card-rgb),.3),
+      0 13px 22px rgba(0,0,0,.48),
+      0 4px 11px rgba(var(--nx-card-rgb),.12),
+      inset 0 1px 0 rgba(255,255,255,.21),
+      inset 0 -7px 14px rgba(0,0,0,.28)!important;
+    transition:border-color 100ms linear,box-shadow 100ms linear!important;
+  }
+  .tools-card>*,
+  .tools-card .icon{
+    transform:none!important;
+    will-change:auto!important;
   }
   .tools-card::before{
     background:linear-gradient(90deg,rgba(240,253,255,.8),rgba(var(--nx-card-rgb),.45),transparent 72%) top/82% 1px no-repeat,linear-gradient(180deg,rgba(var(--nx-card-rgb),.82),transparent 73%) left/2px 100% no-repeat,radial-gradient(circle at 82% 4%,rgba(255,255,255,.17),transparent 34%);
@@ -1652,29 +1668,34 @@ html.nx-low-power .tools-card,html.nx-low-power .nav-tab,html.nx-low-power .nx-p
     border-top-color:rgba(239,253,255,.46);
     background:radial-gradient(circle at 31% 21%,rgba(255,255,255,.33),transparent 25%),linear-gradient(145deg,rgba(var(--nx-card-rgb),.42),rgba(var(--nx-card-rgb),.1));
     box-shadow:0 7px 0 -5px rgba(var(--nx-card-rgb),.42),0 9px 16px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.24),inset 0 -5px 9px rgba(0,0,0,.16);
-    transform:translateZ(8px);
   }
   .tools-card .badge,.nx-card-readiness{
     border-top-color:rgba(255,255,255,.2);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 4px 8px rgba(0,0,0,.18);
   }
-  .tools-card:hover{transform:translate3d(0,0,0)}
+  .tools-card:hover,
   .tools-card:active{
-    transform:translate3d(0,2px,0) scale(.986)!important;
-    border-color:rgba(var(--nx-card-rgb),.48);
-    box-shadow:0 4px 0 -4px rgba(var(--nx-card-rgb),.24),0 7px 14px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.17),inset 0 -5px 10px rgba(0,0,0,.24);
+    transform:none!important;
+  }
+  .tools-card:active{
+    border-color:rgba(var(--nx-card-rgb),.5)!important;
+    box-shadow:
+      0 6px 0 -5px rgba(var(--nx-card-rgb),.32),
+      0 8px 15px rgba(0,0,0,.46),
+      inset 0 1px 0 rgba(255,255,255,.17),
+      inset 0 -6px 12px rgba(0,0,0,.3)!important;
+  }
+  .custom-cursor,
+  .custom-cursor-core,
+  .touch-follower,
+  .cursor-trail{
+    display:none!important;
+    animation:none!important;
+    will-change:auto!important;
   }
   .section-title>i{
     border-top-color:rgba(238,252,255,.35);
-    background:linear-gradient(145deg,rgba(42,32,60,.92),rgba(17,15,25,.92));
+    background:linear-gradient(145deg,#2a203c,#111019);
     box-shadow:0 7px 15px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.12);
   }
 }
-
-/* HF15 — meaningful prerender shell: content is visible before app.js. */
-.nx-noscript-shell{position:relative;z-index:3;width:min(calc(100% - 24px),760px);margin:12px auto;padding:14px 16px;border:1px solid rgba(189,247,255,.2);border-radius:16px;background:#15111e;color:#e9e2f2;box-shadow:0 12px 28px rgba(0,0,0,.35)}
-.nx-noscript-shell strong{display:block;font:700 12px/1.3 Orbitron,sans-serif;color:#bdf7ff}.nx-noscript-shell p{margin:6px 0 0;color:#b9afc4;font-size:10px;line-height:1.55}
-#allGrid[aria-busy="true"] .nx-prerender-card{pointer-events:none}
-.nx-prerender-status{display:inline-flex;align-items:center;gap:4px}.nx-prerender-status::before{content:"";width:5px;height:5px;border-radius:50%;background:#bdf7ff;box-shadow:0 0 0 3px rgba(189,247,255,.08);animation:nxPrerenderPulse 1.1s ease-in-out infinite}
-@keyframes nxPrerenderPulse{50%{opacity:.35;transform:scale(.78)}}
-@media (prefers-reduced-motion:reduce){.nx-prerender-status::before{animation:none}}

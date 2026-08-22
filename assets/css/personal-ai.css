@@ -8,3 +8,12 @@
 @media(max-width:600px){.nx-ai-launcher{right:12px;bottom:max(12px,env(safe-area-inset-bottom));grid-template-columns:40px auto;min-height:52px}.nx-ai-launcher.is-left{left:12px}.nx-ai-launcher-orb{width:40px;height:40px}.nx-ai-panel,.nx-ai-panel.is-left{inset:0;right:0;left:0;bottom:0;width:100%;height:var(--nx-ai-vh,100dvh);max-height:var(--nx-ai-vh,100dvh);border:0;border-radius:0;transform-origin:bottom center;transform:translate3d(0,24px,0);padding-top:env(safe-area-inset-top)}.nx-ai-panel.is-open{transform:translate3d(0,0,0)}body.nx-ai-open{overflow:hidden}.nx-ai-head{padding:10px 10px 8px}.nx-ai-state{margin-inline:10px}.nx-ai-messages{padding-inline:10px}.nx-ai-suggestions{padding-inline:10px}.nx-ai-compose{padding-inline:8px}.nx-ai-input{font-size:16px}.nx-ai-bubble{max-width:88%;font-size:10px}.nx-ai-icon-button{width:44px;height:44px}.nx-ai-send{width:44px;height:44px}.nx-ai-input-wrap{grid-template-columns:minmax(0,1fr) 44px}}
 @media(prefers-reduced-motion:reduce){.nx-ai-panel,.nx-ai-launcher{transition-duration:.01ms}.nx-ai-launcher-orb::after,.nx-ai-thinking i,.nx-ai-thinking i::after{animation:none}}
 .nx-ai-online.is-offline{color:#c8a56d!important}.nx-ai-online.is-offline i{background:#d4a85e;box-shadow:none}
+
+/* HF16 mobile: retain the launcher without perpetual animation or transform
+   promotion. The full panel only animates while it is being opened. */
+@media(max-width:767px){
+  .nx-ai-launcher{transform:none;will-change:auto;transition:border-color .12s linear,opacity .12s linear}
+  .nx-ai-launcher:hover:not(.is-dragging){transform:none}
+  .nx-ai-launcher-orb::after{animation:none}
+  .nx-ai-panel{contain:none}
+}

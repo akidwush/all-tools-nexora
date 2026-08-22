@@ -22,6 +22,6 @@ assert.match(core, /#allGrid\[aria-busy="true"\] \.nx-prerender-card\{pointer-ev
 assert.match(core, /@media \(prefers-reduced-motion:reduce\)\{\.nx-prerender-status::before\{animation:none\}\}/);
 assert.match(app, /container\.replaceChildren\(fragment\)/, "runtime harus mengganti prerender tanpa menduplikasi kartu");
 assert.match(app, /container\.setAttribute\('aria-busy', 'false'\)/);
-assert.match(html, /core\.css\?v=6\.3\.18-hf15-mobile-prerender1/);
+assert.match(html, /core\.css\?v=6\.3\.18-hf16-mobile-paint1/);
 
 console.log("HF15 prerender lulus: 12 kartu bermakna, JSON-LD, noscript, hydration replacement, dan reduced-motion aman.");
