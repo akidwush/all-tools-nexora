@@ -50,13 +50,13 @@ Salin `.env.example` dan isi hanya layanan yang digunakan. Variable utama:
 
 - Database/admin: `SUPABASE_URL`, `SUPABASE_SECRET_KEY` atau `SUPABASE_SERVICE_ROLE_KEY`, serta `FEEDBACK_HASH_SALT`.
 - Operasional: `HEALTH_CHECK_TOKEN` dan pengaturan timeout/cache opsional.
-- Tool eksternal: `COINGECKO_API_KEY`, `GOOGLE_PAGESPEED_API_KEY`, `GOOGLE_SAFE_BROWSING_API_KEY`, `NASA_API_KEY`, `OCR_SPACE_API_KEY`, `FREECONVERT_API_KEY`, `SVGTOXML_API_KEY`, dan `GEMINI_API_KEY` untuk Personal AI.
+- Tool eksternal: `COINGECKO_API_KEY`, `GOOGLE_PAGESPEED_API_KEY`, `GOOGLE_SAFE_BROWSING_API_KEY`, `NASA_API_KEY`, `OCR_SPACE_API_KEY`, `FREECONVERT_API_KEY`, `SVGTOXML_ENGINE_KEY`, dan `GEMINI_API_KEY` untuk Personal AI.
 - SiteGrabber: `SITEGRABBER_API_BASE_URL` dan `SITEGRABBER_API_KEY`.
 - Deploy Center: `NEXUS_DEPLOY_ACCESS_KEY`, kemudian token `VERCEL_TOKEN` atau `NETLIFY_TOKEN`.
 
 Jangan memakai prefix publik untuk secret dan jangan menaruh key di HTML/JavaScript browser. Jika `FEEDBACK_HASH_SALT` kosong, server memakai salt acak per proses; konfigurasi nilai tetap tetap disarankan agar hash konsisten antar-instance.
 
-SVG → Alight XML memakai API resmi `https://svgtoxml.vercel.app`: simpan key sebagai `SVGTOXML_API_KEY` di environment server/Vercel. Nexora memverifikasi key melalui `/api/v1/auth`, lalu meneruskan konversi ke `/api/v1/convert`; key tidak pernah dikirim ke browser.
+SVG → Alight XML memakai API resmi `https://svgtoxml.vercel.app`: simpan key sebagai `SVGTOXML_ENGINE_KEY` di environment server/Vercel. Alias lama `SVGTOXML_API_KEY` tetap didukung, tetapi key resmi selalu diprioritaskan. Nexora memverifikasi key melalui `/api/v1/auth`, lalu meneruskan konversi ke `/api/v1/convert`; key tidak pernah dikirim ke browser.
 
 ## Database dan admin
 

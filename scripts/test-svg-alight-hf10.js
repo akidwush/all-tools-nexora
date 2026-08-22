@@ -20,7 +20,7 @@ for(const token of [
 ]) assert.ok(ui.includes(token),'UI SVG Alight missing '+token);
 
 for(const token of [
-  'SVGTOXML_API_KEY','/api/v1/auth','/api/v1/convert','x-api-key','handleSvgToXml','normalizeOptions',
+  'SVGTOXML_ENGINE_KEY','SVGTOXML_API_KEY','/api/v1/auth','/api/v1/convert','x-api-key','handleSvgToXml','normalizeOptions',
   'optimized','lossless','accurate','balanced','lightweight','microDetailPercent','maxOutputGroups'
 ]) assert.ok(api.includes(token),'API SVG Alight missing '+token);
 
@@ -44,10 +44,12 @@ assert.ok(lazy.includes("svgalight:'svg-alight'"),'lazy-loader svgalight mapping
 assert.ok(lazy.includes("'svg-alight':"),'lazy-loader svg-alight module missing');
 
 async function testProxyContract(){
-  const previousKey=process.env.SVGTOXML_API_KEY;
+  const previousEngineKey=process.env.SVGTOXML_ENGINE_KEY;
+  const previousLegacyKey=process.env.SVGTOXML_API_KEY;
   const previousFetch=global.fetch;
   const requests=[];
-  process.env.SVGTOXML_API_KEY='test-server-key';
+  process.env.SVGTOXML_ENGINE_KEY='test-engine-key';
+  process.env.SVGTOXML_API_KEY='stale-legacy-key';
   global.fetch=async(url,init)=>{
     requests.push({url,init});
     const payload=String(url).endsWith('/api/v1/auth')
@@ -62,7 +64,8 @@ async function testProxyContract(){
     assert.equal(authRes.statusCode,200);
     assert.equal(authRes.payload.authorized,true);
     assert.equal(requests[0].url,'https://svgtoxml.vercel.app/api/v1/auth');
-    assert.equal(requests[0].init.headers['x-api-key'],'test-server-key');
+    assert.equal(authRes.payload.keyVariable,'SVGTOXML_ENGINE_KEY');
+    assert.equal(requests[0].init.headers['x-api-key'],'test-engine-key');
 
     const convertRes=response();
     await handleSvgToXml({method:'POST',body:{svg:'<svg viewBox="0 0 1 1"><path d="M0 0h1v1z"/></svg>',options:{quality:'optimized'}}},convertRes);
@@ -76,8 +79,10 @@ async function testProxyContract(){
     assert.equal(upstreamBody.options.maxOutputGroups,320);
   }finally{
     global.fetch=previousFetch;
-    if(previousKey===undefined)delete process.env.SVGTOXML_API_KEY;
-    else process.env.SVGTOXML_API_KEY=previousKey;
+    if(previousEngineKey===undefined)delete process.env.SVGTOXML_ENGINE_KEY;
+    else process.env.SVGTOXML_ENGINE_KEY=previousEngineKey;
+    if(previousLegacyKey===undefined)delete process.env.SVGTOXML_API_KEY;
+    else process.env.SVGTOXML_API_KEY=previousLegacyKey;
   }
 }
 
