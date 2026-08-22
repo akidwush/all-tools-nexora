@@ -20,7 +20,7 @@ assert.doesNotMatch(core + motion, /nx-static-tabs/);
 assert.doesNotMatch(components, /\.tools-card\{position:relative;overflow:hidden;isolation:isolate\}/);
 assert.match(motion, /if\(coarse\)nav\.classList\.add\('nx-mobile-glass-tabs'\)/);
 assert.match(motion, /positionIndicator\(coarse\)/);
-assert.match(html, /core\.css\?v=6\.3\.18-hf14-mobile-glass1/);
+assert.match(html, /core\.css\?v=6\.3\.18-hf15-mobile-prerender1/);
 assert.match(html, /liquid-reactor\.js\?v=6\.3\.18-hf14-mobile-glass1/);
 
 const assetHeaders = vercel.headers.find(entry => entry.source === "/assets/(.*)");

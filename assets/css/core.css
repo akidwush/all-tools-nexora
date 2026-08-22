@@ -1670,3 +1670,11 @@ html.nx-low-power .tools-card,html.nx-low-power .nav-tab,html.nx-low-power .nx-p
     box-shadow:0 7px 15px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.12);
   }
 }
+
+/* HF15 — meaningful prerender shell: content is visible before app.js. */
+.nx-noscript-shell{position:relative;z-index:3;width:min(calc(100% - 24px),760px);margin:12px auto;padding:14px 16px;border:1px solid rgba(189,247,255,.2);border-radius:16px;background:#15111e;color:#e9e2f2;box-shadow:0 12px 28px rgba(0,0,0,.35)}
+.nx-noscript-shell strong{display:block;font:700 12px/1.3 Orbitron,sans-serif;color:#bdf7ff}.nx-noscript-shell p{margin:6px 0 0;color:#b9afc4;font-size:10px;line-height:1.55}
+#allGrid[aria-busy="true"] .nx-prerender-card{pointer-events:none}
+.nx-prerender-status{display:inline-flex;align-items:center;gap:4px}.nx-prerender-status::before{content:"";width:5px;height:5px;border-radius:50%;background:#bdf7ff;box-shadow:0 0 0 3px rgba(189,247,255,.08);animation:nxPrerenderPulse 1.1s ease-in-out infinite}
+@keyframes nxPrerenderPulse{50%{opacity:.35;transform:scale(.78)}}
+@media (prefers-reduced-motion:reduce){.nx-prerender-status::before{animation:none}}

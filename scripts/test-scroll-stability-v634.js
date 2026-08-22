@@ -32,7 +32,8 @@ assert.doesNotMatch(componentsCss, /#nx-wa-notif/);
 assert.match(componentsCss, /nx-about-dev-room:not\(\.is-open\)/);
 assert.match(coreCss, /HF14 — MOBILE GLASS DEPTH RESTORATION/);
 
-assert.equal((html.match(/class="tools-card/g) || []).length, 0);
+assert.equal((html.match(/class="tools-card nx-prerender-card"/g) || []).length, 12);
+assert.match(app, /container\.replaceChildren\(fragment\)/);
 assert.match(html, /id="allGrid"[^>]*aria-busy="true"/);
 
 console.log('Scroll stability regression tests lulus: no card containment jump, no observer auto-reflow, room iframe tidak bocor, dan mobile glass stabil.');

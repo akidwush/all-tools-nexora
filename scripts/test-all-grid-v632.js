@@ -28,7 +28,8 @@ assert.match(perf, /video\.preload="metadata"/);
 assert.doesNotMatch(perf, /Android\/i/);
 assert.match(html, /data-nx-hero/);
 assert.match(html, /HCYk\.mp4/);
-assert.equal((html.match(/class="tools-card/g) || []).length, 0);
+assert.equal((html.match(/class="tools-card nx-prerender-card"/g) || []).length, 12);
+assert.match(app, /container\.replaceChildren\(fragment\)/);
 for (const id of ["allGrid", "downloaderGrid", "makerGrid", "toolsGrid", "vaultGrid", "externalGrid"]) {
     assert.match(html, new RegExp(`id="${id}"`));
 }
