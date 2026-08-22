@@ -17,15 +17,17 @@
 
   function raf(callback){return window.requestAnimationFrame?window.requestAnimationFrame(callback):setTimeout(callback,16);}
   function activeTab(){return nav&&nav.querySelector('.nav-tab.active');}
-  function positionIndicator(){
+  function positionIndicator(instant){
     if(!indicator||!nav)return;
     var active=activeTab();
     if(!active)return;
+    if(instant)indicator.classList.add('is-instant');
     var navBox=nav.getBoundingClientRect();
     var tabBox=active.getBoundingClientRect();
     indicator.style.transform='translate3d('+Math.round(tabBox.left-navBox.left+nav.scrollLeft)+'px,0,0)';
     indicator.style.width=Math.round(tabBox.width)+'px';
     indicator.style.height=Math.round(tabBox.height)+'px';
+    if(instant)raf(function(){raf(function(){if(indicator)indicator.classList.remove('is-instant');});});
   }
   function moveIndicator(){
     if(!indicator)return;
@@ -38,14 +40,14 @@
   }
   function setupNavigation(){
     if(!nav)return;
-    if(coarse){nav.classList.add('nx-static-tabs');return;}
+    if(coarse)nav.classList.add('nx-mobile-glass-tabs');
     indicator=document.createElement('span');
     indicator.className='nx-mercury-indicator';
     indicator.setAttribute('aria-hidden','true');
     nav.prepend(indicator);
     positionIndicator();
-    window.addEventListener('resize',positionIndicator,{passive:true});
-    nav.addEventListener('scroll',positionIndicator,{passive:true});
+    window.addEventListener('resize',function(){positionIndicator(coarse);},{passive:true});
+    nav.addEventListener('scroll',function(){positionIndicator(coarse);},{passive:true});
     nav.addEventListener('click',function(event){if(event.target.closest('.nav-tab'))raf(moveIndicator);});
     nav.addEventListener('keydown',function(event){
       if(!/^Arrow(Left|Right)$/.test(event.key))return;
@@ -57,6 +59,7 @@
       tabs[next].focus();
       tabs[next].click();
     });
+    if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){positionIndicator(coarse);});
   }
   function cards(){return Array.prototype.slice.call(document.querySelectorAll('.tab-content.active .tools-card'));}
   function tabDistance(card,tab){

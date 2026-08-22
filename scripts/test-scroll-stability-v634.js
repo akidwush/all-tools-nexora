@@ -30,9 +30,9 @@ assert.doesNotMatch(stability, /card\.appendChild\(badge\)/);
 assert.doesNotMatch(shell, /nx-wa-notif|WhatsApp notification on desktop and touch devices/);
 assert.doesNotMatch(componentsCss, /#nx-wa-notif/);
 assert.match(componentsCss, /nx-about-dev-room:not\(\.is-open\)/);
-assert.match(coreCss, /HF11\.1 — MOBILE TAB COMPOSITOR FIX/);
+assert.match(coreCss, /HF14 — MOBILE GLASS DEPTH RESTORATION/);
 
 assert.equal((html.match(/class="tools-card/g) || []).length, 0);
 assert.match(html, /id="allGrid"[^>]*aria-busy="true"/);
 
-console.log('Scroll stability regression tests lulus: no card containment jump, no observer auto-reflow, room iframe tidak bocor, dan mobile tab compositor aman.');
+console.log('Scroll stability regression tests lulus: no card containment jump, no observer auto-reflow, room iframe tidak bocor, dan mobile glass stabil.');

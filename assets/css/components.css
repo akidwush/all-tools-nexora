@@ -1380,7 +1380,6 @@ body.nx-health-lock{overflow:hidden}
 /* =========================================================
    NEXORA v6.2 — STABILITY STATUS + MOBILE CLEANUP
    ========================================================= */
-.tools-card{position:relative;overflow:hidden;isolation:isolate}
 .nx-card-readiness{position:absolute;top:8px;right:8px;z-index:3;display:inline-flex;align-items:center;min-height:20px;padding:4px 7px;border:1px solid rgba(148,163,184,.22);border-radius:999px;background:rgba(8,3,16,.92);color:#a89bb7;font-size:7px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
 .tools-card[data-nx-tool-status="ready"] .nx-card-readiness{border-color:rgba(52,211,153,.28);color:#6ee7b7;background:rgba(6,35,29,.78)}
 .tools-card[data-nx-tool-status="degraded"] .nx-card-readiness,.tools-card[data-nx-tool-status="restricted"] .nx-card-readiness{border-color:rgba(251,191,36,.30);color:#fde68a;background:rgba(47,31,5,.82)}

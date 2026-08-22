@@ -14,8 +14,12 @@ assert.doesNotMatch(shell,/nx-wa-notif|WhatsApp notification on desktop and touc
 assert.doesNotMatch(socials,/getElementById\("nx-wa-notif"\)/);
 assert.doesNotMatch(components,/#nx-wa-notif/);
 assert.match(components,/\.nx-about-dev-room:not\(\.is-open\)\{[\s\S]*display:none!important/);
-assert.match(core,/HF11\.1 — MOBILE TAB COMPOSITOR FIX/);
-assert.match(motion,/if\(coarse\)\{nav\.classList\.add\('nx-static-tabs'\);return;\}/);
+assert.match(core,/HF14 — MOBILE GLASS DEPTH RESTORATION/);
+assert.match(core,/\.nx-mercury-indicator\.is-instant\{transition:none!important\}/);
+assert.match(core,/\.tools-card:active\{[\s\S]*?translate3d\(0,2px,0\) scale\(\.986\)/);
+assert.doesNotMatch(core,/nx-static-tabs/);
+assert.match(motion,/if\(coarse\)nav\.classList\.add\('nx-mobile-glass-tabs'\)/);
+assert.doesNotMatch(motion,/nx-static-tabs|if\(coarse\)\{[^}]*return;/);
 assert.match(stability,/\/api\/tool-health\?refresh=auto/);
 assert.match(stability,/window\.addEventListener\("online",function\(\)\{loadHealth\(true\);\}/);
-console.log("HF11.1 regression lulus: room leak ditutup, tab mobile statis, WhatsApp popup hilang, health auto-refresh aktif.");
+console.log("HF14 regression lulus: room leak ditutup, mercury glass mobile aktif, WhatsApp popup hilang, health auto-refresh aktif.");
