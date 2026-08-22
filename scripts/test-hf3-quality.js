@@ -29,7 +29,7 @@ for (const token of [
   "HERO_SETTINGS_TIMEOUT_MS=1800",
   "if(!heroConfig.enabled)",
   "nx-hero-video-disabled",
-  "localStorage.setItem(HERO_SETTINGS_CACHE_KEY"
+  "localStorage.removeItem(LEGACY_HERO_SETTINGS_CACHE_KEY"
 ]) assert(performance.includes(token), `performance.js harus memuat ${token}`);
 
 const adminHtml = read("admin/index.html");
@@ -51,7 +51,7 @@ for (const token of ["public.app_settings", "heroVideo", "is_public = true", "no
 }
 
 assert(adminHtml.includes("dashboard.js?v=6.3.18-hf3"));
-assert(read("index.html").includes("performance.js?v=6.3.18-hf18-desktop-hero1"));
+assert(read("index.html").includes("performance.js?v=6.3.18-hf18-desktop-hero2"));
 assert(read("index.html").includes("app.js?v=6.3.18-lr4"));
 
 console.log("Nexora HF3 quality tests lulus: kalkulator CSP-safe, password Web Crypto, video hero admin, cache bust, dan migration valid.");

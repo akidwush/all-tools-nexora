@@ -4,7 +4,7 @@
   if(window.__NEXORA_PERFORMANCE__) return;
 
   var DEFAULT_HERO_VIDEO_URL="https://c.termai.cc/v164/HCYk.mp4";
-  var HERO_SETTINGS_CACHE_KEY="nexora_hero_settings_v1";
+  var LEGACY_HERO_SETTINGS_CACHE_KEY="nexora_hero_settings_v1";
   var HERO_SETTINGS_TIMEOUT_MS=1800;
 
   function safeHeroUrl(value,fallback){
@@ -26,20 +26,12 @@
     };
   }
 
-  function readCachedHeroConfig(fallback){
-    try{
-      var cached=JSON.parse(localStorage.getItem(HERO_SETTINGS_CACHE_KEY)||"null");
-      if(cached&&cached.value)return normalizeHeroConfig(cached.value,fallback);
-    }catch(_){ }
-    return normalizeHeroConfig(null,fallback);
-  }
-
-  function writeCachedHeroConfig(config){
-    try{localStorage.setItem(HERO_SETTINGS_CACHE_KEY,JSON.stringify({value:config,updatedAt:Date.now()}));}catch(_){ }
-  }
+  // Do not allow a stale local setting to hide the hero. Older builds cached
+  // disabled flags and obsolete URLs, then used them whenever the API timed out.
+  try{localStorage.removeItem(LEGACY_HERO_SETTINGS_CACHE_KEY);}catch(_){ }
 
   async function loadHeroConfig(fallback){
-    var cached=readCachedHeroConfig(fallback);
+    var fallbackConfig=normalizeHeroConfig(null,fallback);
     var controller=typeof AbortController==="function"?new AbortController():null;
     var timer=controller?setTimeout(function(){controller.abort();},HERO_SETTINGS_TIMEOUT_MS):null;
     try{
@@ -47,15 +39,14 @@
         method:"GET",cache:"no-store",credentials:"same-origin",
         headers:{Accept:"application/json"},signal:controller?controller.signal:undefined
       });
-      if(!response.ok)return cached;
+      if(!response.ok)return fallbackConfig;
       var payload=await response.json();
       var rows=Array.isArray(payload&&payload.data)?payload.data:[];
       var site=rows.find(function(item){return item&&item.key==="site";});
       var config=normalizeHeroConfig(site&&site.value&&site.value.heroVideo,fallback);
-      writeCachedHeroConfig(config);
       return config;
     }catch(_){
-      return cached;
+      return fallbackConfig;
     }finally{
       if(timer)clearTimeout(timer);
     }
