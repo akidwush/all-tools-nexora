@@ -12,7 +12,7 @@ const cursorStart = reactor.indexOf("function setupCursorReactor");
 const cursorEnd = reactor.indexOf("\n  function setupVisibility", cursorStart);
 const cursorSource = reactor.slice(cursorStart, cursorEnd);
 
-assert.match(html, /liquid-reactor\.js\?v=6\.3\.18-hf16-mobile-paint1/);
+assert.match(html, /liquid-reactor\.js\?v=6\.3\.18-hf17-desktop-nav1/);
 assert.match(css, /\.custom-cursor,[\s\S]*?\.touch-follower,[\s\S]*?\.cursor-trail\{[\s\S]*?position:fixed;[\s\S]*?pointer-events:none!important;[\s\S]*?user-select:none;[\s\S]*?will-change:transform,opacity/);
 assert.match(css, /html\.nx-custom-cursor-enabled body \*\{cursor:none!important\}/);
 assert.match(css, /@media \(pointer:coarse\),\(hover:none\)/);

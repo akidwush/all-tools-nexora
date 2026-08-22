@@ -51,13 +51,8 @@
       tabs[next].click();
     }
     nav.addEventListener('keydown',onKeyboard);
-    // Android Chrome can drop painted descendants when a blurred, animated
-    // indicator shares the compositor with dozens of cards. The selected tab
-    // keeps the same glass depth through CSS, without a moving GPU layer.
-    if(coarse){
-      nav.classList.add('nx-mobile-stable-tabs');
-      return;
-    }
+    // The indicator is shared by desktop and touch layouts. Expensive card
+    // FLIP remains disabled for coarse pointers in setupGrid().
     indicator=document.createElement('span');
     indicator.className='nx-mercury-indicator';
     indicator.setAttribute('aria-hidden','true');
@@ -120,7 +115,8 @@
       if(!coarse)captureFlip();
     });
     document.addEventListener('nexora:navigation-changed',function(){
-      if(!coarse)queueMicrotask(animateFlip);
+      if(coarse){raf(moveIndicator);return;}
+      queueMicrotask(animateFlip);
     });
     document.addEventListener('click',function(event){
       var card=event.target.closest&&event.target.closest('.tools-card');

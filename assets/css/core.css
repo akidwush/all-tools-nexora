@@ -1425,53 +1425,22 @@ html.nx-low-power .tools-card,html.nx-low-power .nav-tab,html.nx-low-power .nx-p
     box-shadow:0 13px 30px rgba(0,0,0,.4),0 5px 14px rgba(87,49,151,.14),inset 0 1px 0 rgba(255,255,255,.13),inset 0 -5px 12px rgba(0,0,0,.16);
   }
   #navTabs{
-    isolation:auto;
+    isolation:isolate;
     margin:0 0 24px!important;
     padding:6px!important;
-    gap:2px;
     overflow-x:auto!important;
     overflow-y:hidden!important;
     overscroll-behavior-x:contain;
-    border:1px solid rgba(215,199,248,.24);
-    border-top-color:rgba(241,253,255,.46);
-    border-bottom-color:rgba(96,62,151,.3);
+    border:1px solid rgba(221,214,242,.19);
+    border-top-color:rgba(238,250,255,.28);
     border-radius:17px;
     -webkit-backdrop-filter:none!important;
     backdrop-filter:none!important;
-    background:
-      radial-gradient(90% 125% at 16% -28%,rgba(255,255,255,.13),transparent 44%),
-      linear-gradient(180deg,#242031,#100f18);
-    box-shadow:0 15px 32px rgba(0,0,0,.46),0 6px 18px rgba(81,45,139,.18),inset 0 1px 0 rgba(255,255,255,.14),inset 0 -7px 14px rgba(0,0,0,.2);
+    background:linear-gradient(180deg,rgba(30,27,43,.76),rgba(11,12,20,.7));
+    box-shadow:0 20px 48px rgba(0,0,0,.34),0 8px 24px rgba(91,50,156,.1),inset 0 1px 0 rgba(255,255,255,.08);
   }
-  #navTabs::before{background:linear-gradient(90deg,rgba(19,17,28,.98),transparent)}
-  #navTabs::after{background:linear-gradient(-90deg,rgba(19,17,28,.98),transparent)}
-  #navTabs.nx-mobile-stable-tabs .nx-mercury-indicator,
-  .nx-mercury-indicator{
-    display:none!important;
-    will-change:auto!important;
-  }
-  #navTabs.nx-mobile-stable-tabs .nav-tab{
-    min-height:48px;
-    padding:11px 15px;
-    border:1px solid transparent;
-    background:transparent;
-    font-size:11px;
-    text-shadow:0 1px 2px rgba(0,0,0,.5);
-    transition:color 100ms linear,border-color 100ms linear,box-shadow 100ms linear!important;
-  }
-  #navTabs.nx-mobile-stable-tabs .nav-tab.active{
-    border:1px solid rgba(217,248,255,.48)!important;
-    border-right-color:rgba(177,124,255,.4)!important;
-    border-bottom-color:rgba(93,50,164,.58)!important;
-    background:
-      radial-gradient(90% 145% at 24% -32%,rgba(255,255,255,.34),transparent 42%),
-      linear-gradient(118deg,#7041c9,#6848ae 48%,#51427d)!important;
-    box-shadow:
-      0 8px 0 -6px #3b216a,
-      0 9px 18px rgba(42,22,75,.5),
-      inset 0 1px 0 rgba(255,255,255,.38),
-      inset 0 -7px 13px rgba(35,16,69,.32)!important;
-  }
+  #navTabs::before{background:linear-gradient(90deg,rgba(17,16,25,.92),transparent)}
+  #navTabs::after{background:linear-gradient(-90deg,rgba(17,16,25,.92),transparent)}
   .tools-card{
     isolation:auto!important;
     contain:none!important;
