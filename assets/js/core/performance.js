@@ -104,21 +104,6 @@
     var hero=heroElement||document.querySelector("[data-nx-hero]");
     var video=heroVideo||(hero&&hero.querySelector("video[data-src]"));
     if(!hero||!video)return;
-
-    var heroConfig=await heroConfigPromise;
-    var effectiveHeroMode=heroConfig.enabled?heroMode:"disabled";
-    if(effectiveHeroMode==="disabled"){
-      document.documentElement.classList.remove("nx-hero-video-auto");
-      document.documentElement.classList.add("nx-hero-video-disabled");
-      video.removeAttribute("src");
-      video.load();
-      return;
-    }
-    video.dataset.src=heroConfig.url;
-
-    var source=String(video.dataset.src||DEFAULT_HERO_VIDEO_URL);
-    if(!source)return;
-
     var loaded=false;
     var ready=false;
     var autoplayBlocked=false;
@@ -134,12 +119,25 @@
     video.controls=false;
     video.removeAttribute("controls");
 
+    function isSameSource(candidate){
+      if(!candidate)return false;
+      try{return new URL(video.currentSrc||video.src,location.href).href===new URL(candidate,location.href).href;}catch(_){return false;}
+    }
+
+    // The static source starts decoding immediately, before optional settings
+    // return. This keeps the primary desktop visual independent of API timing.
+    var source=String(video.dataset.src||video.getAttribute("src")||DEFAULT_HERO_VIDEO_URL);
+
     function ensureLoaded(){
       if(loaded)return;
       loaded=true;
       video.preload="metadata";
-      video.src=source;
-      video.load();
+      // Never reload an already attached source: reloading resets currentTime
+      // and can leave a desktop video frozen after a cache/config response.
+      if(!isSameSource(source)){
+        video.src=source;
+        video.load();
+      }
     }
 
     function armInteractionRetry(){
@@ -171,11 +169,13 @@
       if(mobileLike&&!video.paused)video.pause();
     }
 
-    video.addEventListener("loadeddata",function(){
+    function markReady(){
       ready=true;
       hero.classList.add("is-video-ready");
       ensurePlayback();
-    },{once:true});
+    }
+    video.addEventListener("loadeddata",markReady,{once:true});
+    video.addEventListener("canplay",markReady,{once:true});
 
     video.addEventListener("error",function(){
       hero.classList.remove("is-video-ready");
@@ -188,11 +188,32 @@
       else suspendPlayback();
     }
 
+    // Start immediately so desktop playback never waits for remote settings.
+    ensureLoaded();
+    if(video.readyState>=2)markReady();
+
+    var heroConfig=await heroConfigPromise;
+    if(!heroConfig.enabled){
+      document.documentElement.classList.remove("nx-hero-video-auto");
+      document.documentElement.classList.add("nx-hero-video-disabled");
+      video.pause();
+      video.removeAttribute("src");
+      video.load();
+      return;
+    }
+    video.dataset.src=heroConfig.url;
+    source=String(heroConfig.url||source);
+    if(!isSameSource(source)){
+      loaded=false;
+      ready=false;
+      ensureLoaded();
+    }else{
+      ensurePlayback();
+    }
+
     // Load once so the identity frame remains available. On phones the same
     // element is paused outside the viewport, releasing decoder/compositor
     // pressure without reloading or resetting the video.
-    ensureLoaded();
-
     if("IntersectionObserver" in window){
       var observer=new IntersectionObserver(function(entries){onVisibility(entries[0]);},{threshold:[0,0.01,0.35]});
       observer.observe(hero);
