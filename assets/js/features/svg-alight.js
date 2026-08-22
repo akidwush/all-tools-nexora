@@ -30,19 +30,6 @@
           <p>Konversi SVG ke XML Alight Motion dengan empat profil fidelity yang benar-benar terhubung ke engine.</p>\
           <div class="nsa-badges"><span><i class="fa-solid fa-gem"></i> LOSSLESS</span><span><i class="fa-solid fa-layer-group"></i> Z-ORDER</span><span><i class="fa-solid fa-key"></i> SERVER KEY</span></div>\
         </div>\
-        <div class="nsa-motion-visual" aria-label="Alight Motion curve mark">\
-          <div class="nsa-alight-mark" aria-hidden="true">\
-            <svg viewBox="0 0 220 220" role="img" aria-label="Alight Motion curve logo">\
-              <defs><linearGradient id="nsaAlightGradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="48%" stop-color="#a855f7"/><stop offset="100%" stop-color="#7cf7a5"/></linearGradient></defs>\
-              <circle cx="110" cy="110" r="86" fill="none" stroke="url(#nsaAlightGradient)" stroke-width="7" opacity=".32"/>\
-              <path d="M46 139c23-61 91-84 139-44" fill="none" stroke="url(#nsaAlightGradient)" stroke-width="13" stroke-linecap="round"/>\
-              <path d="M58 158c28-38 79-54 121-31" fill="none" stroke="url(#nsaAlightGradient)" stroke-width="10" stroke-linecap="round" opacity=".8"/>\
-              <path d="M83 171c26-18 58-23 88-12" fill="none" stroke="url(#nsaAlightGradient)" stroke-width="8" stroke-linecap="round" opacity=".62"/>\
-              <circle cx="47" cy="139" r="7" fill="#7cf7a5"/>\
-            </svg>\
-          </div>\
-          <div class="nsa-curve-card"><span>BEZIER CURVE</span><b>ALIGHT MOTION XML</b><i></i></div>\
-        </div>\
       </section>\
       <section class="nsa-grid">\
         <article class="nsa-card nsa-input">\
