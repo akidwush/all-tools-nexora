@@ -40,9 +40,7 @@ assert.ok(app.includes("new Blob([bytes], { type: mime })"));
 assert.doesNotMatch(app, /fetch\(dataUrl\)/);
 assert.doesNotMatch(app.slice(app.indexOf("async function nxLocalEnhance"), app.indexOf("window.NexoraLocalEnhanceInfo")), /maxSide\s*=/);
 
-for (const token of ["LOCAL ESRGAN", "WEBGL", "exact 2×", "Local AI", "ESRGAN memproses tile"]) {
-  assert.ok(ui.includes(token), `UI Local AI kehilangan ${token}`);
-}
+assert.doesNotMatch(ui, /Local AI|LOCAL ESRGAN|NexoraLocalEnhance|runLocalFallback/);
 
 for (const token of [
   "@tensorflow/tfjs@4.22.0",
@@ -55,4 +53,4 @@ for (const token of [
 ]) assert.ok(fetcher.includes(token), `Fetcher vendor kehilangan ${token}`);
 assert.ok(vendorReadme.includes("Inference tetap berlangsung di browser"));
 
-console.log("Big Image v6.3.18 Local ESRGAN tests lulus: vendor pinned, WebGL, tiled inference, cancel, progress, dan exact 2× terverifikasi secara struktural.");
+console.log("Runtime ESRGAN internal tetap valid untuk Image Enhancer, tetapi telah dipisahkan sepenuhnya dari UI Big Image.");

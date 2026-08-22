@@ -51,7 +51,7 @@
      therefore otherwise keep the previous CSS/JS after a successful deploy. */
   var ASSET_VERSION = '6.3.18';
   var ASSET_PATCH = 'hf13';
-  var BIG_IMAGE_PATCH = 'hf19-big-image2';
+  var BIG_IMAGE_PATCH = 'hf20-bigjpg-only1';
   var baseShowTool = typeof window.showTool === 'function' ? window.showTool : null;
   var activeCard = null;
 

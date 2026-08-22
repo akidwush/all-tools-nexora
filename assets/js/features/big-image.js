@@ -1,4 +1,4 @@
-/* Nexora Big Image v6.3.18 — Bigjpg + local ESRGAN WebGL */
+/* Nexora Big Image v6.3.18 — official Bigjpg task API only */
 (function(){
   "use strict";
   if(window.renderBigImage) return;
@@ -7,7 +7,6 @@
   var MAX_FILE_BYTES=4000000;
   var ACCEPTED=new Set(["image/png","image/jpeg"]);
   var SCALE_MAP={"1":2,"2":4,"3":8,"4":16};
-  var PROVIDER_STATE_KEY="nexora-big-image-provider-v6318";
 
   function formatBytes(value){
     var bytes=Number(value)||0;
@@ -27,14 +26,6 @@
     return new Promise(function(resolve){setTimeout(resolve,ms);});
   }
 
-  function rememberedProviderState(){
-    try{return sessionStorage.getItem(PROVIDER_STATE_KEY)||"";}catch(_){return "";}
-  }
-
-  function rememberProviderState(value){
-    try{sessionStorage.setItem(PROVIDER_STATE_KEY,value);}catch(_){}
-  }
-
   window.renderBigImage=function(body){
     if(!body)return;
     if(typeof body.__nxCleanup==="function")body.__nxCleanup();
@@ -45,14 +36,14 @@
       +"    <div class='nbi-intro-copy'>"
       +"      <p class='nbi-kicker'><span></span> AI SUPER RESOLUTION</p>"
       +"      <h2>BIG <em>IMAGE</em></h2>"
-      +"      <p>Gunakan Bigjpg hingga 16× atau jalankan ESRGAN Slim 2× langsung di browser dengan WebGL. Mode Auto berpindah ke AI lokal jika provider cloud menolak task.</p>"
+      +"      <p>Upscale resmi melalui Bigjpg hingga 16×. Hasil yang ditampilkan dan diunduh berasal langsung dari task API Bigjpg tanpa resize atau engine pengganti.</p>"
       +"    </div>"
       +"    <div class='nbi-engine' id='nbiEngine' role='status'><i class='fa-solid fa-circle-notch fa-spin'></i><span>CHECKING</span></div>"
       +"  </section>"
       +"  <section class='nbi-feature-strip' aria-label='Kemampuan Big Image'>"
       +"    <article><i class='fa-solid fa-maximize'></i><div><strong>2× — 16×</strong><span>Resolusi adaptif</span></div></article>"
       +"    <article><i class='fa-solid fa-wand-magic-sparkles'></i><div><strong>Anime + Photo</strong><span>Model terpisah</span></div></article>"
-      +"    <article><i class='fa-solid fa-microchip'></i><div><strong>Local ESRGAN</strong><span>WebGL · exact 2×</span></div></article>"
+      +"    <article><i class='fa-solid fa-cloud'></i><div><strong>Official Bigjpg</strong><span>Direct task API</span></div></article>"
       +"  </section>"
       +"  <div class='nbi-layout'>"
       +"    <section class='nbi-card nbi-control-card'>"
@@ -73,14 +64,7 @@
       +"        <summary><i class='fa-solid fa-link'></i> Gunakan URL gambar publik</summary>"
       +"        <div><input id='nbiUrl' type='url' inputmode='url' placeholder='https://domain.com/gambar.jpg' autocomplete='off'><small>Wajib HTTPS dan dapat diakses tanpa login.</small></div>"
       +"      </details>"
-      +"      <div class='nbi-divider'><span>ATUR ENGINE</span></div>"
-      +"      <fieldset class='nbi-fieldset' id='nbiEngineMode'>"
-      +"        <legend>Mode pemrosesan</legend>"
-      +"        <div class='nbi-choice-grid nbi-choice-grid-two'>"
-      +"          <button type='button' class='is-active' data-engine-mode='auto'><i class='fa-solid fa-wand-magic-sparkles'></i><span><strong>Auto</strong><small>Bigjpg → local AI</small></span><i class='fa-solid fa-circle-check'></i></button>"
-      +"          <button type='button' data-engine-mode='local'><i class='fa-solid fa-microchip'></i><span><strong>Local AI</strong><small>ESRGAN · WebGL · 2×</small></span><i class='fa-regular fa-circle'></i></button>"
-      +"        </div>"
-      +"      </fieldset>"
+      +"      <div class='nbi-divider'><span>ATUR KUALITAS BIGJPG</span></div>"
       +"      <fieldset class='nbi-fieldset' id='nbiStyle'>"
       +"        <legend>Jenis gambar</legend>"
       +"        <div class='nbi-choice-grid nbi-choice-grid-two'>"
@@ -98,7 +82,7 @@
       +"        </div>"
       +"      </fieldset>"
       +"      <label class='nbi-noise' for='nbiNoise'><span><strong>Noise reduction</strong><small>Sesuaikan dengan tingkat artefak gambar.</small></span><select id='nbiNoise'><option value='-1'>None</option><option value='0'>Low</option><option value='1' selected>Medium</option><option value='2'>High</option><option value='3'>Highest</option></select></label>"
-      +"      <div class='nbi-privacy'><i class='fa-solid fa-lock'></i><p><strong>Mode Local AI tidak mengunggah gambar ke Bigjpg.</strong> ESRGAN Slim berjalan di browser memakai TensorFlow.js WebGL dengan tile adaptif dan output exact 2×. Mode Auto tetap memakai alur cloud privat lebih dulu.</p></div>"
+      +"      <div class='nbi-privacy'><i class='fa-solid fa-lock'></i><p><strong>Diproses oleh Bigjpg resmi.</strong> File unggahan disimpan sementara melalui URL privat bertanda tangan, dikirim sebagai task Bigjpg, lalu sumber sementara dibersihkan setelah task selesai.</p></div>"
       +"      <button class='nbi-run' id='nbiRun' type='button' disabled><span><i class='fa-solid fa-wand-magic-sparkles'></i> UPSCALE IMAGE</span><i class='fa-solid fa-arrow-up-right-from-square'></i></button>"
       +"      <button class='nbi-stop' id='nbiStop' type='button' hidden><i class='fa-solid fa-stop'></i> Hentikan proses</button>"
       +"      <section class='nbi-progress' id='nbiProgress' hidden aria-live='polite'>"
@@ -159,9 +143,7 @@
     var toast=root.querySelector("#nbiToast");
     var metricEngine=root.querySelector("#nbiMetricEngine");
     var controls={noise:root.querySelector("#nbiNoise")};
-    var engineMode=root.querySelector("#nbiEngineMode");
-    var rememberedLocal=rememberedProviderState()==="requires_vip";
-    var state={file:null,objectUrl:"",localResultUrl:"",resultUrl:"",style:"art",scale:"1",busy:false,cancelled:false,destroyed:false,taskId:"",jobToken:"",width:0,height:0,resultWidth:0,resultHeight:0,progress:0,controller:null,forceLocal:rememberedLocal,engineMode:rememberedLocal?"local":"auto",engine:"bigjpg"};
+    var state={file:null,objectUrl:"",resultUrl:"",style:"art",scale:"1",busy:false,cancelled:false,destroyed:false,taskId:"",jobToken:"",width:0,height:0,resultWidth:0,resultHeight:0,progress:0,controller:null,providerReady:false,engine:"bigjpg"};
 
     function notify(message,tone){
       toast.textContent=message;
@@ -188,17 +170,14 @@
 
     function updateRunAvailability(){
       var hasUrl=urlInput.value.trim().toLowerCase().indexOf("https://")===0;
-      runButton.disabled=state.busy||(!state.file&&!hasUrl);
+      runButton.disabled=state.busy||!state.providerReady||(!state.file&&!hasUrl);
     }
 
     function applyScaleAvailability(){
       root.querySelectorAll("#nbiScale button").forEach(function(button){
-        var localUnavailable=state.forceLocal&&button.dataset.scale!=="1";
-        button.disabled=state.busy||localUnavailable;
-        button.classList.toggle("is-unavailable",localUnavailable);
-        button.setAttribute("aria-disabled",String(state.busy||localUnavailable));
-        if(localUnavailable)button.title="Local ESRGAN menghasilkan exact 2×";
-        else button.removeAttribute("title");
+        button.disabled=state.busy;
+        button.setAttribute("aria-disabled",String(state.busy));
+        button.removeAttribute("title");
       });
     }
 
@@ -208,56 +187,18 @@
       urlInput.disabled=value;
       controls.noise.disabled=value;
       root.querySelectorAll("#nbiStyle button").forEach(function(button){button.disabled=value;});
-      root.querySelectorAll("#nbiEngineMode button").forEach(function(button){button.disabled=value;});
       applyScaleAvailability();
       stopButton.hidden=!value;
       updateRunAvailability();
-    }
-
-    function renderEngineModeButtons(){
-      root.querySelectorAll("#nbiEngineMode button").forEach(function(button){
-        var active=button.dataset.engineMode===state.engineMode;
-        button.classList.toggle("is-active",active);
-        button.lastElementChild.className=active?"fa-solid fa-circle-check":"fa-regular fa-circle";
-      });
-    }
-
-    function activateLocalMode(reason,persist){
-      state.forceLocal=true;
-      state.engineMode="local";
-      state.engine="local-esrgan";
-      state.scale="1";
-      if(persist)rememberProviderState("requires_vip");
-      root.querySelectorAll("#nbiScale button").forEach(function(button){button.classList.toggle("is-active",button.dataset.scale==="1");});
-      renderEngineModeButtons();
-      applyScaleAvailability();
-      engine.className="nbi-engine is-warning";
-      engine.innerHTML="<i class='fa-solid fa-microchip'></i><span>LOCAL ESRGAN 2×</span>";
-      engine.title=reason||"ESRGAN Slim 2× akan berjalan lokal dengan TensorFlow.js WebGL.";
-    }
-
-    function activateAutoMode(){
-      state.forceLocal=false;
-      state.engineMode="auto";
-      state.engine="bigjpg";
-      rememberProviderState("");
-      renderEngineModeButtons();
-      applyScaleAvailability();
-      checkEngine();
     }
 
     function revokeObjectUrl(){
       if(state.objectUrl){URL.revokeObjectURL(state.objectUrl);state.objectUrl="";}
     }
 
-    function revokeLocalResult(){
-      if(state.localResultUrl){URL.revokeObjectURL(state.localResultUrl);state.localResultUrl="";}
-    }
-
     function clearResult(){
-      revokeLocalResult();
       state.resultUrl="";
-      state.engine=state.forceLocal?"local-esrgan":"bigjpg";
+      state.engine="bigjpg";
       state.resultWidth=0;
       state.resultHeight=0;
       resultImage.removeAttribute("src");
@@ -398,40 +339,8 @@
       if(error&&error.category==="quota"||/(?:quota|limit|balance|credit)/.test(code))return "Kuota atau saldo Bigjpg tidak mencukupi.";
       if(error&&error.category==="auth"||/(?:auth|api_key|forbidden)/.test(code))return "API key Bigjpg tidak valid atau tidak memiliki izin.";
       if(error&&error.category==="input"||/(?:input|download|url)/.test(code))return "Bigjpg tidak dapat mengambil URL gambar sumber.";
-      if(code.indexOf("local_esrgan_webgl_unavailable")!==-1)return "WebGL tidak tersedia untuk ESRGAN lokal pada browser ini.";
-      if(code.indexOf("local_engine_unavailable")!==-1||code.indexOf("local_esrgan")!==-1)return error&&error.message?error.message:"Engine ESRGAN lokal gagal dimuat.";
       if(code.indexOf("timeout")!==-1)return "Bigjpg timeout. Coba lagi saat antrean lebih ringan.";
       return error&&error.message?error.message:"Proses Big Image gagal.";
-    }
-
-    function shouldFallbackLocally(error){
-      var code=String(error&&error.code||"").toLowerCase();
-      var category=String(error&&error.category||"").toLowerCase();
-      if(error&&error.name==="TypeError")return true;
-      if(error&&error.terminal)return true;
-      if(["plan","quota","auth","timeout","parameter","provider","input"].includes(category))return true;
-      return /(?:requires_vip|not_configured|rate_limited|daily_limit|database_not_ready|storage_not_ready|storage_not_configured|storage_failed|timeout|http_401|http_402|http_403|http_5\d\d|quota|balance|credit|task_failed|result_not_upscaled|input|download|url)/.test(code);
-    }
-
-    function localStrength(){
-      return {"-1":28,"0":40,"1":55,"2":70,"3":84}[String(controls.noise.value)]||55;
-    }
-
-    async function runLocalFallback(sourceUrl,startedAt,reason,persist){
-      if(typeof window.NexoraLocalEnhance!=="function"){
-        throw Object.assign(new Error("Engine ESRGAN lokal belum termuat."),{code:"LOCAL_ENGINE_UNAVAILABLE"});
-      }
-      activateLocalMode(reason,persist);
-      setProgress(52,"Memuat ESRGAN Slim 2× dan backend WebGL","upscale");
-      resultStatus.className="nbi-result-status is-warning";
-      resultStatus.textContent="LOCAL AI";
-      var localUrl=await window.NexoraLocalEnhance(state.file,sourceUrl,localStrength(),function(percent){
-        setProgress(56+(Math.max(0,Math.min(100,percent))*0.38),"ESRGAN memproses tile · "+Math.round(percent)+"%","upscale");
-      },state.controller&&state.controller.signal);
-      if(state.cancelled||state.destroyed){URL.revokeObjectURL(localUrl);return;}
-      state.localResultUrl=localUrl;
-      var localInfo=typeof window.NexoraLocalEnhanceInfo==="function"?window.NexoraLocalEnhanceInfo():{};
-      finish({url:localUrl,engine:localInfo.lastEngine==="canvas"?"local-resize":"local-esrgan",effectiveMultiplier:2,fallbackReason:reason},startedAt);
     }
 
     function readImageDimensions(url){
@@ -475,20 +384,18 @@
     }
 
     function finish(result,startedAt){
-      var localResize=result.engine==="local-resize";
-      var local=result.engine==="local-esrgan"||localResize;
-      var multiplier=local?(result.effectiveMultiplier||2):(SCALE_MAP[state.scale]||2);
+      var multiplier=SCALE_MAP[state.scale]||2;
       var elapsed=((performance.now()-startedAt)/1000).toFixed(1);
-      state.engine=local?result.engine:"bigjpg";
+      state.engine="bigjpg";
       state.resultUrl=result.url;
       resultImage.src=result.url;
       resultImage.onload=function(){
         state.resultWidth=resultImage.naturalWidth;
         state.resultHeight=resultImage.naturalHeight;
         root.querySelector("#nbiMetricOutput").textContent=state.resultWidth+" × "+state.resultHeight;
-        if(local&&state.width&&state.height){
+        if(state.width&&state.height){
           var actual=Math.min(state.resultWidth/state.width,state.resultHeight/state.height);
-          root.querySelector("#nbiMetricScale").textContent=actual.toFixed(2)+"× exact · "+elapsed+" s";
+          root.querySelector("#nbiMetricScale").textContent=actual.toFixed(2)+"× Bigjpg · "+elapsed+" s";
         }
       };
       after.hidden=false;
@@ -501,28 +408,27 @@
       actions.hidden=false;
       download.href=result.url;
       download.setAttribute("aria-label","Buka dan unduh hasil Big Image");
-      download.setAttribute("download",safeFileBase(state.file&&state.file.name||"big-image")+"-"+multiplier+"x."+(local?"png":"jpg"));
+      download.setAttribute("download",safeFileBase(state.file&&state.file.name||"big-image")+"-"+multiplier+"x.jpg");
       root.querySelector("#nbiMetricOutput").textContent=state.width&&state.height?(state.width*multiplier)+" × "+(state.height*multiplier):"Loading…";
-      root.querySelector("#nbiMetricScale").textContent=local?(localResize?"2× exact resize · ":"2× ESRGAN · ")+elapsed+" s":multiplier+"× Bigjpg · "+elapsed+" s";
-      metricEngine.textContent=local?(localResize?"LOCAL RESIZE":"LOCAL ESRGAN"):"BIGJPG AI";
-      root.querySelector("#nbiMetricMode").textContent=local?(localResize?"CANVAS · HIGH QUALITY":"WEBGL · "+(state.style==="art"?"Illustration":"Photo")):(state.style==="art"?"Illustration":"Photo");
+      root.querySelector("#nbiMetricScale").textContent=multiplier+"× Bigjpg · "+elapsed+" s";
+      metricEngine.textContent="BIGJPG OFFICIAL";
+      root.querySelector("#nbiMetricMode").textContent=state.style==="art"?"Illustration":"Photo";
       resultStatus.className="nbi-result-status is-success";
-      resultStatus.textContent=local?(localResize?"2× READY":"AI READY"):"UPSCALE READY";
-      setProgress(100,local?(localResize?"Selesai · fallback resize exact 2×":"Selesai · ESRGAN Slim WebGL exact 2×"):"Big Image selesai melalui Bigjpg","ready");
-      if(!local){
-        engine.className="nbi-engine is-ready";
-        engine.innerHTML="<i class='fa-solid fa-cloud'></i><span>BIGJPG TASK OK</span>";
-        engine.title="Task Bigjpg berhasil diverifikasi pada sesi ini.";
-      }
+      resultStatus.textContent="UPSCALE READY";
+      setProgress(100,"Big Image selesai melalui Bigjpg resmi","ready");
+      engine.className="nbi-engine is-ready";
+      engine.innerHTML="<i class='fa-solid fa-cloud'></i><span>BIGJPG TASK OK</span>";
+      engine.title="Task dan URL hasil berasal langsung dari API Bigjpg.";
       setBusy(false);
       runButton.querySelector("span").innerHTML="<i class='fa-solid fa-rotate'></i> UPSCALE AGAIN";
-      notify(local?(localResize?"Resize lokal selesai exact 2×.":"ESRGAN lokal selesai exact 2× · "+(result.fallbackReason||"mode Local AI")):"Upscale Bigjpg selesai. Geser pembanding untuk melihat detail.","is-success");
+      notify("Upscale Bigjpg resmi selesai. Geser pembanding untuk melihat detail.","is-success");
       if(matchMedia("(max-width:720px)").matches)root.querySelector(".nbi-preview-card").scrollIntoView({behavior:"smooth",block:"start"});
     }
 
     async function run(){
       if(state.busy)return;
       var sourceUrl=urlInput.value.trim();
+      if(!state.providerReady){notify("Bigjpg belum siap. Periksa API key, migration 015, storage, dan paket akun.","is-error");return;}
       if(!state.file&&sourceUrl.toLowerCase().indexOf("https://")!==0){notify("Pilih file atau masukkan URL HTTPS.","is-error");return;}
       state.cancelled=false;
       state.controller=new AbortController();
@@ -535,10 +441,6 @@
       resultStatus.textContent="PROCESSING";
       var startedAt=performance.now();
       try{
-        if(state.forceLocal){
-          await runLocalFallback(sourceUrl,startedAt,"Mode Local AI aktif.",false);
-          return;
-        }
         var options=selectedOptions();
         var started;
         if(state.file){
@@ -558,17 +460,7 @@
         }
       }catch(error){
         if(state.cancelled||error&&error.code==="BIGJPG_CANCELLED")return;
-        if(shouldFallbackLocally(error)){
-          var providerReason=friendlyError(error);
-          var persist=String(error&&error.code||"").toLowerCase().indexOf("requires_vip")!==-1||error&&error.category==="plan";
-          try{
-            if(!error.terminal&&state.taskId&&state.jobToken)await api({action:"cleanup",taskId:state.taskId,jobToken:state.jobToken},true).catch(function(){});
-            await runLocalFallback(sourceUrl,startedAt,providerReason,persist);
-            return;
-          }catch(localError){
-            error=Object.assign(new Error("Fallback lokal gagal: "+friendlyError(localError)),{code:localError&&localError.code||"LOCAL_FALLBACK_FAILED"});
-          }
-        }
+        if(!error.terminal&&state.taskId&&state.jobToken)await api({action:"cleanup",taskId:state.taskId,jobToken:state.jobToken},true).catch(function(){});
         setBusy(false);
         setProgress(100,"FAILED · "+friendlyError(error),"ready");
         progressValue.textContent="!";
@@ -619,10 +511,6 @@
     }
 
     async function checkEngine(){
-      if(state.forceLocal){
-        activateLocalMode("Bigjpg mengembalikan requires_vip pada sesi ini; Local ESRGAN dipilih.",false);
-        return;
-      }
       try{
         var response=await fetch(ENDPOINT+"?health=1",{cache:"no-store"});
         var data={};
@@ -634,18 +522,17 @@
           if(!data.storageReady)missing.push("storage");
           throw new Error(missing.length?"Belum siap: "+missing.join(", "):"Engine belum siap");
         }
-        engine.className="nbi-engine is-warning";
-        engine.innerHTML="<i class='fa-solid fa-key'></i><span>BIGJPG KEY SET</span>";
+        state.providerReady=true;
+        engine.className="nbi-engine is-ready";
+        engine.innerHTML="<i class='fa-solid fa-cloud'></i><span>BIGJPG API READY</span>";
         engine.title=data.providerCapabilityNote||"Hak menjalankan task Bigjpg diverifikasi ketika gambar dikirim.";
       }catch(error){
-        if(typeof window.NexoraLocalEnhance==="function"){
-          activateLocalMode(error&&error.message?error.message:"Engine cloud belum siap.",false);
-          return;
-        }
+        state.providerReady=false;
         engine.className="nbi-engine is-error";
-        engine.innerHTML="<i class='fa-solid fa-triangle-exclamation'></i><span>ENGINE OFFLINE</span>";
+        engine.innerHTML="<i class='fa-solid fa-triangle-exclamation'></i><span>BIGJPG OFFLINE</span>";
         engine.title=error&&error.message?error.message:"Engine offline";
       }
+      updateRunAvailability();
     }
 
     fileInput.addEventListener("change",function(){if(fileInput.files&&fileInput.files[0])setFile(fileInput.files[0]);});
@@ -655,12 +542,6 @@
     runButton.addEventListener("click",run);
     stopButton.addEventListener("click",stop);
     root.querySelector("#nbiReset").addEventListener("click",reset);
-    engineMode.addEventListener("click",function(event){
-      var button=event.target.closest("button[data-engine-mode]");
-      if(!button||state.busy)return;
-      if(button.dataset.engineMode==="local")activateLocalMode("Mode Local AI dipilih pengguna.",false);
-      else activateAutoMode();
-    });
     root.querySelector("#nbiStyle").addEventListener("click",function(event){
       var button=event.target.closest("button[data-style]");
       if(!button||state.busy)return;
@@ -702,11 +583,9 @@
       if(state.controller)state.controller.abort();
       if(state.busy&&state.taskId&&state.jobToken)api({action:"cleanup",taskId:state.taskId,jobToken:state.jobToken},true).catch(function(){});
       revokeObjectUrl();
-      revokeLocalResult();
       clearTimeout(toast.__timer);
       document.removeEventListener("paste",onPaste);
     };
-    renderEngineModeButtons();
     applyScaleAvailability();
     checkEngine();
     updateRunAvailability();

@@ -20,32 +20,22 @@ for (const token of [
   'providerTaskAccess: "unverified"',
   "providerCapabilityVerified: false",
   "requires_vip"
-]) assert.ok(backend.includes(token), `Backend fallback kehilangan ${token}`);
+]) assert.ok(backend.includes(token), `Backend Bigjpg kehilangan ${token}`);
 
 const ui = read("assets/js/features/big-image.js");
 for (const token of [
-  "nexora-big-image-provider-v6318",
-  "shouldFallbackLocally",
-  "runLocalFallback",
-  "window.NexoraLocalEnhance",
-  "activateLocalMode",
-  "activateAutoMode",
-  'data-engine-mode=\'auto\'',
-  'data-engine-mode=\'local\'',
-  'button.dataset.scale!=="1"',
-  "LOCAL ESRGAN 2×",
-  "LOCAL ESRGAN",
-  '"local-esrgan"'
-]) assert.ok(ui.includes(token), `UI fallback kehilangan ${token}`);
-for (const token of ["validateUpscaledResult", "BIGJPG_RESULT_NOT_UPSCALED", '"local-resize"', "LOCAL RESIZE"]) {
-  assert.ok(ui.includes(token), `Regresi hasil/fallback Big Image kehilangan ${token}`);
+  "official Bigjpg task API only",
+  "Official Bigjpg",
+  "BIGJPG API READY",
+  "BIGJPG OFFICIAL",
+  "providerReady",
+  "validateUpscaledResult",
+  "BIGJPG_RESULT_NOT_UPSCALED"
+]) assert.ok(ui.includes(token), `UI Bigjpg-only kehilangan ${token}`);
+for (const pattern of [/Local AI/i, /LOCAL ESRGAN/, /LOCAL RESIZE/, /local-esrgan/, /local-resize/, /NexoraLocalEnhance/, /runLocalFallback/, /data-engine-mode/]) {
+  assert.doesNotMatch(ui, pattern, `UI Bigjpg masih memuat fallback lokal ${pattern}`);
 }
-assert.doesNotMatch(ui, /BIGJPG READY/);
 assert.doesNotMatch(ui, /BIGJPG_API_KEY/);
-
-const css = read("assets/css/features/big-image.css");
-assert.ok(css.includes(".nbi-engine.is-warning"));
-assert.ok(css.includes("button.is-unavailable"));
 
 const apiFiles = [];
 (function walk(directory){
@@ -57,4 +47,4 @@ const apiFiles = [];
 })(path.join(root, "api"));
 assert.equal(apiFiles.length, 12);
 
-console.log("Big Image v6.3.18 fallback tests lulus: requires_vip tetap aman, Auto/Local AI aktif, scale lokal terkunci, dan 12-function limit terjaga.");
+console.log("Big Image Bigjpg-only lulus: hasil hanya dari task API resmi, fallback lokal dihapus, error provider tetap jujur, dan 12-function limit terjaga.");
