@@ -22,7 +22,7 @@ assert.match(motion, /indicator=document\.createElement\('span'\)/);
 assert.match(motion, /if\(coarse\)\{raf\(moveIndicator\);return;\}/);
 assert.match(motion, /nexora:navigation-before[\s\S]*?captureFlip\(\)/);
 assert.match(motion, /nexora:navigation-changed[\s\S]*?animateFlip/);
-assert.match(html, /core\.css\?v=6\.3\.18-hf17-desktop-nav1/);
+assert.match(html, /core\.css\?v=6\.3\.18-hf17-desktop-nav2/);
 assert.match(html, /liquid-reactor\.js\?v=6\.3\.18-hf17-desktop-nav1/);
 
 const assetHeaders = vercel.headers.find(entry => entry.source === "/assets/(.*)");
