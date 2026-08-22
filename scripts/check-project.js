@@ -26,7 +26,7 @@ const required = [
   "assets/module-manifest.json", "assets/js/core/tool-registry.js", "assets/js/core/app.js",
   "api/health.js", "api/feedback.js", "api/audit.js", "api/tool-health.js",
   "lib/database.js", "lib/memory-store.js", "lib/tool-health.js", "lib/vdeploy.js",
-  "lib/freeconvert-vectorizer.js", "lib/bigjpg-upscaler.js", "lib/sitegrabber-proxy.js",
+  "lib/freeconvert-vectorizer.js", "lib/sitegrabber-proxy.js",
   "lib/downloader-service.js", "database/schema.sql"
 ];
 for (const relative of required) if (!fs.existsSync(path.join(root, relative))) fail(`File wajib hilang: ${relative}`);
@@ -94,7 +94,9 @@ for (const [name, module] of Object.entries(moduleManifest.modules || {})) {
 
 for (const removed of [
   "assets/js/features/nexus-ai.js", "assets/css/features/nexus-ai.css",
-  "assets/js/features/pix-vault.js", "assets/css/features/pix-vault.css"
+  "assets/js/features/pix-vault.js", "assets/css/features/pix-vault.css",
+  "assets/js/features/big-image.js", "assets/css/features/big-image.css",
+  "lib/bigjpg-upscaler.js"
 ]) if (fs.existsSync(path.join(root, removed))) fail(`Modul mati/berisiko masih tersimpan: ${removed}`);
 
 const embeddedFrames = [

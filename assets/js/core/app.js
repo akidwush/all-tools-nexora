@@ -934,7 +934,7 @@ const NX_LOCAL_ESRGAN_ASSETS = Object.freeze({
     upscalerFallback: 'https://cdn.jsdelivr.net/npm/upscaler@1.0.0/dist/browser/umd/upscaler.min.js',
     model: '/assets/vendor/esrgan-slim/x2/model.json',
     modelFallback: 'https://cdn.jsdelivr.net/npm/@upscalerjs/esrgan-slim@1.0.0-beta.10/models/x2/model.json',
-    revision: '6318-hf19-big-image2'
+    revision: '6318-hf20-image-enhancer1'
 });
 
 let nxEsrganReadyPromise = null;
@@ -1168,7 +1168,7 @@ async function nxLocalEnhance(file, imageUrl, strength = 55, onProgress, signal)
             if ((signal && signal.aborted) || (error && error.name === 'AbortError')) throw error;
             nxEsrganLastEngine = 'canvas';
             nxEsrganLastError = String(error && (error.code || error.message) || 'LOCAL_ESRGAN_FAILED');
-            console.warn('[Big Image] ESRGAN tidak tersedia, memakai resize 2x:', nxEsrganLastError);
+            console.warn('[Image Enhancer] ESRGAN tidak tersedia, memakai resize 2x:', nxEsrganLastError);
             if (typeof onProgress === 'function') onProgress(100);
             return await nxCanvasUpscaleExact2x(img, sw, sh);
         }
@@ -1632,7 +1632,6 @@ let toolsData = {
         { id: 'svgalight', icon: 'fa-solid fa-wand-magic-sparkles', name: 'SVG → Alight XML', desc: 'Konversi SVG ke XML Alight Motion dengan 4 mode: Lossless, Accurate, Balanced, Lightweight', badge: 'ANIME XML' },
         { id: 'alightpremium', icon: 'fa-solid fa-bolt', name: 'Alight Motion Premium 1 Tahun', desc: 'Request magic link lalu proses aktivasi Premium melalui API reseller', badge: '1 YEAR' },
         { id: 'imagevectorizer', icon: 'fa-solid fa-bezier-curve', name: 'Nexora Image Vectorizer', desc: 'Ubah PNG atau JPG menjadi SVG melalui FreeConvert Cloud', badge: 'SVG' },
-        { id: 'bigimage', icon: 'fa-solid fa-up-right-and-down-left-from-center', name: 'Big Image', desc: 'Upscale ilustrasi dan foto 2×–16× melalui Bigjpg AI', badge: 'BIGJPG AI' },
         { id: 'calc', icon: 'fa-solid fa-calculator', name: 'Calculator', desc: 'Hitung cepat', badge: 'Math' },
         { id: 'pwgen', icon: 'fa-solid fa-key', name: 'Password Gen', desc: 'Password aman', badge: 'Secure' },
         { id: 'morse', icon: 'fa-solid fa-tower-broadcast', name: 'Morse Code', desc: 'Konversi morse', badge: 'Audio' },
@@ -1876,7 +1875,7 @@ async function applyDatabaseToolConfiguration() {
         };
         // The source catalogue is authoritative for bundled tools. Replacing it
         // wholesale with database rows made new releases silently lose tools
-        // whenever Supabase was one migration behind (47 tools became 45).
+  // whenever Supabase lags behind the local catalog.
         const databaseById = new Map(rows.map(row => [String(row.id || ''), row]));
         let bundledOrder = 0;
         for (const base of baseById.values()) {
@@ -2002,7 +2001,6 @@ function showTool(toolId) {
         case 'svgalight': renderSvgAlight(body); break;
         case 'alightpremium': renderAlightPremium(body); break;
         case 'imagevectorizer': renderImageVectorizer(body); break;
-        case 'bigimage': renderBigImage(body); break;
         case 'promptgenerate': renderPromptGenerator(body); break;
         case 'fakeovo': renderFakeOvo(body); break;
         case 'quotegenerator': renderQuoteGenerator(body); break;

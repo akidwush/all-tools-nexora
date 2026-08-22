@@ -44,15 +44,13 @@ npm run dev
 
 `assets/js/core/tool-registry.js` adalah sumber daftar tool. `assets/module-manifest.json`, `lib/tool-health.js`, dan seed `database/schema.sql` wajib tetap sinkron; `npm run check` memverifikasi semuanya.
 
-Big Image v6.3.18 memakai **Local ESRGAN 2×** sebagai engine on-device. `scripts/fetch-ai-vendor.sh` memasang TensorFlow.js, UpscalerJS, dan ESRGAN Slim versi pinned ke `assets/vendor/`, sehingga saat website berjalan model disajikan dari origin Nexora sendiri dan inference berlangsung di browser dengan WebGL.
-
 ## Konfigurasi
 
 Salin `.env.example` dan isi hanya layanan yang digunakan. Variable utama:
 
 - Database/admin: `SUPABASE_URL`, `SUPABASE_SECRET_KEY` atau `SUPABASE_SERVICE_ROLE_KEY`, serta `FEEDBACK_HASH_SALT`.
 - Operasional: `HEALTH_CHECK_TOKEN` dan pengaturan timeout/cache opsional.
-- Tool eksternal: `COINGECKO_API_KEY`, `GOOGLE_PAGESPEED_API_KEY`, `GOOGLE_SAFE_BROWSING_API_KEY`, `NASA_API_KEY`, `OCR_SPACE_API_KEY`, `FREECONVERT_API_KEY`, `BIGJPG_API_KEY`, `SVGTOXML_API_KEY`, dan `GEMINI_API_KEY` untuk Personal AI.
+- Tool eksternal: `COINGECKO_API_KEY`, `GOOGLE_PAGESPEED_API_KEY`, `GOOGLE_SAFE_BROWSING_API_KEY`, `NASA_API_KEY`, `OCR_SPACE_API_KEY`, `FREECONVERT_API_KEY`, `SVGTOXML_API_KEY`, dan `GEMINI_API_KEY` untuk Personal AI.
 - SiteGrabber: `SITEGRABBER_API_BASE_URL` dan `SITEGRABBER_API_KEY`.
 - Deploy Center: `NEXUS_DEPLOY_ACCESS_KEY`, kemudian token `VERCEL_TOKEN` atau `NETLIFY_TOKEN`.
 
@@ -65,8 +63,6 @@ Untuk instalasi baru, jalankan `database/schema.sql` melalui Supabase SQL Editor
 Untuk database lama, jalankan migration yang belum pernah diterapkan dari `database/migrations/` sesuai urutan nomor. Backup database terlebih dahulu.
 
 Migration `database/migrations/016_hero_video_settings.sql` mengaktifkan pengaturan video header. Setelah migration dijalankan, buka **Dashboard Admin → Ringkasan Sistem → Video Header**, isi URL MP4/WebM HTTPS langsung, lalu simpan. Pengaturan tersimpan di `app_settings.site.heroVideo` dan dibaca halaman publik tanpa mengekspos service-role key.
-
-Big Image memerlukan `database/migrations/015_big_image_bigjpg.sql`. Migration tersebut membuat tabel job dan bucket `big-image-inputs` privat. Atur `BIGJPG_API_KEY` serta `BIGJPG_JOB_SECRET` di Vercel, lalu redeploy. Batas per-IP/global dapat disesuaikan melalui `BIGJPG_HOURLY_IP_LIMIT` dan `BIGJPG_DAILY_TASK_LIMIT`. Bigjpg tetap menjadi engine utama; jika task API ditolak karena `requires_vip`, kuota, autentikasi, timeout, atau infrastruktur cloud, UI beralih jujur ke enhancer lokal hingga 2×.
 
 ## Pemeriksaan dan build
 
@@ -88,11 +84,9 @@ Video header mempertahankan mode hemat: desktop dapat memutar video muted saat t
 
 - VDeploy membatasi ZIP ke 3,2 MB agar payload base64 tidak melewati batas request Function.
 - Proxy SVG dan arsip SiteGrabber dibatasi 4 MB.
-- Upload Big Image dibatasi 4 MB, diverifikasi dari magic bytes PNG/JPG, disimpan sementara di bucket privat, serta dilindungi token HMAC dan rate limit.
 - Konten legacy yang dijalankan lewat `srcdoc` berada dalam iframe sandbox tanpa akses same-origin.
 - Header Content Security Policy membatasi sumber script, frame, object, worker, dan koneksi browser; kebijakan tetap mengizinkan provider yang memang dipakai tool legacy.
 - Image Vectorizer memantau task konversi dan ekspor secara terpisah agar kegagalan kuota, kredensial, timeout, atau engine tidak lagi tertutup pesan dependency umum.
-- Big Image memakai API key Bigjpg hanya pada server, memvalidasi URL publik, memantau task secara terpisah, dan membersihkan file sumber saat task selesai, gagal, dihentikan, atau kedaluwarsa. Status health hanya menyatakan konfigurasi key/infrastruktur; hak paket provider diverifikasi saat submit, dengan fallback lokal hingga 2× jika cloud menolak.
 - Sebagian tool bergantung pada API pihak ketiga dan tetap dapat mengalami kuota, perubahan kontrak, atau downtime.
 
 Lihat [audit keamanan](docs/SECURITY_AUDIT.md) dan [riwayat perubahan](CHANGELOG.md).

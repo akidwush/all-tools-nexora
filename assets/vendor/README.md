@@ -1,6 +1,6 @@
 # Nexora local AI vendor assets
 
-Big Image v6.3.18 memuat seluruh runtime Local ESRGAN dari origin Nexora sendiri. Jalankan `sh scripts/fetch-ai-vendor.sh` sebelum build/deploy untuk memasang aset pinned berikut:
+Image Enhancer memuat runtime Local ESRGAN dari origin Nexora sendiri. Jalankan `sh scripts/fetch-ai-vendor.sh` sebelum build/deploy untuk memasang aset pinned berikut:
 
 - TensorFlow.js 4.22.0
 - UpscalerJS 1.0.0

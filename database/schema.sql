@@ -195,7 +195,6 @@ values
   ('svgalight', 'SVG → Alight XML', 'Konversi SVG menjadi XML Alight Motion dengan Anime Vector Atelier', 'tools', 'ANIME XML', 'fa-solid fa-wand-magic-sparkles', null, true, 68, '{"provider":"svgtoxml","serverProxy":true,"features":["svg-to-alight-xml","anime-atelier","copy-download"]}'::jsonb),
   ('alightpremium', 'Alight Motion Premium 1 Tahun', 'Request magic link lalu proses aktivasi Premium melalui API reseller', 'tools', '1 YEAR', 'fa-solid fa-bolt', null, true, 69, '{"provider":"kyzznekoo","serverProxy":true,"features":["magic-link","apply-premium"]}'::jsonb),
   ('imagevectorizer', 'Nexora Image Vectorizer', 'Ubah PNG atau JPG menjadi SVG berkualitas melalui FreeConvert', 'tools', 'SVG', 'fa-solid fa-bezier-curve', null, true, 69, '{"provider":"freeconvert","engine":"image-conversion-api","serverKey":true,"directUpload":true,"features":["png-jpg-to-svg","signed-upload","copy-download"]}'::jsonb),
-  ('bigimage', 'Big Image', 'Upscale gambar 2×–16× dengan Bigjpg AI, reduksi noise, dan perbandingan sebelum/sesudah', 'tools', 'BIGJPG AI', 'fa-solid fa-up-right-and-down-left-from-center', null, true, 70, '{"provider":"bigjpg","serverKey":true,"privateTemporaryUpload":true,"features":["2x-4x-8x-16x","art-photo","noise-reduction","before-after"]}'::jsonb),
   ('calc', 'Calculator', 'Hitung cepat', 'tools', 'Math', 'fa-solid fa-calculator', null, true, 70, '{}'::jsonb),
   ('pwgen', 'Password Gen', 'Password aman', 'tools', 'Secure', 'fa-solid fa-key', null, true, 80, '{}'::jsonb),
   ('morse', 'Morse Code', 'Konversi morse', 'tools', 'Audio', 'fa-solid fa-tower-broadcast', null, true, 90, '{}'::jsonb),
@@ -214,52 +213,6 @@ on conflict (id) do nothing;
 
 notify pgrst, 'reload schema';
 
--- ============================================================
--- Nexora v6.3.18 — Big Image / Bigjpg
-
-create table if not exists public.big_image_jobs (
-  id uuid primary key default gen_random_uuid(),
-  provider_task_id text not null unique check (provider_task_id ~ '^[A-Za-z0-9_-]{6,160}$'),
-  client_hash text not null check (char_length(client_hash) between 32 and 128),
-  source_path text,
-  source_kind text not null check (source_kind in ('upload', 'url')),
-  file_name text not null default 'big-image.jpg' check (char_length(file_name) between 1 and 120),
-  style text not null check (style in ('art', 'photo')),
-  noise text not null check (noise in ('-1', '0', '1', '2', '3')),
-  scale_code text not null check (scale_code in ('1', '2', '3', '4')),
-  status text not null default 'processing' check (status in ('processing', 'success', 'failed', 'expired')),
-  output_url text,
-  error_code text,
-  completed_at timestamptz,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-alter table public.big_image_jobs enable row level security;
-
-create index if not exists big_image_jobs_created_idx
-  on public.big_image_jobs (created_at desc);
-create index if not exists big_image_jobs_client_created_idx
-  on public.big_image_jobs (client_hash, created_at desc);
-create index if not exists big_image_jobs_cleanup_idx
-  on public.big_image_jobs (created_at asc)
-  where source_path is not null;
-
-drop trigger if exists big_image_jobs_set_updated_at on public.big_image_jobs;
-create trigger big_image_jobs_set_updated_at
-before update on public.big_image_jobs
-for each row execute function public.set_updated_at();
-
-grant select, insert, update, delete on table public.big_image_jobs to service_role;
-
-insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('big-image-inputs', 'big-image-inputs', false, 4000000, array['image/png', 'image/jpeg']::text[])
-on conflict (id) do update set
-  public = false,
-  file_size_limit = excluded.file_size_limit,
-  allowed_mime_types = excluded.allowed_mime_types;
-
-notify pgrst, 'reload schema';
 -- Nexora v6.1 — Social media links managed from the admin dashboard.
 -- Nilai yang pernah diedit admin tidak ditimpa saat schema dijalankan ulang.
 

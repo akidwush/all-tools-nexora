@@ -8,7 +8,6 @@ const { handleOcrIntelligence } = require("../lib/ocr-intelligence");
 const { handleSvgToXml } = require("../lib/svgtoxml-proxy");
 const { handleAlightPremium } = require("../lib/alight-premium-proxy");
 const { handleFreeConvertVectorizer } = require("../lib/freeconvert-vectorizer");
-const { handleBigImage } = require("../lib/bigjpg-upscaler");
 const { handleIpIntelligence } = require("../lib/ipinfo-intelligence");
 const { handleBmkgOpenData } = require("../lib/bmkg-open-data");
 const {
@@ -99,10 +98,6 @@ module.exports = async function handler(request, response) {
 
   if (url.searchParams.get("mode") === "image-vectorizer") {
     return handleFreeConvertVectorizer(request, response, url);
-  }
-
-  if (url.searchParams.get("mode") === "big-image") {
-    return handleBigImage(request, response, url);
   }
 
   if (url.searchParams.get("mode") === "ip-intelligence") {

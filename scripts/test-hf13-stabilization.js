@@ -41,7 +41,6 @@ async function main() {
   const database = read("lib/public-database.js");
   const core = read("assets/css/core.css");
   const components = read("assets/css/components.css");
-  const bigImage = read("assets/js/features/big-image.js");
   const svgAlight = read("assets/js/features/svg-alight.js");
   const downloader = read("lib/downloader-service.js");
 
@@ -56,13 +55,12 @@ async function main() {
   assert.match(core, /@media \(max-width:767px\)\{[\s\S]*?\.tools-card\{[\s\S]*?backdrop-filter:none!important/);
   assert.doesNotMatch(components, /@media\(min-width:320px\) and \(max-width:767px\)[\s\S]*?\.tools-grid/);
 
-  assert.match(bigImage, /signal:keepalive\?undefined:\(state\.controller&&state\.controller\.signal\)/);
   assert.match(svgAlight, /API READY/);
   assert.match(svgAlight, /Konversi melewati batas waktu 35 detik/);
   assert.match(downloader, /Probe the API contract first/);
   assert.match(downloader, /source\.endpoint\(config\.healthInput, \{\}\)/);
 
-  console.log("HF13 stabilization lulus: katalog merge, glass depth, AI fallback, downloader health, Big Image cancel, dan SVG timeout tervalidasi.");
+  console.log("HF13 stabilization lulus: katalog merge, glass depth, AI fallback, downloader health, dan SVG timeout tervalidasi.");
 }
 
 main().catch((error) => {

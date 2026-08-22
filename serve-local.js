@@ -63,7 +63,6 @@ const API_ROUTES = Object.freeze({
   "/api/alight-premium/magic-link": { file: "api/tool-health.js", mode: "alight-premium", action: "magic-link" },
   "/api/alight-premium/apply-premium": { file: "api/tool-health.js", mode: "alight-premium", action: "apply-premium" },
   "/api/alight-premium": { file: "api/tool-health.js", mode: "alight-premium" },
-  "/api/big-image": { file: "api/tool-health.js", mode: "big-image" },
   "/api/vdeploy": { file: "api/health.js", mode: "vdeploy" },
   "/api/ai/chat": { file: "api/health.js", mode: "ai-chat" },
   "/api/admin/auth": { file: "api/admin/auth.js" },
@@ -86,7 +85,7 @@ function bodyLimit(pathname, requestUrl) {
   const mode = requestUrl.searchParams.get("mode") || API_ROUTES[pathname]?.mode || "";
   if (pathname === "/api/vdeploy") return 4_400_000;
   if (pathname === "/api/ocr-intelligence" || mode === "ocr-intelligence") return 1_600_000;
-  if (mode === "image-vectorizer" || mode === "big-image") return 4_200_000;
+  if (mode === "image-vectorizer") return 4_200_000;
   if (pathname === "/api/audit") return 230_000;
   if (pathname === "/api/ai/chat" || pathname === "/api/admin/ai") return 80_000;
   return 550_000;

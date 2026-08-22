@@ -35,7 +35,6 @@
     ["svgalight","SVG → Alight XML","api","svg-alight","renderSvgAlight","https://svgtoxml.vercel.app/"],
     ["alightpremium","Alight Motion Premium 1 Tahun","api","alight-premium","renderAlightPremium","https://api.kyzznekoo.my.id/"],
     ["imagevectorizer","Nexora Image Vectorizer","module","image-vectorizer","renderImageVectorizer",null],
-    ["bigimage","Big Image","api","big-image","renderBigImage",null],
     ["calc","Calculator","local",null,"renderCalc",null],
     ["pwgen","Password Gen","local",null,"renderPwgen",null],
     ["morse","Morse Code","local",null,"renderMorse",null],

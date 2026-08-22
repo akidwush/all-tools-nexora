@@ -5,7 +5,6 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { MAX_ARCHIVE_BYTES } = require("../lib/vdeploy");
 const { MAX_SVG_BYTES, downloadPublicSvg } = require("../lib/freeconvert-vectorizer");
-const { MAX_UPLOAD_BYTES: MAX_BIG_IMAGE_UPLOAD_BYTES } = require("../lib/bigjpg-upscaler");
 const { setBounded, takeFixedWindow } = require("../lib/memory-store");
 const { CONTENT_SECURITY_POLICY } = require("../serve-local");
 
@@ -15,7 +14,6 @@ const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
 assert.ok(Math.ceil(MAX_ARCHIVE_BYTES / 3) * 4 + 20_000 < 4_500_000, "Payload VDeploy dapat melewati batas 4,5 MB");
 assert.ok(MAX_SVG_BYTES <= 4_000_000, "Proxy SVG dapat melewati batas respons Function");
 assert.equal(typeof downloadPublicSvg, "function");
-assert.ok(MAX_BIG_IMAGE_UPLOAD_BYTES <= 4_000_000, "Upload Big Image melewati batas 4 MB");
 
 const store = new Map();
 for (let index = 0; index < 20; index += 1) setBounded(store, `key-${index}`, index, { maxEntries: 5 });
