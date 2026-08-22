@@ -120,9 +120,23 @@ async function ensureAsset(asset) {
   throw new Error(`Gagal menyiapkan ${asset.relative}: ${lastError?.message || "semua sumber gagal"}`);
 }
 
+function patchTensorflowForStrictCsp() {
+  const filename = path.join(vendorRoot, "tfjs", "tf.min.js");
+  const unsafeBootstrap = 'try{regeneratorRuntime=t}catch(e){Function("r","regeneratorRuntime = r")(t)}';
+  const safeBootstrap = "globalThis.regeneratorRuntime=t";
+  const source = fs.readFileSync(filename, "utf8");
+  if (source.includes(safeBootstrap)) return;
+  if (!source.includes(unsafeBootstrap)) {
+    throw new Error("Bootstrap TensorFlow.js berubah; patch CSP aman tidak dapat diterapkan.");
+  }
+  fs.writeFileSync(filename, source.replace(unsafeBootstrap, safeBootstrap));
+  console.log("[AI vendor] TensorFlow.js dipatch agar berjalan tanpa CSP unsafe-eval");
+}
+
 (async () => {
   if (typeof fetch !== "function") throw new Error("Node.js 18+ diperlukan karena build memakai fetch().");
   for (const asset of ASSETS) await ensureAsset(asset);
+  patchTensorflowForStrictCsp();
   console.log("AI vendor siap untuk build: TensorFlow.js + UpscalerJS + ESRGAN Slim 2x.");
 })().catch((error) => {
   console.error(`AI vendor build gagal: ${error.stack || error.message}`);

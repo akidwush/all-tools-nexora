@@ -408,8 +408,9 @@
       var code=String(error&&error.code||"").toLowerCase();
       var category=String(error&&error.category||"").toLowerCase();
       if(error&&error.name==="TypeError")return true;
-      if(["plan","quota","auth","timeout","parameter","provider"].includes(category))return true;
-      return /(?:requires_vip|not_configured|rate_limited|daily_limit|database_not_ready|storage_not_ready|storage_not_configured|storage_failed|timeout|http_401|http_402|http_403|http_5\d\d|quota|balance|credit)/.test(code);
+      if(error&&error.terminal)return true;
+      if(["plan","quota","auth","timeout","parameter","provider","input"].includes(category))return true;
+      return /(?:requires_vip|not_configured|rate_limited|daily_limit|database_not_ready|storage_not_ready|storage_not_configured|storage_failed|timeout|http_401|http_402|http_403|http_5\d\d|quota|balance|credit|task_failed|result_not_upscaled|input|download|url)/.test(code);
     }
 
     function localStrength(){
@@ -429,7 +430,28 @@
       },state.controller&&state.controller.signal);
       if(state.cancelled||state.destroyed){URL.revokeObjectURL(localUrl);return;}
       state.localResultUrl=localUrl;
-      finish({url:localUrl,engine:"local-esrgan",effectiveMultiplier:2,fallbackReason:reason},startedAt);
+      var localInfo=typeof window.NexoraLocalEnhanceInfo==="function"?window.NexoraLocalEnhanceInfo():{};
+      finish({url:localUrl,engine:localInfo.lastEngine==="canvas"?"local-resize":"local-esrgan",effectiveMultiplier:2,fallbackReason:reason},startedAt);
+    }
+
+    function readImageDimensions(url){
+      return new Promise(function(resolve,reject){
+        var image=new Image();
+        image.onload=function(){resolve({width:image.naturalWidth||image.width,height:image.naturalHeight||image.height});};
+        image.onerror=function(){reject(Object.assign(new Error("Hasil Bigjpg tidak dapat dibaca sebagai gambar."),{code:"BIGJPG_RESULT_IMAGE_INVALID",category:"provider",terminal:true}));};
+        image.src=url;
+      });
+    }
+
+    async function validateUpscaledResult(result){
+      if(!result||!result.url)throw Object.assign(new Error("Bigjpg tidak mengembalikan URL hasil."),{code:"BIGJPG_RESULT_URL_MISSING",category:"provider",terminal:true});
+      var dimensions=await readImageDimensions(result.url);
+      if(state.width&&state.height&&(dimensions.width<=state.width||dimensions.height<=state.height)){
+        throw Object.assign(new Error("Hasil Bigjpg tidak lebih besar dari gambar sumber."),{code:"BIGJPG_RESULT_NOT_UPSCALED",category:"provider",terminal:true});
+      }
+      result.width=dimensions.width;
+      result.height=dimensions.height;
+      return result;
     }
 
     async function pollTask(started){
@@ -453,10 +475,11 @@
     }
 
     function finish(result,startedAt){
-      var local=result.engine==="local-esrgan";
+      var localResize=result.engine==="local-resize";
+      var local=result.engine==="local-esrgan"||localResize;
       var multiplier=local?(result.effectiveMultiplier||2):(SCALE_MAP[state.scale]||2);
       var elapsed=((performance.now()-startedAt)/1000).toFixed(1);
-      state.engine=local?"local-esrgan":"bigjpg";
+      state.engine=local?result.engine:"bigjpg";
       state.resultUrl=result.url;
       resultImage.src=result.url;
       resultImage.onload=function(){
@@ -480,12 +503,12 @@
       download.setAttribute("aria-label","Buka dan unduh hasil Big Image");
       download.setAttribute("download",safeFileBase(state.file&&state.file.name||"big-image")+"-"+multiplier+"x."+(local?"png":"jpg"));
       root.querySelector("#nbiMetricOutput").textContent=state.width&&state.height?(state.width*multiplier)+" × "+(state.height*multiplier):"Loading…";
-      root.querySelector("#nbiMetricScale").textContent=local?"2× ESRGAN · "+elapsed+" s":multiplier+"× Bigjpg · "+elapsed+" s";
-      metricEngine.textContent=local?"LOCAL ESRGAN":"BIGJPG AI";
-      root.querySelector("#nbiMetricMode").textContent=local?"WEBGL · "+(state.style==="art"?"Illustration":"Photo"):(state.style==="art"?"Illustration":"Photo");
+      root.querySelector("#nbiMetricScale").textContent=local?(localResize?"2× exact resize · ":"2× ESRGAN · ")+elapsed+" s":multiplier+"× Bigjpg · "+elapsed+" s";
+      metricEngine.textContent=local?(localResize?"LOCAL RESIZE":"LOCAL ESRGAN"):"BIGJPG AI";
+      root.querySelector("#nbiMetricMode").textContent=local?(localResize?"CANVAS · HIGH QUALITY":"WEBGL · "+(state.style==="art"?"Illustration":"Photo")):(state.style==="art"?"Illustration":"Photo");
       resultStatus.className="nbi-result-status is-success";
-      resultStatus.textContent=local?"AI READY":"UPSCALE READY";
-      setProgress(100,local?"Selesai · ESRGAN Slim WebGL exact 2×":"Big Image selesai melalui Bigjpg","ready");
+      resultStatus.textContent=local?(localResize?"2× READY":"AI READY"):"UPSCALE READY";
+      setProgress(100,local?(localResize?"Selesai · fallback resize exact 2×":"Selesai · ESRGAN Slim WebGL exact 2×"):"Big Image selesai melalui Bigjpg","ready");
       if(!local){
         engine.className="nbi-engine is-ready";
         engine.innerHTML="<i class='fa-solid fa-cloud'></i><span>BIGJPG TASK OK</span>";
@@ -493,7 +516,7 @@
       }
       setBusy(false);
       runButton.querySelector("span").innerHTML="<i class='fa-solid fa-rotate'></i> UPSCALE AGAIN";
-      notify(local?"ESRGAN lokal selesai exact 2× · "+(result.fallbackReason||"mode Local AI"):"Upscale Bigjpg selesai. Geser pembanding untuk melihat detail.","is-success");
+      notify(local?(localResize?"Resize lokal selesai exact 2×.":"ESRGAN lokal selesai exact 2× · "+(result.fallbackReason||"mode Local AI")):"Upscale Bigjpg selesai. Geser pembanding untuk melihat detail.","is-success");
       if(matchMedia("(max-width:720px)").matches)root.querySelector(".nbi-preview-card").scrollIntoView({behavior:"smooth",block:"start"});
     }
 
@@ -528,7 +551,11 @@
         if(state.cancelled)return;
         setProgress(36,"Task Bigjpg dibuat; menunggu AI upscaler","submit");
         var result=await pollTask(started);
-        if(!state.cancelled)finish(result,startedAt);
+        if(!state.cancelled){
+          setProgress(95,"Memverifikasi dimensi hasil Bigjpg","upscale");
+          result=await validateUpscaledResult(result);
+          finish(result,startedAt);
+        }
       }catch(error){
         if(state.cancelled||error&&error.code==="BIGJPG_CANCELLED")return;
         if(shouldFallbackLocally(error)){

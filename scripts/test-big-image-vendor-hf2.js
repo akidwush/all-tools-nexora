@@ -12,7 +12,7 @@ const prepare = read("scripts/prepare-ai-vendor.js");
 const pkg = JSON.parse(read("package.json"));
 
 for (const token of [
-  "revision: '6318-hf2'",
+  "revision: '6318-hf19-big-image2'",
   "tensorflowFallback",
   "upscalerFallback",
   "modelFallback",
@@ -35,5 +35,8 @@ for (const token of [
   "weightsManifest",
   "Node.js 18+",
 ]) assert.ok(prepare.includes(token), `Build vendor recovery kehilangan ${token}`);
+assert.ok(prepare.includes("patchTensorflowForStrictCsp"));
+assert.ok(prepare.includes("globalThis.regeneratorRuntime=t"));
+assert.doesNotMatch(read("assets/vendor/tfjs/tf.min.js"), /Function\("r","regeneratorRuntime = r"\)/);
 
 console.log("Big Image hf2 lulus: vendor AI diprovisi saat Vercel prebuild dan runtime ESRGAN tetap dimuat oleh cache-bust terbaru.");

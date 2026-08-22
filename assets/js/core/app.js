@@ -934,13 +934,15 @@ const NX_LOCAL_ESRGAN_ASSETS = Object.freeze({
     upscalerFallback: 'https://cdn.jsdelivr.net/npm/upscaler@1.0.0/dist/browser/umd/upscaler.min.js',
     model: '/assets/vendor/esrgan-slim/x2/model.json',
     modelFallback: 'https://cdn.jsdelivr.net/npm/@upscalerjs/esrgan-slim@1.0.0-beta.10/models/x2/model.json',
-    revision: '6318-hf2'
+    revision: '6318-hf19-big-image2'
 });
 
 let nxEsrganReadyPromise = null;
 let nxEsrganInstance = null;
 let nxEsrganVendorSource = 'pending';
 let nxEsrganModelSource = 'pending';
+let nxEsrganLastEngine = 'pending';
+let nxEsrganLastError = '';
 
 function nxVendorRequestUrl(src) {
     if (!src || !src.startsWith('/')) return src;
@@ -1057,9 +1059,10 @@ async function nxEnsureLocalEsrgan() {
         nxEsrganInstance = new window.Upscaler({
             model: {
                 scale: 2,
+                modelType: 'layers',
                 path: modelPath,
-                preprocess: input => window.tf.tidy(() => window.tf.mul(input, 1 / 255)),
-                postprocess: output => window.tf.tidy(() => output.clipByValue(0, 255))
+                inputRange: [0, 255],
+                outputRange: [0, 255]
             }
         });
         return nxEsrganInstance;
@@ -1072,21 +1075,33 @@ async function nxEnsureLocalEsrgan() {
 }
 
 async function nxObjectUrlFromDataUrl(dataUrl) {
-    const response = await fetch(dataUrl);
-    if (!response.ok) throw new Error('Hasil ESRGAN tidak dapat dibaca.');
-    const blob = await response.blob();
+    const match = /^data:([^;,]+)?(;base64)?,([\s\S]*)$/.exec(String(dataUrl || ''));
+    if (!match) throw new Error('Hasil ESRGAN tidak dapat dibaca.');
+    const mime = match[1] || 'image/png';
+    const raw = match[2] ? atob(match[3]) : decodeURIComponent(match[3]);
+    const bytes = new Uint8Array(raw.length);
+    for (let index = 0; index < raw.length; index++) bytes[index] = raw.charCodeAt(index);
+    const blob = new Blob([bytes], { type: mime });
     if (!blob || blob.size < 32) throw new Error('Hasil ESRGAN kosong.');
     return URL.createObjectURL(blob);
+}
+
+function nxLoadImageFromUrl(url) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error('Hasil ESRGAN tidak dapat dibuka.'));
+        img.src = url;
+    });
 }
 
 async function nxNormalizeExact2x(resultUrl, sourceWidth, sourceHeight) {
     const expectedWidth = Math.max(1, sourceWidth * 2);
     const expectedHeight = Math.max(1, sourceHeight * 2);
-    const loaded = await nxLoadImageFromBlob(await (await fetch(resultUrl)).blob());
-    const resultWidth = loaded.img.naturalWidth || loaded.img.width;
-    const resultHeight = loaded.img.naturalHeight || loaded.img.height;
+    const resultImage = await nxLoadImageFromUrl(resultUrl);
+    const resultWidth = resultImage.naturalWidth || resultImage.width;
+    const resultHeight = resultImage.naturalHeight || resultImage.height;
     if (resultWidth === expectedWidth && resultHeight === expectedHeight) {
-        URL.revokeObjectURL(loaded.url);
         return resultUrl;
     }
     const canvas = document.createElement('canvas');
@@ -1095,9 +1110,20 @@ async function nxNormalizeExact2x(resultUrl, sourceWidth, sourceHeight) {
     const ctx = canvas.getContext('2d');
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(loaded.img, 0, 0, expectedWidth, expectedHeight);
-    URL.revokeObjectURL(loaded.url);
+    ctx.drawImage(resultImage, 0, 0, expectedWidth, expectedHeight);
     URL.revokeObjectURL(resultUrl);
+    return nxCanvasToUrl(canvas);
+}
+
+function nxCanvasUpscaleExact2x(img, sourceWidth, sourceHeight) {
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, sourceWidth * 2);
+    canvas.height = Math.max(1, sourceHeight * 2);
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw Object.assign(new Error('Canvas 2D tidak tersedia untuk fallback resize.'), { code: 'LOCAL_CANVAS_UNAVAILABLE' });
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     return nxCanvasToUrl(canvas);
 }
 
@@ -1115,25 +1141,37 @@ async function nxLocalEnhance(file, imageUrl, strength = 55, onProgress, signal)
     const patchSize = profile.lowPower ? 32 : (profile.mobileLike ? 48 : 64);
     const padding = 4;
     try {
-        const upscaler = await nxEnsureLocalEsrgan();
-        const dataUrl = await upscaler.upscale(img, {
-            output: 'base64',
-            patchSize,
-            padding,
-            awaitNextFrame: true,
-            signal,
-            progress: value => {
-                if (typeof onProgress !== 'function') return;
-                const raw = Number(value) || 0;
-                const percent = raw <= 1 ? raw * 100 : raw;
-                onProgress(Math.max(0, Math.min(100, percent)));
+        try {
+            const upscaler = await nxEnsureLocalEsrgan();
+            const dataUrl = await upscaler.upscale(img, {
+                output: 'base64',
+                patchSize,
+                padding,
+                awaitNextFrame: true,
+                signal,
+                progress: value => {
+                    if (typeof onProgress !== 'function') return;
+                    const raw = Number(value) || 0;
+                    const percent = raw <= 1 ? raw * 100 : raw;
+                    onProgress(Math.max(0, Math.min(100, percent)));
+                }
+            });
+            if (typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/')) {
+                throw Object.assign(new Error('ESRGAN mengembalikan hasil yang tidak valid.'), { code: 'LOCAL_ESRGAN_EMPTY_RESULT' });
             }
-        });
-        if (typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/')) {
-            throw Object.assign(new Error('ESRGAN mengembalikan hasil yang tidak valid.'), { code: 'LOCAL_ESRGAN_EMPTY_RESULT' });
+            const objectUrl = await nxObjectUrlFromDataUrl(dataUrl);
+            const normalizedUrl = await nxNormalizeExact2x(objectUrl, sw, sh);
+            nxEsrganLastEngine = 'esrgan';
+            nxEsrganLastError = '';
+            return normalizedUrl;
+        } catch (error) {
+            if ((signal && signal.aborted) || (error && error.name === 'AbortError')) throw error;
+            nxEsrganLastEngine = 'canvas';
+            nxEsrganLastError = String(error && (error.code || error.message) || 'LOCAL_ESRGAN_FAILED');
+            console.warn('[Big Image] ESRGAN tidak tersedia, memakai resize 2x:', nxEsrganLastError);
+            if (typeof onProgress === 'function') onProgress(100);
+            return await nxCanvasUpscaleExact2x(img, sw, sh);
         }
-        const objectUrl = await nxObjectUrlFromDataUrl(dataUrl);
-        return await nxNormalizeExact2x(objectUrl, sw, sh);
     } finally {
         URL.revokeObjectURL(loaded.url);
     }
@@ -1148,6 +1186,8 @@ window.NexoraLocalEnhanceInfo = () => ({
     tiled: true,
     vendorSource: nxEsrganVendorSource,
     modelSource: nxEsrganModelSource,
+    lastEngine: nxEsrganLastEngine,
+    lastError: nxEsrganLastError,
     runtimeRevision: NX_LOCAL_ESRGAN_ASSETS.revision
 });
 

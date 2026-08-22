@@ -35,8 +35,11 @@ for (const token of [
   'button.dataset.scale!=="1"',
   "LOCAL ESRGAN 2×",
   "LOCAL ESRGAN",
-  'engine:"local-esrgan"'
+  '"local-esrgan"'
 ]) assert.ok(ui.includes(token), `UI fallback kehilangan ${token}`);
+for (const token of ["validateUpscaledResult", "BIGJPG_RESULT_NOT_UPSCALED", '"local-resize"', "LOCAL RESIZE"]) {
+  assert.ok(ui.includes(token), `Regresi hasil/fallback Big Image kehilangan ${token}`);
+}
 assert.doesNotMatch(ui, /BIGJPG READY/);
 assert.doesNotMatch(ui, /BIGJPG_API_KEY/);
 

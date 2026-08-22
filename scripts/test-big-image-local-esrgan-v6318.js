@@ -30,8 +30,14 @@ for (const token of [
 ]) assert.ok(app.includes(token), `Local ESRGAN runtime kehilangan ${token}`);
 assert.ok(app.includes("padding = 4"));
 assert.ok(app.includes("profile.lowPower ? 32 : (profile.mobileLike ? 48 : 64)"));
-assert.ok(app.includes("preprocess: input => window.tf.tidy"));
-assert.ok(app.includes("postprocess: output => window.tf.tidy"));
+assert.ok(app.includes("modelType: 'layers'"));
+assert.ok(app.includes("inputRange: [0, 255]"));
+assert.ok(app.includes("outputRange: [0, 255]"));
+assert.doesNotMatch(app, /window\.tf\.mul\(input,\s*1\s*\/\s*255\)/);
+assert.ok(app.includes("nxCanvasUpscaleExact2x"));
+assert.ok(app.includes("lastEngine: nxEsrganLastEngine"));
+assert.ok(app.includes("new Blob([bytes], { type: mime })"));
+assert.doesNotMatch(app, /fetch\(dataUrl\)/);
 assert.doesNotMatch(app.slice(app.indexOf("async function nxLocalEnhance"), app.indexOf("window.NexoraLocalEnhanceInfo")), /maxSide\s*=/);
 
 for (const token of ["LOCAL ESRGAN", "WEBGL", "exact 2×", "Local AI", "ESRGAN memproses tile"]) {
