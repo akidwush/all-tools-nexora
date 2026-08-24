@@ -1625,7 +1625,7 @@ let toolsData = {
         { id: 'quotegenerator', icon: 'fa-solid fa-quote-left', name: 'Quote Generator', desc: 'Buat gambar quote monokrom', badge: 'JPG' },
         { id: 'carifakta', icon: 'fa-solid fa-magnifying-glass-chart', name: 'CariFakta', desc: 'Analisis klaim dan berita menggunakan AI', badge: 'AI' },
 { id: 'virusscan', icon: 'fa-solid fa-shield-virus', name: 'Virus Scan', desc: 'Scan URL, file, hash, domain & IP', badge: 'SECURITY' },
-        { id: 'cryptomarket', icon: 'fa-solid fa-chart-line', name: 'Crypto Market Scanner', desc: 'Pantau harga, volume, market cap dan pergerakan crypto', badge: 'LIVE' },
+        { id: 'cryptomarket', icon: 'fa-solid fa-chart-line', name: 'Crypto Market Scanner', desc: 'Analisis candle 15m, 1 jam, mikro, makro, indikator dan risiko crypto', badge: 'MTF LIVE' },
         { id: 'webintel', icon: 'fa-solid fa-satellite-dish', name: 'Nexora Web Intelligence', desc: 'Audit SEO, security, performa, aksesibilitas dan teknologi website', badge: 'INTEL' },
         { id: 'ipintel', icon: 'fa-solid fa-network-wired', name: 'IP & ASN Intelligence', desc: 'Lookup IPv4/IPv6, ASN, organisasi, negara dan benua via IPinfo Lite', badge: 'IPINFO' },
         { id: 'bmkg', icon: 'fa-solid fa-cloud-sun-rain', name: 'BMKG Indonesia', desc: 'Gempa terkini, prakiraan cuaca 3 hari dan peringatan dini cuaca dari BMKG', badge: 'BMKG' },
