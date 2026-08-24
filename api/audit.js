@@ -1,5 +1,6 @@
 const { auditBatch } = require("../lib/audit");
 const { handleWebIntelligence } = require("../lib/web-intelligence");
+const { authorizeTool } = require("../lib/account-membership");
 const { takeFixedWindow } = require("../lib/memory-store");
 
 const MAX_BODY_BYTES = 220_000;
@@ -46,6 +47,8 @@ async function readBody(request) {
 module.exports = async function handler(request, response) {
   const requestUrl = new URL(request.url || "/api/audit", "http://localhost");
   if (requestUrl.searchParams.get("mode") === "web-intelligence") {
+    const healthOnly = request.method === "GET" && requestUrl.searchParams.get("health") === "1";
+    if (!healthOnly && !(await authorizeTool(request, response, "webintel"))) return;
     return handleWebIntelligence(request, response, requestUrl);
   }
   if (request.method === "OPTIONS") {
@@ -57,6 +60,8 @@ module.exports = async function handler(request, response) {
     response.setHeader("Allow", "POST, OPTIONS");
     return send(response, 405, { ok: false, error: "METHOD_NOT_ALLOWED" });
   }
+
+  if (!(await authorizeTool(request, response, "getcode"))) return;
 
   const limit = rateLimit(request);
   response.setHeader("X-RateLimit-Limit", String(MAX_REQUESTS_PER_WINDOW));

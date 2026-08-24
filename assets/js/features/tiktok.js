@@ -42,6 +42,7 @@
     params.set('url',choice.url);
     params.set('filename',choice.filename || ('tiktok_media.'+guessExt(choice.type)));
     params.set('type',choice.type || 'MP4');
+    params.set('tool','tiktok');
     if(probe) params.set('probe','1');
     return '/api/media-download?'+params.toString();
   }

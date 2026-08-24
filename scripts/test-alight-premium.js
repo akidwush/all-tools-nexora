@@ -18,16 +18,16 @@ const proxy = read("lib/alight-premium-proxy.js");
 
 const magicSource = "/api/alight-premium/magic-link";
 const applySource = "/api/alight-premium/apply-premium";
-const magicDest = "https://api.kyzznekoo.my.id/api/alightmotion/v1/magic-link";
-const applyDest = "https://api.kyzznekoo.my.id/api/alightmotion/v1/applyPremium";
+const magicDest = "/api/tool-health?mode=alight-premium&action=magic-link";
+const applyDest = "/api/tool-health?mode=alight-premium&action=apply-premium";
 
 assert.equal(manifest.tools.alightpremium, "alight-premium");
 assert.ok(manifest.modules["alight-premium"].js.includes("assets/js/features/alight-premium.js"));
 assert.ok(manifest.modules["alight-premium"].css.includes("assets/css/features/alight-premium.css"));
 
 for (const route of ["/api/alight-premium", magicSource, applySource]) assert.ok(routes.apiRoutes.includes(route), `${route} harus ada di route-manifest`);
-assert.ok(vercel.rewrites.some((row) => row.source === magicSource && row.destination === magicDest), "magic-link harus external rewrite");
-assert.ok(vercel.rewrites.some((row) => row.source === applySource && row.destination === applyDest), "applyPremium harus external rewrite");
+assert.ok(vercel.rewrites.some((row) => row.source === magicSource && row.destination === magicDest), "magic-link harus melewati protected server route");
+assert.ok(vercel.rewrites.some((row) => row.source === applySource && row.destination === applyDest), "applyPremium harus melewati protected server route");
 assert.ok(vercel.rewrites.some((row) => row.source === "/api/alight-premium" && /mode=alight-premium/.test(row.destination)), "health route Alight harus tetap tersedia");
 
 assert.ok(ui.includes("var MAGIC_ROUTE='/api/alight-premium/magic-link'"));
@@ -56,4 +56,5 @@ assert.ok(shell.includes("alightpremium:{renderer:'renderAlightPremium'"));
 assert.ok(app.includes("id: 'alightpremium'"));
 assert.ok(app.includes("case 'alightpremium': renderAlightPremium(body); break;"));
 
-console.log("Alight Motion Premium edge-rewrite tests lulus: browser GET same-origin, Vercel external rewrite ke dua endpoint provider, tanpa CORS/browser direct dan tanpa Node serverless pada production flow.");
+assert.ok(proxy.includes('productionTransport: "protected-server-route"'));
+console.log("Alight Motion Premium protected-route tests lulus: browser tetap same-origin dan seluruh action melewati backend membership Nexora.");

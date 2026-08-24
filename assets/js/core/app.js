@@ -128,8 +128,10 @@ async function getUserInfo() {
                     showCountry(result.name, result.code, provider.name);
                     return true;
                 }
-            } catch (e) {
-                console.warn('[Nexus Country] ' + provider.name + ' gagal:', e && e.message ? e.message : e);
+            } catch (_) {
+                // Provider geolokasi publik dapat membatasi request (429) atau
+                // diblokir oleh privacy tools. Lanjutkan ke provider berikutnya;
+                // fallback perangkat di bawah tetap menampilkan negara.
             }
         }
 
@@ -2443,11 +2445,12 @@ function nxTriggerDownload(url, filename, markHistory, openInNewTab) {
     setTimeout(() => { try { a.remove(); } catch (_) {} }, 1000);
 }
 
-function nxMediaDownloadEndpoint(url, filename, type, probe) {
+function nxMediaDownloadEndpoint(url, filename, type, probe, tool) {
     const params = new URLSearchParams();
     params.set('url', url);
     params.set('filename', filename);
     params.set('type', type);
+    params.set('tool', String(tool || '').toLowerCase());
     if (probe) params.set('probe', '1');
     return '/api/media-download?' + params.toString();
 }
@@ -2465,8 +2468,8 @@ async function nxDownloadUrl(url, filename, meta) {
         return true;
     }
 
-    const probeUrl = nxMediaDownloadEndpoint(url, cleanName, declaredType, true);
-    const streamUrl = nxMediaDownloadEndpoint(url, cleanName, declaredType, false);
+    const probeUrl = nxMediaDownloadEndpoint(url, cleanName, declaredType, true, tool);
+    const streamUrl = nxMediaDownloadEndpoint(url, cleanName, declaredType, false, tool);
     const request = window.NexoraFetch || window.fetch.bind(window);
     const response = await request(probeUrl, {
         cache: 'no-store',

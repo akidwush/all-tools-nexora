@@ -2,6 +2,7 @@ const { databaseRequest } = require("../../lib/database");
 const { publicSession, requireAdmin, verifyMutationRequest } = require("../../lib/admin-auth");
 const { recordAdminAudit } = require("../../lib/admin-audit");
 const { TOOL_CATALOG, normalizeCachedRows, summarizeHealth } = require("../../lib/tool-health");
+const RETIRED_TOOL_IDS = new Set(["bigimage"]);
 const handleAdminPersonalAi = require("../../lib/admin-personal-ai-http");
 
 function send(response, status, payload) {
@@ -177,7 +178,9 @@ module.exports = async function handler(request, response) {
     for (const item of feedback) {
       if (Object.hasOwn(feedbackCounts, item.status)) feedbackCounts[item.status] += 1;
     }
-    const toolRows = Array.isArray(tools) ? tools : [];
+    const toolRows = (Array.isArray(tools) ? tools : []).filter((item) => !RETIRED_TOOL_IDS.has(item.id));
+    const storedToolIds = new Set(toolRows.map((item) => item.id));
+    const missingBuiltinTools = TOOL_CATALOG.filter((item) => !storedToolIds.has(item.id)).length;
     const profileRows = Array.isArray(profiles) ? profiles : [];
     const subscriptionRows = Array.isArray(subscriptions) ? subscriptions : [];
     const now = Date.now();
@@ -217,8 +220,8 @@ module.exports = async function handler(request, response) {
           free: Math.max(0, profileRows.length - activeVvip)
         },
         tools: {
-          total: toolRows.length,
-          active: toolRows.filter((tool) => tool.is_active).length,
+          total: toolRows.length + missingBuiltinTools,
+          active: toolRows.filter((tool) => tool.is_active).length + missingBuiltinTools,
           inactive: toolRows.filter((tool) => !tool.is_active).length
         },
         feedback: {

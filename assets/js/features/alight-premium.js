@@ -1,4 +1,4 @@
-/* Nexora Alight Motion Premium — same-origin GET via Vercel external rewrite */
+/* Nexora Alight Motion Premium — same-origin GET via protected server route */
 (function(){
   "use strict";
 
@@ -75,14 +75,14 @@
           <div>
             <span class="nap-kicker">ALIGHT MOTION · PREMIUM WORKSPACE</span>
             <h2>Premium <b>1 Tahun</b></h2>
-            <p>Dua endpoint GET provider diteruskan oleh Vercel Edge tanpa melewati Node serverless proxy.</p>
+            <p>Dua endpoint provider diteruskan oleh gateway Nexora agar akses membership tetap diverifikasi server.</p>
           </div>
-          <div class="nap-health is-ok" id="napHealth"><i class="fa-solid fa-route"></i><span>EDGE GET</span></div>
+          <div class="nap-health is-ok" id="napHealth"><i class="fa-solid fa-shield-halved"></i><span>PROTECTED GET</span></div>
         </section>
 
         <section class="nap-endpoint-note">
           <i class="fa-solid fa-shuffle"></i>
-          <div><strong>Same-Origin Edge Rewrite</strong><span>Browser tetap mengakses domain Nexora; Vercel meneruskan query GET langsung ke provider. Tidak ada API key tambahan, CORS browser, atau timeout buatan proxy Node.</span></div>
+          <div><strong>Same-Origin Protected Gateway</strong><span>Browser tetap mengakses domain Nexora; server memverifikasi akses FREE/VVIP sebelum menghubungi provider.</span></div>
         </section>
 
         <section class="nap-grid">

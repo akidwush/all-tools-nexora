@@ -134,6 +134,13 @@ async function main() {
   assert.equal(rawAnalysis.metrics.imagesWithAlt, 0);
   assert.equal(rawAnalysis.links.unsafeBlank, 1);
 
+  const database = require("../lib/database");
+  const originalDatabaseRequest = database.databaseRequest;
+  database.databaseRequest = async (resource, options) => resource.startsWith("tools?select=access_level")
+    ? [{ access_level: "free" }]
+    : originalDatabaseRequest(resource, options);
+  delete require.cache[require.resolve("../lib/account-membership")];
+  delete require.cache[require.resolve("../api/audit")];
   const handler = require("../api/audit");
   const health = responseCapture();
   await handler({ method: "GET", url: "/api/audit?mode=web-intelligence&health=1", headers: {}, socket: {} }, health.response);
@@ -143,6 +150,7 @@ async function main() {
 
   const invalid = responseCapture();
   await handler({ method: "POST", url: "/api/audit?mode=web-intelligence", headers: { "x-forwarded-for": "203.0.113.77" }, body: { url: "http://127.0.0.1", mode: "standard" }, socket: {} }, invalid.response);
+  database.databaseRequest = originalDatabaseRequest;
   assert.equal(invalid.captured.status, 400);
   assert.match(invalid.captured.payload.error, /PRIVATE_IP_BLOCKED/);
 

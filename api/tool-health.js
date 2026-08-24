@@ -1,5 +1,5 @@
 const crypto = require("node:crypto");
-const { handleMediaDownload } = require("../lib/media-download");
+const { handleMediaDownload, mediaProvider } = require("../lib/media-download");
 const { handleDownloader } = require("../lib/downloader-service");
 const { handleSiteGrabber } = require("../lib/sitegrabber-proxy");
 const { handleCryptoMarket } = require("../lib/crypto-market");
@@ -23,6 +23,48 @@ const {
 
 let activeRun = null;
 let lastPublicRunAt = 0;
+const DOWNLOADER_TOOL_IDS = new Set(["terabox", "instagram", "tiktok", "youtube", "spotify"]);
+
+function protectedToolId(mode, request, url) {
+  if (mode === "downloader") {
+    const provider = String(request.body?.provider || url.searchParams.get("provider") || "").toLowerCase();
+    return DOWNLOADER_TOOL_IDS.has(provider) ? provider : "";
+  }
+  if (mode === "media-download") {
+    let detected = "";
+    try { detected = mediaProvider(new URL(String(url.searchParams.get("url") || "")).hostname); } catch {}
+    const requested = String(url.searchParams.get("tool") || "").toLowerCase();
+    if (["tiktok", "instagram", "terabox"].includes(detected)) return detected;
+    if (detected === "nexray" && ["instagram", "terabox"].includes(requested)) return requested;
+    return "";
+  }
+  return ({
+    sitegrabber: "getcode",
+    "crypto-market": "cryptomarket",
+    "space-explorer": "spaceexplorer",
+    "ocr-intelligence": "ocrintel",
+    "svg-alight": "svgalight",
+    "alight-premium": "alightpremium",
+    "image-vectorizer": "imagevectorizer",
+    "ip-intelligence": "ipintel",
+    "bmkg-open-data": "bmkg"
+  })[mode] || "";
+}
+
+function publicHealthOnly(mode, request, url) {
+  if (request.method !== "GET") return false;
+  if (mode === "alight-premium") return !url.searchParams.get("action");
+  if (mode === "sitegrabber") return String(url.searchParams.get("action") || "health").toLowerCase() === "health";
+  if (mode === "svg-alight") return true;
+  return new Set([
+    "downloader",
+    "space-explorer",
+    "ocr-intelligence",
+    "image-vectorizer",
+    "ip-intelligence",
+    "bmkg-open-data"
+  ]).has(mode) && url.searchParams.get("health") === "1";
+}
 
 function send(response, status, payload) {
   response.setHeader("Cache-Control", "no-store, max-age=0");
@@ -74,13 +116,9 @@ module.exports = async function handler(request, response) {
   const url = new URL(request.url || "/api/tool-health", origin);
   const mode = url.searchParams.get("mode");
   if (mode === "account") return handleAccount(request, response);
-  const protectedModes = {
-    "media-download":"instagram", downloader:"youtube", sitegrabber:"sitegrabber",
-    "crypto-market":"cryptomarket", "space-explorer":"spaceexplorer", "ocr-intelligence":"ocrintel",
-    "svg-alight":"svgalight", "alight-premium":"alightpremium", "image-vectorizer":"imagevectorizer",
-    "ip-intelligence":"ipintel", "bmkg-open-data":"bmkg"
-  };
-  if (protectedModes[mode] && !(await authorizeTool(request, response, protectedModes[mode]))) return;
+  const protectedId = protectedToolId(mode, request, url);
+  const healthOnly = publicHealthOnly(mode, request, url);
+  if (protectedId && !healthOnly && !(await authorizeTool(request, response, protectedId))) return;
   if (url.searchParams.get("mode") === "media-download") {
     return handleMediaDownload(request, response, url);
   }
@@ -194,3 +232,6 @@ module.exports = async function handler(request, response) {
     data: rows
   });
 };
+
+module.exports.protectedToolId = protectedToolId;
+module.exports.publicHealthOnly = publicHealthOnly;

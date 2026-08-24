@@ -56,7 +56,7 @@
   function absolute(url){ return new URL(url, document.baseURI).href; }
   function versioned(url){
     var separator = String(url).indexOf('?')===-1 ? '?' : '&';
-    var version = /svg-alight\.(?:js|css)(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-'+ASSET_PATCH : (/(?:tiktok|download-pack|source-features)\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-hf6-dl4' : ASSET_VERSION);
+    var version = /svg-alight\.(?:js|css)(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-'+ASSET_PATCH : (/alight-premium\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-audit1' : (/tiktok\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-hf6-dl4-audit1' : (/(?:download-pack|source-features)\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-hf6-dl4' : ASSET_VERSION)));
     return String(url)+separator+'v='+encodeURIComponent(version);
   }
 

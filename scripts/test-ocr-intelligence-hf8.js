@@ -116,6 +116,13 @@ async function main() {
 
   const originalKey = process.env.OCR_SPACE_API_KEY;
   delete process.env.OCR_SPACE_API_KEY;
+  const database = require("../lib/database");
+  const originalDatabaseRequest = database.databaseRequest;
+  database.databaseRequest = async (resource, options) => resource.startsWith("tools?select=access_level")
+    ? [{ access_level: "free" }]
+    : originalDatabaseRequest(resource, options);
+  delete require.cache[require.resolve("../lib/account-membership")];
+  delete require.cache[require.resolve("../api/tool-health")];
   try {
     const handler = require("../api/tool-health");
     const health = responseCapture();
@@ -137,6 +144,7 @@ async function main() {
     assert.equal(missingKey.captured.status, 503);
     assert.equal(missingKey.captured.payload.error, "OCR_API_KEY_MISSING");
   } finally {
+    database.databaseRequest = originalDatabaseRequest;
     if (originalKey === undefined) delete process.env.OCR_SPACE_API_KEY; else process.env.OCR_SPACE_API_KEY = originalKey;
   }
 

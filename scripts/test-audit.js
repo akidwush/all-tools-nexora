@@ -142,6 +142,13 @@ async function main() {
   assert.ok(batch.summary.score < 100);
 
 
+  const database = require("../lib/database");
+  const originalDatabaseRequest = database.databaseRequest;
+  database.databaseRequest = async (resource, options) => resource.startsWith("tools?select=access_level")
+    ? [{ access_level: "free" }]
+    : originalDatabaseRequest(resource, options);
+  delete require.cache[require.resolve("../lib/account-membership")];
+  delete require.cache[require.resolve("../api/audit")];
   const auditHandler = require("../api/audit");
   const captured = {};
   const apiResponse = {
@@ -158,6 +165,7 @@ async function main() {
       items: [{ id: "private", type: "asset", kind: "image", url: "http://127.0.0.1/private.png" }]
     }
   }, apiResponse);
+  database.databaseRequest = originalDatabaseRequest;
   assert.equal(captured.status, 200);
   assert.equal(captured.payload.ok, true);
   assert.equal(captured.payload.audit.results[0].state, "blocked");

@@ -124,11 +124,11 @@
     },
     {
       "source": "/api/alight-premium/magic-link",
-      "destination": "https://api.kyzznekoo.my.id/api/alightmotion/v1/magic-link"
+      "destination": "/api/tool-health?mode=alight-premium&action=magic-link"
     },
     {
       "source": "/api/alight-premium/apply-premium",
-      "destination": "https://api.kyzznekoo.my.id/api/alightmotion/v1/applyPremium"
+      "destination": "/api/tool-health?mode=alight-premium&action=apply-premium"
     },
     {
       "source": "/api/alight-premium",

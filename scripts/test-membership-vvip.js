@@ -17,6 +17,8 @@ assert.match(account,/nx_account_csrf/);
 assert.match(account,/expires_at.*Date\.now/);
 assert.match(account,/VVIP_LOGIN_REQUIRED/);
 assert.doesNotMatch(account,/SUPABASE_SERVICE_ROLE_KEY/);
+assert.doesNotMatch(account,/DATABASE_NOT_CONFIGURED"\)return true/);
+assert.match(account,/MEMBERSHIP_UNAVAILABLE/);
 
 const publicUi=read("assets/js/core/account.js");
 assert.match(publicUi,/adopt-session/);
@@ -33,6 +35,13 @@ assert.match(admin,/current>now\?current:now/);
 const toolHealth=read("api/tool-health.js");
 assert.match(toolHealth,/authorizeTool/);
 assert.match(toolHealth,/mode === "account"/);
+assert.match(toolHealth,/function protectedToolId/);
+assert.match(toolHealth,/sitegrabber: "getcode"/);
+assert.match(toolHealth,/request\.body\?\.provider/);
+assert.match(read("api/audit.js"),/authorizeTool\(request, response, "webintel"\)/);
+assert.match(read("api/audit.js"),/authorizeTool\(request, response, "getcode"\)/);
+assert.match(read("api/health.js"),/authorizeTool\(request, response, "vdeploy"\)/);
+assert.match(read("assets/js/core/app.js"),/params\.set\('tool'/);
 assert.match(read("vercel.json"),/\/api\/account/);
 assert.match(read("route-manifest.json"),/\/api\/account/);
 

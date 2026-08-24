@@ -5,6 +5,7 @@ const { TOOL_CATALOG } = require("../../lib/tool-health");
 
 const ALLOWED_CATEGORIES = new Set(["downloader", "maker", "tools", "vault", "external"]);
 const BUILTIN_TOOL_IDS = new Set(TOOL_CATALOG.map((item) => item.id));
+const RETIRED_TOOL_IDS = new Set(["bigimage"]);
 const TOOL_SELECT = "id,name,description,category,badge,icon,external_url,is_active,access_level,sort_order,metadata,created_at,updated_at";
 
 function send(response, status, payload) {
@@ -76,7 +77,7 @@ async function ensureBuiltinCatalogRows(rows) {
   await databaseRequest("tools?on_conflict=id", {
     method: "POST",
     headers: { Prefer: "resolution=ignore-duplicates,return=minimal" },
-    body: JSON.stringify(missing.map((item, index) => builtinSeed(item, index)))
+    body: JSON.stringify(missing.map((item) => builtinSeed(item, TOOL_CATALOG.findIndex((row) => row.id === item.id))))
   });
   return databaseRequest(`tools?select=${TOOL_SELECT}&order=sort_order.asc,name.asc`, { method: "GET" });
 }
@@ -147,12 +148,12 @@ async function updateMember(body,request,session){
   const userId=clean(body.userId,80),action=clean(body.action,24).toLowerCase();if(!/^[0-9a-f-]{36}$/i.test(userId))return {status:400,payload:{ok:false,error:"INVALID_USER"}};
   const profiles=await databaseRequest(`profiles?select=id,email,display_name,role,account_status&id=eq.${encodeURIComponent(userId)}&limit=1`,{method:"GET"});const profile=profiles?.[0];if(!profile)return {status:404,payload:{ok:false,error:"MEMBER_NOT_FOUND"}};if(profile.role==="admin")return {status:409,payload:{ok:false,error:"ADMIN_MEMBER_PROTECTED",message:"Membership admin tidak dapat diubah dari panel member."}};
   const now=new Date(),before=(await databaseRequest(`subscriptions?select=*&user_id=eq.${encodeURIComponent(userId)}&limit=1`,{method:"GET"}))?.[0]||null;let profilePatch=null,subPatch=null;
-  if(["activate","extend"].includes(action)){const days=Math.max(1,Math.min(3650,Number(body.days)||30)),current=before?.expires_at?new Date(before.expires_at):null,base=current&&current>now?current:now,custom=body.expiresAt?new Date(body.expiresAt):null,expires=custom&&!Number.isNaN(custom.getTime())&&custom>now?custom:new Date(base.getTime()+days*86400000);subPatch={plan:"vvip",status:"active",started_at:before?.started_at||now.toISOString(),expires_at:expires.toISOString()};profilePatch={role:"vvip",account_status:"active"};}
+  if(["activate","extend"].includes(action)){const days=Math.max(1,Math.min(3650,Number(body.days)||30)),current=before?.expires_at?new Date(before.expires_at):null,base=current&&current>now?current:now,custom=body.expiresAt?new Date(body.expiresAt):null;if(body.expiresAt&&(!custom||Number.isNaN(custom.getTime())||custom<=now))return {status:400,payload:{ok:false,error:"INVALID_EXPIRY_DATE",message:"Tanggal berakhir VVIP harus valid dan berada di masa depan."}};const expires=custom||new Date(base.getTime()+days*86400000);subPatch={plan:"vvip",status:"active",started_at:before?.started_at||now.toISOString(),expires_at:expires.toISOString()};profilePatch={role:"vvip",account_status:"active"};}
   else if(action==="revoke"){subPatch={plan:"free",status:"revoked",expires_at:now.toISOString()};profilePatch={role:"free",account_status:"active"};}
   else if(action==="suspend"){subPatch={status:"suspended"};profilePatch={account_status:"suspended"};}
   else if(action==="restore"){const active=before?.plan==="vvip"&&before?.expires_at&&new Date(before.expires_at)>now;subPatch={status:active?"active":"expired"};profilePatch={account_status:"active",role:active?"vvip":"free"};}
   else return {status:400,payload:{ok:false,error:"INVALID_MEMBER_ACTION"}};
-  await databaseRequest(`profiles?id=eq.${encodeURIComponent(userId)}`,{method:"PATCH",headers:{Prefer:"return=minimal"},body:JSON.stringify(profilePatch)});await databaseRequest(`subscriptions?user_id=eq.${encodeURIComponent(userId)}`,{method:"PATCH",headers:{Prefer:"return=minimal"},body:JSON.stringify(subPatch)});
+  await databaseRequest(`profiles?id=eq.${encodeURIComponent(userId)}`,{method:"PATCH",headers:{Prefer:"return=minimal"},body:JSON.stringify(profilePatch)});await databaseRequest("subscriptions?on_conflict=user_id",{method:"POST",headers:{Prefer:"resolution=merge-duplicates,return=minimal"},body:JSON.stringify({user_id:userId,...subPatch})});
   const after=(await databaseRequest(`subscriptions?select=*&user_id=eq.${encodeURIComponent(userId)}&limit=1`,{method:"GET"}))?.[0]||null;await recordAdminAudit({request,session,action:`membership.${action}`,entityType:"membership",entityId:userId,summary:`Membership ${profile.email||userId}: ${action}`,before,after});return {status:200,payload:{ok:true,data:{userId,profile:{...profile,...profilePatch},subscription:after}}};
 }
 
@@ -178,7 +179,7 @@ module.exports = async function handler(request, response) {
       await requireAdmin(request, response);
       let rows = await databaseRequest(`tools?select=${TOOL_SELECT}&order=sort_order.asc,name.asc`, { method: "GET" });
       rows = await ensureBuiltinCatalogRows(rows);
-      return send(response, 200, { ok: true, data: (Array.isArray(rows) ? rows : []).map(responseShape) });
+      return send(response, 200, { ok: true, data: (Array.isArray(rows) ? rows : []).filter((item) => !RETIRED_TOOL_IDS.has(item.id)).map(responseShape) });
     }
 
     if (!["POST", "PATCH", "DELETE"].includes(request.method)) {

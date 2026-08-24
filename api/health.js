@@ -3,6 +3,7 @@ const publicDatabaseHandler = require("../lib/public-database");
 const { getDatabaseConfig, pingDatabase } = require("../lib/database");
 const { readCachedToolHealth, normalizeCachedRows, summarizeHealth } = require("../lib/tool-health");
 const handlePersonalAi = require("../lib/personal-ai-http");
+const { authorizeTool } = require("../lib/account-membership");
 
 function send(response, status, payload, headOnly) {
   response.setHeader("Cache-Control", "no-store, max-age=0");
@@ -19,6 +20,7 @@ module.exports = async function handler(request, response) {
     return publicDatabaseHandler(request, response);
   }
   if (requestUrl.searchParams.get("mode") === "vdeploy") {
+    if (!(await authorizeTool(request, response, "vdeploy"))) return;
     return handleVDeploy(request, response);
   }
   if (request.method !== "GET" && request.method !== "HEAD") {
