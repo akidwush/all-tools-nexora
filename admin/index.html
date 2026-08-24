@@ -13,29 +13,23 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <link href="../assets/css/admin.css?v=6.3.18-hf12-no-login-loader" rel="stylesheet">
+  <link href="../assets/css/admin-redesign.css?v=6.3.18-admin-redesign1" rel="stylesheet">
   <link href="../assets/css/admin-ai.css?v=6.3.18-ai1" rel="stylesheet">
   <link href="../assets/css/visual-qa.css?v=6.3.18" rel="stylesheet">
 </head>
 <body class="admin-dashboard-page">
   <div class="admin-app" id="adminApp" hidden>
-    <aside class="admin-sidebar">
-      <a class="admin-logo" href="/admin">
+    <div class="admin-drawer-backdrop" id="adminDrawerBackdrop" hidden></div>
+    <aside class="admin-sidebar" id="adminSidebar" aria-label="Navigasi utama admin">
+      <div class="admin-brand-row"><a class="admin-logo" href="/admin">
         <span><i class="fa-solid fa-bolt"></i></span>
-        <div><b>NEXORA</b><small>CONTROL PANEL 6.2</small></div>
-      </a>
+        <div><b>NEXORA</b><small>ADMIN WORKSPACE</small></div>
+      </a><button class="sidebar-collapse" id="sidebarCollapse" type="button" aria-label="Ciutkan sidebar" title="Ciutkan sidebar"><i class="fa-solid fa-angles-left"></i></button><button class="drawer-close" id="adminDrawerClose" type="button" aria-label="Tutup menu"><i class="fa-solid fa-xmark"></i></button></div>
       <nav class="admin-nav" aria-label="Navigasi admin">
-        <button class="admin-nav-item is-active" data-section="overview" type="button"><i class="fa-solid fa-grid-2"></i><span>Ringkasan</span></button>
-        <button class="admin-nav-item" data-section="tools" type="button"><i class="fa-solid fa-screwdriver-wrench"></i><span>Tools</span></button>
-        <button class="admin-nav-item" data-section="members" type="button"><i class="fa-solid fa-crown"></i><span>Membership</span></button>
-        <button class="admin-nav-item" data-section="ai" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Personal AI</span></button>
-        <button class="admin-nav-item" data-section="socials" type="button"><i class="fa-solid fa-share-nodes"></i><span>Sosial Media</span></button>
-        <button class="admin-nav-item" data-section="developer" type="button"><i class="fa-solid fa-user-astronaut"></i><span>About Developer</span></button>
-        <button class="admin-nav-item" data-section="analytics" type="button"><i class="fa-solid fa-chart-line"></i><span>Analytics</span></button>
-        <button class="admin-nav-item" data-section="feedback" type="button"><i class="fa-regular fa-message"></i><span>Feedback</span></button>
-        <button class="admin-nav-item" data-section="health" type="button"><i class="fa-solid fa-heart-pulse"></i><span>Health</span></button>
-        <button class="admin-nav-item" data-section="functional" type="button"><i class="fa-solid fa-list-check"></i><span>Functional Audit</span></button>
-        <button class="admin-nav-item" data-section="visual" type="button"><i class="fa-solid fa-camera-retro"></i><span>Visual QA</span></button>
-        <button class="admin-nav-item" data-section="audit" type="button"><i class="fa-solid fa-clock-rotate-left"></i><span>Audit Log</span></button>
+        <div class="admin-nav-group"><span class="admin-nav-label">Overview</span><button class="admin-nav-item is-active" data-section="overview" type="button"><i class="fa-solid fa-house"></i><span>Dashboard</span></button></div>
+        <div class="admin-nav-group"><span class="admin-nav-label">Users</span><button class="admin-nav-item" data-section="members" type="button"><i class="fa-solid fa-users"></i><span>Users &amp; VVIP</span></button></div>
+        <div class="admin-nav-group"><span class="admin-nav-label">Content</span><button class="admin-nav-item" data-section="tools" type="button"><i class="fa-solid fa-toolbox"></i><span>Tools</span></button><button class="admin-nav-item" data-section="socials" type="button"><i class="fa-solid fa-link"></i><span>Links &amp; WhatsApp</span></button><button class="admin-nav-item" data-section="developer" type="button"><i class="fa-solid fa-user-pen"></i><span>About Developer</span></button></div>
+        <div class="admin-nav-group"><span class="admin-nav-label">System</span><button class="admin-nav-item" data-section="ai" type="button"><i class="fa-solid fa-microchip"></i><span>AI Settings</span></button><button class="admin-nav-item" data-section="analytics" type="button"><i class="fa-solid fa-chart-simple"></i><span>Analytics</span></button><button class="admin-nav-item" data-section="feedback" type="button"><i class="fa-solid fa-inbox"></i><span>Reports</span></button><button class="admin-nav-item" data-section="health" type="button"><i class="fa-solid fa-heart-pulse"></i><span>System Health</span></button><button class="admin-nav-item" data-section="functional" type="button"><i class="fa-solid fa-list-check"></i><span>Functional Audit</span></button><button class="admin-nav-item" data-section="visual" type="button"><i class="fa-solid fa-display"></i><span>Visual QA</span></button><button class="admin-nav-item" data-section="audit" type="button"><i class="fa-solid fa-clock-rotate-left"></i><span>Audit Log</span></button></div>
       </nav>
       <div class="sidebar-bottom">
         <a href="/" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Lihat website</a>
@@ -45,19 +39,20 @@
 
     <div class="admin-main">
       <header class="admin-topbar">
-        <div>
+        <button class="admin-menu-button" id="adminMenuButton" type="button" aria-label="Buka navigasi" aria-controls="adminSidebar" aria-expanded="false"><i class="fa-solid fa-bars"></i></button><div class="admin-page-title">
           <p class="eyebrow">ADMINISTRATION</p>
           <h1 id="pageHeading">Ringkasan Sistem</h1>
         </div>
-        <div class="admin-user-chip">
+        <div class="admin-header-actions"><a class="admin-website-link" href="/" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i><span>Website</span></a><button class="admin-user-chip" id="adminAccountButton" type="button" aria-haspopup="menu" aria-expanded="false">
           <span class="admin-avatar" id="adminAvatar">A</span>
-          <div><b id="adminName">Admin</b><small id="adminRole">admin</small></div>
-        </div>
+          <span><b id="adminName">Admin</b><small id="adminRole">admin</small></span><i class="fa-solid fa-chevron-down"></i>
+        </button><div class="admin-account-menu" id="adminAccountMenu" role="menu" hidden><div><b id="adminMenuName">Admin</b><small id="adminMenuRole">admin</small></div><a href="/" target="_blank" rel="noopener" role="menuitem"><i class="fa-solid fa-globe"></i> Buka website</a><button id="headerLogoutButton" type="button" role="menuitem"><i class="fa-solid fa-right-from-bracket"></i> Logout</button></div></div>
       </header>
 
       <main class="admin-content">
         <section class="admin-section is-active" data-panel="overview">
           <div class="metric-grid" id="metricGrid"></div>
+          <div class="overview-utility-grid"><article class="panel-card quick-actions-card"><div class="panel-head"><div><p class="eyebrow">SHORTCUTS</p><h2>Quick Actions</h2></div></div><div class="quick-actions"><button data-go-section="tools" data-open-new-tool type="button"><i class="fa-solid fa-plus"></i><span>Tambah Tool</span></button><button data-go-section="members" type="button"><i class="fa-solid fa-magnifying-glass"></i><span>Cari Member</span></button><button data-go-section="members" data-member-filter="free" type="button"><i class="fa-solid fa-crown"></i><span>Aktifkan VVIP</span></button><button data-go-section="developer" type="button"><i class="fa-solid fa-pen-to-square"></i><span>Konten Website</span></button></div></article><article class="panel-card recent-activity-card"><div class="panel-head"><div><p class="eyebrow">AUDIT LOG</p><h2>Recent Activity</h2></div><button class="ghost-button" data-go-section="audit" type="button">Semua</button></div><div class="recent-activity-list" id="recentActivity"></div></article></div>
           <div class="dashboard-grid">
             <article class="panel-card panel-wide">
               <div class="panel-head"><div><p class="eyebrow">STATUS LIVE</p><h2>Kesehatan Tools</h2></div><button class="ghost-button" data-go-section="health" type="button">Lihat detail</button></div>
@@ -88,16 +83,16 @@
 
         <section class="admin-section" data-panel="tools">
           <div class="section-toolbar">
-            <label class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input id="toolSearch" type="search" placeholder="Cari nama atau ID tools"></label>
-            <select id="toolStatusFilter" class="select-box"><option value="all">Semua status</option><option value="active">Aktif</option><option value="inactive">Nonaktif</option></select>
-            <select id="toolCategoryFilter" class="select-box"><option value="all">Semua kategori</option><option value="downloader">Downloader</option><option value="maker">Maker</option><option value="tools">Tools</option><option value="vault">Vault</option><option value="external">External</option></select>
+            <label class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input id="toolSearch" type="search" aria-label="Cari tools" placeholder="Cari nama atau ID tools"></label>
+            <select id="toolStatusFilter" class="select-box" aria-label="Filter status tool"><option value="all">Semua status</option><option value="active">Aktif</option><option value="inactive">Nonaktif</option></select>
+            <select id="toolCategoryFilter" class="select-box" aria-label="Filter kategori tool"><option value="all">Semua kategori</option><option value="downloader">Downloader</option><option value="maker">Maker</option><option value="tools">Tools</option><option value="vault">Vault</option><option value="external">External</option></select>
             <button id="addToolButton" data-add-tool="true" class="primary-button" type="button"><i class="fa-solid fa-plus"></i> Tambah Tool</button>
           </div>
           <div class="tool-admin-grid" id="toolAdminGrid"></div>
           <div class="empty-state" id="toolEmpty" hidden><i class="fa-solid fa-box-open"></i><b>Tools tidak ditemukan</b><span>Coba ubah pencarian atau filter.</span></div>
         </section>
 
-        <section class="admin-section" data-panel="members"><div class="section-toolbar"><label class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input id="memberSearch" type="search" placeholder="Cari nama atau email"></label><select id="memberStatusFilter" class="select-box"><option value="all">Semua member</option><option value="free">FREE</option><option value="vvip">VVIP aktif</option><option value="expired">Expired</option><option value="suspended">Ditangguhkan</option></select><button id="refreshMembers" class="secondary-button" type="button"><i class="fa-solid fa-rotate"></i> Refresh</button></div><div class="member-admin-grid" id="memberAdminGrid"><div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><b>Memuat membership</b></div></div></section>
+        <section class="admin-section" data-panel="members"><div class="section-intro"><div><p class="eyebrow">USER DIRECTORY</p><h2>Users &amp; Membership</h2><p>Kelola akun FREE, masa aktif VVIP, dan status akses pengguna.</p></div><button id="refreshMembers" class="secondary-button" type="button"><i class="fa-solid fa-rotate"></i> Refresh</button></div><div class="member-toolbar"><label class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input id="memberSearch" type="search" aria-label="Cari username atau email member" placeholder="Cari username atau email"></label><div class="filter-chips" id="memberFilterChips" role="group" aria-label="Filter member"><button class="is-active" data-member-filter="all" type="button">Semua</button><button data-member-filter="free" type="button">Free</button><button data-member-filter="vvip" type="button">VVIP</button><button data-member-filter="expired" type="button">Expired</button><button data-member-filter="suspended" type="button">Suspended</button></div><select id="memberStatusFilter" class="select-box" aria-label="Filter status member" hidden><option value="all">Semua member</option><option value="free">FREE</option><option value="vvip">VVIP aktif</option><option value="expired">Expired</option><option value="suspended">Ditangguhkan</option></select></div><div class="member-table-head" aria-hidden="true"><span>User</span><span>Plan</span><span>Status</span><span>Expired</span><span>Aksi</span></div><div class="member-admin-grid" id="memberAdminGrid"><div class="admin-skeleton-list"><i></i><i></i><i></i></div></div></section>
 
         <section class="admin-section" data-panel="socials">
           <div class="section-toolbar social-toolbar">
@@ -263,6 +258,16 @@
     </aside>
   </div>
 
+  <div class="member-detail-backdrop" id="memberDetailBackdrop" aria-hidden="true"></div>
+  <aside class="member-detail-drawer" id="memberDetailDrawer" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="memberDetailTitle">
+    <div class="member-detail-head"><div><p class="eyebrow">MEMBER DETAIL</p><h2 id="memberDetailTitle">Kelola User</h2></div><button id="memberDetailClose" type="button" aria-label="Tutup detail member"><i class="fa-solid fa-xmark"></i></button></div>
+    <div id="memberDetailBody"></div>
+  </aside>
+
+  <div class="admin-confirm-backdrop" id="adminConfirmModal" hidden>
+    <section class="admin-confirm" role="alertdialog" aria-modal="true" aria-labelledby="adminConfirmTitle" aria-describedby="adminConfirmMessage"><h2 id="adminConfirmTitle">Konfirmasi tindakan</h2><p id="adminConfirmMessage"></p><footer><button id="adminConfirmCancel" type="button">Batal</button><button id="adminConfirmAccept" type="button">Lanjutkan</button></footer></section>
+  </div>
+
   <div class="modal-backdrop" id="socialModal" hidden>
     <section class="tool-editor" role="dialog" aria-modal="true" aria-labelledby="socialEditorTitle">
       <header><div><p class="eyebrow">EDIT SOCIAL LINK</p><h2 id="socialEditorTitle">Pengaturan Sosial Media</h2></div><button id="closeSocialModal" type="button" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button></header>
@@ -290,13 +295,16 @@
       <header><div><p class="eyebrow" id="toolEditorEyebrow">EDIT TOOL</p><h2 id="toolEditorTitle">Pengaturan Tool</h2></div><button id="closeToolModal" type="button" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button></header>
       <form id="toolEditForm">
         <div class="form-grid">
+          <div class="form-section-title"><i class="fa-solid fa-circle-info"></i><div><b>Informasi</b><span>Identitas dan tampilan tool pada katalog.</span></div></div>
           <label><span>ID unik</span><input id="editToolId" maxlength="80" pattern="[a-z0-9][a-z0-9_-]{1,79}" placeholder="contoh: my-tool" required></label>
           <label><span>Nama</span><input id="editToolName" maxlength="80" required></label>
           <label><span>Kategori</span><select id="editToolCategory"><option value="downloader">Downloader</option><option value="maker">Maker</option><option value="tools">Tools</option><option value="vault">Vault</option><option value="external">External</option></select></label>
-          <label><span>Hak akses</span><select id="editToolAccess"><option value="free">Semua user / FREE</option><option value="vvip">VVIP Only</option></select></label>
           <label class="form-span"><span>Deskripsi</span><textarea id="editToolDescription" maxlength="240" rows="3"></textarea></label>
           <label><span>Badge</span><input id="editToolBadge" maxlength="30" placeholder="PRO"></label>
           <label><span>Icon Font Awesome</span><input id="editToolIcon" maxlength="100" placeholder="fa-solid fa-code"></label>
+          <div class="form-section-title"><i class="fa-solid fa-key"></i><div><b>Access</b><span>Tentukan siapa yang dapat menjalankan tool.</span></div></div>
+          <label class="form-span"><span>Hak akses</span><select id="editToolAccess"><option value="free">Semua user / FREE</option><option value="vvip">◆ VVIP Only</option></select></label>
+          <div class="form-section-title"><i class="fa-solid fa-sliders"></i><div><b>Status &amp; Configuration</b><span>Pengaturan operasional dan integrasi tool.</span></div></div>
           <label class="form-span"><span>URL eksternal</span><input id="editToolUrl" maxlength="500" type="url" placeholder="https://..."></label>
           <label><span>Urutan</span><input id="editToolOrder" type="number" min="-10000" max="10000"></label>
           <label class="toggle-field"><span>Status aktif</span><input id="editToolActive" type="checkbox"><b></b></label>
@@ -333,7 +341,8 @@
   </div>
 
   <div class="toast-stack" id="toastStack" aria-live="polite"></div>
-  <script src="../assets/js/admin/dashboard.js?v=6.3.18-hf3-hf12-no-login-loader" defer></script>
+  <script src="../assets/js/admin/admin-shell.js?v=6.3.18-admin-redesign1" defer></script>
+  <script src="../assets/js/admin/dashboard.js?v=6.3.18-hf3-admin-redesign1" defer></script>
   <script src="../assets/js/admin/members.js?v=6.3.18-membership1" defer></script>
   <script src="../assets/js/admin/developer-profile.js?v=6.3.18-step3" defer></script>
   <script src="../assets/js/admin/visual-qa.js?v=6.3.18" defer></script>

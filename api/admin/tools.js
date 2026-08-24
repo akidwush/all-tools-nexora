@@ -53,6 +53,34 @@ function customMetadata() {
   return { origin: "admin", kind: "external-link", schemaVersion: 1 };
 }
 
+function builtinSeed(item, index) {
+  return {
+    id: item.id,
+    name: item.name,
+    description: "",
+    category: ALLOWED_CATEGORIES.has(item.category) ? item.category : "tools",
+    badge: null,
+    icon: null,
+    external_url: item.target?.type === "external-app" ? item.target.url || null : null,
+    is_active: true,
+    access_level: "free",
+    sort_order: index * 10,
+    metadata: { origin: "builtin-catalog", schemaVersion: 1 }
+  };
+}
+
+async function ensureBuiltinCatalogRows(rows) {
+  const existing = new Set((Array.isArray(rows) ? rows : []).map(item => item.id));
+  const missing = TOOL_CATALOG.filter(item => !existing.has(item.id));
+  if (!missing.length) return rows;
+  await databaseRequest("tools?on_conflict=id", {
+    method: "POST",
+    headers: { Prefer: "resolution=ignore-duplicates,return=minimal" },
+    body: JSON.stringify(missing.map((item, index) => builtinSeed(item, index)))
+  });
+  return databaseRequest(`tools?select=${TOOL_SELECT}&order=sort_order.asc,name.asc`, { method: "GET" });
+}
+
 function responseShape(item) {
   return item ? { ...item, is_custom: isCustomTool(item) } : null;
 }
@@ -148,7 +176,8 @@ module.exports = async function handler(request, response) {
     }
     if (request.method === "GET") {
       await requireAdmin(request, response);
-      const rows = await databaseRequest(`tools?select=${TOOL_SELECT}&order=sort_order.asc,name.asc`, { method: "GET" });
+      let rows = await databaseRequest(`tools?select=${TOOL_SELECT}&order=sort_order.asc,name.asc`, { method: "GET" });
+      rows = await ensureBuiltinCatalogRows(rows);
       return send(response, 200, { ok: true, data: (Array.isArray(rows) ? rows : []).map(responseShape) });
     }
 

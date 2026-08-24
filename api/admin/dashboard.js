@@ -160,13 +160,16 @@ module.exports = async function handler(request, response) {
 
   try {
     const session = await requireAdmin(request, response);
-    const [tools, feedbackRows, recentFeedback, healthRows, settings, developerProfile] = await Promise.all([
-      databaseRequest("tools?select=id,name,description,category,badge,icon,external_url,is_active,sort_order,updated_at&order=sort_order.asc,name.asc", { method: "GET" }),
+    const [tools, feedbackRows, recentFeedback, healthRows, settings, developerProfile, profiles, subscriptions, recentActivity] = await Promise.all([
+      databaseRequest("tools?select=id,name,description,category,badge,icon,external_url,is_active,access_level,sort_order,updated_at&order=sort_order.asc,name.asc", { method: "GET" }),
       databaseRequest("feedback?select=id,status&limit=500", { method: "GET" }),
       databaseRequest("feedback?select=id,name,category,message,status,admin_reply,created_at,updated_at&order=created_at.desc&limit=8", { method: "GET" }),
       databaseRequest("tool_health?select=tool_id,tool_name,category,status,target_type,http_status,latency_ms,success_rate,total_checks,successful_checks,consecutive_failures,last_error,last_checked_at,last_success_at,metadata,updated_at&order=tool_name.asc", { method: "GET" }),
       databaseRequest("app_settings?select=key,value,is_public,updated_at&order=key.asc", { method: "GET" }),
-      databaseRequest("developer_profiles?select=id,data,is_published,updated_at&id=eq.primary&limit=1", { method: "GET" })
+      databaseRequest("developer_profiles?select=id,data,is_published,updated_at&id=eq.primary&limit=1", { method: "GET" }),
+      databaseRequest("profiles?select=id,account_status,created_at&limit=5000", { method: "GET" }),
+      databaseRequest("subscriptions?select=user_id,plan,status,expires_at&limit=5000", { method: "GET" }),
+      databaseRequest("admin_audit_logs?select=id,action,entity_type,entity_id,summary,admin_email,created_at&order=created_at.desc&limit=8", { method: "GET" })
     ]);
 
     const feedback = Array.isArray(feedbackRows) ? feedbackRows : [];
@@ -175,6 +178,13 @@ module.exports = async function handler(request, response) {
       if (Object.hasOwn(feedbackCounts, item.status)) feedbackCounts[item.status] += 1;
     }
     const toolRows = Array.isArray(tools) ? tools : [];
+    const profileRows = Array.isArray(profiles) ? profiles : [];
+    const subscriptionRows = Array.isArray(subscriptions) ? subscriptions : [];
+    const now = Date.now();
+    const suspendedIds = new Set(profileRows.filter((item) => item.account_status === "suspended").map((item) => item.id));
+    const activeVvip = subscriptionRows.filter((item) => item.plan === "vvip" && item.status === "active" && !suspendedIds.has(item.user_id) && item.expires_at && new Date(item.expires_at).getTime() > now).length;
+    const expiredVvip = subscriptionRows.filter((item) => item.plan === "vvip" && item.expires_at && new Date(item.expires_at).getTime() <= now).length;
+    const suspendedUsers = profileRows.filter((item) => item.account_status === "suspended").length;
     const cachedHealth = normalizeCachedRows(healthRows);
     const healthById = new Map(cachedHealth.map((item) => [item.toolId, item]));
     const normalizedHealth = TOOL_CATALOG.map((tool) => healthById.get(tool.id) || ({
@@ -199,6 +209,13 @@ module.exports = async function handler(request, response) {
       ok: true,
       session: publicSession(session),
       summary: {
+        members: {
+          total: profileRows.length,
+          activeVvip,
+          expiredVvip,
+          suspended: suspendedUsers,
+          free: Math.max(0, profileRows.length - activeVvip)
+        },
         tools: {
           total: toolRows.length,
           active: toolRows.filter((tool) => tool.is_active).length,
@@ -211,6 +228,7 @@ module.exports = async function handler(request, response) {
         health: summarizeHealth(normalizedHealth)
       },
       recentFeedback: Array.isArray(recentFeedback) ? recentFeedback : [],
+      recentActivity: Array.isArray(recentActivity) ? recentActivity : [],
       health: normalizedHealth,
       settings: Array.isArray(settings) ? settings : [],
       developerProfile: Array.isArray(developerProfile) ? developerProfile[0] || null : null

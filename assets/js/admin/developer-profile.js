@@ -18,13 +18,13 @@
   function fill(value) { profile = { skills: [], projects: [], socials: [], ...(value || {}) }; ['Name','Label','Role','Headline','Bio','AvatarUrl','AvatarAlt','StatusLabel','Footer'].forEach(key => { $('#dev' + key).value = profile[key[0].toLowerCase() + key.slice(1)] || ''; }); $('#devStatusOnline').checked = profile.statusOnline !== false; $('#devPublished').checked = profile.isPublished !== false; ['skills','projects','socials'].forEach(render); }
   async function load() { try { const response = await fetch('/api/admin/dashboard', { credentials: 'same-origin', cache: 'no-store' }); const data = await response.json(); if (!response.ok) throw new Error(data.message || 'Gagal memuat profil'); editable = Boolean(data.session?.permissions?.editTools); fill({ ...data.developerProfile?.data, isPublished: data.developerProfile?.is_published !== false }); setEditable(); } catch (error) { $('#developerProfileMessage').textContent = error.message; $('#developerProfileMessage').className = 'modal-message is-error'; } }
   document.addEventListener('nexora:developer-section-open', load);
-  document.addEventListener('click', event => {
+  document.addEventListener('click', async event => {
     if (!editable) return;
     const add = event.target.closest('[data-dev-add]');
     if (add) { const type = add.dataset.devAdd; rows(type).push(type === 'skills' ? { id:id(type), title:'', icon:'fa-solid fa-code', description:'', isVisible:true } : type === 'projects' ? { id:id(type), title:'', description:'', imageUrl:'', url:'', isVisible:true } : { id:id(type), platform:'', icon:'fa-solid fa-link', url:'', isVisible:true }); render(type); return; }
     const item = event.target.closest('.developer-item'); if (!item) return;
     const type = item.dataset.devType, index = Number(item.dataset.devIndex);
-    if (event.target.closest('[data-dev-delete]')) { if (confirm('Hapus item ini?')) { rows(type).splice(index, 1); render(type); } return; }
+    if (event.target.closest('[data-dev-delete]')) { const accepted = await window.NexoraAdmin.confirm({ title:'Hapus item profil?', message:'Item ini akan dihapus dari draft About Developer. Perubahan diterapkan setelah profil disimpan.', confirmLabel:'Hapus Item', danger:true }); if (accepted) { rows(type).splice(index, 1); render(type); } return; }
     const move = event.target.closest('[data-dev-move]'); if (move) { const next = index + Number(move.dataset.devMove); if (rows(type)[next]) { [rows(type)[index], rows(type)[next]] = [rows(type)[next], rows(type)[index]]; render(type); } }
   });
   function syncItem(event) { if (!editable) return; const item = event.target.closest('.developer-item'); if (!item) return; const value = rows(item.dataset.devType)[Number(item.dataset.devIndex)]; if (value && event.target.dataset.k) value[event.target.dataset.k] = event.target.type === 'checkbox' ? event.target.checked : event.target.value; }
