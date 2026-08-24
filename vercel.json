@@ -63,6 +63,10 @@
   "outputDirectory": "public",
   "rewrites": [
     {
+      "source": "/api/account",
+      "destination": "/api/tool-health?mode=account"
+    },
+    {
       "source": "/api/ai/chat",
       "destination": "/api/health?mode=ai-chat"
     },

@@ -5,7 +5,7 @@ const { TOOL_CATALOG } = require("../../lib/tool-health");
 
 const ALLOWED_CATEGORIES = new Set(["downloader", "maker", "tools", "vault", "external"]);
 const BUILTIN_TOOL_IDS = new Set(TOOL_CATALOG.map((item) => item.id));
-const TOOL_SELECT = "id,name,description,category,badge,icon,external_url,is_active,sort_order,metadata,created_at,updated_at";
+const TOOL_SELECT = "id,name,description,category,badge,icon,external_url,is_active,access_level,sort_order,metadata,created_at,updated_at";
 
 function send(response, status, payload) {
   response.setHeader("Cache-Control", "no-store, max-age=0");
@@ -68,6 +68,7 @@ function auditShape(item) {
     icon: item.icon,
     externalUrl: item.external_url,
     isActive: item.is_active,
+    accessLevel: item.access_level || "free",
     sortOrder: item.sort_order,
     isCustom: isCustomTool(item)
   };
@@ -97,10 +98,34 @@ function toolPayload(body, current) {
     icon,
     external_url: url,
     is_active: booleanValue(body.isActive, current ? Boolean(current.is_active) : true),
+    access_level: ["free","vvip"].includes(clean(body.accessLevel,10).toLowerCase()) ? clean(body.accessLevel,10).toLowerCase() : (current?.access_level || "free"),
     sort_order: sortValue(body.sortOrder),
     updated_at: new Date().toISOString(),
     ...(current ? { metadata: current.metadata || {} } : { metadata: customMetadata() })
   };
+}
+
+async function memberRows(url) {
+  const q=clean(url.searchParams.get("q"),120).toLowerCase(),status=clean(url.searchParams.get("status"),20).toLowerCase();
+  const [profiles,subscriptions]=await Promise.all([
+    databaseRequest("profiles?select=id,email,display_name,avatar_url,role,account_status,created_at,updated_at&order=created_at.desc",{method:"GET"}),
+    databaseRequest("subscriptions?select=user_id,plan,status,started_at,expires_at,updated_at",{method:"GET"})
+  ]);
+  const byUser=new Map((subscriptions||[]).map(row=>[row.user_id,row]));
+  return (profiles||[]).map(profile=>{const sub=byUser.get(profile.id)||{};const expired=sub.plan==="vvip"&&sub.expires_at&&new Date(sub.expires_at).getTime()<=Date.now();const effective=profile.account_status==="suspended"||sub.status==="suspended"?"suspended":sub.plan==="vvip"&&sub.status==="active"&&!expired?"vvip":expired?"expired":"free";return {...profile,subscription:sub,effective_status:effective};}).filter(row=>(!q||`${row.email} ${row.display_name}`.toLowerCase().includes(q))&&(!status||status==="all"||row.effective_status===status));
+}
+
+async function updateMember(body,request,session){
+  const userId=clean(body.userId,80),action=clean(body.action,24).toLowerCase();if(!/^[0-9a-f-]{36}$/i.test(userId))return {status:400,payload:{ok:false,error:"INVALID_USER"}};
+  const profiles=await databaseRequest(`profiles?select=id,email,display_name,role,account_status&id=eq.${encodeURIComponent(userId)}&limit=1`,{method:"GET"});const profile=profiles?.[0];if(!profile)return {status:404,payload:{ok:false,error:"MEMBER_NOT_FOUND"}};if(profile.role==="admin")return {status:409,payload:{ok:false,error:"ADMIN_MEMBER_PROTECTED",message:"Membership admin tidak dapat diubah dari panel member."}};
+  const now=new Date(),before=(await databaseRequest(`subscriptions?select=*&user_id=eq.${encodeURIComponent(userId)}&limit=1`,{method:"GET"}))?.[0]||null;let profilePatch=null,subPatch=null;
+  if(["activate","extend"].includes(action)){const days=Math.max(1,Math.min(3650,Number(body.days)||30)),current=before?.expires_at?new Date(before.expires_at):null,base=current&&current>now?current:now,custom=body.expiresAt?new Date(body.expiresAt):null,expires=custom&&!Number.isNaN(custom.getTime())&&custom>now?custom:new Date(base.getTime()+days*86400000);subPatch={plan:"vvip",status:"active",started_at:before?.started_at||now.toISOString(),expires_at:expires.toISOString()};profilePatch={role:"vvip",account_status:"active"};}
+  else if(action==="revoke"){subPatch={plan:"free",status:"revoked",expires_at:now.toISOString()};profilePatch={role:"free",account_status:"active"};}
+  else if(action==="suspend"){subPatch={status:"suspended"};profilePatch={account_status:"suspended"};}
+  else if(action==="restore"){const active=before?.plan==="vvip"&&before?.expires_at&&new Date(before.expires_at)>now;subPatch={status:active?"active":"expired"};profilePatch={account_status:"active",role:active?"vvip":"free"};}
+  else return {status:400,payload:{ok:false,error:"INVALID_MEMBER_ACTION"}};
+  await databaseRequest(`profiles?id=eq.${encodeURIComponent(userId)}`,{method:"PATCH",headers:{Prefer:"return=minimal"},body:JSON.stringify(profilePatch)});await databaseRequest(`subscriptions?user_id=eq.${encodeURIComponent(userId)}`,{method:"PATCH",headers:{Prefer:"return=minimal"},body:JSON.stringify(subPatch)});
+  const after=(await databaseRequest(`subscriptions?select=*&user_id=eq.${encodeURIComponent(userId)}&limit=1`,{method:"GET"}))?.[0]||null;await recordAdminAudit({request,session,action:`membership.${action}`,entityType:"membership",entityId:userId,summary:`Membership ${profile.email||userId}: ${action}`,before,after});return {status:200,payload:{ok:true,data:{userId,profile:{...profile,...profilePatch},subscription:after}}};
 }
 
 async function findTool(id) {
@@ -115,6 +140,12 @@ module.exports = async function handler(request, response) {
   }
 
   try {
+    const url=new URL(request.url||"/api/admin/tools",`http://${request.headers.host||"localhost"}`);
+    if(url.searchParams.get("resource")==="members"){
+      if(request.method==="GET"){await requireAdmin(request,response);return send(response,200,{ok:true,data:await memberRows(url)});}
+      if(request.method!=="PATCH")return send(response,405,{ok:false,error:"METHOD_NOT_ALLOWED"});
+      const session=await requireAdmin(request,response,{edit:true});if(!verifyMutationRequest(request))return send(response,403,{ok:false,error:"CSRF_REJECTED"});const result=await updateMember(request.body||{},request,session);return send(response,result.status,result.payload);
+    }
     if (request.method === "GET") {
       await requireAdmin(request, response);
       const rows = await databaseRequest(`tools?select=${TOOL_SELECT}&order=sort_order.asc,name.asc`, { method: "GET" });

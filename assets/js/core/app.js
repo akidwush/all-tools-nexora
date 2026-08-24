@@ -1697,8 +1697,8 @@ function toolCardMarkup(item, isExternal = false, category = '') {
     const safeCategory = escapeToolHtml(category || (isExternal ? 'external' : 'tools'));
     const format = isExternal ? 'LINK' : (category === 'downloader' ? 'MEDIA' : category === 'maker' ? 'CREATE' : category === 'vault' ? 'VAULT' : 'UTILITY');
     return `
-        <div class="tools-card" data-tool-id="${safeId}" data-nx-category="${safeCategory}" data-nx-format="${format}" role="button" tabindex="0" aria-label="Buka ${escapeToolHtml(item.name)}" ${clickAttr}>
-            <div class="nx-card-top"><div class="icon"><i class="${safeIcon}"></i></div>${item.badge ? `<span class="badge">${escapeToolHtml(item.badge)}</span>` : ''}</div>
+        <div class="tools-card" data-tool-id="${safeId}" data-access-level="${item.accessLevel === 'vvip' ? 'vvip' : 'free'}" data-nx-category="${safeCategory}" data-nx-format="${format}" role="button" tabindex="0" aria-label="Buka ${escapeToolHtml(item.name)}" ${clickAttr}>
+            <div class="nx-card-top"><div class="icon"><i class="${safeIcon}"></i></div>${item.accessLevel === 'vvip' ? '<span class="badge nx-vvip-badge"><i class="fas fa-crown"></i> VVIP</span>' : item.badge ? `<span class="badge">${escapeToolHtml(item.badge)}</span>` : ''}</div>
             <div class="nx-card-copy"><h4>${escapeToolHtml(item.name)}</h4><p>${escapeToolHtml(item.desc)}</p></div>
             <div class="nx-card-footer"><span class="nx-card-readiness" data-nx-status-slot="true"></span><span class="nx-card-format">${format}</span><div class="arrow"><i class="fas fa-arrow-right"></i></div></div>
         </div>
@@ -1894,7 +1894,8 @@ async function applyDatabaseToolConfiguration() {
                 icon: row?.icon || base.icon || 'fa-solid fa-arrow-up-right-from-square',
                 link: row?.external_url || base.link,
                 sortOrder: Number.isFinite(Number(row?.sort_order)) ? Number(row.sort_order) : bundledOrder,
-                custom: false
+                custom: false,
+                accessLevel: row?.access_level === 'vvip' ? 'vvip' : 'free'
             });
             bundledOrder += 1;
         }
@@ -1915,7 +1916,8 @@ async function applyDatabaseToolConfiguration() {
                 icon: row.icon || 'fa-solid fa-arrow-up-right-from-square',
                 link: row.external_url,
                 sortOrder: Number.isFinite(Number(row.sort_order)) ? Number(row.sort_order) : 999,
-                custom: true
+                custom: true,
+                accessLevel: row.access_level === 'vvip' ? 'vvip' : 'free'
             });
         }
         for (const category of Object.keys(nextTools)) {

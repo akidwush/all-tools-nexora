@@ -10,6 +10,7 @@ const { handleAlightPremium } = require("../lib/alight-premium-proxy");
 const { handleFreeConvertVectorizer } = require("../lib/freeconvert-vectorizer");
 const { handleIpIntelligence } = require("../lib/ipinfo-intelligence");
 const { handleBmkgOpenData } = require("../lib/bmkg-open-data");
+const { authorizeTool, handleAccount } = require("../lib/account-membership");
 const {
   TOOL_CATALOG,
   getHealthConfig,
@@ -71,6 +72,15 @@ module.exports = async function handler(request, response) {
   catch { return send(response, 400, { ok: false, error: "INVALID_REQUEST_HOST" }); }
 
   const url = new URL(request.url || "/api/tool-health", origin);
+  const mode = url.searchParams.get("mode");
+  if (mode === "account") return handleAccount(request, response);
+  const protectedModes = {
+    "media-download":"instagram", downloader:"youtube", sitegrabber:"sitegrabber",
+    "crypto-market":"cryptomarket", "space-explorer":"spaceexplorer", "ocr-intelligence":"ocrintel",
+    "svg-alight":"svgalight", "alight-premium":"alightpremium", "image-vectorizer":"imagevectorizer",
+    "ip-intelligence":"ipintel", "bmkg-open-data":"bmkg"
+  };
+  if (protectedModes[mode] && !(await authorizeTool(request, response, protectedModes[mode]))) return;
   if (url.searchParams.get("mode") === "media-download") {
     return handleMediaDownload(request, response, url);
   }

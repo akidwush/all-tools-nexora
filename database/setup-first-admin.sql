@@ -1,17 +1,13 @@
 -- Nexora v5.0 — Jadikan satu akun Supabase Auth sebagai super admin.
 -- 1. Buat user lebih dahulu melalui Supabase > Authentication > Users > Add user.
--- 2. Ganti GANTI_EMAIL_ADMIN di bawah dengan email user tersebut.
+-- 2. Pastikan migration 022_membership_vvip.sql sudah dijalankan.
 -- 3. Jalankan file ini melalui SQL Editor.
 
 do $$
 declare
-  admin_email text := 'GANTI_EMAIL_ADMIN';
+  admin_email text := 'nexora@gmail.com';
   admin_user_id uuid;
 begin
-  if admin_email = 'GANTI_EMAIL_ADMIN' then
-    raise exception 'Ganti GANTI_EMAIL_ADMIN dengan email akun admin.';
-  end if;
-
   select id into admin_user_id
   from auth.users
   where lower(email) = lower(admin_email)
@@ -32,6 +28,8 @@ begin
     role = 'super_admin',
     is_active = true,
     updated_at = now();
+
+  update public.profiles set role = 'admin', account_status = 'active' where id = admin_user_id;
 end $$;
 
 select

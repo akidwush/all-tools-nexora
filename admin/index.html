@@ -26,6 +26,7 @@
       <nav class="admin-nav" aria-label="Navigasi admin">
         <button class="admin-nav-item is-active" data-section="overview" type="button"><i class="fa-solid fa-grid-2"></i><span>Ringkasan</span></button>
         <button class="admin-nav-item" data-section="tools" type="button"><i class="fa-solid fa-screwdriver-wrench"></i><span>Tools</span></button>
+        <button class="admin-nav-item" data-section="members" type="button"><i class="fa-solid fa-crown"></i><span>Membership</span></button>
         <button class="admin-nav-item" data-section="ai" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Personal AI</span></button>
         <button class="admin-nav-item" data-section="socials" type="button"><i class="fa-solid fa-share-nodes"></i><span>Sosial Media</span></button>
         <button class="admin-nav-item" data-section="developer" type="button"><i class="fa-solid fa-user-astronaut"></i><span>About Developer</span></button>
@@ -95,6 +96,8 @@
           <div class="tool-admin-grid" id="toolAdminGrid"></div>
           <div class="empty-state" id="toolEmpty" hidden><i class="fa-solid fa-box-open"></i><b>Tools tidak ditemukan</b><span>Coba ubah pencarian atau filter.</span></div>
         </section>
+
+        <section class="admin-section" data-panel="members"><div class="section-toolbar"><label class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input id="memberSearch" type="search" placeholder="Cari nama atau email"></label><select id="memberStatusFilter" class="select-box"><option value="all">Semua member</option><option value="free">FREE</option><option value="vvip">VVIP aktif</option><option value="expired">Expired</option><option value="suspended">Ditangguhkan</option></select><button id="refreshMembers" class="secondary-button" type="button"><i class="fa-solid fa-rotate"></i> Refresh</button></div><div class="member-admin-grid" id="memberAdminGrid"><div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i><b>Memuat membership</b></div></div></section>
 
         <section class="admin-section" data-panel="socials">
           <div class="section-toolbar social-toolbar">
@@ -246,6 +249,7 @@
     <aside class="admin-more-sheet" id="adminMoreSheet" aria-hidden="true" aria-label="Menu admin lainnya">
       <header><div><p class="eyebrow">MENU LAINNYA</p><h2>Administrasi</h2></div><button id="closeAdminMore" type="button" aria-label="Tutup menu"><i class="fa-solid fa-xmark"></i></button></header>
       <div class="admin-more-grid">
+        <button data-section="members" type="button"><i class="fa-solid fa-crown"></i><span>Membership</span></button>
         <button data-section="socials" type="button"><i class="fa-solid fa-share-nodes"></i><span>Sosial Media</span></button>
         <button data-section="ai" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Personal AI</span></button>
         <button data-section="developer" type="button"><i class="fa-solid fa-user-astronaut"></i><span>About Developer</span></button>
@@ -289,6 +293,7 @@
           <label><span>ID unik</span><input id="editToolId" maxlength="80" pattern="[a-z0-9][a-z0-9_-]{1,79}" placeholder="contoh: my-tool" required></label>
           <label><span>Nama</span><input id="editToolName" maxlength="80" required></label>
           <label><span>Kategori</span><select id="editToolCategory"><option value="downloader">Downloader</option><option value="maker">Maker</option><option value="tools">Tools</option><option value="vault">Vault</option><option value="external">External</option></select></label>
+          <label><span>Hak akses</span><select id="editToolAccess"><option value="free">Semua user / FREE</option><option value="vvip">VVIP Only</option></select></label>
           <label class="form-span"><span>Deskripsi</span><textarea id="editToolDescription" maxlength="240" rows="3"></textarea></label>
           <label><span>Badge</span><input id="editToolBadge" maxlength="30" placeholder="PRO"></label>
           <label><span>Icon Font Awesome</span><input id="editToolIcon" maxlength="100" placeholder="fa-solid fa-code"></label>
@@ -329,6 +334,7 @@
 
   <div class="toast-stack" id="toastStack" aria-live="polite"></div>
   <script src="../assets/js/admin/dashboard.js?v=6.3.18-hf3-hf12-no-login-loader" defer></script>
+  <script src="../assets/js/admin/members.js?v=6.3.18-membership1" defer></script>
   <script src="../assets/js/admin/developer-profile.js?v=6.3.18-step3" defer></script>
   <script src="../assets/js/admin/visual-qa.js?v=6.3.18" defer></script>
   <script src="../assets/js/admin/personal-ai.js?v=6.3.18-ai1" defer></script>
