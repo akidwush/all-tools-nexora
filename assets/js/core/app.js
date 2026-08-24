@@ -1631,6 +1631,7 @@ let toolsData = {
         { id: 'bmkg', icon: 'fa-solid fa-cloud-sun-rain', name: 'BMKG Indonesia', desc: 'Gempa terkini, prakiraan cuaca 3 hari dan peringatan dini cuaca dari BMKG', badge: 'BMKG' },
         { id: 'spaceexplorer', icon: 'fa-solid fa-user-astronaut', name: 'Space Explorer', desc: 'APOD, galeri Mars, asteroid dekat Bumi dan cuaca antariksa NASA', badge: 'NASA' },
         { id: 'ocrintel', icon: 'fa-solid fa-file-lines', name: 'Nexora OCR Intelligence', desc: 'Ekstrak teks dari gambar dan PDF, analisis dokumen, lalu buat searchable PDF', badge: 'OCR' },
+        { id: 'documentai', icon: 'fa-solid fa-file-waveform', name: 'Nexora Document AI', desc: 'Ringkas, analisis, ekstrak tabel, dan tanya isi dokumen dengan Gemini', badge: 'VVIP', accessLevel: 'vvip' },
         { id: 'svgalight', icon: 'fa-solid fa-wand-magic-sparkles', name: 'SVG → Alight XML', desc: 'Konversi SVG ke XML Alight Motion dengan AM Optimized, Maximum Fidelity, audit kesamaan, dan kontrol layer', badge: 'ENGINE v1.8' },
         { id: 'alightpremium', icon: 'fa-solid fa-bolt', name: 'Alight Motion Premium 1 Tahun', desc: 'Request magic link lalu proses aktivasi Premium melalui API reseller', badge: '1 YEAR' },
         { id: 'imagevectorizer', icon: 'fa-solid fa-bezier-curve', name: 'Nexora Image Vectorizer', desc: 'Ubah PNG atau JPG menjadi SVG melalui FreeConvert Cloud', badge: 'SVG' },
@@ -1897,7 +1898,7 @@ async function applyDatabaseToolConfiguration() {
                 link: row?.external_url || base.link,
                 sortOrder: Number.isFinite(Number(row?.sort_order)) ? Number(row.sort_order) : bundledOrder,
                 custom: false,
-                accessLevel: row?.access_level === 'vvip' ? 'vvip' : 'free'
+                accessLevel: row ? (row.access_level === 'vvip' ? 'vvip' : 'free') : (base.accessLevel === 'vvip' ? 'vvip' : 'free')
             });
             bundledOrder += 1;
         }
@@ -2002,6 +2003,7 @@ function showTool(toolId) {
         case 'bmkg': renderBmkgIndonesia(body); break;
         case 'spaceexplorer': renderSpaceExplorer(body); break;
         case 'ocrintel': renderOcrIntelligence(body); break;
+        case 'documentai': renderDocumentAi(body); break;
         case 'svgalight': renderSvgAlight(body); break;
         case 'alightpremium': renderAlightPremium(body); break;
         case 'imagevectorizer': renderImageVectorizer(body); break;

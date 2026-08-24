@@ -3,6 +3,7 @@ const publicDatabaseHandler = require("../lib/public-database");
 const { getDatabaseConfig, pingDatabase } = require("../lib/database");
 const { readCachedToolHealth, normalizeCachedRows, summarizeHealth } = require("../lib/tool-health");
 const handlePersonalAi = require("../lib/personal-ai-http");
+const { handleDocumentAi } = require("../lib/document-ai");
 const { authorizeTool } = require("../lib/account-membership");
 
 function send(response, status, payload, headOnly) {
@@ -16,6 +17,10 @@ function send(response, status, payload, headOnly) {
 module.exports = async function handler(request, response) {
   const requestUrl = new URL(request.url || "/api/health", `http://${request.headers.host || "localhost"}`);
   if (requestUrl.searchParams.get("mode") === "ai-chat") return handlePersonalAi(request, response);
+  if (requestUrl.searchParams.get("mode") === "document-ai") {
+    if (request.method === "POST" && !(await authorizeTool(request, response, "documentai"))) return;
+    return handleDocumentAi(request, response);
+  }
   if (requestUrl.searchParams.get("mode") === "database") {
     return publicDatabaseHandler(request, response);
   }

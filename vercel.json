@@ -71,6 +71,10 @@
       "destination": "/api/health?mode=ai-chat"
     },
     {
+      "source": "/api/document-ai",
+      "destination": "/api/health?mode=document-ai"
+    },
+    {
       "source": "/api/admin/ai",
       "destination": "/api/admin/dashboard?mode=personal-ai"
     },

@@ -73,6 +73,14 @@
         "assets/js/features/ocr-intelligence.js"
       ]
     },
+    "document-ai": {
+      "css": [
+        "assets/css/features/document-ai.css"
+      ],
+      "js": [
+        "assets/js/features/document-ai.js"
+      ]
+    },
     "image-vectorizer": {
       "css": [
         "assets/css/features/image-vectorizer.css"
@@ -177,6 +185,7 @@
     "ipintel": "ip-intelligence",
     "spaceexplorer": "space-explorer",
     "ocrintel": "ocr-intelligence",
+    "documentai": "document-ai",
     "imagevectorizer": "image-vectorizer",
     "comicreader": "comic-reader",
     "sertifikat": "source-features",

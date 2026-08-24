@@ -13,6 +13,7 @@
     'bmkg-open-data': {css:['assets/css/features/bmkg-open-data.css'],js:['assets/js/features/bmkg-open-data.js']},
     'space-explorer': {css:['assets/css/features/space-explorer.css'],js:['assets/js/features/space-explorer.js']},
     'ocr-intelligence': {css:['assets/css/features/ocr-intelligence.css'],js:['assets/js/features/ocr-intelligence.js']},
+    'document-ai': {css:['assets/css/features/document-ai.css'],js:['assets/js/features/document-ai.js']},
     'image-vectorizer': {css:['assets/css/features/image-vectorizer.css'],js:['assets/js/features/image-vectorizer.js']},
     'svg-alight': {css:['assets/css/features/svg-alight.css'],js:['assets/js/features/svg-alight.js']},
     'alight-premium': {css:['assets/css/features/alight-premium.css'],js:['assets/js/features/alight-premium.js']},
@@ -27,7 +28,7 @@
   };
 
   var toolModules = {
-    getcode:'get-code',tiktok:'tiktok',ttquote:'tiktok-quote',virusscan:'virus-scan',cryptomarket:'crypto-market',webintel:'web-intelligence',ipintel:'ip-intelligence',bmkg:'bmkg-open-data',spaceexplorer:'space-explorer',ocrintel:'ocr-intelligence',svgalight:'svg-alight',alightpremium:'alight-premium',imagevectorizer:'image-vectorizer',comicreader:'comic-reader',
+    getcode:'get-code',tiktok:'tiktok',ttquote:'tiktok-quote',virusscan:'virus-scan',cryptomarket:'crypto-market',webintel:'web-intelligence',ipintel:'ip-intelligence',bmkg:'bmkg-open-data',spaceexplorer:'space-explorer',ocrintel:'ocr-intelligence',documentai:'document-ai',svgalight:'svg-alight',alightpremium:'alight-premium',imagevectorizer:'image-vectorizer',comicreader:'comic-reader',
     sertifikat:'source-features',fakedev:'source-features',
     promptgenerate:'imported-tools',fakeovo:'imported-tools',quotegenerator:'imported-tools',carifakta:'imported-tools',mltools:'imported-tools',
     iqc:'generator-pack',winquotes:'generator-pack',nokiamsg:'generator-pack',
@@ -36,7 +37,7 @@
   };
 
   var labels = {
-    'get code html':'getcode','tiktok':'tiktok','quote tiktok nexus':'ttquote','virus scan':'virusscan','crypto market scanner':'cryptomarket','nexora web intelligence':'webintel','ip & asn intelligence':'ipintel','ip asn intelligence':'ipintel','bmkg indonesia':'bmkg','bmkg':'bmkg','space explorer':'spaceexplorer','nexora ocr intelligence':'ocrintel','ocr intelligence':'ocrintel','svg → alight xml':'svgalight','svg alight xml':'svgalight','anime vector atelier':'svgalight','alight motion premium 1 tahun':'alightpremium','alight premium':'alightpremium','nexora image vectorizer':'imagevectorizer','image vectorizer':'imagevectorizer','baca komik full':'comicreader',
+    'get code html':'getcode','tiktok':'tiktok','quote tiktok nexus':'ttquote','virus scan':'virusscan','crypto market scanner':'cryptomarket','nexora web intelligence':'webintel','ip & asn intelligence':'ipintel','ip asn intelligence':'ipintel','bmkg indonesia':'bmkg','bmkg':'bmkg','space explorer':'spaceexplorer','nexora ocr intelligence':'ocrintel','ocr intelligence':'ocrintel','nexora document ai':'documentai','document ai':'documentai','svg → alight xml':'svgalight','svg alight xml':'svgalight','anime vector atelier':'svgalight','alight motion premium 1 tahun':'alightpremium','alight premium':'alightpremium','nexora image vectorizer':'imagevectorizer','image vectorizer':'imagevectorizer','baca komik full':'comicreader',
     'sertifikat custom':'sertifikat','fakedev':'fakedev','prompt generator':'promptgenerate','fake ovo':'fakeovo',
     'quote generator':'quotegenerator','carifakta':'carifakta','ml tools':'mltools','iqc generator':'iqc',
     'windows quotes':'winquotes','nokia message':'nokiamsg','terabox downloader':'terabox','fake bank jago':'fakebankjago',
@@ -56,7 +57,7 @@
   function absolute(url){ return new URL(url, document.baseURI).href; }
   function versioned(url){
     var separator = String(url).indexOf('?')===-1 ? '?' : '&';
-    var version = /svg-alight\.(?:js|css)(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-'+ASSET_PATCH : (/alight-premium\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-audit1' : (/tiktok\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-hf6-dl4-audit1' : (/(?:download-pack|source-features)\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-hf6-dl4' : ASSET_VERSION)));
+    var version = /document-ai\.(?:js|css)(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-document-ai-v2' : (/svg-alight\.(?:js|css)(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-'+ASSET_PATCH : (/alight-premium\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-audit1' : (/tiktok\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-hf6-dl4-audit1' : (/(?:download-pack|source-features)\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-hf6-dl4' : ASSET_VERSION))));
     return String(url)+separator+'v='+encodeURIComponent(version);
   }
 
@@ -155,6 +156,7 @@
   async function openLazyTool(toolId,event,card){
     var moduleName=toolModules[toolId];
     if(!moduleName) return false;
+    if(window.NexoraAccount && typeof window.NexoraAccount.canAccess==='function' && !window.NexoraAccount.canAccess(toolId)) return false;
     setCardBusy(card,true); activeCard=card||null;
     try{
       await ensureModule(moduleName);
