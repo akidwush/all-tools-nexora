@@ -75,6 +75,10 @@
       "destination": "/api/health?mode=document-ai"
     },
     {
+      "source": "/api/prompt-generator",
+      "destination": "/api/health?mode=prompt-generator"
+    },
+    {
       "source": "/api/admin/ai",
       "destination": "/api/admin/dashboard?mode=personal-ai"
     },

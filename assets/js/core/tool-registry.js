@@ -21,7 +21,7 @@
     ["tanyaustadz","Tanya Ustadz","local",null,"renderTanyaUstadz",null],
     ["mltools","ML Tools","module","imported-tools","renderMlTools",null],
     ["comicreader","Baca Komik Full","module","comic-reader","renderComicReader",null],
-    ["promptgenerate","Prompt Generator","module","imported-tools","renderPromptGenerator",null],
+    ["promptgenerate","Prompt Generator","module","prompt-generator","renderPromptGenerator",null],
     ["fakeovo","Fake OVO","module","imported-tools","renderFakeOvo",null],
     ["quotegenerator","Quote Generator","module","imported-tools","renderQuoteGenerator",null],
     ["carifakta","CariFakta","module","imported-tools","renderCariFakta",null],

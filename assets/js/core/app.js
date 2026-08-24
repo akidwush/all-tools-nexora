@@ -1620,7 +1620,7 @@ let toolsData = {
         { id: 'tanyaustadz', icon: 'fa-solid fa-user-tie', name: 'Tanya Ustadz', desc: 'Meme generator', badge: 'Lucu' }
     ],
     tools: [{ id: 'mltools', icon: 'fa-solid fa-gamepad', name: 'ML Tools', desc: 'Script ML, Winrate dan Stalk MLBB', badge: 'MLBB' },{ id: 'comicreader', icon: 'fa-solid fa-book-open-reader', name: 'Baca Komik Full', desc: 'Manga, manhwa, manhua + reader', badge: 'FULL' },
-        { id: 'promptgenerate', icon: 'fa-solid fa-wand-magic-sparkles', name: 'Prompt Generator', desc: 'Ubah gambar menjadi prompt deskriptif', badge: 'LOCAL' },
+        { id: 'promptgenerate', icon: 'fa-solid fa-wand-magic-sparkles', name: 'Prompt Generator', desc: 'Analisis gambar dengan Gemini Vision menjadi prompt produksi profesional', badge: 'VISION AI' },
         { id: 'fakeovo', icon: 'fa-solid fa-wallet', name: 'Fake OVO', desc: 'Generator tampilan saldo OVO', badge: 'CANVAS' },
         { id: 'quotegenerator', icon: 'fa-solid fa-quote-left', name: 'Quote Generator', desc: 'Buat gambar quote monokrom', badge: 'JPG' },
         { id: 'carifakta', icon: 'fa-solid fa-magnifying-glass-chart', name: 'CariFakta', desc: 'Analisis klaim dan berita menggunakan AI', badge: 'AI' },

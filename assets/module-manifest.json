@@ -81,6 +81,14 @@
         "assets/js/features/document-ai.js"
       ]
     },
+    "prompt-generator": {
+      "css": [
+        "assets/css/features/prompt-generator.css"
+      ],
+      "js": [
+        "assets/js/features/prompt-generator.js"
+      ]
+    },
     "image-vectorizer": {
       "css": [
         "assets/css/features/image-vectorizer.css"
@@ -190,7 +198,7 @@
     "comicreader": "comic-reader",
     "sertifikat": "source-features",
     "fakedev": "source-features",
-    "promptgenerate": "imported-tools",
+    "promptgenerate": "prompt-generator",
     "fakeovo": "imported-tools",
     "quotegenerator": "imported-tools",
     "carifakta": "imported-tools",

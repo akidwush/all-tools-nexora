@@ -67,6 +67,7 @@ const API_ROUTES = Object.freeze({
   "/api/vdeploy": { file: "api/health.js", mode: "vdeploy" },
   "/api/ai/chat": { file: "api/health.js", mode: "ai-chat" },
   "/api/document-ai": { file: "api/health.js", mode: "document-ai" },
+  "/api/prompt-generator": { file: "api/health.js", mode: "prompt-generator" },
   "/api/admin/auth": { file: "api/admin/auth.js" },
   "/api/admin/dashboard": { file: "api/admin/dashboard.js" },
   "/api/admin/tools": { file: "api/admin/tools.js" },
@@ -91,7 +92,7 @@ function bodyLimit(pathname, requestUrl) {
   if (mode === "image-vectorizer") return 4_200_000;
   if (pathname === "/api/audit") return 230_000;
   if (pathname === "/api/ai/chat" || pathname === "/api/admin/ai") return 80_000;
-  if (pathname === "/api/document-ai" || mode === "document-ai") return 4_150_000;
+    if (pathname === "/api/document-ai" || mode === "document-ai" || pathname === "/api/prompt-generator" || mode === "prompt-generator") return 4_150_000;
   return 550_000;
 }
 

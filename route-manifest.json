@@ -28,6 +28,7 @@
     "/api/vdeploy",
     "/api/ai/chat",
     "/api/document-ai",
+    "/api/prompt-generator",
     "/api/admin/auth",
     "/api/admin/dashboard",
     "/api/admin/tools",

@@ -14,6 +14,7 @@
     'space-explorer': {css:['assets/css/features/space-explorer.css'],js:['assets/js/features/space-explorer.js']},
     'ocr-intelligence': {css:['assets/css/features/ocr-intelligence.css'],js:['assets/js/features/ocr-intelligence.js']},
     'document-ai': {css:['assets/css/features/document-ai.css'],js:['assets/js/features/document-ai.js']},
+    'prompt-generator': {css:['assets/css/features/prompt-generator.css'],js:['assets/js/features/prompt-generator.js']},
     'image-vectorizer': {css:['assets/css/features/image-vectorizer.css'],js:['assets/js/features/image-vectorizer.js']},
     'svg-alight': {css:['assets/css/features/svg-alight.css'],js:['assets/js/features/svg-alight.js']},
     'alight-premium': {css:['assets/css/features/alight-premium.css'],js:['assets/js/features/alight-premium.js']},
@@ -30,7 +31,7 @@
   var toolModules = {
     getcode:'get-code',tiktok:'tiktok',ttquote:'tiktok-quote',virusscan:'virus-scan',cryptomarket:'crypto-market',webintel:'web-intelligence',ipintel:'ip-intelligence',bmkg:'bmkg-open-data',spaceexplorer:'space-explorer',ocrintel:'ocr-intelligence',documentai:'document-ai',svgalight:'svg-alight',alightpremium:'alight-premium',imagevectorizer:'image-vectorizer',comicreader:'comic-reader',
     sertifikat:'source-features',fakedev:'source-features',
-    promptgenerate:'imported-tools',fakeovo:'imported-tools',quotegenerator:'imported-tools',carifakta:'imported-tools',mltools:'imported-tools',
+    promptgenerate:'prompt-generator',fakeovo:'imported-tools',quotegenerator:'imported-tools',carifakta:'imported-tools',mltools:'imported-tools',
     iqc:'generator-pack',winquotes:'generator-pack',nokiamsg:'generator-pack',
     terabox:'download-pack',fakebankjago:'download-pack',
     unbanwa:'unban-whatsapp',vdeploy:'deploy-center',webencryption:'web-encryption'
@@ -57,7 +58,7 @@
   function absolute(url){ return new URL(url, document.baseURI).href; }
   function versioned(url){
     var separator = String(url).indexOf('?')===-1 ? '?' : '&';
-    var version = /crypto-market\.(?:js|css)(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-crypto-mtf1' : (/document-ai\.(?:js|css)(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-document-ai-v2' : (/svg-alight\.(?:js|css)(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-'+ASSET_PATCH : (/alight-premium\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-audit1' : (/tiktok\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-hf6-dl4-audit1' : (/(?:download-pack|source-features)\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-hf6-dl4' : ASSET_VERSION)))));
+    var version = /prompt-generator\.(?:js|css)(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-prompt-v2' : (/crypto-market\.(?:js|css)(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-crypto-mtf1' : (/document-ai\.(?:js|css)(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-document-ai-v2' : (/svg-alight\.(?:js|css)(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-'+ASSET_PATCH : (/alight-premium\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-audit1' : (/tiktok\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-hf6-dl4-audit1' : (/(?:download-pack|source-features)\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-hf6-dl4' : ASSET_VERSION))))));
     return String(url)+separator+'v='+encodeURIComponent(version);
   }
 
