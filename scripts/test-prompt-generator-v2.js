@@ -107,6 +107,8 @@ async function main() {
     assert.ok(!/GEMINI_API_KEY\s*=/.test(client));
     const css = read("assets/css/features/prompt-generator.css");
     for (const token of [".nx-prompt-layout", ".nx-prompt-details", "@media(max-width:520px)", "min-height:44px"]) assert.ok(css.includes(token));
+    assert.match(css, /\.nx-prompt-waiting\[hidden\]\{display:none!important\}/);
+    assert.match(read("assets/js/core/lazy-loader.js"), /prompt-v2-state1/);
     const manifest = JSON.parse(read("assets/module-manifest.json"));
     assert.equal(manifest.tools.promptgenerate, "prompt-generator");
     assert.ok(manifest.modules["prompt-generator"].js.includes("assets/js/features/prompt-generator.js"));
