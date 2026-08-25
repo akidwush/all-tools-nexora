@@ -17,7 +17,8 @@ function responseCapture() {
       setHeader(name, value) { captured.headers[name.toLowerCase()] = value; },
       status(value) { captured.status = value; return this; },
       json(value) { captured.payload = value; return value; },
-      end() { captured.ended = true; }
+      send(value) { captured.body = value; return value; },
+      end(value) { captured.ended = true; if (value) captured.body = value; }
     }
   };
 }
@@ -55,6 +56,7 @@ async function mockFetch(url) {
     baseUrl: "https://uploads.mangadex.org",
     chapter: { hash: "hash-uji", data: ["full-1.jpg"], dataSaver: ["saver-1.jpg"] }
   });
+  if (target.pathname.startsWith("/data-saver/") || target.pathname.startsWith("/data/")) return mockResponse(Buffer.from("mock-page"));
   return mockResponse({}, 404);
 }
 
@@ -87,7 +89,13 @@ async function call(query) {
 
   const pages = await call(`?action=pages&id=${chapterId}&quality=saver`);
   assert.equal(pages.payload.data.quality, "saver");
-  assert.match(pages.payload.data.image[0], /data-saver\/hash-uji\/saver-1\.jpg/);
+  assert.equal(pages.payload.data.pageCount, 1);
+  assert.match(pages.payload.data.image[0], /^\/api\/comics\?action=page-image/);
+
+  const pageImage = await call(`?action=page-image&id=${chapterId}&quality=saver&index=0`);
+  assert.equal(pageImage.status, 200);
+  assert.equal(pageImage.headers["content-type"], "image/jpeg");
+  assert.ok(Buffer.isBuffer(pageImage.body) && pageImage.body.length > 0);
 
   const invalid = await call("?action=detail&id=not-a-uuid");
   assert.equal(invalid.status, 400);
@@ -107,5 +115,5 @@ async function call(query) {
   assert.match(fs.readFileSync(path.join(root, "api/health.js"), "utf8"), /handleComicReader/);
   assert.match(fs.readFileSync(path.join(root, "lib/comic-reader.js"), "utf8"), /Access-Control-Allow-Origin/);
 
-  console.log("Comic Reader v2 lulus: katalog, pencarian, detail, chapter, kredit scanlation, halaman saver, proxy same-origin, cache bust, dan route deploy tervalidasi.");
+  console.log("Comic Reader v2 lulus: katalog, pencarian, detail, chapter, kredit scanlation, proxy sampul dan setiap halaman reader, cache bust, serta route deploy tervalidasi.");
 })().catch((error) => { console.error(error); process.exit(1); });
