@@ -1,0 +1,182 @@
+/* Nexora mobile readable mode
+   Keep the compact public catalog intact; enlarge only opened tools/workspaces. */
+@media (max-width:767px){
+  #nxUniversalRoom .nx-room-scroll{
+    padding:8px 0 max(30px,env(safe-area-inset-bottom))!important;
+  }
+  #nxUniversalRoom .nx-room-wrap{
+    width:100%!important;
+    max-width:none!important;
+    padding:0 8px 30px!important;
+  }
+  #nxUniversalRoom .nx-room-hero{
+    margin:0 0 8px!important;
+    padding:16px!important;
+    border-radius:18px!important;
+  }
+  #nxUniversalRoom .nx-room-hero h1{
+    font-size:clamp(24px,7.4vw,32px)!important;
+    line-height:1.12!important;
+  }
+  #nxUniversalRoom .nx-room-hero p{
+    font-size:14px!important;
+    line-height:1.65!important;
+  }
+  #nxUniversalRoom .nx-room-kicker{
+    font-size:11px!important;
+    line-height:1.45!important;
+  }
+  #nxUniversalRoom .nx-room-panel{
+    padding:12px!important;
+    border-radius:17px!important;
+  }
+  #nxUniversalRoom .nx-room-tool-body{
+    font-size:14px!important;
+    line-height:1.6!important;
+  }
+  #nxUniversalRoom .nx-room-tool-body :where(p,li,dd,dt),
+  .tool-viewer-content :where(p,li,dd,dt){
+    font-size:max(13px,.82rem)!important;
+    line-height:1.65!important;
+  }
+  #nxUniversalRoom .nx-room-tool-body :where(small),
+  .tool-viewer-content :where(small){
+    font-size:max(11px,.72rem)!important;
+    line-height:1.55!important;
+  }
+  #nxUniversalRoom .nx-room-tool-body :where(label),
+  .tool-viewer-content :where(label){
+    font-size:max(13px,.8rem)!important;
+    line-height:1.45!important;
+  }
+  #nxUniversalRoom .nx-room-tool-body :where(strong,b),
+  .tool-viewer-content :where(strong,b){
+    font-size:max(13px,1em)!important;
+    line-height:1.4!important;
+  }
+  #nxUniversalRoom .nx-room-tool-body :where(
+    [class*="-meta"],[class*="-hint"],[class*="-desc"],[class*="-note"],
+    [class*="-status"],[class*="-label"],[class*="-caption"]
+  ),
+  .tool-viewer-content :where(
+    [class*="-meta"],[class*="-hint"],[class*="-desc"],[class*="-note"],
+    [class*="-status"],[class*="-label"],[class*="-caption"]
+  ){
+    font-size:max(11px,.74rem)!important;
+    line-height:1.55!important;
+  }
+  #nxUniversalRoom .nx-room-tool-body :where(
+    input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),select,textarea,
+    .v-input,.v-select,.v-textarea
+  ),
+  .tool-viewer-content :where(
+    input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),select,textarea,
+    .v-input,.v-select,.v-textarea
+  ){
+    min-height:50px!important;
+    padding:12px 13px!important;
+    border-radius:13px!important;
+    font-size:16px!important;
+    line-height:1.4!important;
+  }
+  #nxUniversalRoom .nx-room-tool-body textarea,
+  .tool-viewer-content textarea{
+    min-height:118px!important;
+  }
+  #nxUniversalRoom .nx-room-tool-body :where(button,.v-btn,[role="button"]),
+  .tool-viewer-content :where(button,.v-btn,[role="button"]){
+    min-height:46px!important;
+    font-size:max(13px,.82rem)!important;
+    line-height:1.3!important;
+    touch-action:manipulation;
+  }
+  #nxUniversalRoom .nx-room-tool-body :where(input[type="checkbox"],input[type="radio"]),
+  .tool-viewer-content :where(input[type="checkbox"],input[type="radio"]){
+    width:20px!important;
+    height:20px!important;
+    min-width:20px!important;
+  }
+  #nxUniversalRoom .nx-room-tool-body :where(pre,code),
+  .tool-viewer-content :where(pre,code){
+    font-size:12px!important;
+    line-height:1.65!important;
+  }
+  #nxUniversalRoom .nx-room-tool-body :where(th,td),
+  .tool-viewer-content :where(th,td){
+    padding:10px 8px!important;
+    font-size:12px!important;
+    line-height:1.5!important;
+  }
+
+  /* Legacy modal tools use the same full-width, readable surface. */
+  .tool-viewer{padding:6px!important;align-items:flex-start!important;overflow-y:auto!important}
+  .tool-viewer-content{
+    width:calc(100vw - 12px)!important;
+    max-width:none!important;
+    margin:0!important;
+    padding:14px!important;
+    border-radius:17px!important;
+  }
+  .tool-viewer h2{font-size:22px!important;line-height:1.25!important}
+  .tool-viewer-close{width:46px!important;height:46px!important;min-height:46px!important}
+
+  /* Dense AI tools: switch metadata/tabs to layouts that can grow with text. */
+  .nx-prompt-builder,.nx-prompt-output{padding:14px!important;border-radius:17px!important}
+  .nx-prompt-fields{grid-template-columns:1fr!important;gap:12px!important}
+  .nx-prompt-details{grid-template-columns:1fr!important}
+  .nx-prompt-step-head strong,.nx-prompt-output-head strong{font-size:15px!important}
+  .nx-prompt-drop-empty strong{font-size:14px!important}
+  .nx-prompt-drop-empty span{font-size:12px!important}
+
+  .nda{padding:2px!important}
+  .nda-hero p{font-size:14px!important}
+  .nda-input-panel,.nda-output-panel{padding:14px!important}
+  .nda-modes{grid-template-columns:1fr!important}
+  .nda-modes label{grid-template-columns:42px minmax(0,1fr)!important;min-height:70px!important;padding:10px!important;text-align:left!important}
+  .nda-modes label>i{width:42px!important;height:42px!important;margin:0!important;font-size:15px!important}
+  .nda-modes small{display:block!important;font-size:11px!important}
+  .nda-tabs{display:flex!important;gap:6px!important;overflow-x:auto!important;padding-bottom:3px!important;scrollbar-width:none}
+  .nda-tabs::-webkit-scrollbar{display:none}
+  .nda-tabs button{flex:0 0 auto!important;min-width:112px!important;padding:0 12px!important;font-size:13px!important}
+  .nda-tabs button span{display:inline!important}
+  .nda-document-meta{display:flex!important;overflow-x:auto!important;gap:6px!important;scrollbar-width:none}
+  .nda-document-meta span{flex:0 0 auto!important;width:auto!important;min-height:34px!important;padding:0 10px!important;font-size:11px!important}
+  .nda-ai-message,.nda-user-message{max-width:96%!important;font-size:14px!important;line-height:1.65!important}
+
+  /* Intelligence/report tools contain many 6–10px desktop data labels. */
+  .nwi :where(p,small,label),.noi :where(p,small,label),.nx-crypto :where(p,small,label),
+  .nbmkg :where(p,small,label),.nip :where(p,small,label),.nvi :where(p,small,label),
+  .nse :where(p,small,label){font-size:max(12px,.75rem)!important;line-height:1.6!important}
+  .nwi :where(strong,b,button),.noi :where(strong,b,button),.nx-crypto :where(strong,b,button),
+  .nbmkg :where(strong,b,button),.nip :where(strong,b,button),.nvi :where(strong,b,button),
+  .nse :where(strong,b,button){font-size:max(13px,.82rem)!important}
+
+  /* Dedicated full-screen rooms outside the universal room. */
+  :is(#nxGetCodeOverlay,#ttRoomOverlay,#deployOverlay) :where(p,li,label,small){
+    font-size:max(12px,.75rem)!important;
+    line-height:1.6!important;
+  }
+  :is(#nxGetCodeOverlay,#ttRoomOverlay,#deployOverlay) :where(strong,b,button,a){
+    font-size:max(13px,.82rem)!important;
+  }
+  :is(#nxGetCodeOverlay,#ttRoomOverlay,#deployOverlay) :where(button,a[role="button"]){
+    min-height:44px!important;
+    touch-action:manipulation;
+  }
+  :is(#nxGetCodeOverlay,#ttRoomOverlay) :where(input,select,textarea){
+    min-height:50px!important;
+    font-size:16px!important;
+  }
+
+  /* Personal AI is also a feature surface on mobile. */
+  .nx-ai-panel .nx-ai-bubble{max-width:94%!important;font-size:14px!important;line-height:1.65!important}
+  .nx-ai-panel .nx-ai-suggestion{min-height:44px!important;font-size:13px!important;line-height:1.45!important}
+  .nx-ai-panel .nx-ai-identity b{font-size:14px!important}
+  .nx-ai-panel .nx-ai-identity span{font-size:11px!important}
+}
+
+@media (max-width:380px){
+  #nxUniversalRoom .nx-room-wrap{padding-inline:5px!important}
+  #nxUniversalRoom .nx-room-panel{padding:10px!important}
+  .tool-viewer-content{padding:12px!important}
+}
