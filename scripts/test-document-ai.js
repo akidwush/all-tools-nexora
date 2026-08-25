@@ -101,6 +101,21 @@ const response = {
     assert.equal(generated, "Ringkasan dokumen berhasil.");
     assert.deepEqual(attemptedModels, ["gemini-missing-test-model", DEFAULT_MODEL]);
 
+    process.env.DOCUMENT_AI_MODEL = DEFAULT_MODEL;
+    const defaultFailureModels = [];
+    const fallbackResult = await generate({
+      document: textDocument,
+      prompt: "Ringkas dengan fallback.",
+      timeoutMs: 3000,
+      clientFactory: async () => ({ models: { generateContent: async ({ model }) => {
+        defaultFailureModels.push(model);
+        if (model === DEFAULT_MODEL) throw { status: 404, message: "Model is not available for this API project" };
+        return { text: "Fallback Document AI berhasil." };
+      } } })
+    });
+    assert.equal(fallbackResult, "Fallback Document AI berhasil.");
+    assert.deepEqual(defaultFailureModels.slice(0, 2), [DEFAULT_MODEL, "gemini-2.5-flash"]);
+
     let authAttempts = 0;
     await assert.rejects(() => generate({
       document: textDocument,

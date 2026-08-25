@@ -3,6 +3,7 @@
 const assert = require("node:assert/strict");
 const {
   GEMINI_API_KEY_ENV_NAMES,
+  GEMINI_FALLBACK_MODELS,
   geminiErrorDetails,
   geminiGenerationConfig,
   geminiModelCandidates,
@@ -22,9 +23,9 @@ assert.equal(resolveGeminiApiKey({}).configured, false);
 
 assert.deepEqual(
   geminiModelCandidates("DOCUMENT_AI_MODEL", "gemini-stable", { DOCUMENT_AI_MODEL: "gemini-custom", GEMINI_MODEL: "gemini-shared" }),
-  ["gemini-custom", "gemini-shared", "gemini-stable"]
+  ["gemini-custom", "gemini-shared", "gemini-stable", ...GEMINI_FALLBACK_MODELS]
 );
-assert.deepEqual(geminiModelCandidates("DOCUMENT_AI_MODEL", "gemini-stable", { DOCUMENT_AI_MODEL: "gemini-stable" }), ["gemini-stable"]);
+assert.deepEqual(geminiModelCandidates("DOCUMENT_AI_MODEL", "gemini-2.5-flash", { DOCUMENT_AI_MODEL: "gemini-2.5-flash" }), GEMINI_FALLBACK_MODELS);
 assert.deepEqual(geminiGenerationConfig("gemini-3.6-flash", { temperature: 0.2, topP: 0.9, topK: 20, maxOutputTokens: 1000 }), { maxOutputTokens: 1000 });
 assert.equal(geminiGenerationConfig("gemini-3.5-flash", { temperature: 0.2 }).temperature, 0.2);
 

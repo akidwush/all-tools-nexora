@@ -102,13 +102,34 @@ async function main() {
     assert.match(requestPayload.contents[0].parts[1].text, /Midjourney/i);
     assert.ok(!JSON.stringify(generated.captured.payload).includes("gemini_test_server_secret"));
 
+    process.env.PROMPT_GENERATOR_MODEL = DEFAULT_MODEL;
+    const defaultFailureModels = [];
+    const fallbackGenerated = captureResponse();
+    await handlePromptGenerator(request("POST", {
+      fileName: "reference.png", mimeType: "image/png", fileData: `data:image/png;base64,${pngBase64}`,
+      target: "universal", style: "auto", language: "id", aspectRatio: "auto", creativity: 3, includeNegative: true
+    }, "203.0.113.92"), fallbackGenerated.response, {
+      clientFactory: async () => ({ models: { generateContent: async (payload) => {
+        defaultFailureModels.push(payload.model);
+        if (payload.model === DEFAULT_MODEL) throw { status: 404, message: "Model is not available for this API project" };
+        return { text: JSON.stringify({
+          title: "Fallback berhasil", summary: "Model cadangan aktif.",
+          prompt: "Prompt produksi lengkap yang cukup panjang untuk membuktikan fallback Gemini berhasil dan hasil dapat langsung digunakan oleh pengguna.",
+          negativePrompt: "blur", details: {}, keywords: [], warnings: [], variants: []
+        }) };
+      } } })
+    });
+    assert.equal(fallbackGenerated.captured.status, 200);
+    assert.deepEqual(defaultFailureModels.slice(0, 2), [DEFAULT_MODEL, "gemini-2.5-flash"]);
+
     const client = read("assets/js/features/prompt-generator.js");
     for (const token of ["renderPromptGenerator", "/api/prompt-generator", "Image to Video", "negative prompt", "Gambar tidak disimpan", "createImageBitmap"]) assert.ok(client.includes(token));
     assert.ok(!/GEMINI_API_KEY\s*=/.test(client));
+    assert.match(client, /finally\{if\(state\.controller===controller\)\{state\.controller=null;waiting\.hidden=true;setBusy\(false\);\}\}/);
     const css = read("assets/css/features/prompt-generator.css");
     for (const token of [".nx-prompt-layout", ".nx-prompt-details", "@media(max-width:520px)", "min-height:44px"]) assert.ok(css.includes(token));
     assert.match(css, /\.nx-prompt-waiting\[hidden\]\{display:none!important\}/);
-    assert.match(read("assets/js/core/lazy-loader.js"), /prompt-v2-state1/);
+    assert.match(read("assets/js/core/lazy-loader.js"), /prompt-v2-state2/);
     const manifest = JSON.parse(read("assets/module-manifest.json"));
     assert.equal(manifest.tools.promptgenerate, "prompt-generator");
     assert.ok(manifest.modules["prompt-generator"].js.includes("assets/js/features/prompt-generator.js"));

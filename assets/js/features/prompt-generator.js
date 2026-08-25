@@ -111,8 +111,8 @@
       try{
         var response=await window.NexoraFetch('/api/prompt-generator',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({fileName:state.file.name,mimeType:state.mimeType,fileData:state.fileData,direction:root.querySelector('#nxPromptDirection').value,target:root.querySelector('#nxPromptTarget').value,style:root.querySelector('#nxPromptStyle').value,language:root.querySelector('#nxPromptLanguage').value,aspectRatio:root.querySelector('#nxPromptRatio').value,creativity:Number(root.querySelector('#nxPromptCreativity').value),includeNegative:root.querySelector('#nxPromptNegative').checked}),signal:controller.signal,nexoraTimeoutMs:55000,nexoraRetries:0});
         var payload=await response.json().catch(function(){return {};});if(!response.ok||!payload.ok)throw new Error(payload.message||'Prompt belum dapat dibuat.');renderResult(payload);
-      }catch(error){if(error&&error.name==='AbortError')return;waiting.hidden=true;showError(error&&error.message||'Prompt Generator mengalami gangguan.');}
-      finally{if(state.controller===controller)state.controller=null;setBusy(false);}
+      }catch(error){if(state.controller!==controller)return;waiting.hidden=true;if(error&&error.name==='AbortError')return;showError(error&&error.message||'Prompt Generator mengalami gangguan.');}
+      finally{if(state.controller===controller){state.controller=null;waiting.hidden=true;setBusy(false);}}
     }
 
     choose.addEventListener('click',function(event){event.stopPropagation();fileInput.click();});drop.addEventListener('click',function(event){if(!event.target.closest('button'))fileInput.click();});fileInput.addEventListener('change',function(){selectFile(fileInput.files&&fileInput.files[0]);});
