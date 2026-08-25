@@ -176,11 +176,11 @@
     state.mode=chosen.modes[opts.mode]?opts.mode:Object.keys(chosen.modes)[0];
     if(Array.isArray(opts.colors)) (chosen.roles||[]).forEach((role,index)=>{ if(opts.colors[index]) role.color=opts.colors[index]; });
     const set=(id,value)=>{ const el=$(id); if(!el) throw new Error('Kontrol engine Text FX tidak lengkap: '+id); el.value=String(value==null?'':value); };
-    set('inputText',opts.text||'NEXORA FX');
+    set('inputText',opts.text||'flamo creative');
     set('fontName',opts.fontName||'Poppins');
-    set('fontStyle',opts.fontStyle||'700');
+    set('fontStyle',opts.fontStyle||'400');
     set('fontSize',Math.max(8,Math.min(12,Number(opts.fontSize)||12)));
-    set('filename',opts.filename||'nexora-text-fx');
+    set('filename',opts.filename||'flamo-creative#apple');
     const xml=generateXml();
     if(!xml||!/<scene\b/.test(xml)) throw new Error('XML Text FX Animation gagal dibuat.');
     return xml;

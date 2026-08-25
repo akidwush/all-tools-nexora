@@ -738,7 +738,7 @@ function resetGenerated(){generated='';$('#xml').value='';$('#xmlMobile').value=
     setField('spread', Number.isFinite(Number(opts.spread)) ? Number(opts.spread) : 500);
     setField('stagger', Number.isFinite(Number(opts.stagger)) ? Number(opts.stagger) : 50);
     setField('layerDuration', Number.isFinite(Number(opts.layerDuration)) ? Number(opts.layerDuration) : 0.7);
-    setField('endHold', Number.isFinite(Number(opts.endHold)) ? Number(opts.endHold) : 0);
+    setField('endHold', Number.isFinite(Number(opts.endHold)) ? Number(opts.endHold) : 1000);
     setField('fontName', font);
     setField('fontStyle', weight);
     setField('fontSize', Math.max(10, Math.min(220, size)));
@@ -748,7 +748,7 @@ function resetGenerated(){generated='';$('#xml').value='';$('#xmlMobile').value=
     setField('yPos', Number.isFinite(Number(opts.yPos)) ? Number(opts.yPos) : 10);
     setField('depth', Number.isFinite(Number(opts.depth)) ? Number(opts.depth) : 100);
     setField('filename', filenameBase);
-    $('#autoSpacing').checked = false;
+    $('#autoSpacing').checked = opts.autoSpacing !== false;
     prepareRoles();
     if (opts.roles && typeof opts.roles === 'object') {
       Object.keys(opts.roles).forEach((key) => {

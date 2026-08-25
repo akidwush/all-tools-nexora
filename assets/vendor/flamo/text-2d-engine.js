@@ -1297,30 +1297,30 @@
     const styles=window.STYLE_META||[];
     if(styles.some(item=>item.id===opts.style)) selectedStyle=opts.style;
     colorRoleState={
-      mode:['single','repeat','gradient','mirror'].includes(opts.colorMode)?opts.colorMode:'single',
+      mode:['single','repeat','linear','gradient','mirror'].includes(opts.colorMode)?opts.colorMode:'single',
       paletteIndex:Math.max(0,Math.min(COLOR_PALETTES.length-1,Number(opts.paletteIndex)||0)),
       repeatEvery:Math.max(1,Number(opts.repeatEvery)||2),
       customPaletteId:null,
       runtimeColors:Array.isArray(opts.colors)?opts.colors.slice(0,8):null
     };
     styleRoleState={paletteIndex:colorRoleState.paletteIndex,colors:[],customPaletteId:null};
-    graphMode=['smooth','fast','slow','random'].includes(opts.graphMode)?opts.graphMode:'smooth';
+    graphMode=['smooth','linear','fastStart','slowStart','random','custom'].includes(opts.graphMode)?opts.graphMode:'smooth';
     curveHandles=structuredCloneSafe(GRAPH_CURVES[graphMode]||GRAPH_CURVES.smooth);
-    standaloneSet('inputText',opts.text||'NEXORA CREATIVE');
+    standaloneSet('inputText',opts.text||'Flamo\nCreative');
     standaloneSet('timingTarget',opts.timingTarget==='word'?'word':'char');
     standaloneSet('spacing',Number(opts.spacing)||40);
     standaloneSet('lineHeight',Number(opts.lineHeight)||80);
-    standaloneSet('spread',Math.max(0,Number(opts.spread)||700));
-    standaloneSet('stagger',Math.max(0,Number(opts.stagger)||70));
+    standaloneSet('spread',Math.max(0,Number.isFinite(Number(opts.spread))?Number(opts.spread):100));
+    standaloneSet('stagger',Math.max(0,Number.isFinite(Number(opts.stagger))?Number(opts.stagger):50));
     standaloneSet('randomAmount',Math.max(0,Number(opts.randomAmount)||0));
     standaloneSet('seed',Number(opts.seed)||12);
-    standaloneSet('layerDuration',Math.max(.2,Number(opts.layerDuration)||2));
-    standaloneSet('extendToEnd','',opts.extendToEnd!==false);
-    standaloneSet('fontSize',Math.max(8,Number(opts.fontSize)||18));
+    standaloneSet('layerDuration',Math.max(.2,Number(opts.layerDuration)||4));
+    standaloneSet('extendToEnd','',opts.extendToEnd===true);
+    standaloneSet('fontSize',Math.max(2,Number(opts.fontSize)||10));
     standaloneSet('fontName',opts.fontName||'Lexend');
-    standaloneSet('fontStyle',opts.fontStyle||'700');
+    standaloneSet('fontStyle',opts.fontStyle||'400');
     standaloneSet('textColor',opts.textColor||'#ffffff');
-    standaloneSet('filename',opts.filename||'nexora-text-2d');
+    standaloneSet('filename',opts.filename||'flamo#blur');
     const styleSwitch=$('styleFxSwitch');
     if(styleSwitch) styleSwitch.classList.toggle('is-on',opts.styleEnabled===true);
     syncStyleRoleState(true);
