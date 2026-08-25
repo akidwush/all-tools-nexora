@@ -4,3 +4,12 @@
 @media(max-width:900px){.nfg-layout{grid-template-columns:1fr}.nfg-layout>div{display:contents}.nfg-preview-card{order:1;position:static}.nfg-layout>section.nfg-card{order:2}.nfg-history{order:3}.nfg-stage{aspect-ratio:16/9}.nfg-controls{padding:14px}.nfg-actions{margin:0 -14px -14px}.nfg-role-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:540px){.nfg{font-size:15px}.nfg-card{border-radius:16px}.nfg-card-head{padding:16px 14px 0}.nfg-card-head h2,.nfg-card-head h3{font-size:18px}.nfg-card-head p,.nfg-field>span{font-size:13px}.nfg-stage{margin:14px;min-height:230px;padding:16px}.nfg-grid{grid-template-columns:1fr}.nfg-field.wide{grid-column:auto}.nfg input:not([type=checkbox]):not([type=color]),.nfg select,.nfg textarea,.nfg-check,.nfg-btn{min-height:52px}.nfg-actions{grid-template-columns:1fr 52px;padding-bottom:max(14px,env(safe-area-inset-bottom))}.nfg-btn.secondary span{display:none}.nfg-palette{flex-basis:140px}.nfg-history{padding:14px}.nfg-history-item{grid-template-columns:minmax(0,1fr)}.nfg-history-actions{justify-content:flex-end}.nfg-role-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(prefers-reduced-motion:reduce){.nfg *{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}.nfg-preview-text.is-working{animation:none}}
+
+/* Preview safe-frame and collision guards. Keep these overrides last. */
+.nfg-stage{contain:layout paint;isolation:isolate;min-width:0;padding:28px}
+.nfg-stage::before{border:1px solid rgba(148,163,184,.11);border-radius:11px;content:"";inset:12px;pointer-events:none;position:absolute;z-index:2}
+.nfg-preview-text{display:block;hyphens:auto;letter-spacing:-.035em;line-height:1;max-height:calc(100% - 20px);max-width:calc(100% - 20px);overflow:hidden;padding:.1em .16em;text-overflow:clip;transform-origin:center;word-break:break-word}
+.nfg-vector-preview{display:block;height:auto;max-height:100%;object-fit:contain;overflow:hidden}
+.nfg-actions{position:static}
+@media(max-width:900px){.nfg-controls{padding:14px 14px 82px}.nfg-actions{bottom:0;box-shadow:0 -12px 28px rgba(3,7,17,.72);margin:0 -14px -82px;position:sticky}}
+@media(max-width:540px){.nfg-stage{padding:26px}.nfg-stage::before{inset:10px}.nfg-preview-text{max-height:calc(100% - 28px);max-width:calc(100% - 28px)}}

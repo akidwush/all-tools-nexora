@@ -63,21 +63,29 @@ for (const token of ["MAX_PALETTES=15", "new Worker", "prefers-reduced-motion", 
 }
 assert.doesNotMatch(runtime, /universe\.flamocreative\.com|wordpress|member only|login/i);
 assert.match(runtime, /if\(!preview\)return/, "Controller harus aman saat Text to Vector mengganti preview teks dengan SVG");
-assert.ok(runtime.includes('<textarea id="inputText">Flamo\\nCreative</textarea>'), "Default teks 2D harus sama dengan Flamo");
+assert.ok(runtime.includes('<textarea id="inputText">Nexora\\nCreative</textarea>'), "Default teks 2D harus memakai branding Nexora");
 for (const expected of [
   "input('spread','Spread (ms)','number',100",
   "input('stagger','Stagger (ms)','number',50",
   "input('layerDuration','Durasi layer (detik)','number',4",
   "input('endHold','End Hold (ms)','number',1000",
-  "<textarea id=\"textInput\">FLAMO</textarea>",
+  "<textarea id=\"textInput\">NEXORA</textarea>",
   "input('letterSpacing','Letter Spacing','number',10",
   "input('padding','Padding','number',20",
   "]],'fillStroke'",
-  "<textarea id=\"inputText\">Flamo Creative</textarea>",
+  "<textarea id=\"inputText\">Nexora Creative</textarea>",
   "input('stagger','Stagger (ms)','number',30",
   "input('endHold','End Hold (ms)','number',300",
   "colors:ctx.paletteTouched?ctx.colors:null"
 ]) assert.ok(runtime.includes(expected), `Default/adapter akurasi Flamo hilang: ${expected}`);
+for (const token of ["function fitPreview()", "ResizeObserver", "brandXml", "brandFile", "Nexora XML Engine"]) {
+  const haystack = token === "Nexora XML Engine" ? shell : runtime;
+  assert.ok(haystack.includes(token), `Perbaikan preview/branding Nexora hilang: ${token}`);
+}
+const generatorCss = read("assets/css/features/flamo-generators.css");
+for (const token of ["contain:layout paint", ".nfg-stage::before", "max-height:calc(100% - 20px)", "word-break:break-word", "object-fit:contain"]) {
+  assert.ok(generatorCss.includes(token), `Guard preview frame hilang: ${token}`);
+}
 assert.match(read("assets/vendor/flamo/text-2d-engine.js"), /fastStart','slowStart','random','custom/);
 assert.doesNotMatch(read("assets/vendor/flamo/text-2d-presets.js"), /status:'(?:soon|donate)'/, "Preset Coming Soon/donasi tidak boleh dibundel");
 
