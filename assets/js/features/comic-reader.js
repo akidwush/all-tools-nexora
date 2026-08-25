@@ -11,10 +11,25 @@
     var binary = atob(value);
     var bytes = new Uint8Array(binary.length);
     for(var i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
-    if(typeof TextDecoder!=='undefined') return new TextDecoder('utf-8').decode(bytes);
+    if(typeof TextDecoder!=='undefined') return patchComicApp(new TextDecoder('utf-8').decode(bytes));
     var encoded='';
     for(var j=0;j<bytes.length;j++) encoded += '%' + bytes[j].toString(16).padStart(2,'0');
-    return decodeURIComponent(encoded);
+    return patchComicApp(decodeURIComponent(encoded));
+  }
+
+  function patchComicApp(html){
+    return String(html)
+      .replace("const SOURCE_API = 'https://www.alltoolsniel.my.id/api/mangadex';", "const SOURCE_API = '/api/comics';")
+      .replace("const SOURCE_IMAGE_PROXY = 'https://www.alltoolsniel.my.id/api/mangadex?action=image-proxy&url=';", "const SOURCE_IMAGE_PROXY = '';")
+      .replace("function sourceImageUrl(raw){\n  return raw ? SOURCE_IMAGE_PROXY+encodeURIComponent(raw) : '';\n}", "function sourceImageUrl(raw){ return raw || ''; }")
+      .replace("const params=new URLSearchParams({action:'pages',id:chapter.id});", "const params=new URLSearchParams({action:'pages',id:chapter.id,quality:state.readerQuality});")
+      .replace("state.sourceMode='source';\n  return json;", "state.sourceMode='source';\n  const statusBadge=document.getElementById('nxComicApiHealth');if(statusBadge){statusBadge.className='ok';statusBadge.innerHTML='<i></i><span>Nexora Comic API aktif</span>';}\n  return json;")
+      .replace(/All Tools Nexus \/\/ Comic Core/g, 'Nexora // Comic Reader')
+      .replace(/<button class="tab" data-tab="xyz"[^>]*><i class="fa-solid fa-bolt"><\/i> xyZ Manga<\/button>/, '<button class="tab" data-tab="xyz" type="button"><i class="fa-solid fa-compass"></i> Pilihan</button>')
+      .replace('<main class="workspace">', '<main class="workspace"><div class="manga-attribution"><i class="fa-solid fa-circle-info"></i><span>Data dan halaman dari <a href="https://mangadex.org" target="_blank" rel="noopener noreferrer">MangaDex</a>. Hak karya milik kreator; chapter dikreditkan kepada grup scanlation terkait.</span></div>')
+      .replace('</head>', '<style>.manga-attribution{display:flex;align-items:flex-start;gap:8px;margin:0 0 10px;padding:9px 11px;border:1px solid rgba(192,132,252,.18);border-radius:12px;background:rgba(168,85,247,.06);color:#a995c5;font-size:9px;font-weight:700;line-height:1.55}.manga-attribution i,.manga-attribution a{color:#c084fc}.manga-attribution a{text-decoration:none}</style></head>')
+      .replace('function tracked(url){\n    try{', "function tracked(url){\n    if(String(url||'').indexOf('/api/comics')===0) return true;\n    try{")
+      .replace('return host === "api.mangadex.org" ||\n        host === "uploads.mangadex.org";', 'return host === location.hostname || host === "api.mangadex.org" ||\n        host === "uploads.mangadex.org";');
   }
 
   function closeComicReader(event){

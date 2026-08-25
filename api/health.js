@@ -5,6 +5,7 @@ const { readCachedToolHealth, normalizeCachedRows, summarizeHealth } = require("
 const handlePersonalAi = require("../lib/personal-ai-http");
 const { handleDocumentAi } = require("../lib/document-ai");
 const { handlePromptGenerator } = require("../lib/prompt-generator");
+const { handleComicReader } = require("../lib/comic-reader");
 const { authorizeTool } = require("../lib/account-membership");
 
 function send(response, status, payload, headOnly) {
@@ -26,6 +27,7 @@ module.exports = async function handler(request, response) {
     if (request.method === "POST" && !(await authorizeTool(request, response, "promptgenerate"))) return;
     return handlePromptGenerator(request, response);
   }
+  if (requestUrl.searchParams.get("mode") === "comic-reader") return handleComicReader(request, response);
   if (requestUrl.searchParams.get("mode") === "database") {
     return publicDatabaseHandler(request, response);
   }

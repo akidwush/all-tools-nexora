@@ -68,6 +68,7 @@ const API_ROUTES = Object.freeze({
   "/api/ai/chat": { file: "api/health.js", mode: "ai-chat" },
   "/api/document-ai": { file: "api/health.js", mode: "document-ai" },
   "/api/prompt-generator": { file: "api/health.js", mode: "prompt-generator" },
+  "/api/comics": { file: "api/health.js", mode: "comic-reader" },
   "/api/admin/auth": { file: "api/admin/auth.js" },
   "/api/admin/dashboard": { file: "api/admin/dashboard.js" },
   "/api/admin/tools": { file: "api/admin/tools.js" },

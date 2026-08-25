@@ -79,6 +79,10 @@
       "destination": "/api/health?mode=prompt-generator"
     },
     {
+      "source": "/api/comics",
+      "destination": "/api/health?mode=comic-reader"
+    },
+    {
       "source": "/api/admin/ai",
       "destination": "/api/admin/dashboard?mode=personal-ai"
     },
