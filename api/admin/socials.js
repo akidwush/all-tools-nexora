@@ -1,12 +1,7 @@
 const { databaseRequest } = require("../../lib/database");
 const { requireAdmin, verifyMutationRequest } = require("../../lib/admin-auth");
 const { recordAdminAudit } = require("../../lib/admin-audit");
-
-function send(response, status, payload) {
-  response.setHeader("Cache-Control", "no-store, max-age=0");
-  response.setHeader("Content-Type", "application/json; charset=utf-8");
-  return response.status(status).json(payload);
-}
+const { sendJson: send } = require("../../lib/http-response");
 
 function clean(value, maxLength) {
   return String(value || "").replace(/[\u0000-\u001f\u007f]/g, " ").trim().slice(0, maxLength);

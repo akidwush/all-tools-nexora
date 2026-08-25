@@ -13,16 +13,11 @@ const {
 const { databaseRequest } = require("../../lib/database");
 const { recordAdminAudit } = require("../../lib/admin-audit");
 const { takeFixedWindow } = require("../../lib/memory-store");
+const { sendJson: send } = require("../../lib/http-response");
 
 const attempts = new Map();
 const WINDOW_MS = 15 * 60 * 1000;
 const MAX_ATTEMPTS = 6;
-
-function send(response, status, payload) {
-  response.setHeader("Cache-Control", "no-store, max-age=0");
-  response.setHeader("Content-Type", "application/json; charset=utf-8");
-  return response.status(status).json(payload);
-}
 
 function clientIp(request) {
   return (String(request.headers["x-forwarded-for"] || "").split(",")[0].trim() || request.socket?.remoteAddress || "unknown").slice(0, 80);

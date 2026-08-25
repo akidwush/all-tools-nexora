@@ -2,17 +2,12 @@ const { auditBatch } = require("../lib/audit");
 const { handleWebIntelligence } = require("../lib/web-intelligence");
 const { authorizeTool } = require("../lib/account-membership");
 const { takeFixedWindow } = require("../lib/memory-store");
+const { sendJson: send } = require("../lib/http-response");
 
 const MAX_BODY_BYTES = 220_000;
 const WINDOW_MS = 60_000;
 const MAX_REQUESTS_PER_WINDOW = 20;
 const requestBuckets = new Map();
-
-function send(response, status, payload) {
-  response.setHeader("Cache-Control", "no-store, max-age=0");
-  response.setHeader("Content-Type", "application/json; charset=utf-8");
-  return response.status(status).json(payload);
-}
 
 function clientIp(request) {
   const forwarded = String(request.headers["x-forwarded-for"] || "").split(",")[0].trim();

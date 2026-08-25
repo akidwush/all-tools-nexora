@@ -1,16 +1,13 @@
 const publicAnalyticsHandler = require("../lib/public-analytics");
 const { anonymousHash, databaseRequest, getDatabaseConfig } = require("../lib/database");
 const { pruneMap, setBounded } = require("../lib/memory-store");
+const { sendJson } = require("../lib/http-response");
 
 const recentRequests = new Map();
 const WINDOW_MS = 60_000;
 const MAX_BODY_BYTES = 8_192;
 
-function send(response, status, payload) {
-  response.setHeader("Cache-Control", "no-store");
-  response.setHeader("Content-Type", "application/json; charset=utf-8");
-  return response.status(status).json(payload);
-}
+const send = (response, status, payload) => sendJson(response, status, payload, { cacheControl: "no-store" });
 
 function clientIp(request) {
   const forwarded = String(request.headers["x-forwarded-for"] || "").split(",")[0].trim();

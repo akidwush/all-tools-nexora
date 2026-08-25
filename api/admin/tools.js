@@ -2,17 +2,12 @@ const { databaseRequest } = require("../../lib/database");
 const { requireAdmin, verifyMutationRequest } = require("../../lib/admin-auth");
 const { recordAdminAudit } = require("../../lib/admin-audit");
 const { TOOL_CATALOG } = require("../../lib/tool-health");
+const { sendJson: send } = require("../../lib/http-response");
 
 const ALLOWED_CATEGORIES = new Set(["downloader", "maker", "tools", "vault", "external"]);
 const BUILTIN_TOOL_IDS = new Set(TOOL_CATALOG.map((item) => item.id));
 const RETIRED_TOOL_IDS = new Set(["bigimage"]);
 const TOOL_SELECT = "id,name,description,category,badge,icon,external_url,is_active,access_level,sort_order,metadata,created_at,updated_at";
-
-function send(response, status, payload) {
-  response.setHeader("Cache-Control", "no-store, max-age=0");
-  response.setHeader("Content-Type", "application/json; charset=utf-8");
-  return response.status(status).json(payload);
-}
 
 function clean(value, maxLength) {
   return String(value ?? "").replace(/[\u0000-\u001f\u007f]/g, " ").trim().slice(0, maxLength);

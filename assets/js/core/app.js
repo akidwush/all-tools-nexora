@@ -688,16 +688,16 @@ function nxBackupSources(primaryName, primaryUrl, extras) {
     return list;
 }
 
-async function nxFetchJsonWithBackup(apiId, sources, options) {
+async function nxFetchWithBackup(apiId, sources, options, readResponse) {
     const api = getApiById(apiId);
     let lastError = null;
     for (const source of sources) {
         try {
             const res = await window.NexoraFetch(source.url, options || {});
             if (!res.ok) throw new Error('HTTP ' + res.status);
-            const data = await res.json();
+            const value = await readResponse(res);
             if (api) setApiStatus(api, 'ok', 'Online via ' + source.name);
-            return { data, source };
+            return { value, source };
         } catch (e) {
             lastError = e;
         }
@@ -706,22 +706,14 @@ async function nxFetchJsonWithBackup(apiId, sources, options) {
     throw lastError || new Error('Semua API gagal');
 }
 
+async function nxFetchJsonWithBackup(apiId, sources, options) {
+    const { value: data, source } = await nxFetchWithBackup(apiId, sources, options, res => res.json());
+    return { data, source };
+}
+
 async function nxFetchBlobWithBackup(apiId, sources, options) {
-    const api = getApiById(apiId);
-    let lastError = null;
-    for (const source of sources) {
-        try {
-            const res = await window.NexoraFetch(source.url, options || {});
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            const blob = await res.blob();
-            if (api) setApiStatus(api, 'ok', 'Online via ' + source.name);
-            return { blob, source };
-        } catch (e) {
-            lastError = e;
-        }
-    }
-    if (api) setApiStatus(api, 'err', 'Semua API gagal');
-    throw lastError || new Error('Semua API gagal');
+    const { value: blob, source } = await nxFetchWithBackup(apiId, sources, options, res => res.blob());
+    return { blob, source };
 }
 
 function nxFindMediaUrl(data) {
@@ -1664,14 +1656,18 @@ let toolsData = {
     ]
 };
 
-let allTools = [
-    toolsData.tools.find(item => item.id === 'comicreader'),
-    ...toolsData.downloader,
-    ...toolsData.maker,
-    ...toolsData.tools.filter(item => item.id !== 'comicreader'),
-    ...toolsData.vault,
-    ...toolsData.external
-].filter(Boolean);
+function collectAllTools() {
+    return [
+        toolsData.tools.find(item => item.id === 'comicreader'),
+        ...toolsData.downloader,
+        ...toolsData.maker,
+        ...toolsData.tools.filter(item => item.id !== 'comicreader'),
+        ...toolsData.vault,
+        ...toolsData.external
+    ].filter(Boolean);
+}
+
+let allTools = collectAllTools();
 
 const ALL_PAGE_SIZE = 12;
 const catalogGrids = {
@@ -1733,14 +1729,7 @@ function renderGrid(containerId, items, isExternal = false, options = {}) {
 }
 
 function rebuildAllTools() {
-    allTools = [
-        toolsData.tools.find(item => item.id === 'comicreader'),
-        ...toolsData.downloader,
-        ...toolsData.maker,
-        ...toolsData.tools.filter(item => item.id !== 'comicreader'),
-        ...toolsData.vault,
-        ...toolsData.external
-    ].filter(Boolean);
+    allTools = collectAllTools();
     allRenderedCount = 0;
 }
 
@@ -2068,6 +2057,21 @@ document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') closeTool();
 });
 
+function bindCaptionCopy(buttonId, caption) {
+    const button = document.getElementById(buttonId);
+    if (!caption || !button) return;
+    button.onclick = () => {
+        navigator.clipboard.writeText(caption).then(() => {
+            button.textContent = '\u2713 Tersalin!';
+            button.classList.add('copied');
+            setTimeout(() => {
+                button.innerHTML = '<i class="fas fa-copy"></i> Copy Caption';
+                button.classList.remove('copied');
+            }, 2200);
+        });
+    };
+}
+
 function renderInstagram(body) {
     const fmtNum = n => n >= 1e6 ? (n/1e6).toFixed(1)+'M' : n >= 1e3 ? (n/1e3).toFixed(1)+'K' : (n||0).toString();
     const fmtSz  = b => b >= 1e6 ? (b/1e6).toFixed(1)+' MB' : b >= 1e3 ? (b/1e3).toFixed(0)+' KB' : (b||0)+' B';
@@ -2127,14 +2131,7 @@ function renderInstagram(body) {
                     return `<div class="dl-option"><div class="dl-option-info"><div class="dl-option-icon ${isV?'mp4':'std'}"><i class="fas fa-${isV?'video':'image'}"></i></div><div><div class="dl-option-title">${isV?'Video':'Foto'} ${validMedia.length>1?'#'+(i+1):''}</div><div class="dl-option-desc">${isV?'MP4':'JPG'}${sz}</div></div></div><button class="dl-dl-btn ${isV?'mp4':'std'}" data-url="${s2}" data-name="insta_${i+1}.${isV?'mp4':'jpg'}">&#8595; Simpan</button></div>`;
                 }).join('')}</div>
             `;
-            if (caption && document.getElementById('instaCopyCapBtn')) {
-                document.getElementById('instaCopyCapBtn').onclick = function() {
-                    navigator.clipboard.writeText(caption).then(() => {
-                        this.textContent = '\u2713 Tersalin!'; this.classList.add('copied');
-                        setTimeout(() => { this.innerHTML = '<i class="fas fa-copy"></i> Copy Caption'; this.classList.remove('copied'); }, 2200);
-                    });
-                };
-            }
+            bindCaptionCopy('instaCopyCapBtn', caption);
             target.querySelectorAll('[data-url]').forEach(btn2 => { btn2.onclick = () => dlT(btn2.dataset.url, btn2.dataset.name); });
         } catch (e) {
             if (e && e.name === 'AbortError') return;
@@ -2265,14 +2262,7 @@ function renderTiktok(body) {
                     ${musicUrl ? `<div class="dl-option"><div class="dl-option-info"><div class="dl-option-icon mp3"><i class="fas fa-music"></i></div><div><div class="dl-option-title">Audio / Musik</div><div class="dl-option-desc">${(d.music_info&&d.music_info.title)||'Soundtrack video'}</div></div></div><button class="dl-dl-btn mp3" id="ttMusicBtn">&#8595; MP3</button></div>` : ''}
                 </div>
             `;
-            if (caption && document.getElementById('ttCopyCapBtn')) {
-                document.getElementById('ttCopyCapBtn').onclick = function() {
-                    navigator.clipboard.writeText(caption).then(() => {
-                        this.textContent = '\u2713 Tersalin!'; this.classList.add('copied');
-                        setTimeout(() => { this.innerHTML = '<i class="fas fa-copy"></i> Copy Caption'; this.classList.remove('copied'); }, 2200);
-                    });
-                };
-            }
+            bindCaptionCopy('ttCopyCapBtn', caption);
             if (hdUrl && document.getElementById('ttHdBtn'))   document.getElementById('ttHdBtn').onclick   = () => dlTrigger(hdUrl,    'tiktok_hd.mp4');
             if (stdUrl && document.getElementById('ttStdBtn')) document.getElementById('ttStdBtn').onclick  = () => dlTrigger(stdUrl,   'tiktok_std.mp4');
             if (wmUrl && document.getElementById('ttWmBtn'))   document.getElementById('ttWmBtn').onclick   = () => dlTrigger(wmUrl,    'tiktok_wm.mp4');

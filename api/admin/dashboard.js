@@ -4,12 +4,7 @@ const { recordAdminAudit } = require("../../lib/admin-audit");
 const { TOOL_CATALOG, normalizeCachedRows, summarizeHealth } = require("../../lib/tool-health");
 const RETIRED_TOOL_IDS = new Set(["bigimage"]);
 const handleAdminPersonalAi = require("../../lib/admin-personal-ai-http");
-
-function send(response, status, payload) {
-  response.setHeader("Cache-Control", "no-store, max-age=0");
-  response.setHeader("Content-Type", "application/json; charset=utf-8");
-  return response.status(status).json(payload);
-}
+const { sendJson: send } = require("../../lib/http-response");
 
 function booleanValue(value, fallback = true) {
   if (value === true || value === "true" || value === 1 || value === "1") return true;

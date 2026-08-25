@@ -1,17 +1,13 @@
 const { databaseRequest } = require("../../lib/database");
 const { requireAdmin, verifyMutationRequest } = require("../../lib/admin-auth");
 const { recordAdminAudit } = require("../../lib/admin-audit");
+const { sendJson: send } = require("../../lib/http-response");
 
 const ROUTES = new Set(["/", "/about", "/feedback", "/admin/login", "/admin"]);
 const VIEWPORTS = new Set(["mobile", "tablet", "desktop"]);
 const STATUSES = new Set(["pass", "warning", "fail", "error"]);
 const MAX_THUMBNAIL_LENGTH = 240_000;
 
-function send(response, status, payload) {
-  response.setHeader("Cache-Control", "no-store, max-age=0");
-  response.setHeader("Content-Type", "application/json; charset=utf-8");
-  return response.status(status).json(payload);
-}
 function clean(value, max = 300) {
   return String(value || "").replace(/[\u0000-\u001f\u007f]/g, " ").trim().slice(0, max);
 }

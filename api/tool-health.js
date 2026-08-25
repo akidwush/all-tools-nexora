@@ -11,6 +11,7 @@ const { handleFreeConvertVectorizer } = require("../lib/freeconvert-vectorizer")
 const { handleIpIntelligence } = require("../lib/ipinfo-intelligence");
 const { handleBmkgOpenData } = require("../lib/bmkg-open-data");
 const { authorizeTool, handleAccount } = require("../lib/account-membership");
+const { sendJson: send } = require("../lib/http-response");
 const {
   TOOL_CATALOG,
   getHealthConfig,
@@ -64,12 +65,6 @@ function publicHealthOnly(mode, request, url) {
     "ip-intelligence",
     "bmkg-open-data"
   ]).has(mode) && url.searchParams.get("health") === "1";
-}
-
-function send(response, status, payload) {
-  response.setHeader("Cache-Control", "no-store, max-age=0");
-  response.setHeader("Content-Type", "application/json; charset=utf-8");
-  return response.status(status).json(payload);
 }
 
 function requestOrigin(request) {
