@@ -85,6 +85,7 @@ const response = {
     assert.ok(response.payload.acceptedKeyVariables.includes("GOOGLE_API_KEY"));
 
     const attemptedModels = [];
+    let generatedPayload = null;
     const generated = await generate({
       document: textDocument,
       prompt: "Ringkas dokumen ini.",
@@ -94,12 +95,15 @@ const response = {
         return { models: { generateContent: async (payload) => {
           attemptedModels.push(payload.model);
           if (payload.model === "gemini-missing-test-model") throw { error: { code: "NOT_FOUND", message: "Model not found" } };
+          generatedPayload = payload;
           return { text: "Ringkasan dokumen berhasil." };
         } } };
       }
     });
     assert.equal(generated, "Ringkasan dokumen berhasil.");
     assert.deepEqual(attemptedModels, ["gemini-missing-test-model", DEFAULT_MODEL]);
+    assert.deepEqual(generatedPayload.config.thinkingConfig, { thinkingLevel: "low" });
+    assert.match(lazySource, /document-ai-v3/);
 
     process.env.DOCUMENT_AI_MODEL = DEFAULT_MODEL;
     const defaultFailureModels = [];

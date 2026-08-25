@@ -100,6 +100,7 @@ async function main() {
     assert.deepEqual(attemptedModels, ["gemini-missing-test-model", DEFAULT_MODEL]);
     assert.equal(requestPayload.contents[0].parts[0].inlineData.mimeType, "image/png");
     assert.match(requestPayload.contents[0].parts[1].text, /Midjourney/i);
+    assert.deepEqual(requestPayload.config.thinkingConfig, { thinkingLevel: "low" });
     assert.ok(!JSON.stringify(generated.captured.payload).includes("gemini_test_server_secret"));
 
     process.env.PROMPT_GENERATOR_MODEL = DEFAULT_MODEL;
@@ -129,7 +130,7 @@ async function main() {
     const css = read("assets/css/features/prompt-generator.css");
     for (const token of [".nx-prompt-layout", ".nx-prompt-details", "@media(max-width:520px)", "min-height:44px"]) assert.ok(css.includes(token));
     assert.match(css, /\.nx-prompt-waiting\[hidden\]\{display:none!important\}/);
-    assert.match(read("assets/js/core/lazy-loader.js"), /prompt-v2-state2/);
+    assert.match(read("assets/js/core/lazy-loader.js"), /prompt-v2-state3/);
     const manifest = JSON.parse(read("assets/module-manifest.json"));
     assert.equal(manifest.tools.promptgenerate, "prompt-generator");
     assert.ok(manifest.modules["prompt-generator"].js.includes("assets/js/features/prompt-generator.js"));
