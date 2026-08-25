@@ -1,3 +1,11 @@
+## 6.3.18 AI configuration hotfix — 2026-08-25
+
+- Fix: Document AI, Prompt Generator, dan Personal AI kini memakai resolver API key server-side yang sama serta mendukung `GEMINI_API_KEY`, `GOOGLE_GENERATIVE_AI_API_KEY`, `GOOGLE_GEMINI_API_KEY`, dan `GOOGLE_API_KEY`.
+- Fix: nilai environment yang terbungkus quote atau tidak sengaja ditempel sebagai `NAMA_VARIABLE=nilai` dinormalisasi tanpa mengirim key ke browser maupun log.
+- Recover: model khusus yang tidak tersedia otomatis mencoba model Gemini stabil; error autentikasi dan kuota tetap fail-fast agar request tidak digandakan.
+- Diagnose: health endpoint melaporkan status konfigurasi dan model aktif tanpa mengekspos secret, sedangkan error key invalid memberi petunjuk scope Vercel dan redeploy.
+- QA: regression suite 65/65, audit 47 tool, 12/12 Vercel Functions, smoke test kedua route AI, dan build produksi lulus.
+
 ## HF11.1 — Mobile compositor recovery + health refresh
 
 - Recover: mengembalikan baseline HF8 + HF9 + HF10 yang sempat tertimpa patch HF11 lama.

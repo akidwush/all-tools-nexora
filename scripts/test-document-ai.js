@@ -3,7 +3,9 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
-const { handleDocumentAi, MAX_BINARY_BYTES, parseDocument, parseJsonResponse } = require("../lib/document-ai");
+const { generate, handleDocumentAi, MAX_BINARY_BYTES, parseDocument, parseJsonResponse } = require("../lib/document-ai");
+const { GEMINI_API_KEY_ENV_NAMES } = require("../lib/gemini-config");
+const { DEFAULT_MODEL } = require("../lib/personal-ai");
 
 const root = path.resolve(__dirname, "..");
 
@@ -65,12 +67,59 @@ const response = {
 };
 
 (async () => {
-  await handleDocumentAi({ method: "GET", headers: {}, url: "/api/document-ai" }, response);
-  assert.equal(response.statusCode, 200);
-  assert.equal(response.payload.ok, true);
-  assert.equal(response.payload.limits.maxBytes, MAX_BINARY_BYTES);
-  assert.ok(response.payload.formats.includes("application/pdf"));
-  console.log("Document AI: validasi file, parser hasil, VVIP, kuota atomik, dan health endpoint lulus.");
+  const envNames = [...GEMINI_API_KEY_ENV_NAMES, "GEMINI_MODEL", "DOCUMENT_AI_MODEL"];
+  const originalEnvironment = Object.fromEntries(envNames.map((name) => [name, process.env[name]]));
+  try {
+    envNames.forEach((name) => { delete process.env[name]; });
+    await handleDocumentAi({ method: "GET", headers: {}, url: "/api/document-ai" }, response);
+    assert.equal(response.statusCode, 200);
+    assert.equal(response.payload.ok, true);
+    assert.equal(response.payload.configured, false);
+    assert.equal(response.payload.limits.maxBytes, MAX_BINARY_BYTES);
+    assert.ok(response.payload.formats.includes("application/pdf"));
+
+    process.env.GOOGLE_API_KEY = '"document-alias-test-key"';
+    process.env.DOCUMENT_AI_MODEL = "gemini-missing-test-model";
+    await handleDocumentAi({ method: "GET", headers: {}, url: "/api/document-ai" }, response);
+    assert.equal(response.payload.configured, true, "Health harus mengenali alias GOOGLE_API_KEY.");
+    assert.ok(response.payload.acceptedKeyVariables.includes("GOOGLE_API_KEY"));
+
+    const attemptedModels = [];
+    const generated = await generate({
+      document: textDocument,
+      prompt: "Ringkas dokumen ini.",
+      timeoutMs: 3000,
+      clientFactory: async (apiKey) => {
+        assert.equal(apiKey, "document-alias-test-key");
+        return { models: { generateContent: async (payload) => {
+          attemptedModels.push(payload.model);
+          if (payload.model === "gemini-missing-test-model") throw { error: { code: "NOT_FOUND", message: "Model not found" } };
+          return { text: "Ringkasan dokumen berhasil." };
+        } } };
+      }
+    });
+    assert.equal(generated, "Ringkasan dokumen berhasil.");
+    assert.deepEqual(attemptedModels, ["gemini-missing-test-model", DEFAULT_MODEL]);
+
+    let authAttempts = 0;
+    await assert.rejects(() => generate({
+      document: textDocument,
+      prompt: "Ringkas.",
+      timeoutMs: 3000,
+      clientFactory: async () => ({ models: { generateContent: async () => {
+        authAttempts += 1;
+        throw { response: { status: 403, data: { error: { status: "PERMISSION_DENIED", message: "API key not valid" } } } };
+      } } })
+    }), (error) => error.code === "DOCUMENT_AI_AUTH_FAILED" && error.status === 503);
+    assert.equal(authAttempts, 1, "Auth error tidak boleh di-retry ke model lain.");
+
+    console.log("Document AI lulus: validasi file, alias API key, fallback model, auth fail-fast, VVIP, kuota, dan health endpoint.");
+  } finally {
+    for (const [name, value] of Object.entries(originalEnvironment)) {
+      if (value === undefined) delete process.env[name];
+      else process.env[name] = value;
+    }
+  }
 })().catch((error) => {
   console.error(error);
   process.exit(1);

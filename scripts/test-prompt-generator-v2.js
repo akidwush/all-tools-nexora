@@ -10,6 +10,8 @@ const {
   parsePromptResponse,
   resetPromptGeneratorState
 } = require("../lib/prompt-generator");
+const { GEMINI_API_KEY_ENV_NAMES } = require("../lib/gemini-config");
+const { DEFAULT_MODEL } = require("../lib/personal-ai");
 
 const root = path.resolve(__dirname, "..");
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
@@ -33,7 +35,8 @@ function request(method, body = {}, ip = "203.0.113.90") {
 }
 
 async function main() {
-  const originalKey = process.env.GEMINI_API_KEY;
+  const envNames = [...GEMINI_API_KEY_ENV_NAMES, "GEMINI_MODEL", "PROMPT_GENERATOR_MODEL"];
+  const originalEnvironment = Object.fromEntries(envNames.map((name) => [name, process.env[name]]));
   resetPromptGeneratorState();
   try {
     const parsedImage = parseImage({ fileName: "reference.png", mimeType: "image/png", fileData: `data:image/png;base64,${pngBase64}` });
@@ -55,7 +58,7 @@ async function main() {
     assert.match(normalized.prompt, /cinematic/i);
     assert.equal(normalized.variants.length, 1);
 
-    delete process.env.GEMINI_API_KEY;
+    envNames.forEach((name) => { delete process.env[name]; });
     const health = captureResponse();
     await handlePromptGenerator(request("GET"), health.response);
     assert.equal(health.captured.status, 200);
@@ -65,8 +68,10 @@ async function main() {
     await handlePromptGenerator(request("HEAD", {}, "203.0.113.91"), head.response);
     assert.equal(head.captured.status, 200);
 
-    process.env.GEMINI_API_KEY = "gemini_test_server_secret";
+    process.env.GOOGLE_GENERATIVE_AI_API_KEY = '"gemini_test_server_secret"';
+    process.env.PROMPT_GENERATOR_MODEL = "gemini-missing-test-model";
     let requestPayload = null;
+    const attemptedModels = [];
     const generated = captureResponse();
     await handlePromptGenerator(request("POST", {
       fileName: "reference.png", mimeType: "image/png", fileData: `data:image/png;base64,${pngBase64}`,
@@ -76,6 +81,8 @@ async function main() {
       clientFactory: async (key) => {
         assert.equal(key, "gemini_test_server_secret");
         return { models: { generateContent: async (payload) => {
+          attemptedModels.push(payload.model);
+          if (payload.model === "gemini-missing-test-model") throw { error: { code: "NOT_FOUND", message: "Model not found" } };
           requestPayload = payload;
           return { text: JSON.stringify({
             title: "Neon Movie Poster", summary: "Cinematic visual analysis.",
@@ -90,6 +97,7 @@ async function main() {
     assert.equal(generated.captured.status, 200);
     assert.equal(generated.captured.payload.ok, true);
     assert.equal(generated.captured.payload.meta.privacy, "not-stored");
+    assert.deepEqual(attemptedModels, ["gemini-missing-test-model", DEFAULT_MODEL]);
     assert.equal(requestPayload.contents[0].parts[0].inlineData.mimeType, "image/png");
     assert.match(requestPayload.contents[0].parts[1].text, /Midjourney/i);
     assert.ok(!JSON.stringify(generated.captured.payload).includes("gemini_test_server_secret"));
@@ -109,8 +117,10 @@ async function main() {
 
     console.log("Prompt Generator v2 lulus: Gemini Vision server-side, magic-byte image validation, model presets, privacy, Free/VVIP gate, responsive UI, copy/download, dan route aman aktif.");
   } finally {
-    if (originalKey === undefined) delete process.env.GEMINI_API_KEY;
-    else process.env.GEMINI_API_KEY = originalKey;
+    for (const [name, value] of Object.entries(originalEnvironment)) {
+      if (value === undefined) delete process.env[name];
+      else process.env[name] = value;
+    }
     resetPromptGeneratorState();
   }
 }
