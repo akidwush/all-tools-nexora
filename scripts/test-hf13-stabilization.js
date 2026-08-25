@@ -11,7 +11,9 @@ async function main() {
   assert.equal(DEFAULT_MODEL, "gemini-3.6-flash");
 
   const previousKey = process.env.GEMINI_API_KEY;
+  const previousModel = process.env.GEMINI_MODEL;
   process.env.GEMINI_API_KEY = "test-key";
+  delete process.env.GEMINI_MODEL;
   const attempted = [];
   try {
     const result = await generateGeminiReply({
@@ -35,6 +37,8 @@ async function main() {
   } finally {
     if (previousKey === undefined) delete process.env.GEMINI_API_KEY;
     else process.env.GEMINI_API_KEY = previousKey;
+    if (previousModel === undefined) delete process.env.GEMINI_MODEL;
+    else process.env.GEMINI_MODEL = previousModel;
   }
 
   const app = read("assets/js/core/app.js");
