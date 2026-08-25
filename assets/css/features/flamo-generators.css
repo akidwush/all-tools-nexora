@@ -8,8 +8,8 @@
 /* Preview safe-frame and collision guards. Keep these overrides last. */
 .nfg-stage{contain:layout paint;isolation:isolate;min-width:0;padding:28px}
 .nfg-stage::before{border:1px solid rgba(148,163,184,.11);border-radius:11px;content:"";inset:12px;pointer-events:none;position:absolute;z-index:2}
-.nfg-preview-text{display:block;hyphens:auto;letter-spacing:-.035em;line-height:1;max-height:calc(100% - 20px);max-width:calc(100% - 20px);overflow:hidden;padding:.1em .16em;text-overflow:clip;transform-origin:center;word-break:break-word}
+.nfg-preview-text{display:block;hyphens:auto;letter-spacing:-.035em;line-height:1;max-height:calc(100% - 48px);max-width:calc(100% - 48px);overflow:hidden;padding:.1em .16em;text-overflow:clip;transform-origin:center;word-break:break-word}
 .nfg-vector-preview{display:block;height:auto;max-height:100%;object-fit:contain;overflow:hidden}
 .nfg-actions{position:static}
-@media(max-width:900px){.nfg-controls{padding:14px 14px 82px}.nfg-actions{bottom:0;box-shadow:0 -12px 28px rgba(3,7,17,.72);margin:0 -14px -82px;position:sticky}}
-@media(max-width:540px){.nfg-stage{padding:26px}.nfg-stage::before{inset:10px}.nfg-preview-text{max-height:calc(100% - 28px);max-width:calc(100% - 28px)}}
+@media(max-width:900px){.nfg-controls{padding:14px}.nfg-actions{bottom:auto;box-shadow:none;margin:0 -14px -14px;position:static}}
+@media(max-width:540px){.nfg-stage{padding:30px}.nfg-stage::before{inset:10px}.nfg-preview-text{max-height:calc(100% - 56px);max-width:calc(100% - 56px)}}

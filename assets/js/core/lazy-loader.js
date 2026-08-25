@@ -59,7 +59,7 @@
   /* Vercel serves /assets with a one-hour browser cache.  A module can
      therefore otherwise keep the previous CSS/JS after a successful deploy. */
   var ASSET_VERSION = '6.3.18';
-  var ASSET_PATCH = 'nexora-xml-preview6';
+  var ASSET_PATCH = 'nexora-xml-preview7';
   var baseShowTool = typeof window.showTool === 'function' ? window.showTool : null;
   var activeCard = null;
 

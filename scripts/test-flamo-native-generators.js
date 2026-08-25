@@ -83,9 +83,10 @@ for (const token of ["function fitPreview()", "ResizeObserver", "brandXml", "bra
   assert.ok(haystack.includes(token), `Perbaikan preview/branding Nexora hilang: ${token}`);
 }
 const generatorCss = read("assets/css/features/flamo-generators.css");
-for (const token of ["contain:layout paint", ".nfg-stage::before", "max-height:calc(100% - 20px)", "word-break:break-word", "object-fit:contain"]) {
+for (const token of ["contain:layout paint", ".nfg-stage::before", "max-height:calc(100% - 48px)", "word-break:break-word", "object-fit:contain", "position:static", "box-shadow:none"]) {
   assert.ok(generatorCss.includes(token), `Guard preview frame hilang: ${token}`);
 }
+assert.ok(runtime.includes("stage.clientWidth-72") && runtime.includes("stage.clientHeight-64"), "Auto-fit harus menyisakan safe area nyata pada preview");
 assert.match(read("assets/vendor/flamo/text-2d-engine.js"), /fastStart','slowStart','random','custom/);
 assert.doesNotMatch(read("assets/vendor/flamo/text-2d-presets.js"), /status:'(?:soon|donate)'/, "Preset Coming Soon/donasi tidak boleh dibundel");
 
