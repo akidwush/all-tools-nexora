@@ -27,3 +27,78 @@
 @media (max-width:680px){.nbmkg-hero{grid-template-columns:1fr;padding:18px 15px 15px;border-radius:20px}.nbmkg-brand{position:static;width:max-content;margin-left:auto;margin-bottom:-2px}.nbmkg-hero-copy{padding-top:0}.nbmkg h2{font-size:29px}.nbmkg-tabs{gap:4px}.nbmkg-tabs button{grid-template-columns:1fr;grid-template-rows:auto auto auto;text-align:center;justify-items:center;padding:8px 5px;gap:2px;min-height:62px}.nbmkg-tabs button i{grid-row:auto;font-size:14px}.nbmkg-tabs button span{font-size:10px}.nbmkg-tabs button small{font-size:7px}.nbmkg-toolbar,.nbmkg-weather-heading,.nbmkg-alert-head{align-items:flex-start;flex-direction:column}.nbmkg-segment{width:100%;display:grid;grid-template-columns:repeat(3,1fr)}.nbmkg-quake{grid-template-columns:58px minmax(0,1fr);gap:9px;padding:11px}.nbmkg-quake-side{grid-column:1/-1;display:flex;justify-content:space-between;justify-items:stretch;max-width:none;width:100%}.nbmkg-potential{flex:1;text-align:left}.nbmkg-mag{height:58px}.nbmkg-mag strong{font-size:21px}.nbmkg-form{grid-template-columns:1fr}.nbmkg-form .nbmkg-btn{width:100%}.nbmkg-help{align-items:flex-start;flex-wrap:wrap}.nbmkg-help a{margin-left:21px}.nbmkg-forecast-grid{grid-template-columns:1fr}.nbmkg-alert{grid-template-columns:auto minmax(0,1fr)}.nbmkg-alert .nbmkg-outline{grid-column:1/-1;width:100%}.nbmkg-source{align-items:flex-start;flex-direction:column}.nbmkg-footer-links{flex-direction:column}.nbmkg-footer-links span{text-align:left}}
 @media (max-width:380px){.nbmkg{gap:10px}.nbmkg-hero{padding:14px 12px}.nbmkg-signals span{font-size:7px;padding:6px}.nbmkg-tabs button small{display:none}.nbmkg-tabs button{min-height:50px}.nbmkg-quake-stats{display:grid}.nbmkg-weather-metrics{grid-template-columns:1fr}.nbmkg-weather-metrics span{grid-template-columns:auto 1fr auto;grid-template-rows:auto}.nbmkg-weather-metrics i{grid-row:auto}.nbmkg-weather-metrics small{justify-self:end}.nbmkg-alert-head>b{min-width:46px;height:46px}}
 @media (prefers-reduced-motion:reduce){.nbmkg *{animation:none!important;transition:none!important}}
+
+/* Mobile readability and long official BMKG feed values. */
+.nbmkg :is(h2,h3,h4,p,span,small,b,strong,a){overflow-wrap:anywhere;word-break:normal}
+.nbmkg-quake h4,.nbmkg-alert h4,.nbmkg-weather-heading h3{max-width:100%;text-wrap:balance}
+.nbmkg-quake-copy>p,.nbmkg-potential,.nbmkg-felt,.nbmkg-alert p,.nbmkg-alert-meta,.nbmkg-forecast-center p,.nbmkg-source,.nbmkg-footer p{overflow-wrap:anywhere}
+.nbmkg-potential{max-width:100%}
+.nbmkg-alert>div:nth-child(2),.nbmkg-forecast-center,.nbmkg-weather-heading>div,.nbmkg-alert-head>div{min-width:0}
+
+@media (max-width:680px){
+  .nbmkg{gap:12px}
+  .nbmkg-hero{padding:16px;border-radius:18px;gap:15px}
+  .nbmkg-hero:before{background:radial-gradient(circle at 100% 0,rgba(79,194,223,.13),transparent 42%)}
+  .nbmkg-brand{margin:0;align-self:flex-start}
+  .nbmkg-kicker{flex-wrap:wrap;row-gap:5px;letter-spacing:.1em;font-size:9px}
+  .nbmkg-kicker b{margin-left:0}
+  .nbmkg h2{font-size:clamp(27px,9vw,34px);line-height:1.02;letter-spacing:-.04em}
+  .nbmkg-hero-copy>p{font-size:12px;line-height:1.55}
+  .nbmkg-signals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+  .nbmkg-signals span{min-height:42px;justify-content:center;padding:6px 5px;text-align:center;font-size:8px;line-height:1.25}
+  .nbmkg-tabs{position:sticky;top:8px;z-index:3;padding:5px;border-radius:16px;background:rgba(8,19,28,.94);backdrop-filter:blur(14px)}
+  .nbmkg-tabs button{min-width:0;min-height:64px;padding:7px 4px;line-height:1.2}
+  .nbmkg-tabs button span{font-size:10px;line-height:1.15;overflow-wrap:anywhere}
+  .nbmkg-tabs button small{font-size:8px;line-height:1.2}
+  .nbmkg-toolbar h3,.nbmkg-weather-heading h3,.nbmkg-alert-head h3,.nbmkg-weather-search h3{font-size:17px;line-height:1.2}
+  .nbmkg-quake{grid-template-columns:54px minmax(0,1fr);align-items:start;padding:11px}
+  .nbmkg-quake.is-primary{padding:12px}
+  .nbmkg-mag{height:54px;border-radius:13px}
+  .nbmkg-mag strong{font-size:21px}
+  .nbmkg-quake-copy{gap:6px}
+  .nbmkg-quake h4{font-size:12px;line-height:1.4;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+  .nbmkg-quake-copy>p{font-size:9px;line-height:1.45}
+  .nbmkg-quake-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+  .nbmkg-quake-stats span{min-width:0}
+  .nbmkg-quake-stats b{overflow-wrap:anywhere;line-height:1.25}
+  .nbmkg-quake-side{gap:6px;margin-top:1px}
+  .nbmkg-potential{font-size:8.5px;line-height:1.4;text-align:left}
+  .nbmkg-outline{min-height:34px;white-space:normal;text-align:center}
+  .nbmkg-source{font-size:9px;line-height:1.45}
+  .nbmkg-source a{max-width:100%;white-space:normal}
+  .nbmkg-weather-search{padding:15px;border-radius:18px}
+  .nbmkg-help{font-size:9px;line-height:1.5}
+  .nbmkg-help a{margin-left:21px;white-space:normal}
+  .nbmkg-weather-heading>b{align-self:flex-start}
+  .nbmkg-forecast{gap:11px;padding:14px}
+  .nbmkg-forecast-center strong{font-size:28px;flex:0 0 auto}
+  .nbmkg-forecast-center p{font-size:11px;line-height:1.4}
+  .nbmkg-weather-metrics{grid-template-columns:1fr;gap:5px}
+  .nbmkg-weather-metrics span{grid-template-columns:18px minmax(0,1fr) auto;grid-template-rows:auto;padding:8px}
+  .nbmkg-weather-metrics i{grid-row:auto;align-self:center}
+  .nbmkg-weather-metrics b{font-size:9px;overflow-wrap:anywhere}
+  .nbmkg-weather-metrics small{font-size:8px;justify-self:end;text-align:right}
+  .nbmkg-alert{align-items:start;padding:12px}
+  .nbmkg-alert h4{font-size:11px;line-height:1.4}
+  .nbmkg-alert p{font-size:9.5px;line-height:1.55}
+  .nbmkg-alert-meta{font-size:8px;line-height:1.4}
+  .nbmkg-alert .nbmkg-outline{margin-top:2px}
+  .nbmkg-footer{padding:12px 4px 0}
+  .nbmkg-footer p{font-size:9px;line-height:1.55}
+  .nbmkg-footer-links{font-size:8.5px;line-height:1.45}
+}
+
+@media (max-width:380px){
+  .nbmkg-hero{padding:14px 12px}
+  .nbmkg-brand{transform:scale(.94);transform-origin:left top}
+  .nbmkg-signals{grid-template-columns:1fr 1fr}
+  .nbmkg-signals span:last-child{grid-column:1/-1}
+  .nbmkg-tabs button{min-height:56px}
+  .nbmkg-tabs button small{display:none}
+  .nbmkg-tabs button span{font-size:9px}
+  .nbmkg-quake{grid-template-columns:48px minmax(0,1fr);gap:8px;padding:10px}
+  .nbmkg-mag{height:48px}.nbmkg-mag strong{font-size:19px}
+  .nbmkg-quake-stats{grid-template-columns:1fr}
+  .nbmkg-quake-side{display:grid;grid-template-columns:1fr;gap:5px}
+  .nbmkg-outline{width:100%}
+}
