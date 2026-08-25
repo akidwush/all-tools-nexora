@@ -1,6 +1,6 @@
 # All Tools Nexora
 
-All Tools Nexora v6.3.18 adalah website toolkit statis dengan 47 tool, lazy-loaded feature modules, dashboard admin, Supabase, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency `@google/genai`.
+All Tools Nexora v6.3.18 adalah website toolkit statis dengan 53 tool, lazy-loaded feature modules, dashboard admin, Supabase, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency `@google/genai`.
 
 ## Menjalankan secara lokal
 
@@ -44,6 +44,19 @@ npm run dev
 
 `assets/js/core/tool-registry.js` adalah sumber daftar tool. `assets/module-manifest.json`, `lib/tool-health.js`, dan seed `database/schema.sql` wajib tetap sinkron; `npm run check` memverifikasi semuanya.
 
+## Generator XML lokal
+
+Enam generator native berikut dimuat per route dan tidak bergantung pada WordPress atau jaringan Flamo:
+
+- `#tool-text2d` — 2D Text Animate / Text FX.
+- `#tool-text3d` — 3D Text Animate.
+- `#tool-textfxanimation` — Text FX Animation.
+- `#tool-textvector` — Text to Vector dengan OpenType lokal di Web Worker.
+- `#tool-trimpath` — Trimpath Generator.
+- `#tool-logoanimate` — Logo Animate.
+
+Preset, template XML, data huruf, dan 16 file font disimpan di `assets/vendor/flamo`, `assets/data/flamo`, dan `assets/fonts/flamo`. Semua akses member lokal dibuka, palet custom dibatasi 15 per perangkat, dan hasil tersimpan sebagai riwayat lokal. Logo Animate mempertahankan media placeholder bawaan template; ganti media logo di Alight Motion setelah impor XML.
+
 ## Konfigurasi
 
 Salin `.env.example` dan isi hanya layanan yang digunakan. Variable utama:
@@ -63,6 +76,8 @@ SVG → Alight XML memakai API resmi `https://svgtoxml.vercel.app`: simpan key s
 Untuk instalasi baru, jalankan `database/schema.sql` melalui Supabase SQL Editor. Buat user di Supabase Authentication, ganti `GANTI_EMAIL_ADMIN` pada `database/setup-first-admin.sql`, lalu jalankan file tersebut.
 
 Untuk database lama, jalankan migration yang belum pernah diterapkan dari `database/migrations/` sesuai urutan nomor. Backup database terlebih dahulu.
+
+Migration `database/migrations/026_flamo_native_generators.sql` menambahkan enam generator XML lokal ke katalog database. Frontend tetap mempertahankan katalog bundle jika database belum diperbarui, tetapi migration ini perlu dijalankan sekali agar Dashboard Admin dan data Supabase ikut sinkron.
 
 Migration `database/migrations/016_hero_video_settings.sql` mengaktifkan pengaturan video header. Setelah migration dijalankan, buka **Dashboard Admin → Ringkasan Sistem → Video Header**, isi URL MP4/WebM HTTPS langsung, lalu simpan. Pengaturan tersimpan di `app_settings.site.heroVideo` dan dibaca halaman publik tanpa mengekspos service-role key.
 

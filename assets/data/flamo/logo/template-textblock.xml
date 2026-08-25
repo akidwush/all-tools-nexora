@@ -1,0 +1,468 @@
+  <embedScene id="38" label="Group 1" startTime="3234" endTime="8333" fillType="intrinsic" outTime="5099">
+    <transform>
+      <location value="734.083862,559.163391,0.000000"/>
+      <pivot value="0.000000,302.425781"/>
+    </transform>
+    <fillColor value="#FF000000"/>
+    <effect id="com.alightcreative.effects.glowscan" locallyApplied="false">
+      <property name="threshold" type="float">
+        <kf t="0.127476" v="0.480000"/>
+        <kf t="0.239256" v="1.000000"/>
+      </property>
+    </effect>
+    <effect id="com.alightcreative.effects.hueshift" locallyApplied="true">
+      <property name="hue" type="float" value="106.000000"/>
+    </effect>
+    <scene title="" width="2257" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="3783" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+      <embedScene id="40" label="Group and Mask 1" startTime="0" endTime="3783" fillType="intrinsic" outTime="3783">
+        <transform>
+          <location value="1128.500000,541.000000,0.000000"/>
+          <pivot value="-0.350098,301.425781"/>
+        </transform>
+        <fillColor value="#FF000000"/>
+        <effect id="com.alightcreative.effects.mosaic" locallyApplied="true">
+          <property name="size" type="float" value="17.500000"/>
+        </effect>
+        <effect id="com.alightcreative.spectralmap" locallyApplied="true">
+          <property name="blueColor" type="color" value="#FF8589EB"/>
+          <property name="greenColor" type="color" value="#FF139CFF"/>
+          <property name="phase" type="float" value="-4.985000"/>
+          <property name="redColor" type="color" value="#FFF238A9"/>
+        </effect>
+        <scene title="" width="2259" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="3783" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+          <text id="37" label="Flamo Tools" startTime="0" endTime="3783" fillType="color" size="18.000000" font="imported?name=PlusJakartaSans-SemiBold.ttf" wrapWidth="720" align="center">
+            <transform>
+              <location value="1127.827026,842.425781,0.000000"/>
+              <scale value="3.132853,3.132853"/>
+            </transform>
+            <effect id="com.alightcreative.effects.texttransform" locallyApplied="false">
+              <property name="alpha" type="float" value="-1.000000"/>
+              <property name="anchor" type="int" value="1"/>
+              <property name="component" type="int" value="2"/>
+              <property name="easeIn" type="float" value="1.000000"/>
+              <property name="offset" type="vec2" value="0.000000,117.000000"/>
+              <property name="overlap" type="float" value="5.000000"/>
+              <property name="start" type="float">
+                <kf t="0.000000" v="0.000000"/>
+                <kf t="0.459183" v="1.000000" e="cubicBezier 0.0 0.0 0.58 1.0"/>
+              </property>
+            </effect>
+            <content>Flamo Tools</content>
+</text>
+          <shape id="39" label="Rectangle 1" startTime="0" endTime="3783" fillType="color" blending="mask" s=".rect">
+            <transform>
+              <location value="1128.149902,842.425781,0.000000"/>
+              <pivot value="-534.333496,0.000000"/>
+              <scale>
+                <kf t="0.000000" v="0.000001,1.000000"/>
+                <kf t="0.269606" v="1.000000,1.000000" e="cubicBezier 0.42 0.0 0.0 1.0"/>
+              </scale>
+            </transform>
+            <fillColor value="#FFD6AADC"/>
+            <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+              <property name="strength" type="float" value="0.390000"/>
+            </effect>
+            <property name="size" type="vec2" value="510.789062,100.000000"/>
+          </shape>
+          <shape id="43" label="Rectangle 1 Copy" startTime="0" endTime="3783" fillType="color" blending="mask" s=".rect">
+            <transform>
+              <location value="1128.145874,842.425781,0.000000"/>
+              <pivot value="595.666626,0.000000"/>
+              <scale>
+                <kf t="0.022919" v="1.000000,1.000000"/>
+                <kf t="0.362147" v="0.000001,1.000000" e="cubicBezier 0.56306785 0.0 0.15781711 1.0"/>
+              </scale>
+            </transform>
+            <fillColor value="#FFD6AADC"/>
+            <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+              <property name="strength" type="float" value="0.390000"/>
+            </effect>
+            <property name="size" type="vec2" value="510.789062,100.000000"/>
+          </shape>
+        </scene>
+      </embedScene>
+      <embedScene id="46" label="Group and Mask 1 Copy 2" startTime="0" endTime="3783" fillType="intrinsic" blending="linear-dodge" outTime="3783">
+        <transform>
+          <location value="1128.500000,541.000000,0.000000"/>
+          <pivot value="-0.350098,301.425781"/>
+          <opacity value="0.707763"/>
+        </transform>
+        <fillColor value="#FF000000"/>
+        <effect id="com.alightcreative.effects.mosaic" locallyApplied="true">
+          <property name="size" type="float" value="17.500000"/>
+        </effect>
+        <effect id="com.alightcreative.spectralmap" locallyApplied="true">
+          <property name="blueColor" type="color" value="#FF8589EB"/>
+          <property name="greenColor" type="color" value="#FF139CFF"/>
+          <property name="phase" type="float" value="-4.985000"/>
+          <property name="redColor" type="color" value="#FFF238A9"/>
+        </effect>
+        <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+          <property name="smoothing" type="float" value="1.150000"/>
+        </effect>
+        <effect id="com.alightcreative.effects.chromakey" locallyApplied="true">
+          <property name="keyColor" type="color" value="#FFFFFFFF"/>
+        </effect>
+        <effect id="com.alightcreative.solidcolor" locallyApplied="true">
+          <property name="color" type="color" value="#FFFFFFFF"/>
+        </effect>
+        <scene title="" width="2259" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="3783" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+          <text id="37" label="Flamo Tools" startTime="0" endTime="3783" fillType="color" size="18.000000" font="imported?name=PlusJakartaSans-SemiBold.ttf" wrapWidth="720" align="center">
+            <transform>
+              <location value="1127.827026,842.425781,0.000000"/>
+              <scale value="3.132853,3.132853"/>
+            </transform>
+            <effect id="com.alightcreative.effects.texttransform" locallyApplied="false">
+              <property name="alpha" type="float" value="-1.000000"/>
+              <property name="anchor" type="int" value="1"/>
+              <property name="component" type="int" value="2"/>
+              <property name="easeIn" type="float" value="1.000000"/>
+              <property name="offset" type="vec2" value="0.000000,117.000000"/>
+              <property name="overlap" type="float" value="5.000000"/>
+              <property name="start" type="float">
+                <kf t="0.000000" v="0.000000"/>
+                <kf t="0.459183" v="1.000000" e="cubicBezier 0.0 0.0 0.58 1.0"/>
+              </property>
+            </effect>
+            <content>Flamo Tools</content>
+</text>
+          <shape id="39" label="Rectangle 1" startTime="0" endTime="3783" fillType="color" blending="mask" s=".rect">
+            <transform>
+              <location value="1128.149902,842.425781,0.000000"/>
+              <pivot value="-534.333496,0.000000"/>
+              <scale>
+                <kf t="0.000000" v="0.000001,1.000000"/>
+                <kf t="0.269606" v="1.000000,1.000000" e="cubicBezier 0.42 0.0 0.0 1.0"/>
+              </scale>
+            </transform>
+            <fillColor value="#FFD6AADC"/>
+            <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+              <property name="strength" type="float" value="0.390000"/>
+            </effect>
+            <property name="size" type="vec2" value="510.789062,100.000000"/>
+          </shape>
+          <shape id="43" label="Rectangle 1 Copy" startTime="0" endTime="3783" fillType="color" blending="mask" s=".rect">
+            <transform>
+              <location value="1128.145874,842.425781,0.000000"/>
+              <pivot value="595.666626,0.000000"/>
+              <scale>
+                <kf t="0.022919" v="1.000000,1.000000"/>
+                <kf t="0.362147" v="0.000001,1.000000" e="cubicBezier 0.56306785 0.0 0.15781711 1.0"/>
+              </scale>
+            </transform>
+            <fillColor value="#FFD6AADC"/>
+            <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+              <property name="strength" type="float" value="0.390000"/>
+            </effect>
+            <property name="size" type="vec2" value="510.789062,100.000000"/>
+          </shape>
+        </scene>
+      </embedScene>
+      <embedScene id="47" label="Group and Mask 1 Copy 3" startTime="0" endTime="3783" fillType="intrinsic" blending="linear-dodge" outTime="3783">
+        <transform>
+          <location value="1128.500000,541.000000,0.000000"/>
+          <pivot value="-0.350098,301.425781"/>
+          <opacity value="0.842493"/>
+        </transform>
+        <fillColor value="#FF000000"/>
+        <effect id="com.alightcreative.effects.mosaic" locallyApplied="true">
+          <property name="size" type="float" value="17.500000"/>
+        </effect>
+        <effect id="com.alightcreative.spectralmap" locallyApplied="true">
+          <property name="blueColor" type="color" value="#FF8589EB"/>
+          <property name="greenColor" type="color" value="#FF139CFF"/>
+          <property name="phase" type="float" value="-4.985000"/>
+          <property name="redColor" type="color" value="#FFF238A9"/>
+        </effect>
+        <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+          <property name="smoothing" type="float" value="2.330000"/>
+        </effect>
+        <effect id="com.alightcreative.effects.chromakey" locallyApplied="true">
+          <property name="keyColor" type="color" value="#FFFFFFFF"/>
+        </effect>
+        <effect id="com.alightcreative.solidcolor" locallyApplied="true">
+          <property name="color" type="color" value="#FFFFFFFF"/>
+        </effect>
+        <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+          <property name="strength" type="float" value="0.285000"/>
+        </effect>
+        <scene title="" width="2259" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="3783" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+          <text id="37" label="Flamo Tools" startTime="0" endTime="3783" fillType="color" size="18.000000" font="imported?name=PlusJakartaSans-SemiBold.ttf" wrapWidth="720" align="center">
+            <transform>
+              <location value="1127.827026,842.425781,0.000000"/>
+              <scale value="3.132853,3.132853"/>
+            </transform>
+            <effect id="com.alightcreative.effects.texttransform" locallyApplied="false">
+              <property name="alpha" type="float" value="-1.000000"/>
+              <property name="anchor" type="int" value="1"/>
+              <property name="component" type="int" value="2"/>
+              <property name="easeIn" type="float" value="1.000000"/>
+              <property name="offset" type="vec2" value="0.000000,117.000000"/>
+              <property name="overlap" type="float" value="5.000000"/>
+              <property name="start" type="float">
+                <kf t="0.000000" v="0.000000"/>
+                <kf t="0.459183" v="1.000000" e="cubicBezier 0.0 0.0 0.58 1.0"/>
+              </property>
+            </effect>
+            <content>Flamo Tools</content>
+</text>
+          <shape id="39" label="Rectangle 1" startTime="0" endTime="3783" fillType="color" blending="mask" s=".rect">
+            <transform>
+              <location value="1128.149902,842.425781,0.000000"/>
+              <pivot value="-534.333496,0.000000"/>
+              <scale>
+                <kf t="0.000000" v="0.000001,1.000000"/>
+                <kf t="0.269606" v="1.000000,1.000000" e="cubicBezier 0.42 0.0 0.0 1.0"/>
+              </scale>
+            </transform>
+            <fillColor value="#FFD6AADC"/>
+            <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+              <property name="strength" type="float" value="0.390000"/>
+            </effect>
+            <property name="size" type="vec2" value="510.789062,100.000000"/>
+          </shape>
+          <shape id="43" label="Rectangle 1 Copy" startTime="0" endTime="3783" fillType="color" blending="mask" s=".rect">
+            <transform>
+              <location value="1128.145874,842.425781,0.000000"/>
+              <pivot value="595.666626,0.000000"/>
+              <scale>
+                <kf t="0.022919" v="1.000000,1.000000"/>
+                <kf t="0.362147" v="0.000001,1.000000" e="cubicBezier 0.56306785 0.0 0.15781711 1.0"/>
+              </scale>
+            </transform>
+            <fillColor value="#FFD6AADC"/>
+            <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+              <property name="strength" type="float" value="0.390000"/>
+            </effect>
+            <property name="size" type="vec2" value="510.789062,100.000000"/>
+          </shape>
+        </scene>
+      </embedScene>
+      <embedScene id="42" label="Group and Mask 1 Copy" startTime="0" endTime="3783" fillType="color" blending="linear-dodge" outTime="3783">
+        <transform>
+          <location value="1128.500000,541.000000,0.000000"/>
+          <pivot value="-0.350098,301.425781"/>
+        </transform>
+        <fillColor value="#FFF238A9"/>
+        <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+          <property name="strength" type="float" value="0.285000"/>
+        </effect>
+        <scene title="" width="2259" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="3783" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+          <text id="37" label="Flamo Tools" startTime="0" endTime="3783" fillType="color" size="18.000000" font="imported?name=PlusJakartaSans-SemiBold.ttf" wrapWidth="720" align="center">
+            <transform>
+              <location value="1127.827026,842.425781,0.000000"/>
+              <scale value="3.132853,3.132853"/>
+            </transform>
+            <effect id="com.alightcreative.effects.texttransform" locallyApplied="false">
+              <property name="alpha" type="float" value="-1.000000"/>
+              <property name="anchor" type="int" value="1"/>
+              <property name="component" type="int" value="2"/>
+              <property name="easeIn" type="float" value="1.000000"/>
+              <property name="offset" type="vec2" value="0.000000,117.000000"/>
+              <property name="overlap" type="float" value="5.000000"/>
+              <property name="start" type="float">
+                <kf t="0.000000" v="0.000000"/>
+                <kf t="0.459183" v="1.000000" e="cubicBezier 0.0 0.0 0.58 1.0"/>
+              </property>
+            </effect>
+            <content>Flamo Tools</content>
+</text>
+          <shape id="39" label="Rectangle 1" startTime="0" endTime="3783" fillType="color" blending="mask" s=".rect">
+            <transform>
+              <location value="1128.149902,842.425781,0.000000"/>
+              <pivot value="-534.333496,0.000000"/>
+              <scale>
+                <kf t="0.000000" v="0.000001,1.000000"/>
+                <kf t="0.326982" v="1.000000,1.000000" e="cubicBezier 0.42 0.0 0.0 1.0"/>
+              </scale>
+            </transform>
+            <fillColor value="#FFD6AADC"/>
+            <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+              <property name="strength" type="float" value="0.390000"/>
+            </effect>
+            <property name="size" type="vec2" value="510.789062,100.000000"/>
+          </shape>
+          <shape id="49" label="Rectangle 1 Copy" startTime="0" endTime="3783" fillType="color" blending="mask" s=".rect">
+            <transform>
+              <location value="1128.145874,842.425781,0.000000"/>
+              <pivot value="595.666626,0.000000"/>
+              <scale>
+                <kf t="0.022919" v="1.000000,1.000000"/>
+                <kf t="0.362147" v="0.000001,1.000000" e="cubicBezier 0.56306785 0.0 0.15781711 1.0"/>
+              </scale>
+            </transform>
+            <fillColor value="#FFD6AADC"/>
+            <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+              <property name="strength" type="float" value="0.390000"/>
+            </effect>
+            <property name="size" type="vec2" value="510.789062,100.000000"/>
+          </shape>
+        </scene>
+      </embedScene>
+      <embedScene id="50" label="Group and Mask 1 Copy 5" startTime="0" endTime="3783" fillType="color" blending="linear-dodge" outTime="3783">
+        <transform>
+          <location value="1128.500000,541.000000,0.000000"/>
+          <pivot value="-0.350098,301.425781"/>
+        </transform>
+        <fillColor value="#FFFF9500"/>
+        <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+          <property name="strength" type="float" value="0.285000"/>
+        </effect>
+        <scene title="" width="2259" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="3783" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+          <text id="37" label="Flamo Tools" startTime="0" endTime="3783" fillType="color" size="18.000000" font="imported?name=PlusJakartaSans-SemiBold.ttf" wrapWidth="720" align="center">
+            <transform>
+              <location value="1127.827026,842.425781,0.000000"/>
+              <scale value="3.132853,3.132853"/>
+            </transform>
+            <effect id="com.alightcreative.effects.texttransform" locallyApplied="false">
+              <property name="alpha" type="float" value="-1.000000"/>
+              <property name="anchor" type="int" value="1"/>
+              <property name="component" type="int" value="2"/>
+              <property name="easeIn" type="float" value="1.000000"/>
+              <property name="offset" type="vec2" value="0.000000,117.000000"/>
+              <property name="overlap" type="float" value="5.000000"/>
+              <property name="start" type="float">
+                <kf t="0.000000" v="0.000000"/>
+                <kf t="0.459183" v="1.000000" e="cubicBezier 0.0 0.0 0.58 1.0"/>
+              </property>
+            </effect>
+            <content>Flamo Tools</content>
+</text>
+          <shape id="39" label="Rectangle 1" startTime="0" endTime="3783" fillType="color" blending="mask" s=".rect">
+            <transform>
+              <location value="1128.149902,842.425781,0.000000"/>
+              <pivot value="-534.333496,0.000000"/>
+              <scale>
+                <kf t="0.000000" v="0.000001,1.000000"/>
+                <kf t="0.326982" v="1.000000,1.000000" e="cubicBezier 0.42 0.0 0.0 1.0"/>
+              </scale>
+            </transform>
+            <fillColor value="#FFD6AADC"/>
+            <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+              <property name="strength" type="float" value="0.390000"/>
+            </effect>
+            <property name="size" type="vec2" value="510.789062,100.000000"/>
+          </shape>
+          <shape id="49" label="Rectangle 1 Copy" startTime="0" endTime="3783" fillType="color" blending="mask" s=".rect">
+            <transform>
+              <location value="1128.145874,842.425781,0.000000"/>
+              <pivot value="595.666626,0.000000"/>
+              <scale>
+                <kf t="0.022919" v="1.000000,1.000000"/>
+                <kf t="0.362147" v="0.000001,1.000000" e="cubicBezier 0.56306785 0.0 0.15781711 1.0"/>
+              </scale>
+            </transform>
+            <fillColor value="#FFD6AADC"/>
+            <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+              <property name="strength" type="float" value="0.390000"/>
+            </effect>
+            <property name="size" type="vec2" value="510.789062,100.000000"/>
+          </shape>
+        </scene>
+      </embedScene>
+      <embedScene id="51" label="Group and Mask 1 Copy 6" startTime="0" endTime="3783" fillType="color" blending="linear-dodge" outTime="3783">
+        <transform>
+          <location value="1128.500000,541.000000,0.000000"/>
+          <pivot value="-0.350098,301.425781"/>
+        </transform>
+        <fillColor value="#FF8000FF"/>
+        <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+          <property name="strength" type="float" value="0.285000"/>
+        </effect>
+        <scene title="" width="2259" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="3783" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+          <text id="37" label="Flamo Tools" startTime="0" endTime="3783" fillType="color" size="18.000000" font="imported?name=PlusJakartaSans-SemiBold.ttf" wrapWidth="720" align="center">
+            <transform>
+              <location value="1127.827026,842.425781,0.000000"/>
+              <scale value="3.132853,3.132853"/>
+            </transform>
+            <effect id="com.alightcreative.effects.texttransform" locallyApplied="false">
+              <property name="alpha" type="float" value="-1.000000"/>
+              <property name="anchor" type="int" value="1"/>
+              <property name="component" type="int" value="2"/>
+              <property name="easeIn" type="float" value="1.000000"/>
+              <property name="offset" type="vec2" value="0.000000,117.000000"/>
+              <property name="overlap" type="float" value="5.000000"/>
+              <property name="start" type="float">
+                <kf t="0.000000" v="0.000000"/>
+                <kf t="0.459183" v="1.000000" e="cubicBezier 0.0 0.0 0.58 1.0"/>
+              </property>
+            </effect>
+            <content>Flamo Tools</content>
+</text>
+          <shape id="39" label="Rectangle 1" startTime="0" endTime="3783" fillType="color" blending="mask" s=".rect">
+            <transform>
+              <location value="1128.149902,842.425781,0.000000"/>
+              <pivot value="-534.333496,0.000000"/>
+              <scale>
+                <kf t="0.000000" v="0.000001,1.000000"/>
+                <kf t="0.278596" v="1.000000,1.000000" e="cubicBezier 0.42 0.0 0.0 1.0"/>
+              </scale>
+            </transform>
+            <fillColor value="#FFD6AADC"/>
+            <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+              <property name="strength" type="float" value="0.390000"/>
+            </effect>
+            <property name="size" type="vec2" value="510.789062,100.000000"/>
+          </shape>
+          <shape id="49" label="Rectangle 1 Copy" startTime="0" endTime="3783" fillType="color" blending="mask" s=".rect">
+            <transform>
+              <location value="1128.145874,842.425781,0.000000"/>
+              <pivot value="595.666626,0.000000"/>
+              <scale>
+                <kf t="0.000973" v="1.000000,1.000000"/>
+                <kf t="0.353422" v="0.000001,1.000000" e="cubicBezier 0.56306785 0.0 0.15781711 1.0"/>
+              </scale>
+            </transform>
+            <fillColor value="#FFD6AADC"/>
+            <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+              <property name="strength" type="float" value="0.390000"/>
+            </effect>
+            <property name="size" type="vec2" value="510.789062,100.000000"/>
+          </shape>
+        </scene>
+      </embedScene>
+      <embedScene id="48" label="Group and Mask 1 Copy 4" startTime="0" endTime="3783" fillType="intrinsic" outTime="3783">
+        <transform>
+          <location value="1128.500000,541.000000,0.000000"/>
+          <pivot value="-0.350098,301.425781"/>
+        </transform>
+        <fillColor value="#FF000000"/>
+        <scene title="" width="2259" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="3783" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+          <text id="37" label="Flamo Tools" startTime="0" endTime="3783" fillType="color" size="18.000000" font="imported?name=PlusJakartaSans-SemiBold.ttf" wrapWidth="720" align="center">
+            <transform>
+              <location value="1127.827026,842.425781,0.000000"/>
+              <scale value="3.132853,3.132853"/>
+            </transform>
+            <effect id="com.alightcreative.effects.texttransform" locallyApplied="false">
+              <property name="alpha" type="float" value="-1.000000"/>
+              <property name="anchor" type="int" value="1"/>
+              <property name="component" type="int" value="2"/>
+              <property name="easeIn" type="float" value="1.000000"/>
+              <property name="offset" type="vec2" value="0.000000,117.000000"/>
+              <property name="overlap" type="float" value="5.000000"/>
+              <property name="start" type="float">
+                <kf t="0.000000" v="0.000000"/>
+                <kf t="0.459183" v="1.000000" e="cubicBezier 0.0 0.0 0.58 1.0"/>
+              </property>
+            </effect>
+            <content>Flamo Tools</content>
+</text>
+          <shape id="39" label="Rectangle 1" startTime="0" endTime="3783" fillType="color" blending="mask" s=".rect">
+            <transform>
+              <location value="1128.149902,842.425781,0.000000"/>
+              <pivot value="-534.333496,0.000000"/>
+              <scale>
+                <kf t="0.000000" v="0.000001,1.000000"/>
+                <kf t="0.406303" v="1.000000,1.000000" e="cubicBezier 0.42 0.0 0.0 1.0"/>
+              </scale>
+            </transform>
+            <fillColor value="#FFD6AADC"/>
+            <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+              <property name="strength" type="float" value="0.295000"/>
+            </effect>
+            <property name="size" type="vec2" value="510.789062,100.000000"/>
+          </shape>
+        </scene>
+      </embedScene>
+    </scene>
+  </embedScene>

@@ -1635,6 +1635,12 @@ let toolsData = {
         { id: 'svgalight', icon: 'fa-solid fa-wand-magic-sparkles', name: 'SVG → Alight XML', desc: 'Konversi SVG ke XML Alight Motion dengan AM Optimized, Maximum Fidelity, audit kesamaan, dan kontrol layer', badge: 'ENGINE v1.8' },
         { id: 'alightpremium', icon: 'fa-solid fa-bolt', name: 'Alight Motion Premium 1 Tahun', desc: 'Request magic link lalu proses aktivasi Premium melalui API reseller', badge: '1 YEAR' },
         { id: 'imagevectorizer', icon: 'fa-solid fa-bezier-curve', name: 'Nexora Image Vectorizer', desc: 'Ubah PNG atau JPG menjadi SVG melalui FreeConvert Cloud', badge: 'SVG' },
+        { id: 'text2d', icon: 'fa-solid fa-font', name: '2D Text Animate / Text FX', desc: 'Buat XML animasi teks 2D dengan preset dan Style FX lokal', badge: 'XML' },
+        { id: 'text3d', icon: 'fa-solid fa-cube', name: '3D Text Animate', desc: 'Buat XML teks 3D, extrude, offset, dan long shadow', badge: '7 PRESET' },
+        { id: 'textfxanimation', icon: 'fa-solid fa-wand-magic-sparkles', name: 'Text FX Animation', desc: 'Preset efek teks native untuk Alight Motion', badge: '5 PRESET' },
+        { id: 'textvector', icon: 'fa-solid fa-draw-polygon', name: 'Text to Vector', desc: 'Ubah font lokal menjadi path vector Alight Motion', badge: 'OPENTYPE' },
+        { id: 'trimpath', icon: 'fa-solid fa-route', name: 'Trimpath Generator', desc: 'Generator trimpath huruf dengan style, timing, dan color mapping', badge: 'LOCAL XML' },
+        { id: 'logoanimate', icon: 'fa-solid fa-shapes', name: 'Logo Animate', desc: 'Template animasi logo dan text block Alight Motion', badge: '8.33S' },
         { id: 'calc', icon: 'fa-solid fa-calculator', name: 'Calculator', desc: 'Hitung cepat', badge: 'Math' },
         { id: 'pwgen', icon: 'fa-solid fa-key', name: 'Password Gen', desc: 'Password aman', badge: 'Secure' },
         { id: 'morse', icon: 'fa-solid fa-tower-broadcast', name: 'Morse Code', desc: 'Konversi morse', badge: 'Audio' },
@@ -2007,6 +2013,12 @@ function showTool(toolId) {
         case 'svgalight': renderSvgAlight(body); break;
         case 'alightpremium': renderAlightPremium(body); break;
         case 'imagevectorizer': renderImageVectorizer(body); break;
+        case 'text2d': renderFlamoText2D(body); break;
+        case 'text3d': renderFlamoText3D(body); break;
+        case 'textfxanimation': renderFlamoTextFxAnimation(body); break;
+        case 'textvector': renderFlamoTextVector(body); break;
+        case 'trimpath': renderFlamoTrimpath(body); break;
+        case 'logoanimate': renderFlamoLogoAnimate(body); break;
         case 'promptgenerate': renderPromptGenerator(body); break;
         case 'fakeovo': renderFakeOvo(body); break;
         case 'quotegenerator': renderQuoteGenerator(body); break;

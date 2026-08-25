@@ -181,6 +181,30 @@
       "js": [
         "assets/js/features/alight-premium.js"
       ]
+    },
+    "flamo-text-2d": {
+      "css": ["assets/css/features/flamo-generators.css"],
+      "js": ["assets/vendor/flamo/text-2d-presets.js", "assets/vendor/flamo/text-style-data.js", "assets/vendor/flamo/text-2d-engine.js", "assets/js/features/flamo/flamo-runtime.js"]
+    },
+    "flamo-text-3d": {
+      "css": ["assets/css/features/flamo-generators.css"],
+      "js": ["assets/vendor/flamo/3d-engine.js", "assets/js/features/flamo/flamo-runtime.js"]
+    },
+    "flamo-text-fx-animation": {
+      "css": ["assets/css/features/flamo-generators.css"],
+      "js": ["assets/vendor/flamo/text-fx-animation-engine.js", "assets/js/features/flamo/flamo-runtime.js"]
+    },
+    "flamo-text-vector": {
+      "css": ["assets/css/features/flamo-generators.css"],
+      "js": ["assets/js/features/flamo/flamo-runtime.js"]
+    },
+    "flamo-trimpath": {
+      "css": ["assets/css/features/flamo-generators.css"],
+      "js": ["assets/vendor/flamo/trimpath-font-metrics.js", "assets/vendor/flamo/trimpath-letters.js", "assets/vendor/flamo/trimpath-engine.js", "assets/js/features/flamo/flamo-runtime.js"]
+    },
+    "flamo-logo-animate": {
+      "css": ["assets/css/features/flamo-generators.css"],
+      "js": ["assets/js/features/flamo/logo-engine.js", "assets/js/features/flamo/flamo-runtime.js"]
     }
   },
   "tools": {
@@ -213,6 +237,12 @@
     "webencryption": "web-encryption",
     "svgalight": "svg-alight",
     "bmkg": "bmkg-open-data",
-    "alightpremium": "alight-premium"
+    "alightpremium": "alight-premium",
+    "text2d": "flamo-text-2d",
+    "text3d": "flamo-text-3d",
+    "textfxanimation": "flamo-text-fx-animation",
+    "textvector": "flamo-text-vector",
+    "trimpath": "flamo-trimpath",
+    "logoanimate": "flamo-logo-animate"
   }
 }

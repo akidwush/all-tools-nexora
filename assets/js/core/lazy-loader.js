@@ -25,7 +25,13 @@
     'download-pack': {css:['assets/css/features/source-tools.css'],js:['assets/js/features/source-features.js','assets/js/features/download-pack.js']},
     'unban-whatsapp': {css:[],js:['assets/js/features/unban-whatsapp.js']},
     'deploy-center': {css:['assets/css/features/deploy-center.css'],js:['assets/js/features/deploy-center.js']},
-    'web-encryption': {css:['assets/css/features/web-encryption.css'],js:['assets/js/features/web-encryption.js']}
+    'web-encryption': {css:['assets/css/features/web-encryption.css'],js:['assets/js/features/web-encryption.js']},
+    'flamo-text-2d': {css:['assets/css/features/flamo-generators.css'],js:['assets/vendor/flamo/text-2d-presets.js','assets/vendor/flamo/text-style-data.js','assets/vendor/flamo/text-2d-engine.js','assets/js/features/flamo/flamo-runtime.js']},
+    'flamo-text-3d': {css:['assets/css/features/flamo-generators.css'],js:['assets/vendor/flamo/3d-engine.js','assets/js/features/flamo/flamo-runtime.js']},
+    'flamo-text-fx-animation': {css:['assets/css/features/flamo-generators.css'],js:['assets/vendor/flamo/text-fx-animation-engine.js','assets/js/features/flamo/flamo-runtime.js']},
+    'flamo-text-vector': {css:['assets/css/features/flamo-generators.css'],js:['assets/js/features/flamo/flamo-runtime.js']},
+    'flamo-trimpath': {css:['assets/css/features/flamo-generators.css'],js:['assets/vendor/flamo/trimpath-font-metrics.js','assets/vendor/flamo/trimpath-letters.js','assets/vendor/flamo/trimpath-engine.js','assets/js/features/flamo/flamo-runtime.js']},
+    'flamo-logo-animate': {css:['assets/css/features/flamo-generators.css'],js:['assets/js/features/flamo/logo-engine.js','assets/js/features/flamo/flamo-runtime.js']}
   };
 
   var toolModules = {
@@ -34,7 +40,8 @@
     promptgenerate:'prompt-generator',fakeovo:'imported-tools',quotegenerator:'imported-tools',carifakta:'imported-tools',mltools:'imported-tools',
     iqc:'generator-pack',winquotes:'generator-pack',nokiamsg:'generator-pack',
     terabox:'download-pack',fakebankjago:'download-pack',
-    unbanwa:'unban-whatsapp',vdeploy:'deploy-center',webencryption:'web-encryption'
+    unbanwa:'unban-whatsapp',vdeploy:'deploy-center',webencryption:'web-encryption',
+    text2d:'flamo-text-2d',text3d:'flamo-text-3d',textfxanimation:'flamo-text-fx-animation',textvector:'flamo-text-vector',trimpath:'flamo-trimpath',logoanimate:'flamo-logo-animate'
   };
 
   var labels = {
@@ -43,7 +50,8 @@
     'quote generator':'quotegenerator','carifakta':'carifakta','ml tools':'mltools','iqc generator':'iqc',
     'windows quotes':'winquotes','nokia message':'nokiamsg','terabox downloader':'terabox','fake bank jago':'fakebankjago',
     'spotify downloader':'spotify','unban whatsapp':'unbanwa',
-    'deploy & update web':'vdeploy','deploy website':'vdeploy','web encryption':'webencryption'
+    'deploy & update web':'vdeploy','deploy website':'vdeploy','web encryption':'webencryption',
+    '2d text animate / text fx':'text2d','2d text animate':'text2d','3d text animate':'text3d','text fx animation':'textfxanimation','text to vector':'textvector','trimpath generator':'trimpath','logo animate':'logoanimate'
   };
 
   var modulePromises = new Map();
@@ -51,14 +59,14 @@
   /* Vercel serves /assets with a one-hour browser cache.  A module can
      therefore otherwise keep the previous CSS/JS after a successful deploy. */
   var ASSET_VERSION = '6.3.18';
-  var ASSET_PATCH = 'svg-v18-corel1';
+  var ASSET_PATCH = 'flamo-native4';
   var baseShowTool = typeof window.showTool === 'function' ? window.showTool : null;
   var activeCard = null;
 
   function absolute(url){ return new URL(url, document.baseURI).href; }
   function versioned(url){
     var separator = String(url).indexOf('?')===-1 ? '?' : '&';
-    var version = /prompt-generator\.(?:js|css)(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-prompt-v2-state1' : (/crypto-market\.(?:js|css)(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-crypto-mtf1' : (/document-ai\.(?:js|css)(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-document-ai-v2' : (/svg-alight\.(?:js|css)(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-'+ASSET_PATCH : (/alight-premium\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-audit1' : (/tiktok\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-hf6-dl4-audit1' : (/(?:download-pack|source-features)\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-hf6-dl4' : ASSET_VERSION))))));
+    var version = /(?:assets\/(?:vendor\/flamo|js\/features\/flamo)\/|flamo-generators\.css(?:$|\?))/.test(String(url)) ? ASSET_VERSION+'-'+ASSET_PATCH : (/prompt-generator\.(?:js|css)(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-prompt-v2-state1' : (/crypto-market\.(?:js|css)(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-crypto-mtf1' : (/document-ai\.(?:js|css)(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-document-ai-v2' : (/svg-alight\.(?:js|css)(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-'+ASSET_PATCH : (/alight-premium\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-audit1' : (/tiktok\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-hf6-dl4-audit1' : (/(?:download-pack|source-features)\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-hf6-dl4' : ASSET_VERSION)))))));
     return String(url)+separator+'v='+encodeURIComponent(version);
   }
 

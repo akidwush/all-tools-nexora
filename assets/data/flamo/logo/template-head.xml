@@ -1,0 +1,2710 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!--
+Created by Alight Motion (http://alightmotion.com)
+Exported: 2026-08-15 04:31 PM
+6.2.53 (859)
+-->
+<scene title="Flamo Tools Logo Animate" width="1440" height="1080" exportWidth="1920" exportHeight="1080" bgcolor="#FF000000" totalTime="8333" fps="60" modifiedTime="1786804307288" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="freeze">
+  <media uri="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" type="image/png" size="190914" infoUpdated="1786612471157" width="1080" height="1080"/>
+  <embedScene id="53" label="Background" startTime="0" endTime="8333" fillType="intrinsic" outTime="8333">
+    <transform>
+      <location value="895.699463,410.027832,0.000000"/>
+      <scale value="1.389338,1.389338"/>
+    </transform>
+    <fillColor value="#FF000000"/>
+    <effect id="com.alightcreative.effects.exposure" locallyApplied="true">
+      <property name="exposure" type="float" value="-1.020000"/>
+      <property name="gamma" type="float" value="0.840000"/>
+    </effect>
+    <scene title="" width="3859" height="2771" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="8333" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+      <shape id="1" label="Rectangle 1" startTime="0" endTime="8333" fillType="color" s=".rect">
+        <transform>
+          <location value="1789.602661,1535.405029,0.000000"/>
+          <scale value="7.200000,7.200000"/>
+        </transform>
+        <fillColor value="#FF3A3F42"/>
+        <effect id="com.alightcreative.effects.bumpmap2" locallyApplied="false">
+          <property name="lightDepth" type="float" value="503.000000"/>
+          <property name="lightDir" type="vec2" value="644.000000,-487.000000"/>
+          <property name="lightIntensity" type="float" value="0.831000"/>
+          <property name="shineColor" type="color" value="#FFE3E7ED"/>
+          <property name="texColor" type="color" value="#FFF238A9"/>
+          <property name="texScale" type="float" value="0.090000"/>
+          <property name="texStretch" type="vec2" value="0.610000,1.000000"/>
+        </effect>
+        <property name="size" type="vec2" value="141.000000,100.000000"/>
+      </shape>
+      <embedScene id="2" label="Group 2" startTime="0" endTime="8333" speed="0.2" fillType="intrinsic" blending="multiply" outTime="1666">
+        <transform>
+          <location value="1515.266846,1637.785767,-342.666626"/>
+          <pivot value="-1.000000,-1.000000"/>
+          <scale value="2.098776,2.098776"/>
+          <opacity value="0.470320"/>
+        </transform>
+        <fillColor value="#FF000000"/>
+        <scene title="" width="1445" height="1085" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="2149" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+          <embedScene id="5" label="Group 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+            <transform>
+              <location value="722.500000,542.500000,0.000000"/>
+              <pivot value="-0.500000,-0.500000"/>
+            </transform>
+            <fillColor value="#FF000000"/>
+            <effect id="com.alightcreative.effects.exposure" locallyApplied="true">
+              <property name="exposure" type="float" value="0.520000"/>
+            </effect>
+            <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+              <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+                <transform>
+                  <location value="721.000000,541.000000,0.000000"/>
+                </transform>
+                <fillColor value="#FF000000"/>
+                <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                  <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                    <transform>
+                      <location value="720.000000,494.499329,0.000000"/>
+                      <scale value="0.412670,0.412670"/>
+                    </transform>
+                    <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                      <property name="smoothing" type="float" value="1.940000"/>
+                      <property name="threshold" type="float" value="0.226000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="highThreshold" type="float" value="0.529000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.smoothedges" locallyApplied="true">
+                      <property name="strength" type="float" value="0.030000"/>
+                    </effect>
+                    <property name="size" type="vec2" value="554.922302,540.000000"/>
+                  </shape>
+                  <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                    <transform>
+                      <location value="720.000000,540.000000,0.000000"/>
+                      <scale value="7.200000,5.400000"/>
+                    </transform>
+                    <fillColor value="#FF5ABCD9"/>
+                    <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                      <property name="evolution" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.640000"/>
+                      </property>
+                      <property name="octaves" type="float" value="1.000000"/>
+                      <property name="scale" type="float" value="0.180000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="lowThreshold" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                      </property>
+                    </effect>
+                  </shape>
+                </scene>
+              </embedScene>
+              <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                <transform>
+                  <location value="721.000000,495.499329,0.000000"/>
+                  <scale value="0.412670,0.412670"/>
+                </transform>
+                <property name="size" type="vec2" value="554.922302,540.000000"/>
+              </shape>
+            </scene>
+          </embedScene>
+          <embedScene id="9" label="Group and Mask 1" startTime="34" endTime="2117" fillType="color">
+            <transform>
+              <location value="722.000000,542.000000,0.000000"/>
+              <pivot value="-1.000000,-1.000000"/>
+            </transform>
+            <scene title="" width="1444" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="2083" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+              <embedScene id="6" label="Group 1 Copy" startTime="0" endTime="1999" fillType="intrinsic">
+                <transform>
+                  <location value="721.500000,541.500000,0.000000"/>
+                  <pivot value="-0.500000,-0.500000"/>
+                </transform>
+                <fillColor value="#FF000000"/>
+                <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                  <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+                    <transform>
+                      <location value="721.000000,541.000000,0.000000"/>
+                    </transform>
+                    <fillColor value="#FF000000"/>
+                    <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                      <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                        <transform>
+                          <location value="720.000000,494.499329,0.000000"/>
+                          <scale value="0.412670,0.412670"/>
+                        </transform>
+                        <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                          <property name="smoothing" type="float" value="1.940000"/>
+                          <property name="threshold" type="float" value="0.226000"/>
+                        </effect>
+                        <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                          <property name="highThreshold" type="float" value="0.515000"/>
+                        </effect>
+                        <property name="size" type="vec2" value="554.922302,540.000000"/>
+                      </shape>
+                      <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                        <transform>
+                          <location value="720.000000,540.000000,0.000000"/>
+                          <scale value="7.200000,5.400000"/>
+                        </transform>
+                        <fillColor value="#FF5ABCD9"/>
+                        <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                          <property name="evolution" type="float">
+                            <kf t="0.000000" v="0.000000"/>
+                            <kf t="0.730000" v="0.640000"/>
+                          </property>
+                          <property name="octaves" type="float" value="1.000000"/>
+                          <property name="scale" type="float" value="0.180000"/>
+                        </effect>
+                        <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                          <property name="lowThreshold" type="float">
+                            <kf t="0.000000" v="0.000000"/>
+                            <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                          </property>
+                        </effect>
+                      </shape>
+                    </scene>
+                  </embedScene>
+                  <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                    <transform>
+                      <location value="721.000000,495.499329,0.000000"/>
+                      <scale value="0.412670,0.412670"/>
+                    </transform>
+                    <property name="size" type="vec2" value="554.922302,540.000000"/>
+                  </shape>
+                </scene>
+              </embedScene>
+              <embedScene id="7" label="Group 1 Copy 2" startTime="84" endTime="2083" fillType="intrinsic" blending="exclude">
+                <transform>
+                  <location value="721.500000,541.500000,0.000000"/>
+                  <pivot value="-0.500000,-0.500000"/>
+                </transform>
+                <fillColor value="#FF000000"/>
+                <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                  <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+                    <transform>
+                      <location value="721.000000,541.000000,0.000000"/>
+                    </transform>
+                    <fillColor value="#FF000000"/>
+                    <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                      <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                        <transform>
+                          <location value="720.000000,494.499329,0.000000"/>
+                          <scale value="0.412670,0.412670"/>
+                        </transform>
+                        <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                          <property name="smoothing" type="float" value="1.940000"/>
+                          <property name="threshold" type="float" value="0.226000"/>
+                        </effect>
+                        <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                          <property name="highThreshold" type="float" value="0.515000"/>
+                        </effect>
+                        <property name="size" type="vec2" value="554.922302,540.000000"/>
+                      </shape>
+                      <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                        <transform>
+                          <location value="720.000000,540.000000,0.000000"/>
+                          <scale value="7.200000,5.400000"/>
+                        </transform>
+                        <fillColor value="#FF5ABCD9"/>
+                        <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                          <property name="evolution" type="float">
+                            <kf t="0.000000" v="0.000000"/>
+                            <kf t="0.730000" v="0.640000"/>
+                          </property>
+                          <property name="octaves" type="float" value="1.000000"/>
+                          <property name="scale" type="float" value="0.180000"/>
+                        </effect>
+                        <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                          <property name="lowThreshold" type="float">
+                            <kf t="0.000000" v="0.000000"/>
+                            <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                          </property>
+                        </effect>
+                      </shape>
+                    </scene>
+                  </embedScene>
+                  <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                    <transform>
+                      <location value="721.000000,495.499329,0.000000"/>
+                      <scale value="0.412670,0.412670"/>
+                    </transform>
+                    <property name="size" type="vec2" value="554.922302,540.000000"/>
+                  </shape>
+                </scene>
+              </embedScene>
+            </scene>
+          </embedScene>
+          <embedScene id="10" label="Group and Mask 1 Copy" startTime="34" endTime="2117" fillType="intrinsic" blending="linear-dodge" outTime="2083">
+            <transform>
+              <location value="722.000000,542.000000,0.000000"/>
+              <pivot value="-1.000000,-1.000000"/>
+            </transform>
+            <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+              <property name="strength" type="float" value="0.205000"/>
+            </effect>
+            <scene title="" width="1444" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="2083" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+              <embedScene id="6" label="Group 1 Copy" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+                <transform>
+                  <location value="721.500000,541.500000,0.000000"/>
+                  <pivot value="-0.500000,-0.500000"/>
+                </transform>
+                <fillColor value="#FF000000"/>
+                <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                  <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+                    <transform>
+                      <location value="721.000000,541.000000,0.000000"/>
+                    </transform>
+                    <fillColor value="#FF000000"/>
+                    <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                      <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                        <transform>
+                          <location value="720.000000,494.499329,0.000000"/>
+                          <scale value="0.412670,0.412670"/>
+                        </transform>
+                        <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                          <property name="smoothing" type="float" value="5.400000"/>
+                          <property name="threshold" type="float" value="0.226000"/>
+                        </effect>
+                        <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                          <property name="highThreshold" type="float" value="0.515000"/>
+                        </effect>
+                        <property name="size" type="vec2" value="554.922302,540.000000"/>
+                      </shape>
+                      <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                        <transform>
+                          <location value="720.000000,540.000000,0.000000"/>
+                          <scale value="7.200000,5.400000"/>
+                        </transform>
+                        <fillColor value="#FF5ABCD9"/>
+                        <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                          <property name="evolution" type="float">
+                            <kf t="0.000000" v="0.000000"/>
+                            <kf t="0.730000" v="0.640000"/>
+                          </property>
+                          <property name="octaves" type="float" value="1.000000"/>
+                          <property name="scale" type="float" value="0.180000"/>
+                        </effect>
+                        <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                          <property name="lowThreshold" type="float">
+                            <kf t="0.000000" v="0.000000"/>
+                            <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                          </property>
+                        </effect>
+                      </shape>
+                    </scene>
+                  </embedScene>
+                  <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                    <transform>
+                      <location value="721.000000,495.499329,0.000000"/>
+                      <scale value="0.412670,0.412670"/>
+                    </transform>
+                    <property name="size" type="vec2" value="554.922302,540.000000"/>
+                  </shape>
+                </scene>
+              </embedScene>
+              <embedScene id="7" label="Group 1 Copy 2" startTime="84" endTime="2083" fillType="intrinsic" blending="exclude" outTime="1999">
+                <transform>
+                  <location value="721.500000,541.500000,0.000000"/>
+                  <pivot value="-0.500000,-0.500000"/>
+                </transform>
+                <fillColor value="#FF000000"/>
+                <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                  <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+                    <transform>
+                      <location value="721.000000,541.000000,0.000000"/>
+                    </transform>
+                    <fillColor value="#FF000000"/>
+                    <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                      <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                        <transform>
+                          <location value="720.000000,494.499329,0.000000"/>
+                          <scale value="0.412670,0.412670"/>
+                        </transform>
+                        <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                          <property name="smoothing" type="float" value="5.750000"/>
+                          <property name="threshold" type="float" value="0.226000"/>
+                        </effect>
+                        <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                          <property name="highThreshold" type="float" value="0.515000"/>
+                        </effect>
+                        <property name="size" type="vec2" value="554.922302,540.000000"/>
+                      </shape>
+                      <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                        <transform>
+                          <location value="720.000000,540.000000,0.000000"/>
+                          <scale value="7.200000,5.400000"/>
+                        </transform>
+                        <fillColor value="#FF5ABCD9"/>
+                        <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                          <property name="evolution" type="float">
+                            <kf t="0.000000" v="0.000000"/>
+                            <kf t="0.730000" v="0.640000"/>
+                          </property>
+                          <property name="octaves" type="float" value="1.000000"/>
+                          <property name="scale" type="float" value="0.180000"/>
+                        </effect>
+                        <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                          <property name="lowThreshold" type="float">
+                            <kf t="0.000000" v="0.000000"/>
+                            <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                          </property>
+                        </effect>
+                      </shape>
+                    </scene>
+                  </embedScene>
+                  <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                    <transform>
+                      <location value="721.000000,495.499329,0.000000"/>
+                      <scale value="0.412670,0.412670"/>
+                    </transform>
+                    <property name="size" type="vec2" value="554.922302,540.000000"/>
+                  </shape>
+                </scene>
+              </embedScene>
+            </scene>
+          </embedScene>
+          <embedScene id="8" label="Group 1 Copy 3" startTime="150" endTime="2149" fillType="intrinsic">
+            <transform>
+              <location value="722.500000,542.500000,0.000000"/>
+              <pivot value="-0.500000,-0.500000"/>
+            </transform>
+            <fillColor value="#FF000000"/>
+            <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+              <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+                <transform>
+                  <location value="721.000000,541.000000,0.000000"/>
+                </transform>
+                <fillColor value="#FF000000"/>
+                <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                  <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                    <transform>
+                      <location value="720.000000,494.499329,0.000000"/>
+                      <scale value="0.412670,0.412670"/>
+                    </transform>
+                    <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                      <property name="smoothing" type="float" value="1.940000"/>
+                      <property name="threshold" type="float" value="0.226000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="highThreshold" type="float" value="0.515000"/>
+                    </effect>
+                    <property name="size" type="vec2" value="554.922302,540.000000"/>
+                  </shape>
+                  <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                    <transform>
+                      <location value="720.000000,540.000000,0.000000"/>
+                      <scale value="7.200000,5.400000"/>
+                    </transform>
+                    <fillColor value="#FF5ABCD9"/>
+                    <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                      <property name="evolution" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.640000"/>
+                      </property>
+                      <property name="octaves" type="float" value="1.000000"/>
+                      <property name="scale" type="float" value="0.180000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="lowThreshold" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                      </property>
+                    </effect>
+                  </shape>
+                </scene>
+              </embedScene>
+              <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                <transform>
+                  <location value="721.000000,495.499329,0.000000"/>
+                  <scale value="0.412670,0.412670"/>
+                </transform>
+                <property name="size" type="vec2" value="554.922302,540.000000"/>
+              </shape>
+            </scene>
+          </embedScene>
+          <shape id="30" label="Rectangle 1" hidden="true" startTime="0" endTime="1999" fillType="color" s=".rect">
+            <transform>
+              <location value="754.850464,574.850586,0.000000"/>
+            </transform>
+            <fillColor value="#FF3B6282"/>
+            <property name="size" type="vec2" value="436.088287,436.088379"/>
+          </shape>
+        </scene>
+      </embedScene>
+      <embedScene id="31" label="Group 2 Copy" startTime="0" endTime="8333" speed="0.2" fillType="intrinsic" blending="multiply" outTime="1666">
+        <transform>
+          <location value="2348.698975,1137.487183,-342.666626"/>
+          <pivot value="-1.000000,-1.000000"/>
+          <scale value="2.098776,2.098776"/>
+        </transform>
+        <fillColor value="#FF000000"/>
+        <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+          <property name="strength" type="float" value="0.045000"/>
+        </effect>
+        <scene title="" width="1445" height="1085" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="2149" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+          <embedScene id="5" label="Group 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+            <transform>
+              <location value="722.500000,542.500000,0.000000"/>
+              <pivot value="-0.500000,-0.500000"/>
+            </transform>
+            <fillColor value="#FF000000"/>
+            <effect id="com.alightcreative.effects.exposure" locallyApplied="true">
+              <property name="exposure" type="float" value="0.520000"/>
+            </effect>
+            <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+              <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+                <transform>
+                  <location value="721.000000,541.000000,0.000000"/>
+                </transform>
+                <fillColor value="#FF000000"/>
+                <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                  <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                    <transform>
+                      <location value="720.000000,494.499329,0.000000"/>
+                      <scale value="0.412670,0.412670"/>
+                    </transform>
+                    <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                      <property name="smoothing" type="float" value="1.940000"/>
+                      <property name="threshold" type="float" value="0.226000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="highThreshold" type="float" value="0.529000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.smoothedges" locallyApplied="true">
+                      <property name="strength" type="float" value="0.030000"/>
+                    </effect>
+                    <property name="size" type="vec2" value="554.922302,540.000000"/>
+                  </shape>
+                  <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                    <transform>
+                      <location value="720.000000,540.000000,0.000000"/>
+                      <scale value="7.200000,5.400000"/>
+                    </transform>
+                    <fillColor value="#FF5ABCD9"/>
+                    <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                      <property name="evolution" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.640000"/>
+                      </property>
+                      <property name="octaves" type="float" value="1.000000"/>
+                      <property name="scale" type="float" value="0.180000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="lowThreshold" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                      </property>
+                    </effect>
+                  </shape>
+                </scene>
+              </embedScene>
+              <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                <transform>
+                  <location value="721.000000,495.499329,0.000000"/>
+                  <scale value="0.412670,0.412670"/>
+                </transform>
+                <property name="size" type="vec2" value="554.922302,540.000000"/>
+              </shape>
+            </scene>
+          </embedScene>
+          <embedScene id="9" label="Group and Mask 1" startTime="34" endTime="2117" fillType="color">
+            <transform>
+              <location value="722.000000,542.000000,0.000000"/>
+              <pivot value="-1.000000,-1.000000"/>
+            </transform>
+            <scene title="" width="1444" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="2083" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+              <embedScene id="6" label="Group 1 Copy" startTime="0" endTime="1999" fillType="intrinsic">
+                <transform>
+                  <location value="721.500000,541.500000,0.000000"/>
+                  <pivot value="-0.500000,-0.500000"/>
+                </transform>
+                <fillColor value="#FF000000"/>
+                <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                  <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+                    <transform>
+                      <location value="721.000000,541.000000,0.000000"/>
+                    </transform>
+                    <fillColor value="#FF000000"/>
+                    <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                      <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                        <transform>
+                          <location value="720.000000,494.499329,0.000000"/>
+                          <scale value="0.412670,0.412670"/>
+                        </transform>
+                        <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                          <property name="smoothing" type="float" value="1.940000"/>
+                          <property name="threshold" type="float" value="0.226000"/>
+                        </effect>
+                        <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                          <property name="highThreshold" type="float" value="0.515000"/>
+                        </effect>
+                        <property name="size" type="vec2" value="554.922302,540.000000"/>
+                      </shape>
+                      <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                        <transform>
+                          <location value="720.000000,540.000000,0.000000"/>
+                          <scale value="7.200000,5.400000"/>
+                        </transform>
+                        <fillColor value="#FF5ABCD9"/>
+                        <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                          <property name="evolution" type="float">
+                            <kf t="0.000000" v="0.000000"/>
+                            <kf t="0.730000" v="0.640000"/>
+                          </property>
+                          <property name="octaves" type="float" value="1.000000"/>
+                          <property name="scale" type="float" value="0.180000"/>
+                        </effect>
+                        <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                          <property name="lowThreshold" type="float">
+                            <kf t="0.000000" v="0.000000"/>
+                            <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                          </property>
+                        </effect>
+                      </shape>
+                    </scene>
+                  </embedScene>
+                  <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                    <transform>
+                      <location value="721.000000,495.499329,0.000000"/>
+                      <scale value="0.412670,0.412670"/>
+                    </transform>
+                    <property name="size" type="vec2" value="554.922302,540.000000"/>
+                  </shape>
+                </scene>
+              </embedScene>
+              <embedScene id="7" label="Group 1 Copy 2" startTime="84" endTime="2083" fillType="intrinsic" blending="exclude">
+                <transform>
+                  <location value="721.500000,541.500000,0.000000"/>
+                  <pivot value="-0.500000,-0.500000"/>
+                </transform>
+                <fillColor value="#FF000000"/>
+                <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                  <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+                    <transform>
+                      <location value="721.000000,541.000000,0.000000"/>
+                    </transform>
+                    <fillColor value="#FF000000"/>
+                    <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                      <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                        <transform>
+                          <location value="720.000000,494.499329,0.000000"/>
+                          <scale value="0.412670,0.412670"/>
+                        </transform>
+                        <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                          <property name="smoothing" type="float" value="1.940000"/>
+                          <property name="threshold" type="float" value="0.226000"/>
+                        </effect>
+                        <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                          <property name="highThreshold" type="float" value="0.515000"/>
+                        </effect>
+                        <property name="size" type="vec2" value="554.922302,540.000000"/>
+                      </shape>
+                      <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                        <transform>
+                          <location value="720.000000,540.000000,0.000000"/>
+                          <scale value="7.200000,5.400000"/>
+                        </transform>
+                        <fillColor value="#FF5ABCD9"/>
+                        <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                          <property name="evolution" type="float">
+                            <kf t="0.000000" v="0.000000"/>
+                            <kf t="0.730000" v="0.640000"/>
+                          </property>
+                          <property name="octaves" type="float" value="1.000000"/>
+                          <property name="scale" type="float" value="0.180000"/>
+                        </effect>
+                        <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                          <property name="lowThreshold" type="float">
+                            <kf t="0.000000" v="0.000000"/>
+                            <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                          </property>
+                        </effect>
+                      </shape>
+                    </scene>
+                  </embedScene>
+                  <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                    <transform>
+                      <location value="721.000000,495.499329,0.000000"/>
+                      <scale value="0.412670,0.412670"/>
+                    </transform>
+                    <property name="size" type="vec2" value="554.922302,540.000000"/>
+                  </shape>
+                </scene>
+              </embedScene>
+            </scene>
+          </embedScene>
+          <embedScene id="10" label="Group and Mask 1 Copy" startTime="34" endTime="2117" fillType="intrinsic" blending="linear-dodge" outTime="2083">
+            <transform>
+              <location value="722.000000,542.000000,0.000000"/>
+              <pivot value="-1.000000,-1.000000"/>
+            </transform>
+            <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+              <property name="strength" type="float" value="0.205000"/>
+            </effect>
+            <scene title="" width="1444" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="2083" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+              <embedScene id="6" label="Group 1 Copy" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+                <transform>
+                  <location value="721.500000,541.500000,0.000000"/>
+                  <pivot value="-0.500000,-0.500000"/>
+                </transform>
+                <fillColor value="#FF000000"/>
+                <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                  <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+                    <transform>
+                      <location value="721.000000,541.000000,0.000000"/>
+                    </transform>
+                    <fillColor value="#FF000000"/>
+                    <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                      <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                        <transform>
+                          <location value="720.000000,494.499329,0.000000"/>
+                          <scale value="0.412670,0.412670"/>
+                        </transform>
+                        <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                          <property name="smoothing" type="float" value="5.400000"/>
+                          <property name="threshold" type="float" value="0.226000"/>
+                        </effect>
+                        <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                          <property name="highThreshold" type="float" value="0.515000"/>
+                        </effect>
+                        <property name="size" type="vec2" value="554.922302,540.000000"/>
+                      </shape>
+                      <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                        <transform>
+                          <location value="720.000000,540.000000,0.000000"/>
+                          <scale value="7.200000,5.400000"/>
+                        </transform>
+                        <fillColor value="#FF5ABCD9"/>
+                        <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                          <property name="evolution" type="float">
+                            <kf t="0.000000" v="0.000000"/>
+                            <kf t="0.730000" v="0.640000"/>
+                          </property>
+                          <property name="octaves" type="float" value="1.000000"/>
+                          <property name="scale" type="float" value="0.180000"/>
+                        </effect>
+                        <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                          <property name="lowThreshold" type="float">
+                            <kf t="0.000000" v="0.000000"/>
+                            <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                          </property>
+                        </effect>
+                      </shape>
+                    </scene>
+                  </embedScene>
+                  <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                    <transform>
+                      <location value="721.000000,495.499329,0.000000"/>
+                      <scale value="0.412670,0.412670"/>
+                    </transform>
+                    <property name="size" type="vec2" value="554.922302,540.000000"/>
+                  </shape>
+                </scene>
+              </embedScene>
+              <embedScene id="7" label="Group 1 Copy 2" startTime="84" endTime="2083" fillType="intrinsic" blending="exclude" outTime="1999">
+                <transform>
+                  <location value="721.500000,541.500000,0.000000"/>
+                  <pivot value="-0.500000,-0.500000"/>
+                </transform>
+                <fillColor value="#FF000000"/>
+                <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                  <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+                    <transform>
+                      <location value="721.000000,541.000000,0.000000"/>
+                    </transform>
+                    <fillColor value="#FF000000"/>
+                    <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                      <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                        <transform>
+                          <location value="720.000000,494.499329,0.000000"/>
+                          <scale value="0.412670,0.412670"/>
+                        </transform>
+                        <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                          <property name="smoothing" type="float" value="5.750000"/>
+                          <property name="threshold" type="float" value="0.226000"/>
+                        </effect>
+                        <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                          <property name="highThreshold" type="float" value="0.515000"/>
+                        </effect>
+                        <property name="size" type="vec2" value="554.922302,540.000000"/>
+                      </shape>
+                      <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                        <transform>
+                          <location value="720.000000,540.000000,0.000000"/>
+                          <scale value="7.200000,5.400000"/>
+                        </transform>
+                        <fillColor value="#FF5ABCD9"/>
+                        <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                          <property name="evolution" type="float">
+                            <kf t="0.000000" v="0.000000"/>
+                            <kf t="0.730000" v="0.640000"/>
+                          </property>
+                          <property name="octaves" type="float" value="1.000000"/>
+                          <property name="scale" type="float" value="0.180000"/>
+                        </effect>
+                        <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                          <property name="lowThreshold" type="float">
+                            <kf t="0.000000" v="0.000000"/>
+                            <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                          </property>
+                        </effect>
+                      </shape>
+                    </scene>
+                  </embedScene>
+                  <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                    <transform>
+                      <location value="721.000000,495.499329,0.000000"/>
+                      <scale value="0.412670,0.412670"/>
+                    </transform>
+                    <property name="size" type="vec2" value="554.922302,540.000000"/>
+                  </shape>
+                </scene>
+              </embedScene>
+            </scene>
+          </embedScene>
+          <embedScene id="8" label="Group 1 Copy 3" startTime="150" endTime="2149" fillType="intrinsic">
+            <transform>
+              <location value="722.500000,542.500000,0.000000"/>
+              <pivot value="-0.500000,-0.500000"/>
+            </transform>
+            <fillColor value="#FF000000"/>
+            <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+              <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+                <transform>
+                  <location value="721.000000,541.000000,0.000000"/>
+                </transform>
+                <fillColor value="#FF000000"/>
+                <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                  <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                    <transform>
+                      <location value="720.000000,494.499329,0.000000"/>
+                      <scale value="0.412670,0.412670"/>
+                    </transform>
+                    <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                      <property name="smoothing" type="float" value="1.940000"/>
+                      <property name="threshold" type="float" value="0.226000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="highThreshold" type="float" value="0.515000"/>
+                    </effect>
+                    <property name="size" type="vec2" value="554.922302,540.000000"/>
+                  </shape>
+                  <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                    <transform>
+                      <location value="720.000000,540.000000,0.000000"/>
+                      <scale value="7.200000,5.400000"/>
+                    </transform>
+                    <fillColor value="#FF5ABCD9"/>
+                    <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                      <property name="evolution" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.640000"/>
+                      </property>
+                      <property name="octaves" type="float" value="1.000000"/>
+                      <property name="scale" type="float" value="0.180000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="lowThreshold" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                      </property>
+                    </effect>
+                  </shape>
+                </scene>
+              </embedScene>
+              <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                <transform>
+                  <location value="721.000000,495.499329,0.000000"/>
+                  <scale value="0.412670,0.412670"/>
+                </transform>
+                <property name="size" type="vec2" value="554.922302,540.000000"/>
+              </shape>
+            </scene>
+          </embedScene>
+          <shape id="30" label="Rectangle 1" hidden="true" startTime="0" endTime="1999" fillType="color" s=".rect">
+            <transform>
+              <location value="754.850464,574.850586,0.000000"/>
+            </transform>
+            <fillColor value="#FF3B6282"/>
+            <property name="size" type="vec2" value="436.088287,436.088379"/>
+          </shape>
+        </scene>
+      </embedScene>
+      <embedScene id="37" label="Cahaya" startTime="0" endTime="8333" fillType="color" blending="linear-dodge" outTime="8333">
+        <transform>
+          <location value="1911.393799,1365.852661,0.000000"/>
+          <pivot value="-377.910736,-90.746246"/>
+          <scale value="1.432146,1.432146"/>
+          <skew value="0.000000,-0.263545"/>
+          <opacity value="0.485540"/>
+        </transform>
+        <fillColor value="#FFFFDA58"/>
+        <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+          <property name="strength" type="float" value="0.180000"/>
+        </effect>
+        <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+          <shape id="33" label="Rectangle 2" startTime="0" endTime="1999" fillType="color" s=".rect">
+            <transform>
+              <location value="214.925110,304.776123,0.000000"/>
+            </transform>
+            <fillColor value="#FF8B93C9"/>
+            <property name="size" type="vec2" value="100.000000,123.880615"/>
+          </shape>
+          <shape id="34" label="Rectangle 2 Copy" startTime="0" endTime="1999" fillType="color" s=".rect">
+            <transform>
+              <location value="469.253387,302.388062,0.000000"/>
+            </transform>
+            <fillColor value="#FF8B93C9"/>
+            <property name="size" type="vec2" value="100.000000,123.880615"/>
+          </shape>
+          <shape id="35" label="Rectangle 2" startTime="0" endTime="1999" fillType="color" s=".rect">
+            <transform>
+              <location value="214.925110,596.119446,0.000000"/>
+            </transform>
+            <fillColor value="#FF8B93C9"/>
+            <property name="size" type="vec2" value="100.000000,123.880615"/>
+          </shape>
+          <shape id="36" label="Rectangle 2 Copy" startTime="0" endTime="1999" fillType="color" s=".rect">
+            <transform>
+              <location value="469.253387,593.731384,0.000000"/>
+            </transform>
+            <fillColor value="#FF8B93C9"/>
+            <property name="size" type="vec2" value="100.000000,123.880615"/>
+          </shape>
+        </scene>
+      </embedScene>
+      <shape id="40" label="Rectangle 2" startTime="0" endTime="8333" fillType="color" s=".rect">
+        <transform>
+          <location value="1789.602661,1535.405029,0.000000"/>
+          <scale value="7.200000,5.400000"/>
+        </transform>
+        <fillColor value="#FF4C976E"/>
+        <effect id="com.alightcreative.effects.lift" locallyApplied="true"/>
+      </shape>
+    </scene>
+  </embedScene>
+  <embedScene id="27" label="Group 2" startTime="0" endTime="1549" speed="0.4" fillType="intrinsic" blending="linear-dodge" outTime="619">
+    <transform>
+      <location value="718.500000,538.500000,-342.666626"/>
+      <pivot value="-1.000000,-1.000000"/>
+    </transform>
+    <fillColor value="#FF000000"/>
+    <effect id="com.alightcreative.effects.flip3" locallyApplied="true">
+      <property name="angle" type="float">
+        <kf t="0.000000" v="49.000000"/>
+        <kf t="1.384190" v="-42.799999"/>
+      </property>
+      <property name="axis" type="float" value="405.000000"/>
+    </effect>
+    <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+      <property name="strength" type="float">
+        <kf t="0.000000" v="0.280000"/>
+        <kf t="0.990316" v="0.000000"/>
+      </property>
+    </effect>
+    <scene title="" width="1445" height="1085" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="2149" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+      <embedScene id="5" label="Group 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+        <transform>
+          <location value="722.500000,542.500000,0.000000"/>
+          <pivot value="-0.500000,-0.500000"/>
+        </transform>
+        <fillColor value="#FF000000"/>
+        <effect id="com.alightcreative.effects.exposure" locallyApplied="true">
+          <property name="exposure" type="float" value="0.520000"/>
+        </effect>
+        <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+          <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+            <transform>
+              <location value="721.000000,541.000000,0.000000"/>
+            </transform>
+            <fillColor value="#FF000000"/>
+            <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+              <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                <transform>
+                  <location value="720.000000,494.499329,0.000000"/>
+                  <scale value="0.412670,0.412670"/>
+                </transform>
+                <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                  <property name="smoothing" type="float" value="1.940000"/>
+                  <property name="threshold" type="float" value="0.226000"/>
+                </effect>
+                <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                  <property name="highThreshold" type="float" value="0.529000"/>
+                </effect>
+                <effect id="com.alightcreative.effects.smoothedges" locallyApplied="true">
+                  <property name="strength" type="float" value="0.030000"/>
+                </effect>
+                <property name="size" type="vec2" value="554.922302,540.000000"/>
+              </shape>
+              <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                <transform>
+                  <location value="720.000000,540.000000,0.000000"/>
+                  <scale value="7.200000,5.400000"/>
+                </transform>
+                <fillColor value="#FF5ABCD9"/>
+                <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                  <property name="evolution" type="float">
+                    <kf t="0.000000" v="0.000000"/>
+                    <kf t="0.730000" v="0.640000"/>
+                  </property>
+                  <property name="octaves" type="float" value="1.000000"/>
+                  <property name="scale" type="float" value="0.180000"/>
+                </effect>
+                <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                  <property name="lowThreshold" type="float">
+                    <kf t="0.000000" v="0.000000"/>
+                    <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                  </property>
+                </effect>
+              </shape>
+            </scene>
+          </embedScene>
+          <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+            <transform>
+              <location value="721.000000,495.499329,0.000000"/>
+              <scale value="0.412670,0.412670"/>
+            </transform>
+            <property name="size" type="vec2" value="554.922302,540.000000"/>
+          </shape>
+        </scene>
+      </embedScene>
+      <embedScene id="9" label="Group and Mask 1" startTime="34" endTime="2117" fillType="color">
+        <transform>
+          <location value="722.000000,542.000000,0.000000"/>
+          <pivot value="-1.000000,-1.000000"/>
+        </transform>
+        <scene title="" width="1444" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="2083" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+          <embedScene id="6" label="Group 1 Copy" startTime="0" endTime="1999" fillType="intrinsic">
+            <transform>
+              <location value="721.500000,541.500000,0.000000"/>
+              <pivot value="-0.500000,-0.500000"/>
+            </transform>
+            <fillColor value="#FF000000"/>
+            <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+              <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+                <transform>
+                  <location value="721.000000,541.000000,0.000000"/>
+                </transform>
+                <fillColor value="#FF000000"/>
+                <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                  <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                    <transform>
+                      <location value="720.000000,494.499329,0.000000"/>
+                      <scale value="0.412670,0.412670"/>
+                    </transform>
+                    <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                      <property name="smoothing" type="float" value="1.940000"/>
+                      <property name="threshold" type="float" value="0.226000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="highThreshold" type="float" value="0.515000"/>
+                    </effect>
+                    <property name="size" type="vec2" value="554.922302,540.000000"/>
+                  </shape>
+                  <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                    <transform>
+                      <location value="720.000000,540.000000,0.000000"/>
+                      <scale value="7.200000,5.400000"/>
+                    </transform>
+                    <fillColor value="#FF5ABCD9"/>
+                    <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                      <property name="evolution" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.640000"/>
+                      </property>
+                      <property name="octaves" type="float" value="1.000000"/>
+                      <property name="scale" type="float" value="0.180000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="lowThreshold" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                      </property>
+                    </effect>
+                  </shape>
+                </scene>
+              </embedScene>
+              <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                <transform>
+                  <location value="721.000000,495.499329,0.000000"/>
+                  <scale value="0.412670,0.412670"/>
+                </transform>
+                <property name="size" type="vec2" value="554.922302,540.000000"/>
+              </shape>
+            </scene>
+          </embedScene>
+          <embedScene id="7" label="Group 1 Copy 2" startTime="84" endTime="2083" fillType="intrinsic" blending="exclude">
+            <transform>
+              <location value="721.500000,541.500000,0.000000"/>
+              <pivot value="-0.500000,-0.500000"/>
+            </transform>
+            <fillColor value="#FF000000"/>
+            <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+              <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+                <transform>
+                  <location value="721.000000,541.000000,0.000000"/>
+                </transform>
+                <fillColor value="#FF000000"/>
+                <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                  <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                    <transform>
+                      <location value="720.000000,494.499329,0.000000"/>
+                      <scale value="0.412670,0.412670"/>
+                    </transform>
+                    <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                      <property name="smoothing" type="float" value="1.940000"/>
+                      <property name="threshold" type="float" value="0.226000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="highThreshold" type="float" value="0.515000"/>
+                    </effect>
+                    <property name="size" type="vec2" value="554.922302,540.000000"/>
+                  </shape>
+                  <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                    <transform>
+                      <location value="720.000000,540.000000,0.000000"/>
+                      <scale value="7.200000,5.400000"/>
+                    </transform>
+                    <fillColor value="#FF5ABCD9"/>
+                    <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                      <property name="evolution" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.640000"/>
+                      </property>
+                      <property name="octaves" type="float" value="1.000000"/>
+                      <property name="scale" type="float" value="0.180000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="lowThreshold" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                      </property>
+                    </effect>
+                  </shape>
+                </scene>
+              </embedScene>
+              <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                <transform>
+                  <location value="721.000000,495.499329,0.000000"/>
+                  <scale value="0.412670,0.412670"/>
+                </transform>
+                <property name="size" type="vec2" value="554.922302,540.000000"/>
+              </shape>
+            </scene>
+          </embedScene>
+        </scene>
+      </embedScene>
+      <embedScene id="10" label="Group and Mask 1 Copy" startTime="34" endTime="2117" fillType="intrinsic" blending="linear-dodge" outTime="2083">
+        <transform>
+          <location value="722.000000,542.000000,0.000000"/>
+          <pivot value="-1.000000,-1.000000"/>
+        </transform>
+        <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+          <property name="strength" type="float" value="0.205000"/>
+        </effect>
+        <scene title="" width="1444" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="2083" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+          <embedScene id="6" label="Group 1 Copy" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+            <transform>
+              <location value="721.500000,541.500000,0.000000"/>
+              <pivot value="-0.500000,-0.500000"/>
+            </transform>
+            <fillColor value="#FF000000"/>
+            <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+              <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+                <transform>
+                  <location value="721.000000,541.000000,0.000000"/>
+                </transform>
+                <fillColor value="#FF000000"/>
+                <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                  <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                    <transform>
+                      <location value="720.000000,494.499329,0.000000"/>
+                      <scale value="0.412670,0.412670"/>
+                    </transform>
+                    <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                      <property name="smoothing" type="float" value="5.400000"/>
+                      <property name="threshold" type="float" value="0.226000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="highThreshold" type="float" value="0.515000"/>
+                    </effect>
+                    <property name="size" type="vec2" value="554.922302,540.000000"/>
+                  </shape>
+                  <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                    <transform>
+                      <location value="720.000000,540.000000,0.000000"/>
+                      <scale value="7.200000,5.400000"/>
+                    </transform>
+                    <fillColor value="#FF5ABCD9"/>
+                    <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                      <property name="evolution" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.640000"/>
+                      </property>
+                      <property name="octaves" type="float" value="1.000000"/>
+                      <property name="scale" type="float" value="0.180000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="lowThreshold" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                      </property>
+                    </effect>
+                  </shape>
+                </scene>
+              </embedScene>
+              <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                <transform>
+                  <location value="721.000000,495.499329,0.000000"/>
+                  <scale value="0.412670,0.412670"/>
+                </transform>
+                <property name="size" type="vec2" value="554.922302,540.000000"/>
+              </shape>
+            </scene>
+          </embedScene>
+          <embedScene id="7" label="Group 1 Copy 2" startTime="84" endTime="2083" fillType="intrinsic" blending="exclude" outTime="1999">
+            <transform>
+              <location value="721.500000,541.500000,0.000000"/>
+              <pivot value="-0.500000,-0.500000"/>
+            </transform>
+            <fillColor value="#FF000000"/>
+            <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+              <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+                <transform>
+                  <location value="721.000000,541.000000,0.000000"/>
+                </transform>
+                <fillColor value="#FF000000"/>
+                <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                  <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                    <transform>
+                      <location value="720.000000,494.499329,0.000000"/>
+                      <scale value="0.412670,0.412670"/>
+                    </transform>
+                    <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                      <property name="smoothing" type="float" value="5.750000"/>
+                      <property name="threshold" type="float" value="0.226000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="highThreshold" type="float" value="0.515000"/>
+                    </effect>
+                    <property name="size" type="vec2" value="554.922302,540.000000"/>
+                  </shape>
+                  <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                    <transform>
+                      <location value="720.000000,540.000000,0.000000"/>
+                      <scale value="7.200000,5.400000"/>
+                    </transform>
+                    <fillColor value="#FF5ABCD9"/>
+                    <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                      <property name="evolution" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.640000"/>
+                      </property>
+                      <property name="octaves" type="float" value="1.000000"/>
+                      <property name="scale" type="float" value="0.180000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="lowThreshold" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                      </property>
+                    </effect>
+                  </shape>
+                </scene>
+              </embedScene>
+              <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                <transform>
+                  <location value="721.000000,495.499329,0.000000"/>
+                  <scale value="0.412670,0.412670"/>
+                </transform>
+                <property name="size" type="vec2" value="554.922302,540.000000"/>
+              </shape>
+            </scene>
+          </embedScene>
+        </scene>
+      </embedScene>
+      <embedScene id="8" label="Group 1 Copy 3" startTime="150" endTime="2149" fillType="intrinsic">
+        <transform>
+          <location value="722.500000,542.500000,0.000000"/>
+          <pivot value="-0.500000,-0.500000"/>
+        </transform>
+        <fillColor value="#FF000000"/>
+        <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+          <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+            <transform>
+              <location value="721.000000,541.000000,0.000000"/>
+            </transform>
+            <fillColor value="#FF000000"/>
+            <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+              <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                <transform>
+                  <location value="720.000000,494.499329,0.000000"/>
+                  <scale value="0.412670,0.412670"/>
+                </transform>
+                <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                  <property name="smoothing" type="float" value="1.940000"/>
+                  <property name="threshold" type="float" value="0.226000"/>
+                </effect>
+                <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                  <property name="highThreshold" type="float" value="0.515000"/>
+                </effect>
+                <property name="size" type="vec2" value="554.922302,540.000000"/>
+              </shape>
+              <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                <transform>
+                  <location value="720.000000,540.000000,0.000000"/>
+                  <scale value="7.200000,5.400000"/>
+                </transform>
+                <fillColor value="#FF5ABCD9"/>
+                <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                  <property name="evolution" type="float">
+                    <kf t="0.000000" v="0.000000"/>
+                    <kf t="0.730000" v="0.640000"/>
+                  </property>
+                  <property name="octaves" type="float" value="1.000000"/>
+                  <property name="scale" type="float" value="0.180000"/>
+                </effect>
+                <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                  <property name="lowThreshold" type="float">
+                    <kf t="0.000000" v="0.000000"/>
+                    <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                  </property>
+                </effect>
+              </shape>
+            </scene>
+          </embedScene>
+          <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+            <transform>
+              <location value="721.000000,495.499329,0.000000"/>
+              <scale value="0.412670,0.412670"/>
+            </transform>
+            <property name="size" type="vec2" value="554.922302,540.000000"/>
+          </shape>
+        </scene>
+      </embedScene>
+      <shape id="30" label="Rectangle 1" hidden="true" startTime="0" endTime="1999" fillType="color" s=".rect">
+        <transform>
+          <location value="754.850464,574.850586,0.000000"/>
+        </transform>
+        <fillColor value="#FF3B6282"/>
+        <property name="size" type="vec2" value="436.088287,436.088379"/>
+      </shape>
+    </scene>
+  </embedScene>
+  <embedScene id="52" label="Group 2 Copy 2" startTime="0" endTime="1549" speed="0.4" fillType="intrinsic" outTime="619">
+    <transform>
+      <location value="718.500000,538.500000,-342.666626"/>
+      <pivot value="-1.000000,-1.000000"/>
+    </transform>
+    <fillColor value="#FF000000"/>
+    <effect id="com.alightcreative.effects.flip3" locallyApplied="true">
+      <property name="angle" type="float">
+        <kf t="0.000000" v="49.000000"/>
+        <kf t="1.384190" v="-42.799999"/>
+      </property>
+      <property name="axis" type="float" value="405.000000"/>
+    </effect>
+    <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+      <property name="strength" type="float">
+        <kf t="0.000000" v="0.280000"/>
+        <kf t="0.990316" v="0.000000"/>
+      </property>
+    </effect>
+    <scene title="" width="1445" height="1085" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="2149" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+      <embedScene id="5" label="Group 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+        <transform>
+          <location value="722.500000,542.500000,0.000000"/>
+          <pivot value="-0.500000,-0.500000"/>
+        </transform>
+        <fillColor value="#FF000000"/>
+        <effect id="com.alightcreative.effects.exposure" locallyApplied="true">
+          <property name="exposure" type="float" value="0.520000"/>
+        </effect>
+        <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+          <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+            <transform>
+              <location value="721.000000,541.000000,0.000000"/>
+            </transform>
+            <fillColor value="#FF000000"/>
+            <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+              <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                <transform>
+                  <location value="720.000000,494.499329,0.000000"/>
+                  <scale value="0.412670,0.412670"/>
+                </transform>
+                <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                  <property name="smoothing" type="float" value="1.940000"/>
+                  <property name="threshold" type="float" value="0.226000"/>
+                </effect>
+                <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                  <property name="highThreshold" type="float" value="0.529000"/>
+                </effect>
+                <effect id="com.alightcreative.effects.smoothedges" locallyApplied="true">
+                  <property name="strength" type="float" value="0.030000"/>
+                </effect>
+                <property name="size" type="vec2" value="554.922302,540.000000"/>
+              </shape>
+              <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                <transform>
+                  <location value="720.000000,540.000000,0.000000"/>
+                  <scale value="7.200000,5.400000"/>
+                </transform>
+                <fillColor value="#FF5ABCD9"/>
+                <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                  <property name="evolution" type="float">
+                    <kf t="0.000000" v="0.000000"/>
+                    <kf t="0.730000" v="0.640000"/>
+                  </property>
+                  <property name="octaves" type="float" value="1.000000"/>
+                  <property name="scale" type="float" value="0.180000"/>
+                </effect>
+                <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                  <property name="lowThreshold" type="float">
+                    <kf t="0.000000" v="0.000000"/>
+                    <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                  </property>
+                </effect>
+              </shape>
+            </scene>
+          </embedScene>
+          <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+            <transform>
+              <location value="721.000000,495.499329,0.000000"/>
+              <scale value="0.412670,0.412670"/>
+            </transform>
+            <property name="size" type="vec2" value="554.922302,540.000000"/>
+          </shape>
+        </scene>
+      </embedScene>
+      <embedScene id="9" label="Group and Mask 1" startTime="34" endTime="2117" fillType="color">
+        <transform>
+          <location value="722.000000,542.000000,0.000000"/>
+          <pivot value="-1.000000,-1.000000"/>
+        </transform>
+        <scene title="" width="1444" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="2083" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+          <embedScene id="6" label="Group 1 Copy" startTime="0" endTime="1999" fillType="intrinsic">
+            <transform>
+              <location value="721.500000,541.500000,0.000000"/>
+              <pivot value="-0.500000,-0.500000"/>
+            </transform>
+            <fillColor value="#FF000000"/>
+            <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+              <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+                <transform>
+                  <location value="721.000000,541.000000,0.000000"/>
+                </transform>
+                <fillColor value="#FF000000"/>
+                <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                  <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                    <transform>
+                      <location value="720.000000,494.499329,0.000000"/>
+                      <scale value="0.412670,0.412670"/>
+                    </transform>
+                    <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                      <property name="smoothing" type="float" value="1.940000"/>
+                      <property name="threshold" type="float" value="0.226000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="highThreshold" type="float" value="0.515000"/>
+                    </effect>
+                    <property name="size" type="vec2" value="554.922302,540.000000"/>
+                  </shape>
+                  <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                    <transform>
+                      <location value="720.000000,540.000000,0.000000"/>
+                      <scale value="7.200000,5.400000"/>
+                    </transform>
+                    <fillColor value="#FF5ABCD9"/>
+                    <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                      <property name="evolution" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.640000"/>
+                      </property>
+                      <property name="octaves" type="float" value="1.000000"/>
+                      <property name="scale" type="float" value="0.180000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="lowThreshold" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                      </property>
+                    </effect>
+                  </shape>
+                </scene>
+              </embedScene>
+              <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                <transform>
+                  <location value="721.000000,495.499329,0.000000"/>
+                  <scale value="0.412670,0.412670"/>
+                </transform>
+                <property name="size" type="vec2" value="554.922302,540.000000"/>
+              </shape>
+            </scene>
+          </embedScene>
+          <embedScene id="7" label="Group 1 Copy 2" startTime="84" endTime="2083" fillType="intrinsic" blending="exclude">
+            <transform>
+              <location value="721.500000,541.500000,0.000000"/>
+              <pivot value="-0.500000,-0.500000"/>
+            </transform>
+            <fillColor value="#FF000000"/>
+            <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+              <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+                <transform>
+                  <location value="721.000000,541.000000,0.000000"/>
+                </transform>
+                <fillColor value="#FF000000"/>
+                <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                  <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                    <transform>
+                      <location value="720.000000,494.499329,0.000000"/>
+                      <scale value="0.412670,0.412670"/>
+                    </transform>
+                    <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                      <property name="smoothing" type="float" value="1.940000"/>
+                      <property name="threshold" type="float" value="0.226000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="highThreshold" type="float" value="0.515000"/>
+                    </effect>
+                    <property name="size" type="vec2" value="554.922302,540.000000"/>
+                  </shape>
+                  <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                    <transform>
+                      <location value="720.000000,540.000000,0.000000"/>
+                      <scale value="7.200000,5.400000"/>
+                    </transform>
+                    <fillColor value="#FF5ABCD9"/>
+                    <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                      <property name="evolution" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.640000"/>
+                      </property>
+                      <property name="octaves" type="float" value="1.000000"/>
+                      <property name="scale" type="float" value="0.180000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="lowThreshold" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                      </property>
+                    </effect>
+                  </shape>
+                </scene>
+              </embedScene>
+              <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                <transform>
+                  <location value="721.000000,495.499329,0.000000"/>
+                  <scale value="0.412670,0.412670"/>
+                </transform>
+                <property name="size" type="vec2" value="554.922302,540.000000"/>
+              </shape>
+            </scene>
+          </embedScene>
+        </scene>
+      </embedScene>
+      <embedScene id="10" label="Group and Mask 1 Copy" startTime="34" endTime="2117" fillType="intrinsic" blending="linear-dodge" outTime="2083">
+        <transform>
+          <location value="722.000000,542.000000,0.000000"/>
+          <pivot value="-1.000000,-1.000000"/>
+        </transform>
+        <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+          <property name="strength" type="float" value="0.205000"/>
+        </effect>
+        <scene title="" width="1444" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="2083" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+          <embedScene id="6" label="Group 1 Copy" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+            <transform>
+              <location value="721.500000,541.500000,0.000000"/>
+              <pivot value="-0.500000,-0.500000"/>
+            </transform>
+            <fillColor value="#FF000000"/>
+            <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+              <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+                <transform>
+                  <location value="721.000000,541.000000,0.000000"/>
+                </transform>
+                <fillColor value="#FF000000"/>
+                <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                  <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                    <transform>
+                      <location value="720.000000,494.499329,0.000000"/>
+                      <scale value="0.412670,0.412670"/>
+                    </transform>
+                    <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                      <property name="smoothing" type="float" value="5.400000"/>
+                      <property name="threshold" type="float" value="0.226000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="highThreshold" type="float" value="0.515000"/>
+                    </effect>
+                    <property name="size" type="vec2" value="554.922302,540.000000"/>
+                  </shape>
+                  <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                    <transform>
+                      <location value="720.000000,540.000000,0.000000"/>
+                      <scale value="7.200000,5.400000"/>
+                    </transform>
+                    <fillColor value="#FF5ABCD9"/>
+                    <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                      <property name="evolution" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.640000"/>
+                      </property>
+                      <property name="octaves" type="float" value="1.000000"/>
+                      <property name="scale" type="float" value="0.180000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="lowThreshold" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                      </property>
+                    </effect>
+                  </shape>
+                </scene>
+              </embedScene>
+              <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                <transform>
+                  <location value="721.000000,495.499329,0.000000"/>
+                  <scale value="0.412670,0.412670"/>
+                </transform>
+                <property name="size" type="vec2" value="554.922302,540.000000"/>
+              </shape>
+            </scene>
+          </embedScene>
+          <embedScene id="7" label="Group 1 Copy 2" startTime="84" endTime="2083" fillType="intrinsic" blending="exclude" outTime="1999">
+            <transform>
+              <location value="721.500000,541.500000,0.000000"/>
+              <pivot value="-0.500000,-0.500000"/>
+            </transform>
+            <fillColor value="#FF000000"/>
+            <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+              <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+                <transform>
+                  <location value="721.000000,541.000000,0.000000"/>
+                </transform>
+                <fillColor value="#FF000000"/>
+                <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                  <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                    <transform>
+                      <location value="720.000000,494.499329,0.000000"/>
+                      <scale value="0.412670,0.412670"/>
+                    </transform>
+                    <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                      <property name="smoothing" type="float" value="5.750000"/>
+                      <property name="threshold" type="float" value="0.226000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="highThreshold" type="float" value="0.515000"/>
+                    </effect>
+                    <property name="size" type="vec2" value="554.922302,540.000000"/>
+                  </shape>
+                  <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                    <transform>
+                      <location value="720.000000,540.000000,0.000000"/>
+                      <scale value="7.200000,5.400000"/>
+                    </transform>
+                    <fillColor value="#FF5ABCD9"/>
+                    <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                      <property name="evolution" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.640000"/>
+                      </property>
+                      <property name="octaves" type="float" value="1.000000"/>
+                      <property name="scale" type="float" value="0.180000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="lowThreshold" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                      </property>
+                    </effect>
+                  </shape>
+                </scene>
+              </embedScene>
+              <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                <transform>
+                  <location value="721.000000,495.499329,0.000000"/>
+                  <scale value="0.412670,0.412670"/>
+                </transform>
+                <property name="size" type="vec2" value="554.922302,540.000000"/>
+              </shape>
+            </scene>
+          </embedScene>
+        </scene>
+      </embedScene>
+      <embedScene id="8" label="Group 1 Copy 3" startTime="150" endTime="2149" fillType="intrinsic">
+        <transform>
+          <location value="722.500000,542.500000,0.000000"/>
+          <pivot value="-0.500000,-0.500000"/>
+        </transform>
+        <fillColor value="#FF000000"/>
+        <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+          <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+            <transform>
+              <location value="721.000000,541.000000,0.000000"/>
+            </transform>
+            <fillColor value="#FF000000"/>
+            <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+              <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                <transform>
+                  <location value="720.000000,494.499329,0.000000"/>
+                  <scale value="0.412670,0.412670"/>
+                </transform>
+                <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                  <property name="smoothing" type="float" value="1.940000"/>
+                  <property name="threshold" type="float" value="0.226000"/>
+                </effect>
+                <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                  <property name="highThreshold" type="float" value="0.515000"/>
+                </effect>
+                <property name="size" type="vec2" value="554.922302,540.000000"/>
+              </shape>
+              <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                <transform>
+                  <location value="720.000000,540.000000,0.000000"/>
+                  <scale value="7.200000,5.400000"/>
+                </transform>
+                <fillColor value="#FF5ABCD9"/>
+                <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                  <property name="evolution" type="float">
+                    <kf t="0.000000" v="0.000000"/>
+                    <kf t="0.730000" v="0.640000"/>
+                  </property>
+                  <property name="octaves" type="float" value="1.000000"/>
+                  <property name="scale" type="float" value="0.180000"/>
+                </effect>
+                <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                  <property name="lowThreshold" type="float">
+                    <kf t="0.000000" v="0.000000"/>
+                    <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                  </property>
+                </effect>
+              </shape>
+            </scene>
+          </embedScene>
+          <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+            <transform>
+              <location value="721.000000,495.499329,0.000000"/>
+              <scale value="0.412670,0.412670"/>
+            </transform>
+            <property name="size" type="vec2" value="554.922302,540.000000"/>
+          </shape>
+        </scene>
+      </embedScene>
+      <shape id="30" label="Rectangle 1" hidden="true" startTime="0" endTime="1999" fillType="color" s=".rect">
+        <transform>
+          <location value="754.850464,574.850586,0.000000"/>
+        </transform>
+        <fillColor value="#FF3B6282"/>
+        <property name="size" type="vec2" value="436.088287,436.088379"/>
+      </shape>
+    </scene>
+  </embedScene>
+  <embedScene id="28" label="Group 2 Copy" startTime="1550" endTime="2999" fillType="intrinsic" inTime="700">
+    <transform>
+      <location value="725.614136,558.184387,0.000000"/>
+      <pivot value="-1.000000,-1.000000"/>
+      <scale value="1.575115,1.575115"/>
+    </transform>
+    <fillColor value="#FF000000"/>
+    <scene title="" width="1445" height="1085" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="2149" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+      <embedScene id="5" label="Group 1" startTime="0" endTime="1999" fillType="intrinsic">
+        <transform>
+          <location value="722.500000,542.500000,0.000000"/>
+          <pivot value="-0.500000,-0.500000"/>
+        </transform>
+        <fillColor value="#FF000000"/>
+        <effect id="com.alightcreative.effects.exposure" locallyApplied="true">
+          <property name="exposure" type="float" value="0.520000"/>
+        </effect>
+        <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+          <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+            <transform>
+              <location value="721.000000,541.000000,0.000000"/>
+            </transform>
+            <fillColor value="#FF000000"/>
+            <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+              <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                <transform>
+                  <location value="720.000000,494.499329,0.000000"/>
+                  <scale value="0.412670,0.412670"/>
+                </transform>
+                <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                  <property name="smoothing" type="float" value="1.940000"/>
+                  <property name="threshold" type="float" value="0.226000"/>
+                </effect>
+                <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                  <property name="highThreshold" type="float" value="0.515000"/>
+                </effect>
+                <property name="size" type="vec2" value="554.922302,540.000000"/>
+              </shape>
+              <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                <transform>
+                  <location value="720.000000,540.000000,0.000000"/>
+                  <scale value="7.200000,5.400000"/>
+                </transform>
+                <fillColor value="#FF5ABCD9"/>
+                <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                  <property name="evolution" type="float">
+                    <kf t="0.000000" v="0.000000"/>
+                    <kf t="0.730000" v="0.640000"/>
+                  </property>
+                  <property name="octaves" type="float" value="1.000000"/>
+                  <property name="scale" type="float" value="0.180000"/>
+                </effect>
+                <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                  <property name="lowThreshold" type="float">
+                    <kf t="0.000000" v="0.000000"/>
+                    <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                  </property>
+                </effect>
+              </shape>
+            </scene>
+          </embedScene>
+          <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+            <transform>
+              <location value="721.000000,495.499329,0.000000"/>
+              <scale value="0.412670,0.412670"/>
+            </transform>
+            <property name="size" type="vec2" value="554.922302,540.000000"/>
+          </shape>
+        </scene>
+      </embedScene>
+      <embedScene id="9" label="Group and Mask 1" startTime="34" endTime="2117" fillType="color">
+        <transform>
+          <location value="722.000000,542.000000,0.000000"/>
+          <pivot value="-1.000000,-1.000000"/>
+        </transform>
+        <scene title="" width="1444" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="2083" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+          <embedScene id="6" label="Group 1 Copy" startTime="0" endTime="1999" fillType="intrinsic">
+            <transform>
+              <location value="721.500000,541.500000,0.000000"/>
+              <pivot value="-0.500000,-0.500000"/>
+            </transform>
+            <fillColor value="#FF000000"/>
+            <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+              <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+                <transform>
+                  <location value="721.000000,541.000000,0.000000"/>
+                </transform>
+                <fillColor value="#FF000000"/>
+                <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                  <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                    <transform>
+                      <location value="720.000000,494.499329,0.000000"/>
+                      <scale value="0.412670,0.412670"/>
+                    </transform>
+                    <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                      <property name="smoothing" type="float" value="1.940000"/>
+                      <property name="threshold" type="float" value="0.226000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="highThreshold" type="float" value="0.515000"/>
+                    </effect>
+                    <property name="size" type="vec2" value="554.922302,540.000000"/>
+                  </shape>
+                  <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                    <transform>
+                      <location value="720.000000,540.000000,0.000000"/>
+                      <scale value="7.200000,5.400000"/>
+                    </transform>
+                    <fillColor value="#FF5ABCD9"/>
+                    <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                      <property name="evolution" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.640000"/>
+                      </property>
+                      <property name="octaves" type="float" value="1.000000"/>
+                      <property name="scale" type="float" value="0.180000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="lowThreshold" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                      </property>
+                    </effect>
+                  </shape>
+                </scene>
+              </embedScene>
+              <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                <transform>
+                  <location value="721.000000,495.499329,0.000000"/>
+                  <scale value="0.412670,0.412670"/>
+                </transform>
+                <property name="size" type="vec2" value="554.922302,540.000000"/>
+              </shape>
+            </scene>
+          </embedScene>
+          <embedScene id="7" label="Group 1 Copy 2" startTime="84" endTime="2083" fillType="intrinsic" blending="exclude">
+            <transform>
+              <location value="721.500000,541.500000,0.000000"/>
+              <pivot value="-0.500000,-0.500000"/>
+            </transform>
+            <fillColor value="#FF000000"/>
+            <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+              <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+                <transform>
+                  <location value="721.000000,541.000000,0.000000"/>
+                </transform>
+                <fillColor value="#FF000000"/>
+                <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                  <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                    <transform>
+                      <location value="720.000000,494.499329,0.000000"/>
+                      <scale value="0.412670,0.412670"/>
+                    </transform>
+                    <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                      <property name="smoothing" type="float" value="1.940000"/>
+                      <property name="threshold" type="float" value="0.226000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="highThreshold" type="float" value="0.515000"/>
+                    </effect>
+                    <property name="size" type="vec2" value="554.922302,540.000000"/>
+                  </shape>
+                  <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                    <transform>
+                      <location value="720.000000,540.000000,0.000000"/>
+                      <scale value="7.200000,5.400000"/>
+                    </transform>
+                    <fillColor value="#FF5ABCD9"/>
+                    <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                      <property name="evolution" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.640000"/>
+                      </property>
+                      <property name="octaves" type="float" value="1.000000"/>
+                      <property name="scale" type="float" value="0.180000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="lowThreshold" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                      </property>
+                    </effect>
+                  </shape>
+                </scene>
+              </embedScene>
+              <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                <transform>
+                  <location value="721.000000,495.499329,0.000000"/>
+                  <scale value="0.412670,0.412670"/>
+                </transform>
+                <property name="size" type="vec2" value="554.922302,540.000000"/>
+              </shape>
+            </scene>
+          </embedScene>
+        </scene>
+      </embedScene>
+      <embedScene id="10" label="Group and Mask 1 Copy" startTime="34" endTime="2117" fillType="intrinsic" blending="linear-dodge" outTime="2083">
+        <transform>
+          <location value="722.000000,542.000000,0.000000"/>
+          <pivot value="-1.000000,-1.000000"/>
+        </transform>
+        <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+          <property name="strength" type="float" value="0.205000"/>
+        </effect>
+        <scene title="" width="1444" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="2083" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+          <embedScene id="6" label="Group 1 Copy" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+            <transform>
+              <location value="721.500000,541.500000,0.000000"/>
+              <pivot value="-0.500000,-0.500000"/>
+            </transform>
+            <fillColor value="#FF000000"/>
+            <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+              <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+                <transform>
+                  <location value="721.000000,541.000000,0.000000"/>
+                </transform>
+                <fillColor value="#FF000000"/>
+                <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                  <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                    <transform>
+                      <location value="720.000000,494.499329,0.000000"/>
+                      <scale value="0.412670,0.412670"/>
+                    </transform>
+                    <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                      <property name="smoothing" type="float" value="5.400000"/>
+                      <property name="threshold" type="float" value="0.226000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="highThreshold" type="float" value="0.515000"/>
+                    </effect>
+                    <property name="size" type="vec2" value="554.922302,540.000000"/>
+                  </shape>
+                  <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                    <transform>
+                      <location value="720.000000,540.000000,0.000000"/>
+                      <scale value="7.200000,5.400000"/>
+                    </transform>
+                    <fillColor value="#FF5ABCD9"/>
+                    <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                      <property name="evolution" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.640000"/>
+                      </property>
+                      <property name="octaves" type="float" value="1.000000"/>
+                      <property name="scale" type="float" value="0.180000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="lowThreshold" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                      </property>
+                    </effect>
+                  </shape>
+                </scene>
+              </embedScene>
+              <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                <transform>
+                  <location value="721.000000,495.499329,0.000000"/>
+                  <scale value="0.412670,0.412670"/>
+                </transform>
+                <property name="size" type="vec2" value="554.922302,540.000000"/>
+              </shape>
+            </scene>
+          </embedScene>
+          <embedScene id="7" label="Group 1 Copy 2" startTime="84" endTime="2083" fillType="intrinsic" blending="exclude" outTime="1999">
+            <transform>
+              <location value="721.500000,541.500000,0.000000"/>
+              <pivot value="-0.500000,-0.500000"/>
+            </transform>
+            <fillColor value="#FF000000"/>
+            <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+              <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+                <transform>
+                  <location value="721.000000,541.000000,0.000000"/>
+                </transform>
+                <fillColor value="#FF000000"/>
+                <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+                  <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                    <transform>
+                      <location value="720.000000,494.499329,0.000000"/>
+                      <scale value="0.412670,0.412670"/>
+                    </transform>
+                    <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                      <property name="smoothing" type="float" value="5.750000"/>
+                      <property name="threshold" type="float" value="0.226000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="highThreshold" type="float" value="0.515000"/>
+                    </effect>
+                    <property name="size" type="vec2" value="554.922302,540.000000"/>
+                  </shape>
+                  <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                    <transform>
+                      <location value="720.000000,540.000000,0.000000"/>
+                      <scale value="7.200000,5.400000"/>
+                    </transform>
+                    <fillColor value="#FF5ABCD9"/>
+                    <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                      <property name="evolution" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.640000"/>
+                      </property>
+                      <property name="octaves" type="float" value="1.000000"/>
+                      <property name="scale" type="float" value="0.180000"/>
+                    </effect>
+                    <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                      <property name="lowThreshold" type="float">
+                        <kf t="0.000000" v="0.000000"/>
+                        <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                      </property>
+                    </effect>
+                  </shape>
+                </scene>
+              </embedScene>
+              <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                <transform>
+                  <location value="721.000000,495.499329,0.000000"/>
+                  <scale value="0.412670,0.412670"/>
+                </transform>
+                <property name="size" type="vec2" value="554.922302,540.000000"/>
+              </shape>
+            </scene>
+          </embedScene>
+        </scene>
+      </embedScene>
+      <embedScene id="8" label="Group 1 Copy 3" startTime="150" endTime="2149" fillType="intrinsic">
+        <transform>
+          <location value="722.500000,542.500000,0.000000"/>
+          <pivot value="-0.500000,-0.500000"/>
+        </transform>
+        <fillColor value="#FF000000"/>
+        <scene title="" width="1443" height="1083" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+          <embedScene id="3" label="Group and Mask 1" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+            <transform>
+              <location value="721.000000,541.000000,0.000000"/>
+            </transform>
+            <fillColor value="#FF000000"/>
+            <scene title="" width="1442" height="1082" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+              <shape id="1" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+                <transform>
+                  <location value="720.000000,494.499329,0.000000"/>
+                  <scale value="0.412670,0.412670"/>
+                </transform>
+                <effect id="com.alightcreative.effects.findedges" locallyApplied="true">
+                  <property name="smoothing" type="float" value="1.940000"/>
+                  <property name="threshold" type="float" value="0.226000"/>
+                </effect>
+                <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                  <property name="highThreshold" type="float" value="0.515000"/>
+                </effect>
+                <property name="size" type="vec2" value="554.922302,540.000000"/>
+              </shape>
+              <shape id="2" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+                <transform>
+                  <location value="720.000000,540.000000,0.000000"/>
+                  <scale value="7.200000,5.400000"/>
+                </transform>
+                <fillColor value="#FF5ABCD9"/>
+                <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+                  <property name="evolution" type="float">
+                    <kf t="0.000000" v="0.000000"/>
+                    <kf t="0.730000" v="0.640000"/>
+                  </property>
+                  <property name="octaves" type="float" value="1.000000"/>
+                  <property name="scale" type="float" value="0.180000"/>
+                </effect>
+                <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+                  <property name="lowThreshold" type="float">
+                    <kf t="0.000000" v="0.000000"/>
+                    <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+                  </property>
+                </effect>
+              </shape>
+            </scene>
+          </embedScene>
+          <shape id="4" startTime="0" endTime="1999" clippingMask="true" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+            <transform>
+              <location value="721.000000,495.499329,0.000000"/>
+              <scale value="0.412670,0.412670"/>
+            </transform>
+            <property name="size" type="vec2" value="554.922302,540.000000"/>
+          </shape>
+        </scene>
+      </embedScene>
+    </scene>
+  </embedScene>
+  <embedScene id="16" label="Group and Mask 2" startTime="2165" endTime="4164" fillType="intrinsic" outTime="1999">
+    <transform>
+      <location value="726.401611,558.971375,0.000000"/>
+      <pivot value="-1.000000,-1.000000"/>
+      <scale value="1.575115,1.575115"/>
+    </transform>
+    <fillColor value="#FF000000"/>
+    <scene title="" width="1444" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+      <shape id="13" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+        <transform>
+          <location value="721.000000,495.499329,0.000000"/>
+          <scale value="0.412670,0.412670"/>
+        </transform>
+        <property name="size" type="vec2" value="554.922302,540.000000"/>
+      </shape>
+      <shape id="15" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+        <transform>
+          <location value="720.000000,540.000000,0.000000"/>
+          <scale value="7.200000,5.400000"/>
+        </transform>
+        <fillColor value="#FF5ABCD9"/>
+        <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+          <property name="evolution" type="float">
+            <kf t="0.000000" v="0.000000"/>
+            <kf t="0.730000" v="0.640000"/>
+          </property>
+          <property name="octaves" type="float" value="1.000000"/>
+          <property name="scale" type="float" value="0.180000"/>
+        </effect>
+        <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+          <property name="lowThreshold" type="float">
+            <kf t="0.000000" v="0.000000"/>
+            <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+          </property>
+        </effect>
+      </shape>
+    </scene>
+  </embedScene>
+  <embedScene id="22" label="Group and Mask 3" startTime="2232" endTime="4298" fillType="intrinsic" blending="linear-dodge">
+    <transform>
+      <location value="725.614136,558.184387,0.000000"/>
+      <pivot value="-1.500000,-1.500000"/>
+      <scale value="1.575115,1.575115"/>
+    </transform>
+    <fillColor value="#FF000000"/>
+    <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+      <property name="strength" type="float" value="0.265000"/>
+    </effect>
+    <scene title="" width="1445" height="1085" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="2066" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+      <embedScene id="19" label="Group and Mask 2 Copy" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+        <transform>
+          <location value="722.000000,542.000000,0.000000"/>
+          <pivot value="-1.000000,-1.000000"/>
+        </transform>
+        <fillColor value="#FF000000"/>
+        <scene title="" width="1444" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+          <shape id="13" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+            <transform>
+              <location value="721.000000,495.499329,0.000000"/>
+              <scale value="0.412670,0.412670"/>
+            </transform>
+            <property name="size" type="vec2" value="554.922302,540.000000"/>
+          </shape>
+          <shape id="15" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+            <transform>
+              <location value="720.000000,540.000000,0.000000"/>
+              <scale value="7.200000,5.400000"/>
+            </transform>
+            <fillColor value="#FF5ABCD9"/>
+            <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+              <property name="evolution" type="float">
+                <kf t="0.000000" v="0.000000"/>
+                <kf t="0.730000" v="0.640000"/>
+              </property>
+              <property name="octaves" type="float" value="1.000000"/>
+              <property name="scale" type="float" value="0.180000"/>
+            </effect>
+            <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+              <property name="lowThreshold" type="float">
+                <kf t="0.000000" v="0.000000"/>
+                <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+              </property>
+            </effect>
+          </shape>
+        </scene>
+      </embedScene>
+      <embedScene id="20" label="Group and Mask 2 Copy 2" startTime="67" endTime="2066" fillType="intrinsic" blending="exclude" outTime="1999">
+        <transform>
+          <location value="722.000000,542.000000,0.000000"/>
+          <pivot value="-1.000000,-1.000000"/>
+        </transform>
+        <fillColor value="#FF000000"/>
+        <scene title="" width="1444" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+          <shape id="13" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+            <transform>
+              <location value="721.000000,495.499329,0.000000"/>
+              <scale value="0.412670,0.412670"/>
+            </transform>
+            <property name="size" type="vec2" value="554.922302,540.000000"/>
+          </shape>
+          <shape id="15" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+            <transform>
+              <location value="720.000000,540.000000,0.000000"/>
+              <scale value="7.200000,5.400000"/>
+            </transform>
+            <fillColor value="#FF5ABCD9"/>
+            <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+              <property name="evolution" type="float">
+                <kf t="0.000000" v="0.000000"/>
+                <kf t="0.730000" v="0.640000"/>
+              </property>
+              <property name="octaves" type="float" value="1.000000"/>
+              <property name="scale" type="float" value="0.180000"/>
+            </effect>
+            <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+              <property name="lowThreshold" type="float">
+                <kf t="0.000000" v="0.000000"/>
+                <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+              </property>
+            </effect>
+          </shape>
+        </scene>
+      </embedScene>
+    </scene>
+  </embedScene>
+  <embedScene id="23" label="Group and Mask 3 Copy" startTime="2232" endTime="4298" fillType="intrinsic" blending="linear-dodge">
+    <transform>
+      <location value="725.614136,558.184387,0.000000"/>
+      <pivot value="-1.500000,-1.500000"/>
+      <scale value="1.575115,1.575115"/>
+    </transform>
+    <fillColor value="#FF000000"/>
+    <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+      <property name="strength" type="float" value="0.265000"/>
+    </effect>
+    <scene title="" width="1445" height="1085" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="2066" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+      <embedScene id="19" label="Group and Mask 2 Copy" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+        <transform>
+          <location value="722.000000,542.000000,0.000000"/>
+          <pivot value="-1.000000,-1.000000"/>
+        </transform>
+        <fillColor value="#FF000000"/>
+        <scene title="" width="1444" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+          <shape id="13" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+            <transform>
+              <location value="721.000000,495.499329,0.000000"/>
+              <scale value="0.412670,0.412670"/>
+            </transform>
+            <property name="size" type="vec2" value="554.922302,540.000000"/>
+          </shape>
+          <shape id="15" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+            <transform>
+              <location value="720.000000,540.000000,0.000000"/>
+              <scale value="7.200000,5.400000"/>
+            </transform>
+            <fillColor value="#FF5ABCD9"/>
+            <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+              <property name="evolution" type="float">
+                <kf t="0.000000" v="0.000000"/>
+                <kf t="0.730000" v="0.640000"/>
+              </property>
+              <property name="octaves" type="float" value="1.000000"/>
+              <property name="scale" type="float" value="0.180000"/>
+            </effect>
+            <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+              <property name="lowThreshold" type="float">
+                <kf t="0.000000" v="0.000000"/>
+                <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+              </property>
+            </effect>
+          </shape>
+        </scene>
+      </embedScene>
+      <embedScene id="20" label="Group and Mask 2 Copy 2" startTime="67" endTime="2066" fillType="intrinsic" blending="exclude" outTime="1999">
+        <transform>
+          <location value="722.000000,542.000000,0.000000"/>
+          <pivot value="-1.000000,-1.000000"/>
+        </transform>
+        <fillColor value="#FF000000"/>
+        <scene title="" width="1444" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+          <shape id="13" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+            <transform>
+              <location value="721.000000,495.499329,0.000000"/>
+              <scale value="0.412670,0.412670"/>
+            </transform>
+            <property name="size" type="vec2" value="554.922302,540.000000"/>
+          </shape>
+          <shape id="15" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+            <transform>
+              <location value="720.000000,540.000000,0.000000"/>
+              <scale value="7.200000,5.400000"/>
+            </transform>
+            <fillColor value="#FF5ABCD9"/>
+            <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+              <property name="evolution" type="float">
+                <kf t="0.000000" v="0.000000"/>
+                <kf t="0.730000" v="0.640000"/>
+              </property>
+              <property name="octaves" type="float" value="1.000000"/>
+              <property name="scale" type="float" value="0.180000"/>
+            </effect>
+            <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+              <property name="lowThreshold" type="float">
+                <kf t="0.000000" v="0.000000"/>
+                <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+              </property>
+            </effect>
+          </shape>
+        </scene>
+      </embedScene>
+    </scene>
+  </embedScene>
+  <embedScene id="24" label="Group and Mask 3 Copy 2" startTime="2232" endTime="4298" fillType="intrinsic" blending="linear-dodge">
+    <transform>
+      <location value="725.614136,558.184387,0.000000"/>
+      <pivot value="-1.500000,-1.500000"/>
+      <scale value="1.575115,1.575115"/>
+    </transform>
+    <fillColor value="#FF000000"/>
+    <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+      <property name="strength" type="float" value="0.265000"/>
+    </effect>
+    <scene title="" width="1445" height="1085" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="2066" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+      <embedScene id="19" label="Group and Mask 2 Copy" startTime="0" endTime="1999" fillType="intrinsic" outTime="1999">
+        <transform>
+          <location value="722.000000,542.000000,0.000000"/>
+          <pivot value="-1.000000,-1.000000"/>
+        </transform>
+        <fillColor value="#FF000000"/>
+        <scene title="" width="1444" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+          <shape id="13" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+            <transform>
+              <location value="721.000000,495.499329,0.000000"/>
+              <scale value="0.412670,0.412670"/>
+            </transform>
+            <property name="size" type="vec2" value="554.922302,540.000000"/>
+          </shape>
+          <shape id="15" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+            <transform>
+              <location value="720.000000,540.000000,0.000000"/>
+              <scale value="7.200000,5.400000"/>
+            </transform>
+            <fillColor value="#FF5ABCD9"/>
+            <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+              <property name="evolution" type="float">
+                <kf t="0.000000" v="0.000000"/>
+                <kf t="0.730000" v="0.640000"/>
+              </property>
+              <property name="octaves" type="float" value="1.000000"/>
+              <property name="scale" type="float" value="0.180000"/>
+            </effect>
+            <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+              <property name="lowThreshold" type="float">
+                <kf t="0.000000" v="0.000000"/>
+                <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+              </property>
+            </effect>
+          </shape>
+        </scene>
+      </embedScene>
+      <embedScene id="20" label="Group and Mask 2 Copy 2" startTime="67" endTime="2066" fillType="intrinsic" blending="exclude" outTime="1999">
+        <transform>
+          <location value="722.000000,542.000000,0.000000"/>
+          <pivot value="-1.000000,-1.000000"/>
+        </transform>
+        <fillColor value="#FF000000"/>
+        <scene title="" width="1444" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="1999" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+          <shape id="13" startTime="0" endTime="1999" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+            <transform>
+              <location value="721.000000,495.499329,0.000000"/>
+              <scale value="0.412670,0.412670"/>
+            </transform>
+            <property name="size" type="vec2" value="554.922302,540.000000"/>
+          </shape>
+          <shape id="15" label="Rectangle 1" startTime="0" endTime="1999" fillType="color" blending="exclude" s=".rect">
+            <transform>
+              <location value="720.000000,540.000000,0.000000"/>
+              <scale value="7.200000,5.400000"/>
+            </transform>
+            <fillColor value="#FF5ABCD9"/>
+            <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+              <property name="evolution" type="float">
+                <kf t="0.000000" v="0.000000"/>
+                <kf t="0.730000" v="0.640000"/>
+              </property>
+              <property name="octaves" type="float" value="1.000000"/>
+              <property name="scale" type="float" value="0.180000"/>
+            </effect>
+            <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+              <property name="lowThreshold" type="float">
+                <kf t="0.000000" v="0.000000"/>
+                <kf t="0.730000" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+              </property>
+            </effect>
+          </shape>
+        </scene>
+      </embedScene>
+    </scene>
+  </embedScene>
+  <embedScene id="21" label="Group and Mask 2 Copy 3" startTime="2332" endTime="8333" fillType="intrinsic" outTime="6001">
+    <transform>
+      <location value="726.401611,558.971375,0.000000"/>
+      <pivot value="-1.000000,-1.000000"/>
+      <scale value="1.575115,1.575115"/>
+    </transform>
+    <fillColor value="#FF000000"/>
+    <scene title="" width="1444" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="6001" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+      <shape id="13" startTime="0" endTime="6001" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+        <transform>
+          <location value="721.000000,495.499329,0.000000"/>
+          <scale value="0.412670,0.412670"/>
+        </transform>
+        <property name="size" type="vec2" value="554.922302,540.000000"/>
+      </shape>
+      <shape id="56" label="Rectangle 2" startTime="2634" endTime="4633" clippingMask="true" fillType="color" blending="linear-dodge" s=".rect">
+        <transform>
+          <location>
+            <kf t="0.000000" v="367.387848,539.605286,0.000000"/>
+            <kf t="0.991996" v="1169.054688,540.000000,0.000000" e="cubicBezier 0.5597345 0.0 0.48893806 1.0"/>
+          </location>
+          <rotation value="20.853659"/>
+        </transform>
+        <fillColor value="#FF007AFF"/>
+        <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+          <property name="strength" type="float" value="0.680000"/>
+        </effect>
+        <property name="size" type="vec2" value="58.092903,277.207367"/>
+      </shape>
+      <shape id="58" label="Rectangle 2 Copy" startTime="2816" endTime="4517" clippingMask="true" speed="1.175191" fillType="color" blending="linear-dodge" s=".rect">
+        <transform>
+          <location>
+            <kf t="0.000000" v="367.387848,539.605286,0.000000"/>
+            <kf t="0.991996" v="1169.054688,540.000000,0.000000" e="cubicBezier 0.5597345 0.0 0.48893806 1.0"/>
+          </location>
+          <rotation value="20.853659"/>
+        </transform>
+        <fillColor value="#FF79B9FF"/>
+        <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+          <property name="strength" type="float" value="0.225000"/>
+        </effect>
+        <property name="size" type="vec2" value="33.000000,277.207367"/>
+      </shape>
+      <shape id="15" label="Rectangle 1" startTime="0" endTime="6001" fillType="color" blending="exclude" s=".rect">
+        <transform>
+          <location value="720.000000,540.000000,0.000000"/>
+          <scale value="7.200000,5.400000"/>
+        </transform>
+        <fillColor value="#FF5ABCD9"/>
+        <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+          <property name="evolution" type="float">
+            <kf t="0.000000" v="0.000000"/>
+            <kf t="0.243171" v="0.640000"/>
+          </property>
+          <property name="octaves" type="float" value="1.000000"/>
+          <property name="scale" type="float" value="0.180000"/>
+        </effect>
+        <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+          <property name="lowThreshold" type="float">
+            <kf t="0.000000" v="0.000000"/>
+            <kf t="0.243171" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+          </property>
+        </effect>
+      </shape>
+    </scene>
+  </embedScene>
+  <embedScene id="59" label="Group and Mask 2 Copy" startTime="2332" endTime="8333" fillType="intrinsic" blending="linear-dodge" outTime="6001">
+    <transform>
+      <location value="726.401611,558.971375,0.000000"/>
+      <pivot value="-1.000000,-1.000000"/>
+      <scale value="1.575115,1.575115"/>
+      <opacity>
+        <kf t="0.130812" v="0.000000"/>
+        <kf t="0.190833" v="1.000000"/>
+        <kf t="0.299167" v="0.000000"/>
+      </opacity>
+    </transform>
+    <fillColor value="#FF000000"/>
+    <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+      <property name="strength" type="float" value="0.480000"/>
+    </effect>
+    <scene title="" width="1444" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="6001" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+      <shape id="13" startTime="0" endTime="6001" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+        <transform>
+          <location value="721.000000,495.499329,0.000000"/>
+          <scale value="0.412670,0.412670"/>
+        </transform>
+        <property name="size" type="vec2" value="554.922302,540.000000"/>
+      </shape>
+      <shape id="56" label="Rectangle 2" startTime="2634" endTime="4633" clippingMask="true" fillType="color" blending="linear-dodge" s=".rect">
+        <transform>
+          <location>
+            <kf t="0.000000" v="367.387848,539.605286,0.000000"/>
+            <kf t="0.991996" v="1169.054688,540.000000,0.000000" e="cubicBezier 0.5597345 0.0 0.48893806 1.0"/>
+          </location>
+          <rotation value="20.853659"/>
+        </transform>
+        <fillColor value="#FF007AFF"/>
+        <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+          <property name="strength" type="float" value="0.680000"/>
+        </effect>
+        <property name="size" type="vec2" value="58.092903,277.207367"/>
+      </shape>
+      <shape id="58" label="Rectangle 2 Copy" startTime="2816" endTime="4517" clippingMask="true" speed="1.175191" fillType="color" blending="linear-dodge" s=".rect">
+        <transform>
+          <location>
+            <kf t="0.000000" v="367.387848,539.605286,0.000000"/>
+            <kf t="0.991996" v="1169.054688,540.000000,0.000000" e="cubicBezier 0.5597345 0.0 0.48893806 1.0"/>
+          </location>
+          <rotation value="20.853659"/>
+        </transform>
+        <fillColor value="#FF79B9FF"/>
+        <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+          <property name="strength" type="float" value="0.225000"/>
+        </effect>
+        <property name="size" type="vec2" value="33.000000,277.207367"/>
+      </shape>
+      <shape id="15" label="Rectangle 1" startTime="0" endTime="6001" fillType="color" blending="exclude" s=".rect">
+        <transform>
+          <location value="720.000000,540.000000,0.000000"/>
+          <scale value="7.200000,5.400000"/>
+        </transform>
+        <fillColor value="#FF5ABCD9"/>
+        <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+          <property name="evolution" type="float">
+            <kf t="0.000000" v="0.000000"/>
+            <kf t="0.243171" v="0.640000"/>
+          </property>
+          <property name="octaves" type="float" value="1.000000"/>
+          <property name="scale" type="float" value="0.180000"/>
+        </effect>
+        <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+          <property name="lowThreshold" type="float">
+            <kf t="0.000000" v="0.000000"/>
+            <kf t="0.243171" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+          </property>
+        </effect>
+      </shape>
+    </scene>
+  </embedScene>
+  <embedScene id="60" label="Group and Mask 2 Copy 2" startTime="2332" endTime="8333" fillType="intrinsic" blending="linear-dodge" outTime="6001">
+    <transform>
+      <location value="726.401611,558.971375,0.000000"/>
+      <pivot value="-1.000000,-1.000000"/>
+      <scale value="1.575115,1.575115"/>
+      <opacity>
+        <kf t="0.130812" v="0.000000"/>
+        <kf t="0.190833" v="1.000000"/>
+        <kf t="0.388000" v="0.000000"/>
+      </opacity>
+    </transform>
+    <fillColor value="#FF000000"/>
+    <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+      <property name="strength" type="float" value="1.430000"/>
+    </effect>
+    <scene title="" width="1444" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="6001" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
+      <shape id="13" startTime="0" endTime="6001" fillType="media" fillImage="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" mediaFillMode="fill" s=".rect">
+        <transform>
+          <location value="721.000000,495.499329,0.000000"/>
+          <scale value="0.412670,0.412670"/>
+        </transform>
+        <property name="size" type="vec2" value="554.922302,540.000000"/>
+      </shape>
+      <shape id="56" label="Rectangle 2" startTime="2634" endTime="4633" clippingMask="true" fillType="color" blending="linear-dodge" s=".rect">
+        <transform>
+          <location>
+            <kf t="0.000000" v="367.387848,539.605286,0.000000"/>
+            <kf t="0.991996" v="1169.054688,540.000000,0.000000" e="cubicBezier 0.5597345 0.0 0.48893806 1.0"/>
+          </location>
+          <rotation value="20.853659"/>
+        </transform>
+        <fillColor value="#FF007AFF"/>
+        <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+          <property name="strength" type="float" value="0.680000"/>
+        </effect>
+        <property name="size" type="vec2" value="58.092903,277.207367"/>
+      </shape>
+      <shape id="58" label="Rectangle 2 Copy" startTime="2816" endTime="4517" clippingMask="true" speed="1.175191" fillType="color" blending="linear-dodge" s=".rect">
+        <transform>
+          <location>
+            <kf t="0.000000" v="367.387848,539.605286,0.000000"/>
+            <kf t="0.991996" v="1169.054688,540.000000,0.000000" e="cubicBezier 0.5597345 0.0 0.48893806 1.0"/>
+          </location>
+          <rotation value="20.853659"/>
+        </transform>
+        <fillColor value="#FF79B9FF"/>
+        <effect id="com.alightcreative.effects.gaussianblur" locallyApplied="true">
+          <property name="strength" type="float" value="0.225000"/>
+        </effect>
+        <property name="size" type="vec2" value="33.000000,277.207367"/>
+      </shape>
+      <shape id="15" label="Rectangle 1" startTime="0" endTime="6001" fillType="color" blending="exclude" s=".rect">
+        <transform>
+          <location value="720.000000,540.000000,0.000000"/>
+          <scale value="7.200000,5.400000"/>
+        </transform>
+        <fillColor value="#FF5ABCD9"/>
+        <effect id="com.alightcreative.effects.ridges2" locallyApplied="false">
+          <property name="evolution" type="float">
+            <kf t="0.000000" v="0.000000"/>
+            <kf t="0.243171" v="0.640000"/>
+          </property>
+          <property name="octaves" type="float" value="1.000000"/>
+          <property name="scale" type="float" value="0.180000"/>
+        </effect>
+        <effect id="com.alightcreative.effects.lumakey3" locallyApplied="false">
+          <property name="lowThreshold" type="float">
+            <kf t="0.000000" v="0.000000"/>
+            <kf t="0.243171" v="0.946000" e="cubicBezier 0.42 0.0 0.3381121 1.0"/>
+          </property>
+        </effect>
+      </shape>
+    </scene>
+  </embedScene>
+  <shape id="25" label="Rectangle 1" startTime="2133" endTime="4132" fillType="color" s=".rect">
+    <transform>
+      <location value="720.000000,540.000000,0.000000"/>
+      <scale value="7.200000,5.400000"/>
+    </transform>
+    <fillColor value="#FF3F9C41"/>
+    <effect id="com.alightcreative.effects.lift" locallyApplied="true"/>
+    <effect id="com.alightcreative.effects.glowscan" locallyApplied="false">
+      <property name="alpha" type="float">
+        <kf t="0.183092" v="0.000000"/>
+        <kf t="0.475238" v="0.000000"/>
+        <kf t="0.338000" v="1.000000"/>
+      </property>
+    </effect>
+  </shape>
+  <shape id="26" label="Rectangle 1" startTime="2117" endTime="4116" fillType="color" s=".rect">
+    <transform>
+      <location value="720.000000,540.000000,0.000000"/>
+      <scale value="7.200000,5.400000"/>
+      <opacity>
+        <kf t="0.275138" v="1.000000"/>
+        <kf t="0.676500" v="0.000000"/>
+      </opacity>
+    </transform>
+    <fillColor value="#FF3F9C41"/>
+    <effect id="com.alightcreative.effects.lift" locallyApplied="true"/>
+    <effect id="com.alightcreative.effects.rays" locallyApplied="true">
+      <property name="intensity" type="float">
+        <kf t="0.183592" v="1.520000"/>
+        <kf t="0.000000" v="0.000000"/>
+      </property>
+      <property name="strength" type="float">
+        <kf t="0.058529" v="0.850000"/>
+        <kf t="0.605000" v="0.000000" e="cubicBezier 0.42 0.0 0.2496165 1.0"/>
+      </property>
+    </effect>
+  </shape>
+  <nullobj id="32" label="Null 1" startTime="0" endTime="1549" fillType="none">
+    <transform>
+      <location value="892.567200,518.474487,651.007812"/>
+      <rotation value="15.365853"/>
+    </transform>
+  </nullobj>
+  <shape id="33" label="Rectangle 2" startTime="0" endTime="1549" fillType="gradient" s=".rect">
+    <transform>
+      <location value="749.173889,561.322449,-545.000000"/>
+      <scale value="0.945326,0.945326"/>
+      <rotation value="15.365853"/>
+    </transform>
+    <fillColor value="#FF50D197"/>
+    <gradient type="linear" startColor="#FF000000" endColor="#00141728" start="0.714140,0.611385" end="1.292849,0.080352"/>
+    <effect id="com.alightcreative.effects.lift" locallyApplied="true"/>
+    <effect id="com.alightcreative.effects.lensblur2" locallyApplied="false">
+      <property name="strength" type="float" value="0.045000"/>
+    </effect>
+  </shape>
+  <camera type="perspective" id="31" label="Camera 1" parent="32" startTime="0" endTime="1549" fillType="none">
+    <transform>
+      <location>
+        <kf t="0.000000" v="0.000000,0.000000,-1247.076782"/>
+        <kf t="1.217677" v="0.000000,0.000000,-1632.743530"/>
+      </location>
+    </transform>
+    <fov value="60.000000"/>
+    <focus-blur enabled="false">
+      <strength value="0.500000"/>
+      <depth-of-field value="124.707680"/>
+      <distance value="602.000000"/>
+    </focus-blur>
+    <fog enabled="false">
+      <near-z value="1247.076782"/>
+      <far-z value="2494.153564"/>
+    </fog>
+  </camera>
+  <camera type="perspective" id="34" label="Camera 2" parent="35" startTime="1550" endTime="8333" fillType="none">
+    <transform>
+      <location>
+        <kf t="-0.019608" v="0.000000,0.000000,0.000000"/>
+        <kf t="0.356657" v="0.000000,0.000000,-1016.410278" e="cubicBezier 0.0 1.0 0.0 1.0"/>
+      </location>
+    </transform>
+    <fov value="60.000000"/>
+    <focus-blur enabled="false">
+      <strength value="0.500000"/>
+      <depth-of-field value="124.707680"/>
+      <distance value="1247.076782"/>
+    </focus-blur>
+    <fog enabled="false">
+      <near-z value="1247.076782"/>
+      <far-z value="2494.153564"/>
+    </fog>
+  </camera>
+  <nullobj id="35" label="Null 2" parent="36" startTime="3150" endTime="8333" fillType="none">
+    <transform>
+      <location>
+        <kf t="0.000000" v="-0.106251,0.128234,0.000000"/>
+        <kf t="0.196684" v="19.197697,-23.169523,-509.000031" e="cubicBezier 1.0 0.0 0.25 1.0"/>
+      </location>
+      <scale value="0.997667,0.997667"/>
+    </transform>
+  </nullobj>
+  <nullobj id="36" label="Null 3" parent="57" startTime="3267" endTime="5266" fillType="none">
+    <transform>
+      <location>
+        <kf t="0.000000" v="-2.613049,-7.262427,0.000000"/>
+        <kf t="0.425213" v="-6.724817,70.399590,0.000000" e="cubicBezier 1.0 0.0 0.18657817 1.0"/>
+      </location>
+      <scale value="0.916036,0.916036"/>
+    </transform>
+  </nullobj>

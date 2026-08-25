@@ -1,0 +1,23 @@
+const GIFS = {};
+const $=id=>document.getElementById(id), MAX_MS=10000;
+const PRESETS={
+ fadeBlur:{access:'free',status:'active',name:'Blur',gif:'fadeblur.GIF',duration:1999,pivot:'0.000000,39.666653',location:[{t:0,off:[396,0,0]},{t:.325163,off:[0,0,0],e:'cubicBezier 0.0 0.0 0.040176973 1.0'}],scaleValue:'2.140850,2.140850',opacity:[{t:.0385,v:'0.000000'},{t:.172,v:'1.000000'}],blur:[{t:0,v:'0.150000'},{t:.133567,v:'0.000000'}]},
+ elastic:{access:'free',status:'active',name:'Elastic',gif:'elasticoriginal.GIF',duration:1999,pivot:'0.000000,39.666653',location:[{t:0,off:[123,0,0]},{t:.325163,off:[0,0,0],e:'local elastic 0.5 1.0 0.0 0.30324566'}],scale:[{t:0,v:'0.000014,0.000025'},{t:.2885,v:'2.140850,2.140850',e:'local elastic 0.3960177 1.0 0.0 0.44754386'}],rotation:[{t:0,v:'28.536585'},{t:.333667,v:'0.000000',e:'local elastic 0.44321534 1.0 0.06710528 0.7114035'}]},
+ jumpRotate:{access:'free',status:'active',name:'Squish Rot',gif:'jumpsqushyrotate.GIF',duration:1999,pivot:'0.000000,39.666653',location:[{t:0,off:[-6.333,218.333,0]},{t:.325163,off:[0,0,0],e:'local elastic 0.5 1.0 0.0 0.4063158'}],scale:[{t:0,v:'0.000014,0.000031'},{t:.397,v:'2.140850,2.140850',e:'local elastic 0.5 1.0 0.0 1.0'}],rotation:[{t:0,v:'51.585365'},{t:.425213,v:'0.000000',e:'local elastic 0.5 1.0 0.0 0.65368426'}],opacity:[{t:.092046,v:'0.000000'},{t:.167084,v:'1.000000'}]},
+ jumpRotateUp:{access:'free',status:'active',name:'Squish Up',gif:'jumssqushiroatetup.GIF',duration:1999,pivot:'0.000000,39.666653',location:[{t:0,off:[0,-230.003,0]},{t:.325163,off:[0,0,0],e:'local elastic 0.5 1.0 0.0 0.4063158'}],scale:[{t:0,v:'0.000014,0.000031'},{t:.397,v:'2.140850,2.140850',e:'local elastic 0.5 1.0 0.0 1.0'}],rotation:[{t:0,v:'-46.097561'},{t:.425213,v:'0.000000',e:'local elastic 0.5 1.0 0.0 0.65368426'}],opacity:[{t:.092046,v:'0.000000'},{t:.167084,v:'1.000000'}]},
+ rotateUpCopy:{access:'free',status:'active',name:'Up',gif:'roatet up copy.GIF',duration:1999,pivot:'0.000000,-34.000004',location:[{t:0,off:[0,-100.667,0]},{t:.325163,off:[0,0,0],e:'local elastic 0.5 1.0 0.0 0.4063158'}],scale:[{t:0,v:'0.000014,0.000031'},{t:.397,v:'2.140850,2.140850',e:'local elastic 0.5 1.0 0.0 1.0'}],rotation:[{t:0,v:'-46.097561'},{t:.425213,v:'0.000000',e:'local elastic 0.5 1.0 0.0 0.65368426'}]},
+ moveBounce:{access:'free',status:'active',name:'Bounce Move',gif:'',duration:1999,pivot:'0.000000,36.333332',location:[{t:0,off:[135.333190,0,0]},{t:.333667,off:[0,0,0],e:'cubicBezier 0.0 0.20526315 0.0014749262 1.0'}],scale:[{t:0,v:'1.000000,0.000000'},{t:.351000,v:'1.000000,1.000000',e:'local elastic 0.33554572 1.0 0.16192983 0.60833335'}],opacity:[{t:0,v:'0.000000'},{t:.146073,v:'1.000000'}],wordNull:{duration:2541,location:[{t:0,off:[-97.333374,1.000061,0]},{t:.095977,off:[48.852356,0,0],e:'cubicBezier 0.0 0.0 0.20094393 1.0'},{t:.325300,off:[0,0,0],e:'cubicBezier 0.42 0.0 0.100648955 1.0'}]}},
+ stretchHalf:{access:'free',status:'active',name:'Stretch Half',gif:'',duration:1999,location:[{t:0,off:[217.333313,0,0]},{t:.229615,off:[0,0,0],e:'cubicBezier 0.0 0.0 0.16407079 1.0'}],scale:[{t:0,v:'1.000000,0.000000'},{t:.083542,v:'1.000000,2.098188',e:'cubicBezier 0.33997053 0.8105263 0.32227138 1.0'},{t:.351000,v:'1.000000,1.000000',e:'cubicBezier 0.8860767 0.0 0.22306783 1.0'},{t:.729865,v:'1.000000,1.000000'},{t:.767500,v:'1.000000,0.892857',e:'cubicBezier 0.42 0.0 0.58 1.0'},{t:.892500,v:'1.000000,1.882440',e:'cubicBezier 0.43952802 0.0 0.0 1.0'},{t:.979990,v:'1.000000,0.000016',e:'cubicBezier 1.0 0.0 0.75 0.75'}],opacity:[{t:0,v:'0.000000'},{t:.021011,v:'1.000000'}]},
+ blurUp:{access:'free',status:'active',name:'Blur Up',gif:'',duration:2958,location:[{t:0,off:[0,177.333327,0]},{t:.155173,off:[0,0,0],e:'cubicBezier 0.0 0.0 0.16407079 1.0'}],opacity:[{t:0,v:'0.000000'},{t:.054064,v:'1.000000'}],blur:[{t:0,v:'0.060000'},{t:.124684,v:'0.000000'}]},
+ randomIn:{access:'free',status:'active',name:'Random In',gif:'',duration:2124,randomIn:true,opacity:[{t:0,v:'0.000000'},{t:.06,v:'1.000000'}]},
+ randomInOut:{access:'free',status:'active',name:'Random In & Out',gif:'',duration:2124,randomInOut:true}
+};
+const FONTS=['Lexend','Exo','Inter','Poppins','Montserrat','Manrope','Plus Jakarta Sans','Sora','DM Sans','Space Grotesk','Outfit','Urbanist','Rubik','Raleway','Oswald','Bebas Neue','Anton','Archivo Black','League Spartan','Orbitron','Nunito Sans'];
+const FONT_STYLES=[['300','Light'],['400','Regular'],['500','Medium'],['600','Semi Bold'],['700','Bold'],['800','Extra Bold'],['900','Black']];
+
+
+// Expose registries for the iframe runtime. Top-level const does not become window.* in modern browsers.
+window.GIFS = GIFS;
+window.PRESETS = PRESETS;
+window.FONTS = FONTS;
+window.FONT_STYLES = FONT_STYLES;
