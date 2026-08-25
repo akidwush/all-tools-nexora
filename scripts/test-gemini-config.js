@@ -4,6 +4,7 @@ const assert = require("node:assert/strict");
 const {
   GEMINI_API_KEY_ENV_NAMES,
   geminiErrorDetails,
+  geminiGenerationConfig,
   geminiModelCandidates,
   normalizeGeminiApiKey,
   resolveGeminiApiKey
@@ -24,6 +25,8 @@ assert.deepEqual(
   ["gemini-custom", "gemini-shared", "gemini-stable"]
 );
 assert.deepEqual(geminiModelCandidates("DOCUMENT_AI_MODEL", "gemini-stable", { DOCUMENT_AI_MODEL: "gemini-stable" }), ["gemini-stable"]);
+assert.deepEqual(geminiGenerationConfig("gemini-3.6-flash", { temperature: 0.2, topP: 0.9, topK: 20, maxOutputTokens: 1000 }), { maxOutputTokens: 1000 });
+assert.equal(geminiGenerationConfig("gemini-3.5-flash", { temperature: 0.2 }).temperature, 0.2);
 
 const nested = geminiErrorDetails({ response: { status: 403, data: { error: { status: "PERMISSION_DENIED", message: "API key not valid" } } } });
 assert.equal(nested.status, 403);

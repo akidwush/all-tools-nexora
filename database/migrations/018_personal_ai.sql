@@ -15,7 +15,7 @@ create table if not exists public.ai_settings (
   response_length text not null default 'balanced' check (response_length in ('short','balanced','detailed')),
   temperature numeric(3,2) not null default 0.65 check (temperature between 0 and 2),
   max_output_tokens integer not null default 1200 check (max_output_tokens between 128 and 8192),
-  model text not null default 'gemini-3.6-flash' check (model in ('gemini-3.6-flash','gemini-3.5-flash','gemini-3.5-flash-lite','gemini-3.1-flash-lite','gemini-2.5-flash')),
+  model text not null default 'gemini-3.6-flash' check (model in ('gemini-3.7-flash','gemini-3.6-flash','gemini-3.5-flash','gemini-3.5-flash-lite','gemini-3.1-flash-lite','gemini-2.5-flash')),
   suggested_prompts jsonb not null default '[]'::jsonb check (jsonb_typeof(suggested_prompts) = 'array'),
   disabled_message text not null default '' check (char_length(disabled_message) <= 300),
   error_message text not null default '' check (char_length(error_message) <= 300),

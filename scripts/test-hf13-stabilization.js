@@ -8,21 +8,21 @@ const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 const { DEFAULT_MODEL, generateGeminiReply, normalizeSettings } = require("../lib/personal-ai");
 
 async function main() {
-  assert.equal(DEFAULT_MODEL, "gemini-2.5-flash");
+  assert.equal(DEFAULT_MODEL, "gemini-3.6-flash");
 
   const previousKey = process.env.GEMINI_API_KEY;
   process.env.GEMINI_API_KEY = "test-key";
   const attempted = [];
   try {
     const result = await generateGeminiReply({
-      settings: normalizeSettings({ model: "gemini-3.6-flash" }),
+      settings: normalizeSettings({ model: "gemini-2.5-flash" }),
       message: "uji",
       timeoutMs: 2_000,
       clientFactory: async () => ({
         models: {
           generateContent: async ({ model }) => {
             attempted.push(model);
-            if (model === "gemini-3.6-flash") {
+            if (model === "gemini-2.5-flash") {
               throw Object.assign(new Error("model is not found for this API version"), { status: 404 });
             }
             return { text: "OK" };
@@ -30,8 +30,8 @@ async function main() {
         }
       })
     });
-    assert.deepEqual(attempted, ["gemini-3.6-flash", "gemini-2.5-flash"]);
-    assert.deepEqual(result, { text: "OK", model: "gemini-2.5-flash" });
+    assert.deepEqual(attempted, ["gemini-2.5-flash", "gemini-3.6-flash"]);
+    assert.deepEqual(result, { text: "OK", model: "gemini-3.6-flash" });
   } finally {
     if (previousKey === undefined) delete process.env.GEMINI_API_KEY;
     else process.env.GEMINI_API_KEY = previousKey;
