@@ -55,6 +55,50 @@
     });
   }
 
+  function imageBitmap(file) {
+    if (typeof createImageBitmap === "function") return createImageBitmap(file);
+    return new Promise(function (resolve, reject) {
+      var image = new Image();
+      var url = URL.createObjectURL(file);
+      image.onload = function () { URL.revokeObjectURL(url); resolve(image); };
+      image.onerror = function () { URL.revokeObjectURL(url); reject(new Error("Gambar tidak dapat dibuka.")); };
+      image.src = url;
+    });
+  }
+
+  function canvasBlob(canvas, type, quality) {
+    return new Promise(function (resolve, reject) {
+      canvas.toBlob(function (blob) { if (blob) resolve(blob); else reject(new Error("Optimasi gambar gagal.")); }, type, quality);
+    });
+  }
+
+  async function prepareFile(file, mime) {
+    if (!mime.startsWith("image/")) return { data: await readFile(file), mime: mime, bytes: file.size };
+    var bitmap = await imageBitmap(file);
+    var width = Number(bitmap.width || bitmap.naturalWidth || 0);
+    var height = Number(bitmap.height || bitmap.naturalHeight || 0);
+    var maxSide = 1800;
+    if (!width || !height) { if (typeof bitmap.close === "function") bitmap.close(); throw new Error("Resolusi gambar tidak dapat dibaca."); }
+    if (Math.max(width, height) <= maxSide && file.size <= 1_200_000) {
+      if (typeof bitmap.close === "function") bitmap.close();
+      return { data: await readFile(file), mime: mime, bytes: file.size, width: width, height: height };
+    }
+    var scale = Math.min(1, maxSide / Math.max(width, height));
+    var canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(width * scale));
+    canvas.height = Math.max(1, Math.round(height * scale));
+    var context = canvas.getContext("2d", { alpha: false });
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    if (typeof bitmap.close === "function") bitmap.close();
+    var blob = await canvasBlob(canvas, "image/jpeg", .86);
+    if (blob.size > 2_400_000) blob = await canvasBlob(canvas, "image/jpeg", .72);
+    var result = { data: await readFile(blob), mime: "image/jpeg", bytes: blob.size, width: canvas.width, height: canvas.height };
+    canvas.width = 1; canvas.height = 1;
+    return result;
+  }
+
   function renderDocumentAi(root) {
     if (!root) return;
     root.innerHTML = `
@@ -77,7 +121,7 @@
               <span class="nda-drop-icon"><i class="fa-solid fa-cloud-arrow-up"></i></span>
               <strong>Pilih atau jatuhkan dokumen</strong>
               <small>PDF · JPG · PNG · WEBP · TXT · MD · CSV</small>
-              <em>Maksimal 3 MB</em>
+              <em>Dokumen 3 MB · foto kamera 12 MB</em>
             </button>
             <article class="nda-file" id="ndaFileCard" hidden><span><i class="fa-regular fa-file-lines"></i></span><div><strong id="ndaFileName"></strong><small id="ndaFileMeta"></small></div><button id="ndaRemove" type="button" aria-label="Hapus dokumen"><i class="fa-solid fa-xmark"></i></button></article>
 
@@ -175,12 +219,16 @@
       var extension = (file.name.toLowerCase().match(/\.([a-z0-9]+)$/) || [])[1] || "";
       var mime = file.type || ({ pdf: "application/pdf", jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp", txt: "text/plain", md: "text/markdown", csv: "text/csv" })[extension] || "";
       if (!allowed.includes(mime)) return notify("Format belum didukung. Gunakan PDF, gambar, TXT, Markdown, atau CSV.", true);
-      if (file.size > 3_000_000) return notify("File maksimal 3 MB agar upload stabil.", true);
+      var isImage = mime.startsWith("image/");
+      if (file.size > (isImage ? 12_000_000 : 3_000_000)) return notify(isImage ? "Foto kamera maksimal 12 MB sebelum optimasi." : "Dokumen maksimal 3 MB.", true);
       try {
-        state.fileData = await readFile(file);
-        state.file = { name: file.name, size: file.size, type: mime };
+        notify(isImage ? "Mengoptimalkan foto untuk Android…" : "Membaca dokumen…");
+        var prepared = await prepareFile(file, mime);
+        if (prepared.bytes > 3_000_000) throw new Error("File masih melebihi 3 MB setelah optimasi.");
+        state.fileData = prepared.data;
+        state.file = { name: file.name, size: prepared.bytes, type: prepared.mime };
         root.querySelector("#ndaFileName").textContent = file.name;
-        root.querySelector("#ndaFileMeta").textContent = fileSize(file.size) + " · " + (file.type.split("/")[1] || "file").toUpperCase();
+        root.querySelector("#ndaFileMeta").textContent = fileSize(file.size) + (prepared.bytes !== file.size ? " → " + fileSize(prepared.bytes) : "") + " · " + (prepared.mime.split("/")[1] || "file").toUpperCase();
         root.querySelector("#ndaFileCard").hidden = false;
         drop.hidden = true;
         analyze.disabled = false;
@@ -223,7 +271,7 @@
 
     async function api(body) {
       var response = await (window.NexoraFetch || window.fetch)("/api/document-ai", {
-        method: "POST", credentials: "same-origin", cache: "no-store", nexoraTimeoutMs: 65000, nexoraRetries: 0,
+        method: "POST", credentials: "same-origin", cache: "no-store", nexoraTimeoutMs: 85000, nexoraRetries: 0,
         headers: { "Content-Type": "application/json", "Accept": "application/json" }, body: JSON.stringify(body)
       });
       var payload = await response.json().catch(function () { return {}; });

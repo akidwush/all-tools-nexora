@@ -53,8 +53,10 @@ assert.match(lazySource, /NexoraAccount\.canAccess\(toolId\)/, "Deep link lazy t
 const accountSource = fs.readFileSync(path.join(root, "assets/js/core/account.js"), "utf8");
 assert.match(accountSource, /defaultRestrictedTools=new Map\(\[\["documentai"/, "Guard VVIP harus fail-closed sebelum kartu katalog selesai dirender.");
 const documentCss = fs.readFileSync(path.join(root, "assets/css/features/document-ai.css"), "utf8");
+const documentClient = fs.readFileSync(path.join(root, "assets/js/features/document-ai.js"), "utf8");
 assert.match(documentCss, /\.nda \[hidden\]\{display:none!important\}/, "Elemen hasil tersembunyi tidak boleh bocor sebelum analisis.");
 assert.match(documentCss, /tool-viewer-content:has\(\.nda\)/, "Workspace desktop harus menggunakan room lebar.");
+for (const token of ["prepareFile", "maxSide = 1800", "foto kamera 12 MB", "nexoraTimeoutMs: 85000"]) assert.ok(documentClient.includes(token), `Document AI mobile guard hilang: ${token}`);
 
 const response = {
   headers: {},
@@ -103,7 +105,8 @@ const response = {
     assert.equal(generated, "Ringkasan dokumen berhasil.");
     assert.deepEqual(attemptedModels, ["gemini-missing-test-model", DEFAULT_MODEL]);
     assert.deepEqual(generatedPayload.config.thinkingConfig, { thinkingLevel: "low" });
-    assert.match(lazySource, /document-ai-v3/);
+    assert.match(lazySource, /document-ai-v4-android/);
+    assert.match(fs.readFileSync(path.join(root, "index.html"), "utf8"), /document-ai-v4-android/);
 
     process.env.DOCUMENT_AI_MODEL = DEFAULT_MODEL;
     const defaultFailureModels = [];

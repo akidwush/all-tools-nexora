@@ -59,26 +59,30 @@
     function clearError(){errorBox.hidden=true;errorBox.textContent='';}
     function setBusy(busy,label){state.processing=busy;generate.disabled=busy||!state.fileData;generate.classList.toggle('is-loading',busy);generate.querySelector('i').className=busy?'fa-solid fa-circle-notch fa-spin':'fa-solid fa-wand-magic-sparkles';generate.querySelector('span').textContent=busy?(label||'Menganalisis visual…'):'Analisis & Buat Prompt';}
     function readDataUrl(blob){return new Promise(function(resolve,reject){var reader=new FileReader();reader.onload=function(){resolve(String(reader.result||''));};reader.onerror=function(){reject(new Error('Gambar gagal dibaca.'));};reader.readAsDataURL(blob);});}
+    function imageMime(file){var mime=String(file&&file.type||'').toLowerCase();if(!mime||mime==='application/octet-stream'){var ext=(String(file&&file.name||'').toLowerCase().match(/\.([a-z0-9]+)$/)||[])[1]||'';mime={jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp'}[ext]||mime;}return mime;}
     function imageBitmap(file){
       if(typeof createImageBitmap==='function')return createImageBitmap(file);
       return new Promise(function(resolve,reject){var image=new Image();var url=URL.createObjectURL(file);image.onload=function(){URL.revokeObjectURL(url);resolve(image);};image.onerror=function(){URL.revokeObjectURL(url);reject(new Error('Gambar tidak dapat dibuka.'));};image.src=url;});
     }
     function canvasBlob(canvas,type,quality){return new Promise(function(resolve,reject){canvas.toBlob(function(blob){if(blob)resolve(blob);else reject(new Error('Optimasi gambar gagal.'));},type,quality);});}
-    async function optimize(file){
-      if(file.size<=2500000)return {data:await readDataUrl(file),mime:file.type,bytes:file.size};
-      var bitmap=await imageBitmap(file),width=bitmap.width,height=bitmap.height,maxSide=1600,scale=Math.min(1,maxSide/Math.max(width,height));
+    async function optimize(file,mime){
+      var bitmap=await imageBitmap(file),width=Number(bitmap.width||bitmap.naturalWidth||0),height=Number(bitmap.height||bitmap.naturalHeight||0),maxSide=1600;
+      if(!width||!height){if(typeof bitmap.close==='function')bitmap.close();throw new Error('Resolusi gambar tidak dapat dibaca.');}
+      if(Math.max(width,height)<=maxSide&&file.size<=900000){if(typeof bitmap.close==='function')bitmap.close();return {data:await readDataUrl(file),mime:mime,bytes:file.size,width:width,height:height};}
+      var scale=Math.min(1,maxSide/Math.max(width,height));
       var canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(width*scale));canvas.height=Math.max(1,Math.round(height*scale));
       var context=canvas.getContext('2d',{alpha:false});context.fillStyle='#ffffff';context.fillRect(0,0,canvas.width,canvas.height);context.drawImage(bitmap,0,0,canvas.width,canvas.height);if(typeof bitmap.close==='function')bitmap.close();
-      var blob=await canvasBlob(canvas,'image/jpeg',.86);if(blob.size>2900000)blob=await canvasBlob(canvas,'image/jpeg',.72);
-      return {data:await readDataUrl(blob),mime:'image/jpeg',bytes:blob.size};
+      var blob=await canvasBlob(canvas,'image/jpeg',.84);if(blob.size>1500000)blob=await canvasBlob(canvas,'image/jpeg',.7);canvas.width=1;canvas.height=1;
+      return {data:await readDataUrl(blob),mime:'image/jpeg',bytes:blob.size,width:Math.round(width*scale),height:Math.round(height*scale)};
     }
     async function selectFile(file){
       clearError();if(!file)return;
-      if(!['image/jpeg','image/png','image/webp'].includes(file.type)){showError('Format harus JPG, PNG, atau WebP.');return;}
+      var mime=imageMime(file);
+      if(!['image/jpeg','image/png','image/webp'].includes(mime)){showError('Format harus JPG, PNG, atau WebP.');return;}
       if(file.size>12*1024*1024){showError('Ukuran gambar maksimal 12 MB sebelum optimasi.');return;}
       if(state.previewUrl)URL.revokeObjectURL(state.previewUrl);state.previewUrl=URL.createObjectURL(file);preview.src=state.previewUrl;
       state.file=null;state.fileData='';empty.hidden=true;previewWrap.hidden=false;root.querySelector('#nxPromptFileName').textContent=file.name;root.querySelector('#nxPromptFileMeta').textContent=bytesLabel(file.size)+' · mengoptimalkan…';setBusy(true,'Mengoptimalkan gambar…');
-      try{var optimized=await optimize(file);if(optimized.bytes>3000000)throw new Error('Gambar masih terlalu besar setelah optimasi. Coba gambar lain.');state.file=file;state.fileData=optimized.data;state.mimeType=optimized.mime;root.querySelector('#nxPromptFileMeta').textContent=bytesLabel(file.size)+' → '+bytesLabel(optimized.bytes)+' siap dianalisis';}
+      try{var optimized=await optimize(file,mime);if(optimized.bytes>3000000)throw new Error('Gambar masih terlalu besar setelah optimasi. Coba gambar lain.');state.file=file;state.fileData=optimized.data;state.mimeType=optimized.mime;root.querySelector('#nxPromptFileMeta').textContent=bytesLabel(file.size)+' → '+bytesLabel(optimized.bytes)+' · '+optimized.width+'×'+optimized.height+' siap';}
       catch(error){showError(error.message||'Gambar gagal diproses.');state.file=null;state.fileData='';}
       finally{setBusy(false);}
     }
@@ -109,7 +113,7 @@
     async function submit(event){
       event.preventDefault();clearError();if(!state.file||!state.fileData){showError('Pilih gambar terlebih dahulu.');return;}if(state.controller)state.controller.abort();var controller=new AbortController();state.controller=controller;setBusy(true,'Gemini membaca gambar…');waiting.hidden=false;waiting.innerHTML='<i class="fa-solid fa-circle-notch fa-spin"></i><strong>Menganalisis visual</strong><span>Membaca subjek, komposisi, lighting, warna, kamera, dan gaya untuk membangun prompt.</span>';resultRoot.hidden=true;
       try{
-        var response=await window.NexoraFetch('/api/prompt-generator',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({fileName:state.file.name,mimeType:state.mimeType,fileData:state.fileData,direction:root.querySelector('#nxPromptDirection').value,target:root.querySelector('#nxPromptTarget').value,style:root.querySelector('#nxPromptStyle').value,language:root.querySelector('#nxPromptLanguage').value,aspectRatio:root.querySelector('#nxPromptRatio').value,creativity:Number(root.querySelector('#nxPromptCreativity').value),includeNegative:root.querySelector('#nxPromptNegative').checked}),signal:controller.signal,nexoraTimeoutMs:55000,nexoraRetries:0});
+        var response=await window.NexoraFetch('/api/prompt-generator',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({fileName:state.file.name,mimeType:state.mimeType,fileData:state.fileData,direction:root.querySelector('#nxPromptDirection').value,target:root.querySelector('#nxPromptTarget').value,style:root.querySelector('#nxPromptStyle').value,language:root.querySelector('#nxPromptLanguage').value,aspectRatio:root.querySelector('#nxPromptRatio').value,creativity:Number(root.querySelector('#nxPromptCreativity').value),includeNegative:root.querySelector('#nxPromptNegative').checked}),signal:controller.signal,nexoraTimeoutMs:85000,nexoraRetries:0});
         var payload=await response.json().catch(function(){return {};});if(!response.ok||!payload.ok)throw new Error(payload.message||'Prompt belum dapat dibuat.');renderResult(payload);
       }catch(error){if(state.controller!==controller)return;waiting.hidden=true;if(error&&error.name==='AbortError')return;showError(error&&error.message||'Prompt Generator mengalami gangguan.');}
       finally{if(state.controller===controller){state.controller=null;waiting.hidden=true;setBusy(false);}}
