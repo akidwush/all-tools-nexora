@@ -13,9 +13,9 @@
         <div class="nx-prompt-layout">\
           <form id="nxPromptForm" class="nx-prompt-builder">\
             <div class="nx-prompt-step-head"><span>01</span><div><strong>Gambar Referensi</strong><small>JPG, PNG, atau WebP · otomatis dioptimalkan</small></div></div>\
-            <input id="nxPromptFile" type="file" accept="image/jpeg,image/png,image/webp" hidden>\
+            <input id="nxPromptFile" class="nx-prompt-file-input" type="file" accept="image/jpeg,image/png,image/webp">\
             <div id="nxPromptDrop" class="nx-prompt-drop" aria-label="Area unggah gambar">\
-              <div id="nxPromptEmpty" class="nx-prompt-drop-empty"><i class="fa-solid fa-image"></i><strong>Pilih atau jatuhkan gambar</strong><span>Maksimal 12 MB sebelum optimasi</span><button type="button" id="nxPromptChoose">Pilih Gambar</button></div>\
+              <div id="nxPromptEmpty" class="nx-prompt-drop-empty"><i class="fa-solid fa-image"></i><strong>Pilih atau jatuhkan gambar</strong><span>Maksimal 12 MB sebelum optimasi</span><label for="nxPromptFile" id="nxPromptChoose" role="button" tabindex="0">Pilih Gambar</label></div>\
               <div id="nxPromptPreviewWrap" class="nx-prompt-preview" hidden><img id="nxPromptPreview" alt="Pratinjau gambar referensi"><div><strong id="nxPromptFileName"></strong><span id="nxPromptFileMeta"></span></div><button id="nxPromptRemove" type="button" aria-label="Hapus gambar"><i class="fa-solid fa-trash"></i></button></div>\
             </div>\
             <div class="nx-prompt-step-head"><span>02</span><div><strong>Arah Produksi</strong><small>Sesuaikan prompt untuk model dan hasil yang dituju</small></div></div>\
@@ -60,18 +60,21 @@
     function setBusy(busy,label){state.processing=busy;generate.disabled=busy||!state.fileData;generate.classList.toggle('is-loading',busy);generate.querySelector('i').className=busy?'fa-solid fa-circle-notch fa-spin':'fa-solid fa-wand-magic-sparkles';generate.querySelector('span').textContent=busy?(label||'Menganalisis visual…'):'Analisis & Buat Prompt';}
     function readDataUrl(blob){return new Promise(function(resolve,reject){var reader=new FileReader();reader.onload=function(){resolve(String(reader.result||''));};reader.onerror=function(){reject(new Error('Gambar gagal dibaca.'));};reader.readAsDataURL(blob);});}
     function imageMime(file){var mime=String(file&&file.type||'').toLowerCase();if(!mime||mime==='application/octet-stream'){var ext=(String(file&&file.name||'').toLowerCase().match(/\.([a-z0-9]+)$/)||[])[1]||'';mime={jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp'}[ext]||mime;}return mime;}
-    function imageBitmap(file){
-      if(typeof createImageBitmap==='function')return createImageBitmap(file);
+    function imageElement(file){
       return new Promise(function(resolve,reject){var image=new Image();var url=URL.createObjectURL(file);image.onload=function(){URL.revokeObjectURL(url);resolve(image);};image.onerror=function(){URL.revokeObjectURL(url);reject(new Error('Gambar tidak dapat dibuka.'));};image.src=url;});
     }
-    function canvasBlob(canvas,type,quality){return new Promise(function(resolve,reject){canvas.toBlob(function(blob){if(blob)resolve(blob);else reject(new Error('Optimasi gambar gagal.'));},type,quality);});}
+    function imageBitmap(file){
+      if(typeof createImageBitmap==='function')return createImageBitmap(file).catch(function(){return imageElement(file);});
+      return imageElement(file);
+    }
+    function canvasBlob(canvas,type,quality){return new Promise(function(resolve,reject){if(typeof canvas.toBlob==='function'){canvas.toBlob(function(blob){if(blob)resolve(blob);else reject(new Error('Optimasi gambar gagal.'));},type,quality);return;}try{var parts=canvas.toDataURL(type,quality).split(',');var binary=atob(parts[1]||'');var bytes=new Uint8Array(binary.length);for(var index=0;index<binary.length;index++)bytes[index]=binary.charCodeAt(index);resolve(new Blob([bytes],{type:type}));}catch(error){reject(new Error('Optimasi gambar tidak didukung browser ini.'));}});}
     async function optimize(file,mime){
       var bitmap=await imageBitmap(file),width=Number(bitmap.width||bitmap.naturalWidth||0),height=Number(bitmap.height||bitmap.naturalHeight||0),maxSide=1600;
       if(!width||!height){if(typeof bitmap.close==='function')bitmap.close();throw new Error('Resolusi gambar tidak dapat dibaca.');}
       if(Math.max(width,height)<=maxSide&&file.size<=900000){if(typeof bitmap.close==='function')bitmap.close();return {data:await readDataUrl(file),mime:mime,bytes:file.size,width:width,height:height};}
       var scale=Math.min(1,maxSide/Math.max(width,height));
       var canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(width*scale));canvas.height=Math.max(1,Math.round(height*scale));
-      var context=canvas.getContext('2d',{alpha:false});context.fillStyle='#ffffff';context.fillRect(0,0,canvas.width,canvas.height);context.drawImage(bitmap,0,0,canvas.width,canvas.height);if(typeof bitmap.close==='function')bitmap.close();
+      var context=canvas.getContext('2d',{alpha:false})||canvas.getContext('2d');if(!context){if(typeof bitmap.close==='function')bitmap.close();throw new Error('Browser tidak dapat memproses gambar ini.');}context.fillStyle='#ffffff';context.fillRect(0,0,canvas.width,canvas.height);context.drawImage(bitmap,0,0,canvas.width,canvas.height);if(typeof bitmap.close==='function')bitmap.close();
       var blob=await canvasBlob(canvas,'image/jpeg',.84);if(blob.size>1500000)blob=await canvasBlob(canvas,'image/jpeg',.7);canvas.width=1;canvas.height=1;
       return {data:await readDataUrl(blob),mime:'image/jpeg',bytes:blob.size,width:Math.round(width*scale),height:Math.round(height*scale)};
     }
@@ -119,7 +122,7 @@
       finally{if(state.controller===controller){state.controller=null;waiting.hidden=true;setBusy(false);}}
     }
 
-    choose.addEventListener('click',function(event){event.stopPropagation();fileInput.click();});drop.addEventListener('click',function(event){if(!event.target.closest('button'))fileInput.click();});fileInput.addEventListener('change',function(){selectFile(fileInput.files&&fileInput.files[0]);});
+    choose.addEventListener('click',function(event){event.stopPropagation();});choose.addEventListener('keydown',function(event){if(event.key==='Enter'||event.key===' '){event.preventDefault();fileInput.click();}});drop.addEventListener('click',function(event){if(!event.target.closest('button,label'))fileInput.click();});fileInput.addEventListener('change',function(){selectFile(fileInput.files&&fileInput.files[0]);});
     ['dragenter','dragover'].forEach(function(name){drop.addEventListener(name,function(event){event.preventDefault();drop.classList.add('is-dragging');});});['dragleave','drop'].forEach(function(name){drop.addEventListener(name,function(event){event.preventDefault();drop.classList.remove('is-dragging');});});drop.addEventListener('drop',function(event){selectFile(event.dataTransfer&&event.dataTransfer.files&&event.dataTransfer.files[0]);});remove.addEventListener('click',function(event){event.stopPropagation();clearFile();});form.addEventListener('submit',submit);
     var direction=root.querySelector('#nxPromptDirection');direction.addEventListener('input',function(){root.querySelector('#nxPromptDirectionCount').textContent=direction.value.length;});var creativity=root.querySelector('#nxPromptCreativity');creativity.addEventListener('input',function(){root.querySelector('#nxPromptCreativityLabel').textContent=creativityNames[Number(creativity.value)]||'Seimbang';});
     root.querySelector('#nxPromptCopyMain').addEventListener('click',function(event){copyText(state.result&&state.result.prompt,event.currentTarget);});root.querySelector('#nxPromptCopyNegative').addEventListener('click',function(event){copyText(state.result&&state.result.negativePrompt,event.currentTarget);});root.querySelector('#nxPromptCopyAll').addEventListener('click',function(event){copyText(fullText(),event.currentTarget);});

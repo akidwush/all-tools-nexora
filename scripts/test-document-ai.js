@@ -56,7 +56,8 @@ const documentCss = fs.readFileSync(path.join(root, "assets/css/features/documen
 const documentClient = fs.readFileSync(path.join(root, "assets/js/features/document-ai.js"), "utf8");
 assert.match(documentCss, /\.nda \[hidden\]\{display:none!important\}/, "Elemen hasil tersembunyi tidak boleh bocor sebelum analisis.");
 assert.match(documentCss, /tool-viewer-content:has\(\.nda\)/, "Workspace desktop harus menggunakan room lebar.");
-for (const token of ["prepareFile", "maxSide = 1800", "foto kamera 12 MB", "nexoraTimeoutMs: 85000"]) assert.ok(documentClient.includes(token), `Document AI mobile guard hilang: ${token}`);
+for (const token of ["prepareFile", "maxSide = 1800", "foto kamera 12 MB", "nexoraTimeoutMs: 85000", "createImageBitmap(file).catch", "for=\"ndaFile\"", "application/octet-stream"]) assert.ok(documentClient.includes(token), `Document AI mobile guard hilang: ${token}`);
+assert.match(documentCss, /\.nda-file-input/, "File picker Document AI harus tetap dapat diaktifkan browser Android.");
 
 const response = {
   headers: {},
@@ -105,8 +106,8 @@ const response = {
     assert.equal(generated, "Ringkasan dokumen berhasil.");
     assert.deepEqual(attemptedModels, ["gemini-missing-test-model", DEFAULT_MODEL]);
     assert.deepEqual(generatedPayload.config.thinkingConfig, { thinkingLevel: "low" });
-    assert.match(lazySource, /document-ai-v4-android/);
-    assert.match(fs.readFileSync(path.join(root, "index.html"), "utf8"), /document-ai-v4-android/);
+    assert.match(lazySource, /document-ai-v5-android-picker/);
+    assert.match(fs.readFileSync(path.join(root, "index.html"), "utf8"), /document-ai-v5-android-picker/);
 
     process.env.DOCUMENT_AI_MODEL = DEFAULT_MODEL;
     const defaultFailureModels = [];

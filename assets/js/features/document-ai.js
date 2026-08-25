@@ -55,8 +55,7 @@
     });
   }
 
-  function imageBitmap(file) {
-    if (typeof createImageBitmap === "function") return createImageBitmap(file);
+  function imageElement(file) {
     return new Promise(function (resolve, reject) {
       var image = new Image();
       var url = URL.createObjectURL(file);
@@ -66,9 +65,24 @@
     });
   }
 
+  function imageBitmap(file) {
+    if (typeof createImageBitmap === "function") return createImageBitmap(file).catch(function () { return imageElement(file); });
+    return imageElement(file);
+  }
+
   function canvasBlob(canvas, type, quality) {
     return new Promise(function (resolve, reject) {
-      canvas.toBlob(function (blob) { if (blob) resolve(blob); else reject(new Error("Optimasi gambar gagal.")); }, type, quality);
+      if (typeof canvas.toBlob === "function") {
+        canvas.toBlob(function (blob) { if (blob) resolve(blob); else reject(new Error("Optimasi gambar gagal.")); }, type, quality);
+        return;
+      }
+      try {
+        var parts = canvas.toDataURL(type, quality).split(",");
+        var binary = atob(parts[1] || "");
+        var bytes = new Uint8Array(binary.length);
+        for (var index = 0; index < binary.length; index++) bytes[index] = binary.charCodeAt(index);
+        resolve(new Blob([bytes], { type: type }));
+      } catch (error) { reject(new Error("Optimasi gambar tidak didukung browser ini.")); }
     });
   }
 
@@ -87,7 +101,8 @@
     var canvas = document.createElement("canvas");
     canvas.width = Math.max(1, Math.round(width * scale));
     canvas.height = Math.max(1, Math.round(height * scale));
-    var context = canvas.getContext("2d", { alpha: false });
+    var context = canvas.getContext("2d", { alpha: false }) || canvas.getContext("2d");
+    if (!context) { if (typeof bitmap.close === "function") bitmap.close(); throw new Error("Browser tidak dapat memproses gambar ini."); }
     context.fillStyle = "#ffffff";
     context.fillRect(0, 0, canvas.width, canvas.height);
     context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
@@ -116,13 +131,13 @@
         <section class="nda-workspace">
           <aside class="nda-input-panel">
             <div class="nda-panel-heading"><div><span>01 · SOURCE</span><h3>Pilih dokumen</h3></div><b id="ndaApiState">CHECKING</b></div>
-            <input id="ndaFile" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.txt,.md,.csv,application/pdf,image/jpeg,image/png,image/webp,text/plain,text/markdown,text/csv" hidden>
-            <button class="nda-drop" id="ndaDrop" type="button">
+            <input id="ndaFile" class="nda-file-input" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.txt,.md,.csv,application/pdf,image/jpeg,image/png,image/webp,text/plain,text/markdown,text/csv">
+            <label class="nda-drop" id="ndaDrop" for="ndaFile" role="button" tabindex="0">
               <span class="nda-drop-icon"><i class="fa-solid fa-cloud-arrow-up"></i></span>
               <strong>Pilih atau jatuhkan dokumen</strong>
               <small>PDF · JPG · PNG · WEBP · TXT · MD · CSV</small>
               <em>Dokumen 3 MB · foto kamera 12 MB</em>
-            </button>
+            </label>
             <article class="nda-file" id="ndaFileCard" hidden><span><i class="fa-regular fa-file-lines"></i></span><div><strong id="ndaFileName"></strong><small id="ndaFileMeta"></small></div><button id="ndaRemove" type="button" aria-label="Hapus dokumen"><i class="fa-solid fa-xmark"></i></button></article>
 
             <fieldset class="nda-modes">
@@ -217,7 +232,8 @@
       var allowed = ["application/pdf", "image/jpeg", "image/png", "image/webp", "text/plain", "text/markdown", "text/csv"];
       if (!file) return;
       var extension = (file.name.toLowerCase().match(/\.([a-z0-9]+)$/) || [])[1] || "";
-      var mime = file.type || ({ pdf: "application/pdf", jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp", txt: "text/plain", md: "text/markdown", csv: "text/csv" })[extension] || "";
+      var mime = String(file.type || "").toLowerCase();
+      if (!mime || mime === "application/octet-stream") mime = ({ pdf: "application/pdf", jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp", txt: "text/plain", md: "text/markdown", csv: "text/csv" })[extension] || mime;
       if (!allowed.includes(mime)) return notify("Format belum didukung. Gunakan PDF, gambar, TXT, Markdown, atau CSV.", true);
       var isImage = mime.startsWith("image/");
       if (file.size > (isImage ? 12_000_000 : 3_000_000)) return notify(isImage ? "Foto kamera maksimal 12 MB sebelum optimasi." : "Dokumen maksimal 3 MB.", true);
@@ -327,7 +343,8 @@
       download(base + ".txt", text, "text/plain;charset=utf-8");
     }
 
-    drop.addEventListener("click", function () { if (!state.busy) fileInput.click(); });
+    drop.addEventListener("click", function (event) { if (state.busy) event.preventDefault(); });
+    drop.addEventListener("keydown", function (event) { if (!state.busy && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); fileInput.click(); } });
     fileInput.addEventListener("change", function () { selectFile(fileInput.files && fileInput.files[0]); });
     ["dragenter", "dragover"].forEach(function (name) { drop.addEventListener(name, function (event) { event.preventDefault(); drop.classList.add("is-dragging"); }); });
     ["dragleave", "drop"].forEach(function (name) { drop.addEventListener(name, function (event) { event.preventDefault(); drop.classList.remove("is-dragging"); }); });
