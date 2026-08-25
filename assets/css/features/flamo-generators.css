@@ -13,3 +13,18 @@
 .nfg-actions{position:static}
 @media(max-width:900px){.nfg-controls{padding:14px}.nfg-actions{bottom:auto;box-shadow:none;margin:0 -14px -14px;position:static}}
 @media(max-width:540px){.nfg-stage{padding:30px}.nfg-stage::before{inset:10px}.nfg-preview-text{max-height:calc(100% - 56px);max-width:calc(100% - 56px)}}
+
+/* Content sizing, independent from the preview clipping boundary. */
+.nfg-card-head{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start}
+.nfg-card-head>div{min-width:0}
+.nfg-card-head h2,.nfg-card-head h3,.nfg-card-head p{overflow-wrap:anywhere}
+.nfg-badge{align-self:start;flex:0 0 auto;max-width:100%;text-align:center}
+.nfg-status{align-items:flex-start;overflow-wrap:anywhere}
+.nfg-status i{flex:0 0 auto;margin-top:.25em}
+@media(max-width:540px){
+  .nfg-badge{max-width:84px;padding:5px 7px;font-size:10px;line-height:1.25;white-space:normal}
+  .nfg-actions{grid-template-columns:minmax(0,1fr) 52px}
+  /* min-height + aspect-ratio previously made the stage use the card's full
+     width before margins, so its right edge extended 14px past the frame. */
+  .nfg-stage{width:calc(100% - 28px);max-width:calc(100% - 28px);aspect-ratio:auto}
+}

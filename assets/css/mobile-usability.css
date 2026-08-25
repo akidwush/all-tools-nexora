@@ -1,6 +1,18 @@
 /* Nexora mobile readable mode
-   Keep the compact public catalog intact; enlarge only opened tools/workspaces. */
+   Keep the catalog efficient without sacrificing readable cards or workspaces. */
 @media (max-width:767px){
+  /* Public catalog: the former three-column layout reduced cards to about
+     91px at 320px, making labels unreadable and wider than their cards. */
+  .tools-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+  .tools-card{min-height:184px!important;padding:12px!important}
+  .tools-card .icon{width:42px!important;height:42px!important;font-size:18px!important}
+  .tools-card .badge{max-width:76px!important;padding:4px 6px!important;font-size:9px!important;line-height:1.25!important}
+  .nx-card-copy{margin-top:11px!important}
+  .tools-card h4{min-height:32px;font-size:13px!important;line-height:1.28!important}
+  .tools-card p{display:-webkit-box!important;min-height:34px!important;margin-top:6px!important;-webkit-line-clamp:2!important;font-size:11px!important;line-height:1.45!important}
+  .nx-card-footer{padding-top:9px!important}
+  .nx-card-readiness{position:static!important;max-width:100%!important;min-height:24px!important;padding:4px 6px!important;font-size:9px!important}
+
   #nxUniversalRoom .nx-room-scroll{
     padding:8px 0 max(30px,env(safe-area-inset-bottom))!important;
   }

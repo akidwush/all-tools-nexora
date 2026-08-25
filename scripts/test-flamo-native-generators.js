@@ -83,7 +83,7 @@ for (const token of ["function fitPreview()", "ResizeObserver", "brandXml", "bra
   assert.ok(haystack.includes(token), `Perbaikan preview/branding Nexora hilang: ${token}`);
 }
 const generatorCss = read("assets/css/features/flamo-generators.css");
-for (const token of ["contain:layout paint", ".nfg-stage::before", "max-height:calc(100% - 48px)", "word-break:break-word", "object-fit:contain", "position:static", "box-shadow:none"]) {
+for (const token of ["contain:layout paint", ".nfg-stage::before", "max-height:calc(100% - 48px)", "word-break:break-word", "object-fit:contain", "position:static", "box-shadow:none", "grid-template-columns:minmax(0,1fr) auto", "width:calc(100% - 28px)"]) {
   assert.ok(generatorCss.includes(token), `Guard preview frame hilang: ${token}`);
 }
 assert.ok(runtime.includes("stage.clientWidth-72") && runtime.includes("stage.clientHeight-64"), "Auto-fit harus menyisakan safe area nyata pada preview");
