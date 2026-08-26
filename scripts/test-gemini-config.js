@@ -8,6 +8,8 @@ const {
   geminiGenerationConfig,
   geminiLowLatencyConfig,
   geminiModelCandidates,
+  geminiResponseDiagnostics,
+  geminiResponseText,
   normalizeGeminiApiKey,
   resolveGeminiApiKey
 } = require("../lib/gemini-config");
@@ -31,6 +33,8 @@ assert.deepEqual(geminiGenerationConfig("gemini-3.6-flash", { temperature: 0.2, 
 assert.equal(geminiGenerationConfig("gemini-3.5-flash", { temperature: 0.2 }).temperature, 0.2);
 assert.deepEqual(geminiLowLatencyConfig("gemini-3.6-flash", { maxOutputTokens: 1000 }), { maxOutputTokens: 1000, thinkingConfig: { thinkingLevel: "low" } });
 assert.deepEqual(geminiLowLatencyConfig("models/gemini-2.5-flash", { maxOutputTokens: 1000 }), { maxOutputTokens: 1000, thinkingConfig: { thinkingBudget: 0 } });
+assert.equal(geminiResponseText({ candidates: [{ content: { parts: [{ text: "fallback text" }] } }] }), "fallback text");
+assert.deepEqual(geminiResponseDiagnostics({ candidates: [{ finishReason: "MAX_TOKENS" }], promptFeedback: { blockReason: "" } }), { candidateCount: 1, finishReasons: ["MAX_TOKENS"], blockReason: "" });
 
 const nested = geminiErrorDetails({ response: { status: 403, data: { error: { status: "PERMISSION_DENIED", message: "API key not valid" } } } });
 assert.equal(nested.status, 403);
