@@ -197,11 +197,11 @@
   }
   function setupCursorReactor(){
     var fine=Boolean(window.matchMedia&&window.matchMedia('(pointer: fine)').matches);
-    // Reduced-motion is an explicit accessibility preference. Coarse-pointer
-    // phones still receive the lightweight touch halo: it only schedules a
-    // frame while a finger is moving and trails are strictly bounded.
-    if(reduced){
-      window.__NEXORA_CURSOR_REACTOR__={version:'1.2.0',enabled:false,finePointer:fine,reducedMotion:true,mobileTouch:false};
+    // Never attach pointermove animation to a coarse pointer. On Android that
+    // event is also the primary scroll stream; creating fixed trail layers in
+    // it can exhaust the compositor and briefly paint a blank viewport.
+    if(reduced||coarse||!fine){
+      window.__NEXORA_CURSOR_REACTOR__={version:'1.3.0',enabled:false,finePointer:fine,reducedMotion:reduced,mobileTouch:false};
       return;
     }
 
@@ -374,7 +374,7 @@
     document.addEventListener('visibilitychange',function(){if(document.hidden){hideMouse();clearTimeout(holdTimer);}});
 
     window.__NEXORA_CURSOR_REACTOR__={
-      version:'1.2.0',enabled:true,finePointer:fine,reducedMotion:false,mobileTouch:coarse,
+      version:'1.3.0',enabled:true,finePointer:fine,reducedMotion:false,mobileTouch:false,
       getState:function(){return {mouseVisible:mouseVisible,touchActive:activeTouchId!==null,trailCount:trailCount,frameActive:Boolean(frame)};}
     };
   }

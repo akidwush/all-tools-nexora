@@ -1070,6 +1070,7 @@ html.nx-low-power *{scroll-behavior:auto!important}
 
 /* ===== Nexora v6.3.3: mobile hero video decode-jank fix ===== */
 html.nx-hero-video-auto .video-banner video{display:block}
+html.nx-hero-video-static .video-banner video{display:block}
 html.nx-hero-video-disabled .video-banner video{display:none!important}
 @media (max-width:900px),(pointer:coarse){
   .video-banner video{will-change:auto!important}
@@ -1363,7 +1364,7 @@ html.nx-low-power .tools-card,html.nx-low-power .nav-tab,html.nx-low-power .nx-p
   html.nx-custom-cursor-enabled body *{cursor:none!important}
 }
 @media (pointer:coarse),(hover:none){
-  .custom-cursor,.custom-cursor-core{display:none!important}
+  .custom-cursor,.custom-cursor-core,.touch-follower,.cursor-trail{display:none!important;animation:none!important;will-change:auto!important}
 }
 @media (prefers-reduced-motion:reduce){
   .custom-cursor,.custom-cursor-core,.touch-follower,.cursor-trail{display:none!important;animation:none!important}

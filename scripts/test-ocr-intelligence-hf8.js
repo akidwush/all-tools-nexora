@@ -165,8 +165,8 @@ async function main() {
   assertBalancedCss(css);
   assert.ok(read("database/migrations/011_nexora_ocr_intelligence.sql").includes("on conflict (id) do update"));
   assert.ok(read(".env.example").includes("OCR_SPACE_API_KEY="));
-  assert.ok(read("index.html").includes("v=6.3.18"));
-  assert.ok(read("assets/js/core/lazy-loader.js").includes("ASSET_VERSION = '6.3.18'"));
+  assert.ok(read("index.html").includes("v=6.4.0"));
+  assert.ok(read("assets/js/core/lazy-loader.js").includes("ASSET_VERSION = '6.4.0'"));
 
   const serverless = [];
   (function walk(directory) { for (const entry of fs.readdirSync(directory, { withFileTypes: true })) { const target = path.join(directory, entry.name); if (entry.isDirectory()) walk(target); else if (target.endsWith(".js")) serverless.push(target); } })(path.join(root, "api"));

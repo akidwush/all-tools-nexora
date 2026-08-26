@@ -124,14 +124,14 @@ async function main() {
     assert.deepEqual(defaultFailureModels.slice(0, 2), [DEFAULT_MODEL, "gemini-2.5-flash"]);
 
     const client = read("assets/js/features/prompt-generator.js");
-    for (const token of ["renderPromptGenerator", "/api/prompt-generator", "Image to Video", "negative prompt", "Gambar tidak disimpan", "createImageBitmap(file).catch", "application/octet-stream", "maxSide=1600", "nexoraTimeoutMs:85000", "for=\"nxPromptFile\""]) assert.ok(client.includes(token));
+    for (const token of ["renderPromptGenerator", "/api/prompt-generator", "Image to Video", "negative prompt", "Gambar tidak disimpan", "createImageBitmap(file).catch", "application/octet-stream", "maxSide=1600", "nexoraTimeoutMs:85000", "id=\"nxPromptChoose\" type=\"button\"", "function openFilePicker()", "fileInput.click()"] ) assert.ok(client.includes(token));
     assert.ok(!/GEMINI_API_KEY\s*=/.test(client));
     assert.match(client, /finally\{if\(state\.controller===controller\)\{state\.controller=null;waiting\.hidden=true;setBusy\(false\);\}\}/);
     const css = read("assets/css/features/prompt-generator.css");
     for (const token of [".nx-prompt-layout", ".nx-prompt-details", "@media(max-width:520px)", "min-height:44px", ".nx-prompt-file-input"]) assert.ok(css.includes(token));
     assert.match(css, /\.nx-prompt-waiting\[hidden\]\{display:none!important\}/);
-    assert.match(read("assets/js/core/lazy-loader.js"), /prompt-v2-state5-android-picker/);
-    assert.match(read("index.html"), /prompt-v2-state5-android-picker/);
+    assert.match(read("assets/js/core/lazy-loader.js"), /'prompt-android'/);
+    assert.match(read("index.html"), /prompt-v2-responsive-audit2/);
     const manifest = JSON.parse(read("assets/module-manifest.json"));
     assert.equal(manifest.tools.promptgenerate, "prompt-generator");
     assert.ok(manifest.modules["prompt-generator"].js.includes("assets/js/features/prompt-generator.js"));

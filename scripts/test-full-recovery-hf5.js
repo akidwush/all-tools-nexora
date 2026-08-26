@@ -76,9 +76,9 @@ async function main() {
   }
 
   const index = read("index.html");
-  const appIndex = index.lastIndexOf("assets/js/core/app.js?v=6.3.18-lr4-hf5-download1");
-  const renderersIndex = index.indexOf("assets/js/core/downloader-renderers.js?v=6.3.18-hf5-download1");
-  const shellIndex = index.indexOf("assets/js/core/shell.js?v=6.3.18-hf11.1-no-wa-notif");
+  const appIndex = index.lastIndexOf("assets/js/core/app.js?v=6.4.0-lr4-hf5-download1");
+  const renderersIndex = index.indexOf("assets/js/core/downloader-renderers.js?v=6.4.0-hf5-download1");
+  const shellIndex = index.indexOf("assets/js/core/shell.js?v=6.4.0-hf11.1-no-wa-notif");
   assert.ok(appIndex > 0 && renderersIndex > appIndex && shellIndex > renderersIndex, "canonical downloader renderers must load after legacy app and before shell");
   assert.match(index, /viewport-fit=cover/);
 

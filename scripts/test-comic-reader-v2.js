@@ -107,7 +107,7 @@ async function call(query) {
   assert.doesNotMatch(client, /allow-same-origin/);
   assert.match(client, /MangaDex<\/a>/);
   assert.match(client, /quality:state\.readerQuality/);
-  assert.match(fs.readFileSync(path.join(root, "assets/js/core/lazy-loader.js"), "utf8"), /comic-reader-v4/);
+  assert.match(fs.readFileSync(path.join(root, "assets/js/core/lazy-loader.js"), "utf8"), /'comic-reader'/);
 
   const vercel = JSON.parse(fs.readFileSync(path.join(root, "vercel.json"), "utf8"));
   assert.ok(vercel.rewrites.some((row) => row.source === "/api/comics" && /comic-reader/.test(row.destination)));

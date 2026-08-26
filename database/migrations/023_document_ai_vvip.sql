@@ -9,13 +9,13 @@ values
     'Nexora Document AI',
     'Ringkas, analisis, ekstrak tabel, dan tanya isi dokumen dengan Gemini',
     'tools',
-    'VVIP',
+    'AI',
     'fa-solid fa-file-waveform',
     null,
     true,
     69,
     '{"provider":"gemini","serverKey":true,"privacy":"not-stored","limits":{"maxBytes":3000000,"analyzePerDay":20,"questionsPerDay":80},"features":["summary","deep-analysis","study-notes","table-extraction","document-qa","txt-json-word-csv-export"]}'::jsonb,
-    'vvip'
+    'free'
   )
 on conflict (id) do update set
   name = excluded.name,

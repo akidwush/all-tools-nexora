@@ -3,21 +3,10 @@
 
   const state = { rows: [], byKey: new Map(), loaded: false };
   const footerExcludedKeys = new Set(["whatsapp_access"]);
-  const CACHE_KEY = "nexora_social_links_v63";
-  const CACHE_TTL = 15 * 60 * 1000;
   const FALLBACK_ROWS = [
     {key:"whatsapp_channel",platform:"whatsapp",label:"Gabung Saluran WhatsApp",description:"Ikuti update fitur, project baru, dan informasi All Tools Nexora.",url:"https://whatsapp.com/channel/0029VatAJdFHltYFp77RUU3a",icon:"fa-brands fa-whatsapp",accent_color:"#25d366",sort_order:10,is_active:true},
     {key:"whatsapp_access",platform:"whatsapp",label:"Minta Akses",description:"Hubungi developer untuk meminta akses tools.",url:"https://wa.me/6282125204840",icon:"fa-brands fa-whatsapp",accent_color:"#25d366",sort_order:20,is_active:true}
   ];
-
-  function readCache(){
-    try{
-      const cached=JSON.parse(localStorage.getItem(CACHE_KEY)||"null");
-      if(cached&&Array.isArray(cached.rows)&&Date.now()-Number(cached.savedAt||0)<CACHE_TTL) return cached.rows;
-    }catch(_){ }
-    return null;
-  }
-  function writeCache(rows){try{localStorage.setItem(CACHE_KEY,JSON.stringify({rows,savedAt:Date.now()}));}catch(_){ }}
 
   function safeUrl(value){
     try{
@@ -128,15 +117,14 @@
       const response = await fetch("/api/health?mode=database&resource=socials", { cache: "no-store", credentials: "same-origin", headers: { Accept: "application/json" } });
       const payload = await response.json().catch(() => ({}));
       const rows=response.ok && Array.isArray(payload.data) ? payload.data : [];
-      if(rows.length){writeCache(rows);apply(rows);}else if(!state.loaded){apply(readCache()||FALLBACK_ROWS);}
+      if(rows.length)apply(rows);else if(!state.loaded)apply(FALLBACK_ROWS);
     }catch{
-      if(!state.loaded) apply(readCache()||FALLBACK_ROWS);
+      if(!state.loaded) apply(FALLBACK_ROWS);
     }
     return state.rows.slice();
   }
 
-  const initialRows=readCache()||FALLBACK_ROWS;
-  apply(initialRows);
+  apply(FALLBACK_ROWS);
   const ready=new Promise(resolve=>{
     const schedule=window.NexoraScheduleIdle||function(task){setTimeout(task,450);};
     schedule(()=>load().then(resolve),{timeout:1600});

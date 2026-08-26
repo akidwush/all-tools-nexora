@@ -44,19 +44,19 @@ assert.equal(parsed.title, "Laporan");
 assert.equal(parsed.tables[0].rows[0][0], "Nexora");
 
 const migration = fs.readFileSync(path.join(root, "database/migrations/023_document_ai_vvip.sql"), "utf8");
-assert.match(migration, /'documentai'[\s\S]*?'vvip'/i, "Document AI harus VVIP secara default.");
+assert.match(migration, /'documentai'[\s\S]*?'free'/i, "Document AI harus tersedia untuk akun FREE.");
 assert.match(migration, /for update/i, "Konsumsi kuota harus dikunci secara atomik.");
 const appSource = fs.readFileSync(path.join(root, "assets/js/core/app.js"), "utf8");
-assert.match(appSource, /base\.accessLevel === 'vvip'/, "Lock VVIP bawaan tidak boleh hilang ketika migration database belum dijalankan.");
+assert.match(appSource, /item\.id === 'documentai' \? 'free'/, "Katalog lama tidak boleh mengunci kembali Document AI.");
 const lazySource = fs.readFileSync(path.join(root, "assets/js/core/lazy-loader.js"), "utf8");
 assert.match(lazySource, /NexoraAccount\.canAccess\(toolId\)/, "Deep link lazy tool harus tetap melewati guard VVIP.");
 const accountSource = fs.readFileSync(path.join(root, "assets/js/core/account.js"), "utf8");
-assert.match(accountSource, /defaultRestrictedTools=new Map\(\[\["documentai"/, "Guard VVIP harus fail-closed sebelum kartu katalog selesai dirender.");
+assert.doesNotMatch(accountSource, /defaultRestrictedTools=new Map\(\[\["documentai"/, "Document AI tidak boleh dikunci oleh guard lama.");
 const documentCss = fs.readFileSync(path.join(root, "assets/css/features/document-ai.css"), "utf8");
 const documentClient = fs.readFileSync(path.join(root, "assets/js/features/document-ai.js"), "utf8");
 assert.match(documentCss, /\.nda \[hidden\]\{display:none!important\}/, "Elemen hasil tersembunyi tidak boleh bocor sebelum analisis.");
 assert.match(documentCss, /tool-viewer-content:has\(\.nda\)/, "Workspace desktop harus menggunakan room lebar.");
-for (const token of ["prepareFile", "maxSide = 1800", "foto kamera 12 MB", "nexoraTimeoutMs: 85000", "createImageBitmap(file).catch", "for=\"ndaFile\"", "application/octet-stream"]) assert.ok(documentClient.includes(token), `Document AI mobile guard hilang: ${token}`);
+for (const token of ["prepareFile", "maxSide = 1800", "foto kamera 12 MB", "nexoraTimeoutMs: 85000", "createImageBitmap(file).catch", "id=\"ndaChoose\" type=\"button\"", "function openFilePicker()", "fileInput.click()", "application/octet-stream"]) assert.ok(documentClient.includes(token), `Document AI mobile guard hilang: ${token}`);
 assert.match(documentCss, /\.nda-file-input/, "File picker Document AI harus tetap dapat diaktifkan browser Android.");
 
 const response = {
@@ -106,8 +106,8 @@ const response = {
     assert.equal(generated, "Ringkasan dokumen berhasil.");
     assert.deepEqual(attemptedModels, ["gemini-missing-test-model", DEFAULT_MODEL]);
     assert.deepEqual(generatedPayload.config.thinkingConfig, { thinkingLevel: "low" });
-    assert.match(lazySource, /document-ai-v5-android-picker/);
-    assert.match(fs.readFileSync(path.join(root, "index.html"), "utf8"), /document-ai-v5-android-picker/);
+    assert.match(lazySource, /'document-android'/);
+    assert.match(fs.readFileSync(path.join(root, "index.html"), "utf8"), /document-ai-v1/);
 
     process.env.DOCUMENT_AI_MODEL = DEFAULT_MODEL;
     const defaultFailureModels = [];
@@ -136,7 +136,7 @@ const response = {
     }), (error) => error.code === "DOCUMENT_AI_AUTH_FAILED" && error.status === 503);
     assert.equal(authAttempts, 1, "Auth error tidak boleh di-retry ke model lain.");
 
-    console.log("Document AI lulus: validasi file, alias API key, fallback model, auth fail-fast, VVIP, kuota, dan health endpoint.");
+    console.log("Document AI lulus: picker Android native, akun FREE, validasi file, fallback model, kuota, dan health endpoint.");
   } finally {
     for (const [name, value] of Object.entries(originalEnvironment)) {
       if (value === undefined) delete process.env[name];

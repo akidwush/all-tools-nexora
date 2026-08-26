@@ -1,3 +1,13 @@
+## 6.4.0 Final mobile workflow — 2026-08-26
+
+- Fix: fast-scroll Android tidak lagi menjalankan touch halo/trail pada aliran `pointermove`; layer fixed tidak dibuat pada coarse pointer.
+- Fix: hero video desktop tetap hidup, sedangkan Android memakai frame terdekode yang dipause agar decoder tidak memicu blank viewport saat scroll cepat.
+- Fix: Document AI dan Prompt Generator memakai tombol file native dengan pemanggilan picker langsung dalam gesture pengguna, kompatibel dengan Chrome dan WebView Android.
+- Access: Document AI tersedia untuk akun FREE yang sudah login; kuota harian dan proteksi API tetap aktif.
+- Cache: HTML, asset, dan API memakai `no-store`; cache persisten status tool, link sosial, dan negara dihapus agar deploy baru tidak tertahan data lama.
+- Cleanup: header cache Vercel duplikat dan resolver versi lazy-module bertumpuk disederhanakan.
+- QA: audit 53 tool, 12/12 Vercel Functions, regression suite 69/69, build produksi 126 file, dan smoke test kedua endpoint AI lulus.
+
 ## 6.3.18 AI configuration hotfix — 2026-08-25
 
 - Fix: Document AI, Prompt Generator, dan Personal AI kini memakai resolver API key server-side yang sama serta mendukung `GEMINI_API_KEY`, `GOOGLE_GENERATIVE_AI_API_KEY`, `GOOGLE_GEMINI_API_KEY`, dan `GOOGLE_API_KEY`.

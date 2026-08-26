@@ -22,11 +22,12 @@ assert.match(motion, /indicator=document\.createElement\('span'\)/);
 assert.match(motion, /if\(coarse\)\{raf\(moveIndicator\);return;\}/);
 assert.match(motion, /nexora:navigation-before[\s\S]*?captureFlip\(\)/);
 assert.match(motion, /nexora:navigation-changed[\s\S]*?animateFlip/);
-assert.match(html, /core\.css\?v=6\.3\.18-hf17-desktop-nav2/);
-assert.match(html, /liquid-reactor\.js\?v=6\.3\.18-hf18-desktop-hero1/);
+assert.match(html, /core\.css\?v=6\.4\.0-hf17-desktop-nav2/);
+assert.match(html, /liquid-reactor\.js\?v=6\.4\.0-hf18-desktop-hero1/);
 
-const assetHeaders = vercel.headers.find(entry => entry.source === "/assets/(.*)");
-assert.ok(assetHeaders, "Header aset Vercel tidak ditemukan");
-assert.ok(assetHeaders.headers.some(header => header.key === "Cache-Control" && header.value === "public, max-age=0, must-revalidate"));
+const globalHeaders = vercel.headers.find(entry => entry.source === "/(.*)");
+assert.ok(globalHeaders, "Header global Vercel tidak ditemukan");
+assert.ok(globalHeaders.headers.some(header => header.key === "Cache-Control" && header.value === "no-store, no-cache, must-revalidate, max-age=0"));
+assert.equal(vercel.headers.filter(entry => entry.source === "/assets/(.*)").length, 0, "Header cache aset duplikat harus dihapus.");
 
-console.log("HF16 mobile glass lulus: grid 3 kolom, tab statis berlapis, kartu tanpa compositor storm, dedup CSS, dan cache revalidation aktif.");
+console.log("HF16 mobile glass lulus: grid 3 kolom, kartu tanpa compositor storm, dedup CSS, dan cache global dinonaktifkan.");

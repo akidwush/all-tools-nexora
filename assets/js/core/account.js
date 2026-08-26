@@ -1,6 +1,6 @@
 (function(){"use strict";
 const state={authenticated:false,user:null,membership:{role:"guest",isVvip:false,status:"guest"},tools:new Map(),wa:""};
-const defaultRestrictedTools=new Map([["documentai",{id:"documentai",name:"Nexora Document AI",accessLevel:"vvip"}]]);
+const defaultRestrictedTools=new Map();
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const cookie=n=>{const x=document.cookie.split(";").map(v=>v.trim()).find(v=>v.startsWith(n+"="));return x?decodeURIComponent(x.slice(n.length+1)):""};
 async function api(options={}){const mutation=options.method&&!['GET'].includes(options.method);const response=await fetch("/api/account",{credentials:"same-origin",cache:"no-store",...options,headers:{Accept:"application/json",...(options.body?{"Content-Type":"application/json"}:{}),...(mutation?{"X-CSRF-Token":cookie("nx_account_csrf")}:{})}});const data=await response.json().catch(()=>({}));if(!response.ok||data.ok===false)throw new Error(data.message||data.error||"Permintaan gagal.");return data;}

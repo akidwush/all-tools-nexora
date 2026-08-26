@@ -1,4 +1,4 @@
-/* Nexora v6.3.18 lazy module loader */
+/* Nexora v6.4.0 lazy module loader */
 (function(){
   'use strict';
 
@@ -56,18 +56,26 @@
 
   var modulePromises = new Map();
   var assetPromises = new Map();
-  /* Vercel serves /assets with a one-hour browser cache.  A module can
-     therefore otherwise keep the previous CSS/JS after a successful deploy. */
-  var ASSET_VERSION = '6.3.18';
-  var ASSET_PATCH = 'nexora-responsive-audit2';
+  var ASSET_VERSION = '6.4.0';
+  var ASSET_PATCH = 'final-mobile';
+  var ASSET_PATCHES = [
+    [/(?:assets\/(?:vendor\/flamo|js\/features\/flamo)\/|flamo-generators\.css(?:$|\?))/, 'flamo'],
+    [/prompt-generator\.(?:js|css)(?:$|\?)/, 'prompt-android'],
+    [/document-ai\.(?:js|css)(?:$|\?)/, 'document-android'],
+    [/crypto-market\.(?:js|css)(?:$|\?)/, 'crypto-mtf'],
+    [/comic-reader\.(?:js|css)(?:$|\?)/, 'comic-reader'],
+    [/svg-alight\.(?:js|css)(?:$|\?)/, 'svg-alight'],
+    [/alight-premium\.js(?:$|\?)/, 'alight-premium'],
+    [/(?:tiktok|download-pack|source-features)\.js(?:$|\?)/, 'download']
+  ];
   var baseShowTool = typeof window.showTool === 'function' ? window.showTool : null;
   var activeCard = null;
 
   function absolute(url){ return new URL(url, document.baseURI).href; }
   function versioned(url){
     var separator = String(url).indexOf('?')===-1 ? '?' : '&';
-    var version = /(?:assets\/(?:vendor\/flamo|js\/features\/flamo)\/|flamo-generators\.css(?:$|\?))/.test(String(url)) ? ASSET_VERSION+'-'+ASSET_PATCH : (/prompt-generator\.(?:js|css)(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-prompt-v2-state5-android-picker' : (/crypto-market\.(?:js|css)(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-crypto-mtf1' : (/document-ai\.(?:js|css)(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-document-ai-v5-android-picker' : (/svg-alight\.(?:js|css)(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-'+ASSET_PATCH : (/alight-premium\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-audit1' : (/tiktok\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-hf6-dl4-audit1' : (/(?:download-pack|source-features)\.js(?:$|\?)/.test(String(url)) ? ASSET_VERSION+'-hf6-dl4' : ASSET_VERSION)))))));
-    if(/comic-reader\.(?:js|css)(?:$|\?)/.test(String(url))) version=ASSET_VERSION+'-comic-reader-v4';
+    var match=ASSET_PATCHES.find(function(entry){return entry[0].test(String(url));});
+    var version=ASSET_VERSION+'-'+(match?match[1]:ASSET_PATCH);
     return String(url)+separator+'v='+encodeURIComponent(version);
   }
 

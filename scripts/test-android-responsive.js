@@ -26,12 +26,14 @@ const mobileSessionRules = core.match(/@media \(max-width:768px\)\{[\s\S]*?\n\}/
 assert.doesNotMatch(mobileSessionRules, /overflow-x:(?:auto|scroll)|flex-flow:row nowrap|min-width:max-content|width:max-content|scroll-snap-type/);
 assert.match(core, /\.video-banner\{[^}]*aspect-ratio:16\/9/);
 assert.match(core, /\.nx-membrane\{animation:none!important;filter:none!important/);
-assert.match(reactor, /if\(reduced\|\|coarse\)return;/);
+assert.match(reactor, /if\(reduced\|\|coarse\|\|!fine\)\{/);
 assert.match(performance, /interactionRetryUsed=true/);
 assert.doesNotMatch(html + core + performance, /nx-hero-video-toggle|data-nx-hero-toggle/);
 assert.match(performance, /function suspendPlayback\(\)/);
-for (const attribute of ["autoplay", "muted", "loop", "playsinline"]) {
+for (const attribute of ["muted", "loop", "playsinline"]) {
   assert.match(html, new RegExp(`<video[^>]*${attribute}`, "i"));
 }
+assert.doesNotMatch(html, /<video[^>]*autoplay/i);
+assert.match(performance, /heroMode=mobileLike\?"static":"auto"/);
 
 console.log("Android responsive checks passed: dark root, compact Session Matrix, stable video, and exact grid breakpoints.");

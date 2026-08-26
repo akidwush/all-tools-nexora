@@ -84,7 +84,7 @@ async function fetchBuffer(url) {
       redirect: "follow",
       cache: "no-store",
       signal: controller.signal,
-      headers: { "user-agent": "Nexora-Build/6.3.18-hf2" },
+      headers: { "user-agent": "Nexora-Build/6.4.0-hf2" },
     });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     return Buffer.from(await response.arrayBuffer());

@@ -2,9 +2,6 @@
 // script.js
 async function getUserInfo() {
     const countryEl = document.getElementById('userCountry');
-    const COUNTRY_CACHE_KEY = 'nexus_country_cache_v2';
-    const COUNTRY_CACHE_AGE = 6 * 60 * 60 * 1000;
-
     function countryNameFromCode(code) {
         if (!code) return '';
         const normalized = String(code).trim().toUpperCase();
@@ -30,22 +27,6 @@ async function getUserInfo() {
         countryEl.dataset.countrySource = source || '';
         countryEl.title = source ? 'Sumber deteksi: ' + source : '';
         return true;
-    }
-
-    function readCountryCache() {
-        try {
-            const cached = JSON.parse(localStorage.getItem(COUNTRY_CACHE_KEY) || 'null');
-            if (cached && cached.name && Date.now() - Number(cached.time || 0) < COUNTRY_CACHE_AGE) {
-                return cached;
-            }
-        } catch (e) {}
-        return null;
-    }
-
-    function saveCountryCache(name, code) {
-        try {
-            localStorage.setItem(COUNTRY_CACHE_KEY, JSON.stringify({ name, code, time: Date.now() }));
-        } catch (e) {}
     }
 
     function deviceCountryFallback() {
@@ -94,9 +75,7 @@ async function getUserInfo() {
     }
 
     async function detectCountry() {
-        const cached = readCountryCache();
-        if (cached) showCountry(cached.name, cached.code, 'cache');
-        else if (countryEl) countryEl.textContent = 'Mendeteksi...';
+        if (countryEl) countryEl.textContent = 'Mendeteksi...';
 
         const providers = [
             {
@@ -124,7 +103,6 @@ async function getUserInfo() {
                 const data = await fetchJsonWithTimeout(provider.url, 5500);
                 const result = provider.parse(data);
                 if (result && result.name) {
-                    saveCountryCache(result.name, result.code);
                     showCountry(result.name, result.code, provider.name);
                     return true;
                 }
@@ -135,7 +113,6 @@ async function getUserInfo() {
             }
         }
 
-        if (cached) return true;
         const fallback = deviceCountryFallback();
         if (fallback) {
             showCountry(fallback.name, fallback.code, 'perkiraan perangkat');
@@ -150,7 +127,6 @@ async function getUserInfo() {
 
     await detectCountry();
     window.addEventListener('online', function nexusRetryCountryOnce() {
-        try { localStorage.removeItem(COUNTRY_CACHE_KEY); } catch (e) {}
         detectCountry();
     }, { once: true });
 
@@ -1623,7 +1599,7 @@ let toolsData = {
         { id: 'bmkg', icon: 'fa-solid fa-cloud-sun-rain', name: 'BMKG Indonesia', desc: 'Gempa terkini, prakiraan cuaca 3 hari dan peringatan dini cuaca dari BMKG', badge: 'BMKG' },
         { id: 'spaceexplorer', icon: 'fa-solid fa-user-astronaut', name: 'Space Explorer', desc: 'APOD, galeri Mars, asteroid dekat Bumi dan cuaca antariksa NASA', badge: 'NASA' },
         { id: 'ocrintel', icon: 'fa-solid fa-file-lines', name: 'Nexora OCR Intelligence', desc: 'Ekstrak teks dari gambar dan PDF, analisis dokumen, lalu buat searchable PDF', badge: 'OCR' },
-        { id: 'documentai', icon: 'fa-solid fa-file-waveform', name: 'Nexora Document AI', desc: 'Ringkas, analisis, ekstrak tabel, dan tanya isi dokumen dengan Gemini', badge: 'VVIP', accessLevel: 'vvip' },
+        { id: 'documentai', icon: 'fa-solid fa-file-waveform', name: 'Nexora Document AI', desc: 'Ringkas, analisis, ekstrak tabel, dan tanya isi dokumen dengan Gemini', badge: 'AI' },
         { id: 'svgalight', icon: 'fa-solid fa-wand-magic-sparkles', name: 'SVG → Alight XML', desc: 'Konversi SVG ke XML Alight Motion dengan AM Optimized, Maximum Fidelity, audit kesamaan, dan kontrol layer', badge: 'ENGINE v1.8' },
         { id: 'alightpremium', icon: 'fa-solid fa-bolt', name: 'Alight Motion Premium 1 Tahun', desc: 'Request magic link lalu proses aktivasi Premium melalui API reseller', badge: '1 YEAR' },
         { id: 'imagevectorizer', icon: 'fa-solid fa-bezier-curve', name: 'Nexora Image Vectorizer', desc: 'Ubah PNG atau JPG menjadi SVG melalui FreeConvert Cloud', badge: 'SVG' },
@@ -1686,6 +1662,7 @@ let allLoadPending = false;
 function toolCardMarkup(item, isExternal = false, category = '') {
     const escapeToolHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
     const safeId = escapeToolHtml(item.id);
+    const accessLevel = item.id === 'documentai' ? 'free' : (item.accessLevel === 'vvip' ? 'vvip' : 'free');
     const safeIcon = escapeToolHtml(item.icon || 'fa-solid fa-cube');
     const safeLink = encodeURIComponent(String(item.link || '#')).replace(/'/g, '%27');
     const clickAttr = item.id === 'unbanwa' ?
@@ -1702,8 +1679,8 @@ function toolCardMarkup(item, isExternal = false, category = '') {
     const safeCategory = escapeToolHtml(category || (isExternal ? 'external' : 'tools'));
     const format = isExternal ? 'LINK' : (category === 'downloader' ? 'MEDIA' : category === 'maker' ? 'CREATE' : category === 'vault' ? 'VAULT' : 'UTILITY');
     return `
-        <div class="tools-card" data-tool-id="${safeId}" data-access-level="${item.accessLevel === 'vvip' ? 'vvip' : 'free'}" data-nx-category="${safeCategory}" data-nx-format="${format}" role="button" tabindex="0" aria-label="Buka ${escapeToolHtml(item.name)}" ${clickAttr}>
-            <div class="nx-card-top"><div class="icon"><i class="${safeIcon}"></i></div>${item.accessLevel === 'vvip' ? '<span class="badge nx-vvip-badge"><i class="fas fa-crown"></i> VVIP</span>' : item.badge ? `<span class="badge">${escapeToolHtml(item.badge)}</span>` : ''}</div>
+        <div class="tools-card" data-tool-id="${safeId}" data-access-level="${accessLevel}" data-nx-category="${safeCategory}" data-nx-format="${format}" role="button" tabindex="0" aria-label="Buka ${escapeToolHtml(item.name)}" ${clickAttr}>
+            <div class="nx-card-top"><div class="icon"><i class="${safeIcon}"></i></div>${accessLevel === 'vvip' ? '<span class="badge nx-vvip-badge"><i class="fas fa-crown"></i> VVIP</span>' : item.badge ? `<span class="badge">${escapeToolHtml(item.badge)}</span>` : ''}</div>
             <div class="nx-card-copy"><h4>${escapeToolHtml(item.name)}</h4><p>${escapeToolHtml(item.desc)}</p></div>
             <div class="nx-card-footer"><span class="nx-card-readiness" data-nx-status-slot="true"></span><span class="nx-card-format">${format}</span><div class="arrow"><i class="fas fa-arrow-right"></i></div></div>
         </div>
@@ -1752,7 +1729,7 @@ function catalogListTools() {
 }
 
 window.NexoraToolCatalog = Object.freeze({
-    version: '6.3.18',
+    version: '6.4.0',
     has: catalogHasTool,
     list: catalogListTools
 });

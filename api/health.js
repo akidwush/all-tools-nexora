@@ -20,7 +20,6 @@ module.exports = async function handler(request, response) {
   const requestUrl = new URL(request.url || "/api/health", `http://${request.headers.host || "localhost"}`);
   if (requestUrl.searchParams.get("mode") === "ai-chat") return handlePersonalAi(request, response);
   if (requestUrl.searchParams.get("mode") === "document-ai") {
-    if (request.method === "POST" && !(await authorizeTool(request, response, "documentai"))) return;
     return handleDocumentAi(request, response);
   }
   if (requestUrl.searchParams.get("mode") === "prompt-generator") {
@@ -65,7 +64,7 @@ module.exports = async function handler(request, response) {
     status: serviceStatus,
     app: "All Tools Nexora",
     developer: "Dika",
-    version: "6.3.18",
+    version: "6.4.0",
     database: {
       configured: database.configured,
       connected: database.connected,

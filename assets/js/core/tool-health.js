@@ -2,8 +2,6 @@
 (function () {
   "use strict";
 
-  const CACHE_KEY = "nexora_tool_health_v42";
-  const CACHE_AGE_MS = 15 * 60 * 1000;
   const labels = {
     operational: { short: "Operational", title: "Semua sistem normal", icon: "fa-circle-check" },
     degraded: { short: "Degraded", title: "Beberapa tools terganggu", icon: "fa-triangle-exclamation" },
@@ -27,18 +25,6 @@
     } catch {
       return date.toLocaleString();
     }
-  }
-
-  function readCache() {
-    try {
-      const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || "null");
-      if (cached && cached.payload && Date.now() - Number(cached.savedAt || 0) < CACHE_AGE_MS) return cached.payload;
-    } catch {}
-    return null;
-  }
-
-  function writeCache(payload) {
-    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ payload, savedAt: Date.now() })); } catch {}
   }
 
   function text(tag, className, value) {
@@ -135,14 +121,11 @@
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const payload = await response.json();
       if (!payload || payload.ok !== true) throw new Error(payload && payload.error ? payload.error : "INVALID_RESPONSE");
-      writeCache(payload);
       setState(root, payload);
       document.dispatchEvent(new CustomEvent("nexora:tool-health-loaded",{detail:payload}));
     } catch (error) {
-      const cached = readCache();
-      if (cached) setState(root, cached);
       const description = root.querySelector("[data-health-description]");
-      if (description && !cached) description.textContent = "Status belum dapat dimuat. Coba lagi nanti.";
+      if (description) description.textContent = "Status belum dapat dimuat. Coba lagi nanti.";
       console.warn("[Nexora Health]", error && error.message ? error.message : error);
     } finally {
       root.classList.remove("is-loading");
@@ -175,9 +158,6 @@
     const root = document.getElementById("nxToolHealth");
     if (!root) return;
 
-    const cached = readCache();
-    if (cached) setState(root, cached);
-
     root.querySelector("[data-health-open]")?.addEventListener("click", () => { openPanel(root); load(root, false); });
     root.querySelector("[data-health-close]")?.addEventListener("click", () => closePanel(root));
     root.querySelector("[data-health-refresh]")?.addEventListener("click", () => load(root, true));
@@ -188,10 +168,8 @@
       if (event.key === "Escape" && root.querySelector("[data-health-dialog]")?.classList.contains("is-open")) closePanel(root);
     });
 
-    if (!cached) {
-      const schedule=window.NexoraScheduleIdle||function(task){setTimeout(task,2200);};
-      schedule(() => load(root, true), { timeout: 4200 });
-    }
+    const schedule=window.NexoraScheduleIdle||function(task){setTimeout(task,2200);};
+    schedule(() => load(root, true), { timeout: 4200 });
     window.addEventListener("online", () => {
       const schedule=window.NexoraScheduleIdle||function(task){setTimeout(task,800);};
       schedule(() => load(root, false), { timeout: 2200 });

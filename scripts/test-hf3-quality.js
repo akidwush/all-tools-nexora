@@ -50,8 +50,8 @@ for (const token of ["public.app_settings", "heroVideo", "is_public = true", "no
   assert(migration.includes(token), `migration hero harus memuat ${token}`);
 }
 
-assert(adminHtml.includes("dashboard.js?v=6.3.18-hf3"));
-assert(read("index.html").includes("performance.js?v=6.3.18-hf18-desktop-hero3"));
-assert(read("index.html").includes("app.js?v=6.3.18-lr4"));
+assert(adminHtml.includes("dashboard.js?v=6.4.0-hf3"));
+assert(read("index.html").includes("performance.js?v=6.4.0-hf18-desktop-hero3"));
+assert(read("index.html").includes("app.js?v=6.4.0-lr4"));
 
 console.log("Nexora HF3 quality tests lulus: kalkulator CSP-safe, password Web Crypto, video hero admin, cache bust, dan migration valid.");

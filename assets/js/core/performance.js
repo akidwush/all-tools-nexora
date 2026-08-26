@@ -1,4 +1,4 @@
-/* Nexora v6.3.18 HF3 — adaptive, database-configurable hero video. */
+/* Nexora v6.4.0 — adaptive, database-configurable hero video. */
 (function(){
   "use strict";
   if(window.__NEXORA_PERFORMANCE__) return;
@@ -73,9 +73,10 @@
     reduced
   );
 
-  // The hero is a primary visual, not an optional mobile enhancement. Keep the
-  // same muted inline video eligible for autoplay on every device.
-  var heroMode="auto";
+  // Android receives a decoded first frame instead of continuous playback.
+  // This preserves the hero identity while removing decoder/compositor work
+  // from the same frames used by fast scrolling.
+  var heroMode=mobileLike?"static":"auto";
   document.documentElement.classList.add("nx-hero-video-"+heroMode);
   if(lowPower) document.documentElement.classList.add("nx-low-power");
 
@@ -102,7 +103,7 @@
     var interactionRetryArmed=false;
     var interactionRetryUsed=false;
 
-    video.autoplay=true;
+    video.autoplay=!mobileLike;
     video.muted=true;
     video.defaultMuted=true;
     video.loop=true;
@@ -149,7 +150,8 @@
     }
 
     function ensurePlayback(){
-      if(!ready||document.hidden||autoplayBlocked||(mobileLike&&!heroVisible))return;
+      if(mobileLike){if(!video.paused)video.pause();return;}
+      if(!ready||document.hidden||autoplayBlocked||!heroVisible)return;
       Promise.resolve(video.play()).then(function(){autoplayBlocked=false;}).catch(function(){
         autoplayBlocked=true;
         armInteractionRetry();
@@ -157,7 +159,7 @@
     }
 
     function suspendPlayback(){
-      if(mobileLike&&!video.paused)video.pause();
+      if(!video.paused)video.pause();
     }
 
     function markReady(){
@@ -202,9 +204,8 @@
       ensurePlayback();
     }
 
-    // Load once so the identity frame remains available. On phones the same
-    // element is paused outside the viewport, releasing decoder/compositor
-    // pressure without reloading or resetting the video.
+    // Load once so the identity frame remains available. Phones keep that
+    // decoded frame paused; desktop retains normal visibility-based playback.
     if("IntersectionObserver" in window){
       var observer=new IntersectionObserver(function(entries){onVisibility(entries[0]);},{threshold:[0,0.01,0.35]});
       observer.observe(hero);
@@ -225,7 +226,7 @@
   },{once:true});
 
   window.__NEXORA_PERFORMANCE__={
-    version:"6.3.18",
+    version:"6.4.0",
     lowPower:lowPower,
     mobileLike:mobileLike,
     heroMode:heroMode,

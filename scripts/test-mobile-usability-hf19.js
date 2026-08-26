@@ -6,7 +6,7 @@ const fs = require("node:fs");
 const css = fs.readFileSync("assets/css/mobile-usability.css", "utf8");
 const html = fs.readFileSync("index.html", "utf8");
 
-assert.match(html, /mobile-usability\.css\?v=6\.3\.18-responsive-audit3/);
+assert.match(html, /mobile-usability\.css\?v=6\.4\.0-responsive-audit3/);
 assert.match(css, /@media \(max-width:767px\)/);
 assert.match(css, /#nxUniversalRoom \.nx-room-tool-body/);
 assert.match(css, /font-size:16px!important/);

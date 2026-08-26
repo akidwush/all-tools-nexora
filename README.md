@@ -1,6 +1,6 @@
 # All Tools Nexora
 
-All Tools Nexora v6.3.18 adalah website toolkit statis dengan 53 tool, lazy-loaded feature modules, dashboard admin, Supabase, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency `@google/genai`.
+All Tools Nexora v6.4.0 adalah website toolkit statis dengan 53 tool, lazy-loaded feature modules, dashboard admin, Supabase, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency `@google/genai`.
 
 ## Menjalankan secara lokal
 
@@ -63,7 +63,7 @@ Salin `.env.example` dan isi hanya layanan yang digunakan. Variable utama:
 
 - Database/admin: `SUPABASE_URL`, `SUPABASE_SECRET_KEY` atau `SUPABASE_SERVICE_ROLE_KEY`, serta `FEEDBACK_HASH_SALT`.
 - Operasional: `HEALTH_CHECK_TOKEN` dan pengaturan timeout/cache opsional.
-- Tool eksternal: `COINGECKO_API_KEY`, `GOOGLE_PAGESPEED_API_KEY`, `GOOGLE_SAFE_BROWSING_API_KEY`, `NASA_API_KEY`, `OCR_SPACE_API_KEY`, `FREECONVERT_API_KEY`, `SVGTOXML_ENGINE_KEY`, dan `GEMINI_API_KEY` untuk Personal AI, Document AI VVIP, serta Prompt Generator. Alias `GOOGLE_GENERATIVE_AI_API_KEY`, `GOOGLE_GEMINI_API_KEY`, dan `GOOGLE_API_KEY` juga didukung. Model dapat dioverride lewat `GEMINI_MODEL`, `DOCUMENT_AI_MODEL`, atau `PROMPT_GENERATOR_MODEL`. Setelah mengubah environment Vercel, lakukan redeploy agar Function menerima nilai terbaru.
+- Tool eksternal: `COINGECKO_API_KEY`, `GOOGLE_PAGESPEED_API_KEY`, `GOOGLE_SAFE_BROWSING_API_KEY`, `NASA_API_KEY`, `OCR_SPACE_API_KEY`, `FREECONVERT_API_KEY`, `SVGTOXML_ENGINE_KEY`, dan `GEMINI_API_KEY` untuk Personal AI, Document AI, serta Prompt Generator. Alias `GOOGLE_GENERATIVE_AI_API_KEY`, `GOOGLE_GEMINI_API_KEY`, dan `GOOGLE_API_KEY` juga didukung. Model dapat dioverride lewat `GEMINI_MODEL`, `DOCUMENT_AI_MODEL`, atau `PROMPT_GENERATOR_MODEL`. Setelah mengubah environment Vercel, lakukan redeploy agar Function menerima nilai terbaru.
 - SiteGrabber: `SITEGRABBER_API_BASE_URL` dan `SITEGRABBER_API_KEY`.
 - Deploy Center: `NEXUS_DEPLOY_ACCESS_KEY`, kemudian token `VERCEL_TOKEN` atau `NETLIFY_TOKEN`.
 
@@ -78,6 +78,8 @@ Untuk instalasi baru, jalankan `database/schema.sql` melalui Supabase SQL Editor
 Untuk database lama, jalankan migration yang belum pernah diterapkan dari `database/migrations/` sesuai urutan nomor. Backup database terlebih dahulu.
 
 Migration `database/migrations/026_flamo_native_generators.sql` menambahkan enam generator XML lokal ke katalog database. Frontend tetap mempertahankan katalog bundle jika database belum diperbarui, tetapi migration ini perlu dijalankan sekali agar Dashboard Admin dan data Supabase ikut sinkron.
+
+Migration `database/migrations/023_document_ai_vvip.sql` tetap mempertahankan kuota Document AI, tetapi v6.4.0 mengubah akses katalognya menjadi FREE. Jalankan ulang migration ini satu kali pada database lama agar Dashboard Admin menampilkan status yang sama dengan frontend.
 
 Migration `database/migrations/016_hero_video_settings.sql` mengaktifkan pengaturan video header. Setelah migration dijalankan, buka **Dashboard Admin → Ringkasan Sistem → Video Header**, isi URL MP4/WebM HTTPS langsung, lalu simpan. Pengaturan tersimpan di `app_settings.site.heroVideo` dan dibaca halaman publik tanpa mengekspos service-role key.
 
@@ -95,7 +97,21 @@ npm run build
 
 Deploy ke Vercel menggunakan konfigurasi `vercel.json`. Seluruh secret harus diatur sebagai environment variable server-side.
 
-Video header mempertahankan mode hemat: desktop dapat memutar video muted saat terlihat, HP memakai kontrol manual, dan perangkat dengan Save Data, reduced motion, RAM/CPU rendah, atau jaringan 2G otomatis memakai background statis agar scrolling tetap ringan.
+Video header mempertahankan mode hemat: desktop memutar video muted saat terlihat, sedangkan HP menampilkan frame video statis agar scrolling tetap ringan dan stabil.
+
+### Push dari Termux
+
+Setelah menyalin isi ZIP final ke repository lokal:
+
+```bash
+cd all-tools-nexora
+npm ci
+npm test
+npm run build
+git add .
+git commit -m "fix: final Android stability and AI workflow"
+git push origin main
+```
 
 ## Batas dan keamanan
 

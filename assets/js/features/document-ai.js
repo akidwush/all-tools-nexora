@@ -132,12 +132,13 @@
           <aside class="nda-input-panel">
             <div class="nda-panel-heading"><div><span>01 · SOURCE</span><h3>Pilih dokumen</h3></div><b id="ndaApiState">CHECKING</b></div>
             <input id="ndaFile" class="nda-file-input" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,.txt,.md,.csv,application/pdf,image/jpeg,image/png,image/webp,text/plain,text/markdown,text/csv">
-            <label class="nda-drop" id="ndaDrop" for="ndaFile" role="button" tabindex="0">
+            <div class="nda-drop" id="ndaDrop">
               <span class="nda-drop-icon"><i class="fa-solid fa-cloud-arrow-up"></i></span>
               <strong>Pilih atau jatuhkan dokumen</strong>
               <small>PDF · JPG · PNG · WEBP · TXT · MD · CSV</small>
               <em>Dokumen 3 MB · foto kamera 12 MB</em>
-            </label>
+              <button class="nda-file-picker" id="ndaChoose" type="button"><i class="fa-solid fa-folder-open"></i> Pilih File</button>
+            </div>
             <article class="nda-file" id="ndaFileCard" hidden><span><i class="fa-regular fa-file-lines"></i></span><div><strong id="ndaFileName"></strong><small id="ndaFileMeta"></small></div><button id="ndaRemove" type="button" aria-label="Hapus dokumen"><i class="fa-solid fa-xmark"></i></button></article>
 
             <fieldset class="nda-modes">
@@ -182,8 +183,10 @@
     var state = { file: null, fileData: "", analysis: null, history: [], busy: false, progressTimer: null };
     var fileInput = root.querySelector("#ndaFile");
     var drop = root.querySelector("#ndaDrop");
+    var choose = root.querySelector("#ndaChoose");
     var analyze = root.querySelector("#ndaAnalyze");
     var message = root.querySelector("#ndaMessage");
+    var fetcher = typeof window.NexoraFetch === "function" ? window.NexoraFetch : window.fetch.bind(window);
 
     function notify(text, error) {
       message.textContent = text || "";
@@ -226,6 +229,12 @@
       drop.hidden = false;
       analyze.disabled = true;
       notify("");
+    }
+
+    function openFilePicker() {
+      if (state.busy || fileInput.disabled) return;
+      fileInput.value = "";
+      fileInput.click();
     }
 
     async function selectFile(file) {
@@ -286,7 +295,7 @@
     }
 
     async function api(body) {
-      var response = await (window.NexoraFetch || window.fetch)("/api/document-ai", {
+      var response = await fetcher("/api/document-ai", {
         method: "POST", credentials: "same-origin", cache: "no-store", nexoraTimeoutMs: 85000, nexoraRetries: 0,
         headers: { "Content-Type": "application/json", "Accept": "application/json" }, body: JSON.stringify(body)
       });
@@ -343,8 +352,8 @@
       download(base + ".txt", text, "text/plain;charset=utf-8");
     }
 
-    drop.addEventListener("click", function (event) { if (state.busy) event.preventDefault(); });
-    drop.addEventListener("keydown", function (event) { if (!state.busy && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); fileInput.click(); } });
+    choose.addEventListener("click", function (event) { event.stopPropagation(); openFilePicker(); });
+    drop.addEventListener("click", function (event) { if (!event.target.closest("button")) openFilePicker(); });
     fileInput.addEventListener("change", function () { selectFile(fileInput.files && fileInput.files[0]); });
     ["dragenter", "dragover"].forEach(function (name) { drop.addEventListener(name, function (event) { event.preventDefault(); drop.classList.add("is-dragging"); }); });
     ["dragleave", "drop"].forEach(function (name) { drop.addEventListener(name, function (event) { event.preventDefault(); drop.classList.remove("is-dragging"); }); });
@@ -362,7 +371,15 @@
       download(safeName(state.file.name) + "-tabel-" + (Number(csvButton.dataset.ndaCsv) + 1) + ".csv", "\ufeff" + rows, "text/csv;charset=utf-8");
     });
 
-    (window.NexoraFetch || window.fetch)("/api/document-ai", { method: "GET", credentials: "same-origin", cache: "no-store", nexoraTimeoutMs: 8000, nexoraRetries: 0 }).then(function (response) { return response.json(); }).then(function (payload) {
+    root.__nxCleanup = function () {
+      clearInterval(state.progressTimer);
+      state.file = null;
+      state.fileData = "";
+      state.analysis = null;
+      state.history = [];
+    };
+
+    fetcher("/api/document-ai", { method: "GET", credentials: "same-origin", cache: "no-store", nexoraTimeoutMs: 8000, nexoraRetries: 0 }).then(function (response) { return response.json(); }).then(function (payload) {
       var badge = root.querySelector("#ndaApiState"); badge.textContent = payload.configured ? "GEMINI READY" : "KEY REQUIRED"; badge.classList.toggle("is-warning", !payload.configured);
       if (!payload.configured) notify("Gemini API belum dikonfigurasi pada server.", true);
     }).catch(function () { var badge = root.querySelector("#ndaApiState"); badge.textContent = "API OFFLINE"; badge.classList.add("is-warning"); });
