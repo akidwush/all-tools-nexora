@@ -1,3 +1,11 @@
+## 6.4.0 HF23 DLYYZ red cursor — 2026-08-27
+
+- Visual: menambahkan kursor merah DLYYZ berupa dot merah dan ring magnetik yang membesar pada elemen interaktif.
+- Mobile: modul berhenti sebelum membuat DOM, listener, atau animation frame ketika perangkat tidak memiliki fine pointer; Android tetap memakai cursor native tanpa beban tambahan.
+- Performa: ring hanya menganimasikan selisih posisi dan menghentikan `requestAnimationFrame` otomatis setelah gerak selesai; hover memakai event delegation tanpa listener per kartu.
+- Aksesibilitas: reduced-motion membuat ring mengikuti posisi langsung dan seluruh elemen dekoratif bersifat `aria-hidden`.
+- QA: regression khusus HF23 memvalidasi capability gate, cleanup listener, cache-bust, dan larangan touch allocation.
+
 ## 6.4.0 HF22 Original unified UI — 2026-08-27
 
 - Visual: tampilan Android original menjadi satu-satunya sumber layout untuk PC, tablet, dan ponsel; kanvas 430 px dipusatkan pada monitor dan katalog tetap tiga kolom dengan kartu compact yang sama.
