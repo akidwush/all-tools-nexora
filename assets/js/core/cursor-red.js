@@ -1,9 +1,10 @@
-/* Nexora HF23 — DLYYZ red cursor with zero Android allocation. */
+/* Nexora HF24 — DLYYZ red cursor with persistent Android touch position. */
 (function(){
   "use strict";
   if(window.__NEXORA_RED_CURSOR__)return;
 
-  var fine=window.matchMedia("(hover:hover) and (pointer:fine)");
+  var fine=window.matchMedia("(any-hover:hover) and (any-pointer:fine)");
+  var coarse=window.matchMedia("(any-pointer:coarse)");
   var reduced=window.matchMedia("(prefers-reduced-motion:reduce)");
   var dot=null;
   var ring=null;
@@ -14,6 +15,8 @@
   var frame=0;
   var mounted=false;
   var visible=false;
+  var hasPosition=false;
+  var lastPointerType="";
 
   function transform(element,x,y){
     element.style.transform="translate3d("+x.toFixed(2)+"px,"+y.toFixed(2)+"px,0) translate(-50%,-50%)";
@@ -55,10 +58,11 @@
     return target instanceof Element&&Boolean(target.closest("a,button,[role='button'],.tools-card,input,select,textarea"));
   }
 
-  function onPointerMove(event){
-    if(event.pointerType&&event.pointerType!=="mouse")return;
+  function moveTo(event){
+    lastPointerType=event.pointerType||"mouse";
     targetX=event.clientX;
     targetY=event.clientY;
+    hasPosition=true;
     if(!visible){
       ringX=targetX;
       ringY=targetY;
@@ -67,12 +71,18 @@
     schedule();
   }
 
+  function onPointerDown(event){moveTo(event);}
+  function onPointerMove(event){moveTo(event);}
+
   function onPointerOver(event){setHover(interactiveTarget(event.target));}
   function onPointerOut(event){
-    if(!event.relatedTarget)setVisible(false);
+    if(lastPointerType==="mouse"&&!event.relatedTarget)setVisible(false);
     setHover(interactiveTarget(event.relatedTarget));
   }
-  function onVisibility(){if(document.hidden)setVisible(false);}
+  function onVisibility(){
+    if(document.hidden)setVisible(false);
+    else if(hasPosition&&(lastPointerType!=="mouse"||coarse.matches))setVisible(true);
+  }
 
   function createNode(id){
     var node=document.createElement("span");
@@ -83,19 +93,31 @@
   }
 
   function mount(){
-    if(mounted||!fine.matches)return;
+    if(mounted)return;
     dot=document.getElementById("nxRedCursorDot")||createNode("nxRedCursorDot");
     ring=document.getElementById("nxRedCursorRing")||createNode("nxRedCursorRing");
     document.documentElement.classList.add("nx-red-cursor-enabled");
+    document.addEventListener("pointerdown",onPointerDown,{passive:true});
     document.addEventListener("pointermove",onPointerMove,{passive:true});
     document.addEventListener("pointerover",onPointerOver,{passive:true});
     document.addEventListener("pointerout",onPointerOut,{passive:true});
     document.addEventListener("visibilitychange",onVisibility);
     mounted=true;
+    if(coarse.matches&&!fine.matches){
+      targetX=Math.round(window.innerWidth/2);
+      targetY=Math.round(window.innerHeight/3);
+      ringX=targetX;
+      ringY=targetY;
+      hasPosition=true;
+      lastPointerType="touch";
+      setVisible(true);
+      schedule();
+    }
   }
 
   function unmount(){
     if(!mounted)return;
+    document.removeEventListener("pointerdown",onPointerDown);
     document.removeEventListener("pointermove",onPointerMove);
     document.removeEventListener("pointerover",onPointerOver);
     document.removeEventListener("pointerout",onPointerOut);
@@ -110,11 +132,8 @@
     mounted=false;
   }
 
-  function sync(){if(fine.matches)mount();else unmount();}
-  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",sync,{once:true});
-  else sync();
-  if(fine.addEventListener)fine.addEventListener("change",sync);
-  else fine.addListener(sync);
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",mount,{once:true});
+  else mount();
 
-  window.__NEXORA_RED_CURSOR__={version:"1.0.0",touchAllocation:false,sync:sync};
+  window.__NEXORA_RED_CURSOR__={version:"1.1.0",touchPersistent:true,mount:mount,unmount:unmount};
 })();

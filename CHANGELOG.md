@@ -1,3 +1,11 @@
+## 6.4.0 HF24 Persistent Android cursor — 2026-08-27
+
+- Android: dot dan ring merah kini dibuat pada perangkat sentuh, tampil sejak halaman dimuat, mengikuti `pointerdown`/`pointermove`, dan menetap pada posisi terakhir setelah jari terangkat.
+- Desktop: cursor DLYYZ tetap mengikuti mouse; deteksi diperluas ke `any-pointer:fine` agar laptop hybrid dengan layar sentuh tidak kehilangan cursor.
+- Stabilitas: listener sentuh bersifat pasif, hanya satu frame render aktif saat posisi berubah, dan tidak ada interval maupun jejak cursor bertumpuk.
+- Cache: CSS dan runtime cursor memakai cache-bust HF24 agar Vercel dan browser tidak mempertahankan aturan desktop-only HF23.
+- QA: regression HF24 memvalidasi posisi awal Android, persistensi setelah touch, kompatibilitas hybrid, dan tidak adanya handler yang menyembunyikan cursor saat jari dilepas.
+
 ## 6.4.0 HF23 DLYYZ red cursor — 2026-08-27
 
 - Visual: menambahkan kursor merah DLYYZ berupa dot merah dan ring magnetik yang membesar pada elemen interaktif.

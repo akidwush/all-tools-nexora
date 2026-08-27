@@ -1,11 +1,11 @@
-/* Nexora HF23 — DLYYZ red cursor, isolated from touch/mobile rendering. */
+/* Nexora HF24 — DLYYZ red cursor, persistent on mouse and touch. */
 #nxRedCursorDot,
 #nxRedCursorRing{
   position:fixed;
   z-index:2147483000;
   left:0;
   top:0;
-  display:none;
+  display:block;
   border-radius:50%;
   opacity:0;
   pointer-events:none!important;
@@ -14,14 +14,16 @@
   transition:width .12s ease,height .12s ease,border-color .18s ease,opacity .16s linear;
 }
 
-@media (hover:hover) and (pointer:fine){
+html.nx-red-cursor-enabled #nxRedCursorDot,
+html.nx-red-cursor-enabled #nxRedCursorRing{display:block;will-change:transform}
+
+@media (any-hover:hover) and (any-pointer:fine){
   html.nx-red-cursor-enabled,
   html.nx-red-cursor-enabled body,
   html.nx-red-cursor-enabled a,
   html.nx-red-cursor-enabled button,
   html.nx-red-cursor-enabled [role="button"],
   html.nx-red-cursor-enabled .tools-card{cursor:none!important}
-  #nxRedCursorDot,#nxRedCursorRing{display:block;will-change:transform}
 }
 
 #nxRedCursorDot{
