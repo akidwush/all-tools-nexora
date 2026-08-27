@@ -1,3 +1,12 @@
+## 6.4.0 HF26 Puter runtime diagnostics — 2026-08-27
+
+- Fix: membaca error Puter bertingkat seperti `error.code`, `error.message`, dan status HTTP sehingga pesan allowance, konfirmasi email, login, rate limit, safety, jaringan, dan model tidak lagi disamarkan sebagai error umum.
+- Fix: rasio dikirim sesuai kontrak setiap provider; GPT Image Mini memakai ukuran resmi OpenAI, GPT Image 2 memakai ukuran piksel, sedangkan Gemini, Imagen, FLUX, dan Ideogram memakai rasio sederhana.
+- Recovery: fallback ke GPT Image Mini hanya berjalan saat model benar-benar tidak tersedia; allowance, login, safety, dan rate limit tidak diulang agar penggunaan tidak tergandakan.
+- Visual: elemen hasil beratribut `hidden` benar-benar disembunyikan sehingga placeholder dan gambar lama tidak tampil bersamaan.
+- Diagnose: console hanya mencatat model, kode, status, dan pesan provider; prompt serta identitas pengguna tidak masuk log.
+- Cache: lazy loader dan asset Puter memakai cache-bust HF26.
+
 ## 6.4.0 HF25 Puter AI Image — 2026-08-27
 
 - Fitur: menambahkan Nexora AI Image berbasis Puter untuk membuat gambar dari prompt, memilih model, rasio, preview, dan mengunduh hasil.

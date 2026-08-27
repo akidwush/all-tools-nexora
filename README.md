@@ -24,6 +24,9 @@ Hal penting yang perlu diketahui:
 - Gambar memakai allowance atau jatah dari akun Puter pengguna. Jatah developer Nexora tidak dipakai.
 - Nexora tidak meminta API key Puter dan tidak menyimpan password, prompt, atau gambar hasil.
 - Jika jatah habis, cek pemakaian akun Puter atau tunggu jatah tersedia lagi.
+- Jika muncul pesan email belum dikonfirmasi, buka Puter dan konfirmasi alamat email akunmu.
+- Jika muncul pesan permintaan terlalu cepat, tunggu sebentar sampai proses sebelumnya selesai.
+- GPT Image Mini memakai ukuran potret atau lanskap terdekat yang didukung model. Model lain mengikuti rasio yang dipilih.
 - Jangan membuat gambar yang melanggar hukum, merugikan orang lain, atau melanggar aturan Puter.
 
 Fitur ini memakai sistem [User-Pays dari Puter](https://developer.puter.com/tutorials/free-unlimited-image-generation-api/). Harga dan batas pemakaian mengikuti [ketentuan Puter](https://developer.puter.com/pricing/).

@@ -3,15 +3,30 @@
 
   var PUTER_SDK_URL = "https://js.puter.com/v2/";
   var sdkPromise = null;
+  var DEFAULT_MODEL = "gpt-image-1-mini";
   var MODEL_IDS = Object.freeze([
-    "openai/gpt-image-1-mini",
-    "openai/gpt-image-2",
+    "gpt-image-1-mini",
+    "gpt-image-2",
     "google/gemini-2.5-flash-image",
     "google/imagen-4.0-fast",
     "black-forest-labs/flux-schnell",
     "ideogram/ideogram-3.0"
   ]);
   var RATIOS = Object.freeze({
+    "1:1": { w: 1, h: 1 },
+    "3:4": { w: 3, h: 4 },
+    "4:3": { w: 4, h: 3 },
+    "9:16": { w: 9, h: 16 },
+    "16:9": { w: 16, h: 9 }
+  });
+  var GPT_MINI_RATIOS = Object.freeze({
+    "1:1": { w: 1024, h: 1024 },
+    "3:4": { w: 1024, h: 1536 },
+    "4:3": { w: 1536, h: 1024 },
+    "9:16": { w: 1024, h: 1536 },
+    "16:9": { w: 1536, h: 1024 }
+  });
+  var GPT_2_RATIOS = Object.freeze({
     "1:1": { w: 1024, h: 1024 },
     "3:4": { w: 768, h: 1024 },
     "4:3": { w: 1024, h: 768 },
@@ -63,15 +78,50 @@
     return String(value || "Pengguna Puter").replace(/[<>]/g, "").slice(0, 80);
   }
 
+  function errorDetails(error) {
+    var root = error && typeof error === "object" ? error : {};
+    var nested = root.error && typeof root.error === "object" ? root.error : root;
+    var code = String(nested.code || root.code || "").trim().toLowerCase();
+    var status = Number(nested.status || root.status || 0) || 0;
+    var message = String(nested.message || root.message || (typeof root.error === "string" ? root.error : "") || error || "").trim();
+    return { code: code, status: status, message: message.slice(0, 240) };
+  }
+
   function errorMessage(error) {
-    var raw = String((error && (error.message || error.error || error.code)) || error || "").toLowerCase();
+    var details = errorDetails(error);
+    var raw = (details.code + " " + details.status + " " + details.message).toLowerCase();
     if (/popup|blocked/.test(raw)) return "Jendela login diblokir browser. Izinkan pop-up untuk Nexora lalu coba lagi.";
-    if (/cancel|closed|denied|auth/.test(raw)) return "Login Puter belum selesai. Tekan Hubungkan Puter bila ingin mencoba lagi.";
-    if (/allowance|credit|quota|limit|insufficient|payment/.test(raw)) return "Allowance Puter kamu tidak cukup. Periksa pemakaian akun Puter lalu coba lagi.";
-    if (/rate|too many/.test(raw)) return "Permintaan terlalu cepat. Tunggu sebentar lalu coba lagi.";
-    if (/safety|moderation|policy/.test(raw)) return "Prompt tidak dapat diproses karena aturan keamanan. Ubah isi prompt lalu coba lagi.";
+    if (/email_must_be_confirmed|confirm.*email|email.*confirm/.test(raw)) return "Email akun Puter belum dikonfirmasi. Konfirmasi email di Puter, lalu coba lagi.";
+    if (/cancel|closed|denied|unauthorized|auth_canceled|authentication/.test(raw)) return "Login Puter belum selesai atau sesi sudah habis. Hubungkan Puter lagi.";
+    if (details.status === 402 || /allowance|credit|quota|usage.limit|insufficient|payment|fund/.test(raw)) return "Allowance atau credit Puter tidak cukup. Buka akun Puter dan periksa menu Usage.";
+    if (details.status === 429 || /rate|too many|concurren/.test(raw)) return "Permintaan terlalu cepat atau masih ada proses lain. Tunggu sebentar lalu coba lagi.";
+    if (/safety|moderation|policy|filtered|rai/.test(raw)) return "Prompt ditolak aturan keamanan Puter. Ubah isi prompt lalu coba lagi.";
+    if (/model not found|model.*unavailable|unsupported model|no provider/.test(raw)) return "Model ini sedang tidak tersedia di Puter. Pilih model lain.";
     if (/network|fetch|offline/.test(raw)) return "Koneksi ke Puter terputus. Periksa internet lalu coba lagi.";
-    return "Gambar belum berhasil dibuat. Coba prompt atau model lain.";
+    if (details.message && details.message !== "[object Object]") return "Puter menolak permintaan: " + details.message + (details.code ? " (" + details.code + ")" : "");
+    return "Puter tidak memberi alasan yang dapat dibaca. Coba lagi beberapa saat.";
+  }
+
+  function canFallback(error) {
+    var details = errorDetails(error);
+    var raw = (details.code + " " + details.message).toLowerCase();
+    return /model not found|model.*unavailable|unsupported model|no provider/.test(raw);
+  }
+
+  function generationOptions(modelId, ratioKey) {
+    var options = { model: modelId };
+    if (modelId === "gpt-image-1-mini") {
+      options.quality = "low";
+      options.ratio = GPT_MINI_RATIOS[ratioKey] || GPT_MINI_RATIOS["1:1"];
+      return options;
+    }
+    if (modelId === "gpt-image-2") {
+      options.quality = "low";
+      options.ratio = GPT_2_RATIOS[ratioKey] || GPT_2_RATIOS["1:1"];
+      return options;
+    }
+    options.ratio = RATIOS[ratioKey] || RATIOS["1:1"];
+    return options;
   }
 
   function percentRemaining(usage) {
@@ -104,12 +154,12 @@
           '<div class="npi-count"><span>Minimal 3 huruf</span><span id="npiCount">0 / 2000</span></div>' +
           '<label class="npi-field-label" for="npiModel">Model gambar</label>' +
           '<select id="npiModel">' +
-            '<option value="openai/gpt-image-1-mini">GPT Image Mini — cepat</option>' +
+            '<option value="gpt-image-1-mini">GPT Image Mini — paling hemat</option>' +
             '<option value="google/gemini-2.5-flash-image">Gemini Flash Image</option>' +
             '<option value="google/imagen-4.0-fast">Imagen 4 Fast</option>' +
             '<option value="black-forest-labs/flux-schnell">FLUX Schnell</option>' +
             '<option value="ideogram/ideogram-3.0">Ideogram 3</option>' +
-            '<option value="openai/gpt-image-2">GPT Image 2</option>' +
+            '<option value="gpt-image-2">GPT Image 2</option>' +
           '</select>' +
           '<label class="npi-field-label" for="npiRatio">Ukuran gambar</label>' +
           '<select id="npiRatio">' +
@@ -212,7 +262,7 @@
       if (busy) return;
       var value = prompt.value.trim();
       var modelId = MODEL_IDS.indexOf(model.value) !== -1 ? model.value : MODEL_IDS[0];
-      var size = RATIOS[ratio.value] || RATIOS["1:1"];
+      var ratioKey = RATIOS[ratio.value] ? ratio.value : "1:1";
       if (value.length < 3) {
         setMessage("Tulis prompt sedikitnya 3 huruf.", "error");
         prompt.focus();
@@ -226,13 +276,22 @@
       setBusy(true);
       setMessage("Puter sedang membuat gambar. Jangan tutup halaman ini.", "loading");
       try {
-        var generated = await window.puter.ai.txt2img(value, {
-          model: modelId,
-          ratio: { w: size.w, h: size.h }
-        });
+        var usedModel = modelId;
+        var generated;
+        try {
+          generated = await window.puter.ai.txt2img(value, generationOptions(modelId, ratioKey));
+        } catch (firstError) {
+          var firstDetails = errorDetails(firstError);
+          console.warn("[puter-image] generation failed", { model: modelId, code: firstDetails.code, status: firstDetails.status, message: firstDetails.message });
+          if (!canFallback(firstError) || modelId === DEFAULT_MODEL) throw firstError;
+          usedModel = DEFAULT_MODEL;
+          setMessage("Model pilihan tidak tersedia. Mencoba GPT Image Mini…", "loading");
+          generated = await window.puter.ai.txt2img(value, generationOptions(DEFAULT_MODEL, ratioKey));
+        }
         if (!alive) return;
         var src = generated && generated.src ? String(generated.src) : "";
         if (!/^(data:image\/|blob:|https:\/\/)/i.test(src)) throw new Error("invalid image response");
+        if (resultUrl.indexOf("blob:") === 0 && window.URL && typeof window.URL.revokeObjectURL === "function") window.URL.revokeObjectURL(resultUrl);
         resultUrl = src;
         image.src = src;
         image.hidden = false;
@@ -240,9 +299,13 @@
         download.href = src;
         download.download = "nexora-ai-" + Date.now() + ".png";
         download.hidden = false;
-        setMessage("Gambar selesai. Tekan Unduh Gambar untuk menyimpannya.", "ok");
+        setMessage(usedModel === modelId ? "Gambar selesai. Tekan Unduh Gambar untuk menyimpannya." : "Model pilihan sedang gangguan. Gambar berhasil dibuat dengan GPT Image Mini.", "ok");
       } catch (error) {
-        if (alive) setMessage(errorMessage(error), "error");
+        if (alive) {
+          var details = errorDetails(error);
+          console.warn("[puter-image] request stopped", { model: modelId, code: details.code, status: details.status, message: details.message });
+          setMessage(errorMessage(error), "error");
+        }
       } finally {
         if (alive) setBusy(false);
       }
@@ -265,6 +328,7 @@
       busy = false;
       image.removeAttribute("src");
       download.removeAttribute("href");
+      if (resultUrl.indexOf("blob:") === 0 && window.URL && typeof window.URL.revokeObjectURL === "function") window.URL.revokeObjectURL(resultUrl);
       resultUrl = "";
     };
   };
