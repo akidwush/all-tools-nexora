@@ -163,6 +163,7 @@ grant execute on function public.set_updated_at() to service_role;
 insert into public.tools
   (id, name, description, category, badge, icon, external_url, is_active, sort_order, metadata)
 values
+  ('aiodownloader', 'All In One Downloader', 'Ambil pilihan media yang tersedia dari satu link', 'downloader', 'AIO', 'fa-solid fa-cloud-arrow-down', null, true, -10, '{"provider":"kuroneko","serverProxy":true,"apiKeyRequired":true,"cache":"no-store"}'::jsonb),
   ('terabox', 'Terabox Downloader', 'Ambil file dari link share Terabox', 'downloader', 'FILE', 'fa-solid fa-box-open', null, true, 0, '{}'::jsonb),
   ('instagram', 'Instagram', 'Download video & foto', 'downloader', 'HD', 'fa-brands fa-instagram', null, true, 10, '{}'::jsonb),
   ('tiktok', 'TikTok', 'Video, foto & audio', 'downloader', 'MP4/MP3/JPG', 'fa-brands fa-tiktok', null, true, 20, '{}'::jsonb),

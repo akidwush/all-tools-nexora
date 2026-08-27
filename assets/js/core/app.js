@@ -1569,7 +1569,7 @@ document.addEventListener('click', function(e) {
 
 let toolsData = {
     downloader: [
-        
+        { id: 'aiodownloader', icon: 'fa-solid fa-cloud-arrow-down', name: 'All In One Downloader', desc: 'Ambil pilihan media yang tersedia dari satu link', badge: 'AIO' },
         { id: 'terabox', icon: 'fa-solid fa-box-open', name: 'Terabox Downloader', desc: 'Ambil file dari link share Terabox', badge: 'FILE' },{ id: 'instagram', icon: 'fa-brands fa-instagram', name: 'Instagram', desc: 'Download video & foto', badge: 'HD' },
         { id: 'tiktok', icon: 'fa-brands fa-tiktok', name: 'TikTok', desc: 'Video, foto & audio', badge: 'MP4/MP3/JPG' },
         { id: 'youtube', icon: 'fa-brands fa-youtube', name: 'YouTube Metadata', desc: 'Metadata dan tautan resmi YouTube', badge: 'RESMI' },
@@ -1952,6 +1952,7 @@ function showTool(toolId) {
     if (!tool) { closeTool(); return; }
 
     switch (toolId) {
+        case 'aiodownloader': renderAioDownloader(body); break;
         case 'instagram': renderInstagram(body); break;
         case 'tiktok': renderTiktok(body); break;
         case 'youtube': renderYoutube(body); break;

@@ -24,6 +24,7 @@
     "/api/ip-intelligence",
     "/api/bmkg",
     "/api/genmail",
+    "/api/download/aio",
     "/api/space-explorer",
     "/api/ocr-intelligence",
     "/api/vdeploy",

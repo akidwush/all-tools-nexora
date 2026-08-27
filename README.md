@@ -1,6 +1,6 @@
 # All Tools Nexora
 
-All Tools Nexora v6.4.0 adalah website toolkit statis dengan 55 tool, lazy-loaded feature modules, dashboard admin, Supabase, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency `@google/genai`.
+All Tools Nexora v6.4.0 adalah website toolkit statis dengan 56 tool, lazy-loaded feature modules, dashboard admin, Supabase, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency `@google/genai`.
 
 ## Cara memakai Nexora AI Image
 
@@ -59,6 +59,21 @@ Cara memakainya:
 6. Gunakan alamat itu pada layanan yang ingin kamu coba.
 7. Kembali ke GenMail, tekan **Open Inbox**, lalu tekan **Refresh Inbox**.
 8. Pilih pesan yang masuk untuk membacanya.
+
+## Cara memakai All In One Downloader
+
+**[Buka All In One Downloader](https://all-tools-nexora.vercel.app/#tool-aiodownloader)**
+
+Cara pakainya gampang:
+
+1. Salin link video atau media yang memang boleh kamu unduh.
+2. Buka fitur **All In One Downloader**.
+3. Tempel link pada kotak URL. Tombol **Paste** bisa dipakai jika browser memberi izin clipboard.
+4. Tekan **Ambil Media** dan tunggu sampai hasil tersedia.
+5. Tekan **Buka Media** atau **Download** pada pilihan yang diberikan server.
+6. Tekan **Copy Link** jika kamu hanya ingin menyalin link medianya.
+
+Nexora tidak menjanjikan platform atau kualitas tertentu. Pilihan yang muncul mengikuti data nyata dari server downloader. Fitur ini tidak membypass akun privat, DRM, paywall, atau media yang dilindungi.
 
 Hal penting:
 
@@ -129,7 +144,7 @@ Salin `.env.example` dan isi hanya layanan yang digunakan. Variable utama:
 
 - Database/admin: `SUPABASE_URL`, `SUPABASE_SECRET_KEY` atau `SUPABASE_SERVICE_ROLE_KEY`, serta `FEEDBACK_HASH_SALT`.
 - Operasional: `HEALTH_CHECK_TOKEN` dan pengaturan timeout/cache opsional.
-- Tool eksternal: `COINGECKO_API_KEY`, `GOOGLE_PAGESPEED_API_KEY`, `GOOGLE_SAFE_BROWSING_API_KEY`, `NASA_API_KEY`, `OCR_SPACE_API_KEY`, `FREECONVERT_API_KEY`, `SVGTOXML_ENGINE_KEY`, `KURONEKO_API_KEY` untuk GenMail, dan `GEMINI_API_KEY` untuk Personal AI, Document AI, serta Prompt Generator. Alias `GOOGLE_GENERATIVE_AI_API_KEY`, `GOOGLE_GEMINI_API_KEY`, dan `GOOGLE_API_KEY` juga didukung. Model dapat dioverride lewat `GEMINI_MODEL`, `DOCUMENT_AI_MODEL`, atau `PROMPT_GENERATOR_MODEL`. Setelah mengubah environment Vercel, lakukan redeploy agar Function menerima nilai terbaru.
+- Tool eksternal: `COINGECKO_API_KEY`, `GOOGLE_PAGESPEED_API_KEY`, `GOOGLE_SAFE_BROWSING_API_KEY`, `NASA_API_KEY`, `OCR_SPACE_API_KEY`, `FREECONVERT_API_KEY`, `SVGTOXML_ENGINE_KEY`, `KURONEKO_API_KEY` untuk GenMail dan All In One Downloader, serta `GEMINI_API_KEY` untuk Personal AI, Document AI, dan Prompt Generator. Alias `GOOGLE_GENERATIVE_AI_API_KEY`, `GOOGLE_GEMINI_API_KEY`, dan `GOOGLE_API_KEY` juga didukung. Model dapat dioverride lewat `GEMINI_MODEL`, `DOCUMENT_AI_MODEL`, atau `PROMPT_GENERATOR_MODEL`. Setelah mengubah environment Vercel, lakukan redeploy agar Function menerima nilai terbaru.
 - SiteGrabber: `SITEGRABBER_API_BASE_URL` dan `SITEGRABBER_API_KEY`.
 - Deploy Center: `NEXUS_DEPLOY_ACCESS_KEY`, kemudian token `VERCEL_TOKEN` atau `NETLIFY_TOKEN`.
 
@@ -148,6 +163,8 @@ Migration `database/migrations/026_flamo_native_generators.sql` menambahkan enam
 Migration `database/migrations/027_puter_ai_image.sql` menambahkan Nexora AI Image ke katalog database. Fitur berjalan langsung di browser melalui Puter, tidak memakai API key Nexora, dan tidak menambah Vercel Function.
 
 Migration `database/migrations/028_genmail.sql` menambahkan GenMail ke katalog database. Isi `KURONEKO_API_KEY` di Environment Variables Vercel lalu redeploy. Key hanya dibaca oleh proxy server `/api/genmail`; GenMail tetap memakai 12 Function karena route ini dimultipleks melalui `api/tool-health.js`.
+
+Migration `database/migrations/029_aio_downloader.sql` menambahkan All In One Downloader. Route `/api/download/aio` juga dimultipleks melalui `api/tool-health.js`, memakai `KURONEKO_API_KEY` yang sama, tidak mem-proxy file media besar, dan tidak menambah jumlah Vercel Function.
 
 Migration `database/migrations/023_document_ai_vvip.sql` tetap mempertahankan kuota Document AI, tetapi v6.4.0 mengubah akses katalognya menjadi FREE. Jalankan ulang migration ini satu kali pada database lama agar Dashboard Admin menampilkan status yang sama dengan frontend.
 

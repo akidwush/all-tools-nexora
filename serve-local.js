@@ -61,6 +61,7 @@ const API_ROUTES = Object.freeze({
   "/api/ip-intelligence": { file: "api/tool-health.js", mode: "ip-intelligence" },
   "/api/bmkg": { file: "api/tool-health.js", mode: "bmkg-open-data" },
   "/api/genmail": { file: "api/tool-health.js", mode: "genmail" },
+  "/api/download/aio": { file: "api/tool-health.js", mode: "aio-download" },
   "/api/tool-health": { file: "api/tool-health.js" },
   "/api/account": { file: "api/tool-health.js", mode: "account" },
   "/api/media-download": { file: "api/tool-health.js", mode: "media-download" },

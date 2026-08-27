@@ -117,6 +117,10 @@
       "destination": "/api/tool-health?mode=genmail"
     },
     {
+      "source": "/api/download/aio",
+      "destination": "/api/tool-health?mode=aio-download"
+    },
+    {
       "source": "/api/space-explorer",
       "destination": "/api/tool-health?mode=space-explorer"
     },

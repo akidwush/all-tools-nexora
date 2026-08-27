@@ -105,6 +105,14 @@
         "assets/js/features/genmail.js"
       ]
     },
+    "aio-downloader": {
+      "css": [
+        "assets/css/features/aio-downloader.css"
+      ],
+      "js": [
+        "assets/js/features/aio-downloader.js"
+      ]
+    },
     "image-vectorizer": {
       "css": [
         "assets/css/features/image-vectorizer.css"
@@ -241,6 +249,7 @@
     "promptgenerate": "prompt-generator",
     "aiimage": "puter-image",
     "genmail": "genmail",
+    "aiodownloader": "aio-downloader",
     "fakeovo": "imported-tools",
     "quotegenerator": "imported-tools",
     "carifakta": "imported-tools",

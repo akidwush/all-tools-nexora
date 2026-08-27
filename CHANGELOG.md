@@ -1,3 +1,11 @@
+## 6.4.0 HF31 All In One Downloader — 2026-08-27
+
+- Fitur: menambahkan All In One Downloader mobile-first dengan Paste, loading stabil, thumbnail lazy, metadata dinamis, pilihan media, Open/Download, dan Copy Link.
+- API: route same-origin `/api/download/aio` meneruskan hanya URL tervalidasi menuju endpoint KuroNeko tetap; `KURONEKO_API_KEY` hanya ditambahkan di server.
+- Parser: response `result`, `data`, `download(s)`, `media`, `items`, `links`, dan field turunannya dinormalisasi ke format internal tanpa mengarang platform, kualitas, format, ukuran, atau metadata yang tidak ada.
+- Security: method/query whitelist, batas input/response, timeout, no-store, URL publik, rate limit, deduplikasi request aktif, sanitasi error, dan larangan fetch langsung ke URL pengguna.
+- Infrastruktur: katalog menjadi 56 tool dan route tetap dimultipleks melalui `api/tool-health.js`, sehingga jumlah Vercel Functions tetap 12/12.
+
 ## 6.4.0 HF30 Alight Premium all-email — 2026-08-27
 
 - Compatibility: Request Magic Link dan Apply Premium kini menerima alamat email valid dari provider mana pun, termasuk Gmail, Outlook, Yahoo, dan domain temp mail seperti GenMail.

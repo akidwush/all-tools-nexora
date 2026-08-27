@@ -3,6 +3,7 @@
   if(window.NexoraToolRegistry) return;
 
   var rows = [
+    ["aiodownloader","All In One Downloader","api","aio-downloader","renderAioDownloader","https://all-tools-nexora.vercel.app/api/download/aio"],
     ["terabox","Terabox Downloader","api","download-pack","renderTerabox","https://all-tools-nexora.vercel.app/api/downloader"],
     ["instagram","Instagram","api",null,"renderInstagram","https://all-tools-nexora.vercel.app/api/downloader"],
     ["tiktok","TikTok","api","tiktok","renderTiktok","https://all-tools-nexora.vercel.app/api/downloader"],
