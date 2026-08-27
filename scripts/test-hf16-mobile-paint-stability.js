@@ -28,8 +28,8 @@ assert.match(reactor, /nexora:navigation-before[\s\S]*?captureFlip\(\)/);
 assert.match(reactor, /nexora:navigation-changed[\s\S]*?animateFlip/);
 assert.match(reactor, /indicator=document\.createElement\('span'\)/);
 assert.match(reactor, /if\(coarse\)\{raf\(moveIndicator\);return;\}/);
-assert.match(performance, /if\(mobileLike\)\{if\(!video\.paused\)video\.pause\(\);return;\}/);
-assert.match(performance, /heroMode=mobileLike\?"static":"auto"/);
+assert.doesNotMatch(performance, /if\(mobileLike\)\{if\(!video\.paused\)video\.pause\(\);return;\}/);
+assert.match(performance, /heroMode="auto"/);
 assert.match(performance, /threshold:\[0,0\.01,0\.35\]/);
 assert.match(ai, /@media\(max-width:767px\)\{[\s\S]*?\.nx-ai-launcher-orb::after\{animation:none\}/);
 
@@ -43,4 +43,4 @@ for (const [asset, version] of Object.entries(assetVersions)) {
   assert.match(html, new RegExp(`${asset.replace(".", "\\.")}\\?v=${version.replaceAll(".", "\\.")}`));
 }
 
-console.log("HF16 paint stability lulus: layer kartu, tanpa touch trail Android, tab FLIP desktop, hero statis mobile, dan content visibility aman.");
+console.log("HF16 paint stability lulus: layer kartu, tanpa touch trail Android, tab FLIP desktop, hero loop mobile, dan content visibility aman.");

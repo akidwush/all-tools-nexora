@@ -13,6 +13,6 @@ assert.doesNotMatch(css + motion, /nxLiquidAperture|nxAperture|nx-aperture-revea
 for (const token of ['requestAnimationFrame', 'IntersectionObserver', 'pointermove', 'positionIndicator', 'nexora:tool-room-open']) assert.ok(motion.includes(token), `runtime motion kehilangan ${token}`);
 for (const event of ['nexora:tool-room-open', 'nexora:tool-room-close']) assert.ok(shell.includes(`new CustomEvent('${event}'`), `tool room harus memberi sinyal ${event}`);
 for (const attribute of ['muted', 'playsinline', 'loop']) assert.match(html, new RegExp(`<video[^>]*\\b${attribute}`, 'i'));
-assert.doesNotMatch(html, /<video[^>]*autoplay/i);
+assert.match(html, /<video[^>]*autoplay/i);
 
 console.log('Liquid Reactor Step 2 tests lulus: desktop motion tetap tersedia dan jalur mobile stabil terpasang.');

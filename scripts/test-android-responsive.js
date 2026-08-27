@@ -33,7 +33,8 @@ assert.match(performance, /function suspendPlayback\(\)/);
 for (const attribute of ["muted", "loop", "playsinline"]) {
   assert.match(html, new RegExp(`<video[^>]*${attribute}`, "i"));
 }
-assert.doesNotMatch(html, /<video[^>]*autoplay/i);
-assert.match(performance, /heroMode=mobileLike\?"static":"auto"/);
+assert.match(html, /<video[^>]*autoplay/i);
+assert.match(performance, /heroMode="auto"/);
+assert.doesNotMatch(performance, /if\(mobileLike\)\{if\(!video\.paused\)video\.pause\(\);return;\}/);
 
-console.log("Android responsive checks passed: dark root, compact Session Matrix, stable video, and exact grid breakpoints.");
+console.log("Android responsive checks passed: dark root, compact Session Matrix, looping video, and exact grid breakpoints.");

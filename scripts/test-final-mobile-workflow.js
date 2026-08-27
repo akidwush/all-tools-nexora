@@ -33,9 +33,9 @@ const coarseGuard = reactor.indexOf("if(reduced||coarse||!fine)");
 const cursorAllocation = reactor.indexOf("ring=document.createElement", reactor.indexOf("function setupCursorReactor"));
 assert.ok(coarseGuard > 0 && coarseGuard < cursorAllocation, "Android harus keluar sebelum layer cursor dialokasikan.");
 assert.match(core, /@media \(pointer:coarse\),\(hover:none\)\{[\s\S]*?\.cursor-trail\{display:none!important;animation:none!important;will-change:auto!important/);
-assert.match(performance, /heroMode=mobileLike\?"static":"auto"/);
-assert.match(performance, /if\(mobileLike\)\{if\(!video\.paused\)video\.pause\(\);return;\}/);
-assert.doesNotMatch(html, /<video[^>]*autoplay/i);
+assert.match(performance, /heroMode="auto"/);
+assert.doesNotMatch(performance, /if\(mobileLike\)\{if\(!video\.paused\)video\.pause\(\);return;\}/);
+assert.match(html, /<video[^>]*autoplay/i);
 
 for (const [client, css, id] of [
   [documentClient, documentCss, "ndaChoose"],

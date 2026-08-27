@@ -73,10 +73,10 @@
     reduced
   );
 
-  // Android receives a decoded first frame instead of continuous playback.
-  // This preserves the hero identity while removing decoder/compositor work
-  // from the same frames used by fast scrolling.
-  var heroMode=mobileLike?"static":"auto";
+  // The hero is muted and inline, so it may autoplay on both desktop and
+  // mobile. Off-screen playback is still suspended to avoid wasting decoder
+  // work; it resumes automatically when the hero returns to the viewport.
+  var heroMode="auto";
   document.documentElement.classList.add("nx-hero-video-"+heroMode);
   if(lowPower) document.documentElement.classList.add("nx-low-power");
 
@@ -100,10 +100,13 @@
     var ready=false;
     var autoplayBlocked=false;
     var heroVisible=true;
+    var heroEnabled=true;
     var interactionRetryArmed=false;
     var interactionRetryUsed=false;
+    var recoveryTimer=0;
 
-    video.autoplay=!mobileLike;
+    video.autoplay=true;
+    video.setAttribute("autoplay","");
     video.muted=true;
     video.defaultMuted=true;
     video.loop=true;
@@ -133,7 +136,7 @@
     }
 
     function armInteractionRetry(){
-      if(interactionRetryArmed||interactionRetryUsed)return;
+      if(interactionRetryArmed)return;
       interactionRetryArmed=true;
       var events=["pointerdown","touchstart","keydown"];
       function cleanup(){
@@ -143,19 +146,31 @@
       function retry(){
         cleanup();
         interactionRetryUsed=true;
-        if(document.hidden)return;
-        Promise.resolve(video.play()).then(function(){autoplayBlocked=false;}).catch(function(){ });
+        if(document.hidden||!heroEnabled)return;
+        if(!heroVisible){autoplayBlocked=false;return;}
+        Promise.resolve(video.play()).then(function(){autoplayBlocked=false;}).catch(function(){
+          autoplayBlocked=true;
+          setTimeout(armInteractionRetry,0);
+        });
       }
       events.forEach(function(type){document.addEventListener(type,retry,{once:true,passive:true});});
     }
 
     function ensurePlayback(){
-      if(mobileLike){if(!video.paused)video.pause();return;}
-      if(!ready||document.hidden||autoplayBlocked||!heroVisible)return;
+      if(!heroEnabled||!ready||document.hidden||autoplayBlocked||!heroVisible)return;
       Promise.resolve(video.play()).then(function(){autoplayBlocked=false;}).catch(function(){
         autoplayBlocked=true;
         armInteractionRetry();
       });
+    }
+
+    function schedulePlaybackRecovery(){
+      if(recoveryTimer||!heroEnabled||!heroVisible||document.hidden||autoplayBlocked)return;
+      recoveryTimer=setTimeout(function(){
+        recoveryTimer=0;
+        if(video.ended){try{video.currentTime=0;}catch(_){ }}
+        if(video.paused||video.ended)ensurePlayback();
+      },80);
     }
 
     function suspendPlayback(){
@@ -169,6 +184,10 @@
     }
     video.addEventListener("loadeddata",markReady,{once:true});
     video.addEventListener("canplay",markReady,{once:true});
+    video.addEventListener("canplay",schedulePlaybackRecovery);
+    video.addEventListener("ended",schedulePlaybackRecovery);
+    video.addEventListener("pause",schedulePlaybackRecovery);
+    video.addEventListener("playing",function(){autoplayBlocked=false;});
 
     video.addEventListener("error",function(){
       hero.classList.remove("is-video-ready");
@@ -187,6 +206,7 @@
 
     var heroConfig=await heroConfigPromise;
     if(!heroConfig.enabled){
+      heroEnabled=false;
       document.documentElement.classList.remove("nx-hero-video-auto");
       document.documentElement.classList.add("nx-hero-video-disabled");
       video.pause();
@@ -215,7 +235,7 @@
 
     document.addEventListener("visibilitychange",function(){
       if(document.hidden)suspendPlayback();
-      else if(!autoplayBlocked)ensurePlayback();
+      else if(!autoplayBlocked)schedulePlaybackRecovery();
     });
 
   }

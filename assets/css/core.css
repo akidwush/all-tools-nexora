@@ -1547,3 +1547,49 @@ html.nx-low-power .tools-card,html.nx-low-power .nav-tab,html.nx-low-power .nx-p
     box-shadow:0 7px 15px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.12);
   }
 }
+
+/* =========================================================
+   HF21 — ANDROID FLING PAINT BUDGET
+   The former mobile scene still painted page-sized clipped membranes, an
+   atmosphere layer and multi-pass card decoration. During a fast fling those
+   surfaces could outrun Chrome Android's raster queue and expose blank tiles.
+   Keep the visual depth, but make every scrolling surface locally paintable.
+   ========================================================= */
+@media (max-width:767px),(pointer:coarse){
+  html,body{
+    overflow-x:hidden!important;
+    background-color:#06060b!important;
+  }
+  body{
+    background-image:linear-gradient(180deg,#050509 0,#0a0812 44rem,#06060b 100%)!important;
+    background-repeat:no-repeat!important;
+    background-size:100% 100%!important;
+  }
+  .bg-glow{
+    display:none!important;
+  }
+  .tab-content.active,
+  .tools-grid,
+  .tools-grid>.tools-card{
+    contain:none!important;
+    content-visibility:visible!important;
+    visibility:visible!important;
+    opacity:1!important;
+    transform:none!important;
+  }
+  .tools-grid{
+    isolation:auto!important;
+  }
+  .tools-card{
+    isolation:auto!important;
+    -webkit-backdrop-filter:none!important;
+    backdrop-filter:none!important;
+    box-shadow:0 11px 20px rgba(0,0,0,.43),inset 0 1px 0 rgba(255,255,255,.17)!important;
+  }
+  .tools-card::before{
+    background:linear-gradient(90deg,rgba(240,253,255,.72),rgba(var(--nx-card-rgb),.34),transparent 72%) top/82% 1px no-repeat,linear-gradient(180deg,rgba(var(--nx-card-rgb),.62),transparent 76%) left/2px 100% no-repeat!important;
+  }
+  .tools-card::after{
+    display:none!important;
+  }
+}

@@ -14,7 +14,7 @@ const performance = read("assets/js/core/performance.js");
 const about = read("assets/css/about.css");
 
 for (const attribute of ["muted", "loop", "playsinline"]) assert.match(html, new RegExp(`<video[^>]*${attribute}`, "i"));
-assert.doesNotMatch(html, /<video[^>]*autoplay/i);
+assert.match(html, /<video[^>]*autoplay/i);
 assert.match(html, /nx-membrane-a/);
 assert.match(html, /LIVE REACTOR/);
 assert.doesNotMatch(html, /nx-public-wa-actions/);

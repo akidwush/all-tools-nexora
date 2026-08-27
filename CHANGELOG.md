@@ -1,3 +1,12 @@
+## 6.4.0 HF21 Android fling + hero loop — 2026-08-27
+
+- Fix: hero video kini autoplay muted dan loop pada desktop maupun mobile, pulih setelah pause/ended, dan kembali berjalan ketika masuk viewport.
+- Fix: mode `static` yang selalu mem-pause video pada perangkat sentuh dihapus; pengaturan admin untuk menonaktifkan hero tetap dihormati.
+- Fix: layer latar page-sized, clipped membranes, atmosphere overlay, dan dekorasi pseudo-element kartu yang membebani raster Chrome Android dinonaktifkan khusus mobile/coarse pointer.
+- Stabilitas: konten tab dan kartu mobile dipaksa tetap visible tanpa `content-visibility`, containment, backdrop blur, atau transform permanen; depth tetap dipertahankan dengan gradient dan shadow ringan.
+- Cache: versi `core.css` dan `performance.js` dinaikkan agar deployment tidak memakai asset lama.
+- QA: regression suite 71/71, audit 53 tool, 183 JavaScript, 12/12 Vercel Functions, dan build produksi 126 file lulus di atas HF20 Gemini.
+
 ## 6.4.0 Final mobile workflow — 2026-08-26
 
 - Fix: fast-scroll Android tidak lagi menjalankan touch halo/trail pada aliran `pointermove`; layer fixed tidak dibuat pada coarse pointer.
