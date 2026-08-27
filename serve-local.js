@@ -62,6 +62,7 @@ const API_ROUTES = Object.freeze({
   "/api/bmkg": { file: "api/tool-health.js", mode: "bmkg-open-data" },
   "/api/genmail": { file: "api/tool-health.js", mode: "genmail" },
   "/api/download/aio": { file: "api/tool-health.js", mode: "aio-download" },
+  "/api/search/danbooru": { file: "api/tool-health.js", service: "danbooru-search" },
   "/api/tool-health": { file: "api/tool-health.js" },
   "/api/account": { file: "api/tool-health.js", mode: "account" },
   "/api/media-download": { file: "api/tool-health.js", mode: "media-download" },
@@ -141,6 +142,7 @@ async function readBody(request, limit) {
 async function runApi(route, request, response, requestUrl) {
   try {
     if (route.mode) requestUrl.searchParams.set("mode", route.mode);
+    if (route.service) requestUrl.searchParams.set("_service", route.service);
     if (route.action) requestUrl.searchParams.set("action", route.action);
     request.url = `${requestUrl.pathname}${requestUrl.search}`;
     request.query = Object.fromEntries(requestUrl.searchParams.entries());

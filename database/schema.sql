@@ -184,6 +184,7 @@ values
   ('comicreader', 'Baca Komik Full', 'Manga, manhwa, manhua + reader', 'tools', 'FULL', 'fa-solid fa-book-open-reader', null, true, 10, '{}'::jsonb),
   ('aiimage', 'Nexora AI Image', 'Buat gambar AI memakai akun dan allowance Puter milik pengguna', 'tools', 'PUTER AI', 'fa-solid fa-image', null, true, 15, '{"provider":"puter","billing":"user-pays","apiKeyRequired":false,"privacy":"not-stored"}'::jsonb),
   ('genmail', 'GenMail', 'Buat email sementara, periksa inbox, dan baca pesan dengan aman', 'tools', 'TEMP MAIL', 'fa-solid fa-envelope-open-text', null, true, 18, '{"provider":"kuroneko","serverProxy":true,"apiKeyRequired":true,"polling":"manual"}'::jsonb),
+  ('danbooru', 'Danbooru Search', 'Cari ilustrasi anime berdasarkan tag dalam gallery ringan', 'tools', 'SAFE DEFAULT', 'fa-solid fa-images', null, true, 19, '{"provider":"kuroneko","serverProxy":true,"apiKeyRequired":true,"defaultMode":"safe","galleryColumns":2}'::jsonb),
   ('promptgenerate', 'Prompt Generator', 'Analisis gambar dengan Gemini Vision menjadi prompt produksi profesional', 'tools', 'VISION AI', 'fa-solid fa-wand-magic-sparkles', null, true, 20, '{"provider":"gemini","privacy":"not-stored","targets":["midjourney","flux","stable-diffusion","ideogram","video"]}'::jsonb),
   ('fakeovo', 'Fake OVO', 'Generator tampilan saldo OVO', 'tools', 'CANVAS', 'fa-solid fa-wallet', null, true, 30, '{}'::jsonb),
   ('quotegenerator', 'Quote Generator', 'Buat gambar quote monokrom', 'tools', 'JPG', 'fa-solid fa-quote-left', null, true, 40, '{}'::jsonb),

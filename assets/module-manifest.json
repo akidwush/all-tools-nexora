@@ -113,6 +113,14 @@
         "assets/js/features/aio-downloader.js"
       ]
     },
+    "danbooru-search": {
+      "css": [
+        "assets/css/features/danbooru-search.css"
+      ],
+      "js": [
+        "assets/js/features/danbooru-search.js"
+      ]
+    },
     "image-vectorizer": {
       "css": [
         "assets/css/features/image-vectorizer.css"
@@ -250,6 +258,7 @@
     "aiimage": "puter-image",
     "genmail": "genmail",
     "aiodownloader": "aio-downloader",
+    "danbooru": "danbooru-search",
     "fakeovo": "imported-tools",
     "quotegenerator": "imported-tools",
     "carifakta": "imported-tools",

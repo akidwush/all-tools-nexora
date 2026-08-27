@@ -1,6 +1,6 @@
 # All Tools Nexora
 
-All Tools Nexora v6.4.0 adalah website toolkit statis dengan 56 tool, lazy-loaded feature modules, dashboard admin, Supabase, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency `@google/genai`.
+All Tools Nexora v6.4.0 adalah website toolkit statis dengan 57 tool, lazy-loaded feature modules, dashboard admin, Supabase, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency `@google/genai`.
 
 ## Cara memakai Nexora AI Image
 
@@ -74,6 +74,20 @@ Cara pakainya gampang:
 6. Tekan **Copy Link** jika kamu hanya ingin menyalin link medianya.
 
 Nexora tidak menjanjikan platform atau kualitas tertentu. Pilihan yang muncul mengikuti data nyata dari server downloader. Fitur ini tidak membypass akun privat, DRM, paywall, atau media yang dilindungi.
+
+## Cara memakai Danbooru Search
+
+**[Buka Danbooru Search](https://all-tools-nexora.vercel.app/#tool-danbooru)**
+
+Cara pakainya:
+
+1. Tulis tag atau nama karakter, misalnya `hatsune_miku` atau `furina`.
+2. Biarkan mode **Safe** jika ingin hasil yang aman sebagai pilihan awal.
+3. Tekan **Search**. Nexora tidak mencari otomatis saat kamu sedang mengetik.
+4. Tekan salah satu gambar untuk membuka preview dan informasi yang memang tersedia.
+5. Jika link gambar tersedia, gunakan **Open Image**, **Copy Image Link**, atau **Download**.
+
+Gallery memakai thumbnail jika server memberikannya. Jika server hanya memberikan gambar asli, Nexora memakai URL itu langsung tanpa memindahkan file besar melalui Vercel. Hasil pencarian yang sama disimpan sebentar selama sesi agar jatah request tidak cepat habis. API key KuroNeko tetap berada di server Nexora.
 
 Hal penting:
 
@@ -165,6 +179,8 @@ Migration `database/migrations/027_puter_ai_image.sql` menambahkan Nexora AI Ima
 Migration `database/migrations/028_genmail.sql` menambahkan GenMail ke katalog database. Isi `KURONEKO_API_KEY` di Environment Variables Vercel lalu redeploy. Key hanya dibaca oleh proxy server `/api/genmail`; GenMail tetap memakai 12 Function karena route ini dimultipleks melalui `api/tool-health.js`.
 
 Migration `database/migrations/029_aio_downloader.sql` menambahkan All In One Downloader. Route `/api/download/aio` juga dimultipleks melalui `api/tool-health.js`, memakai `KURONEKO_API_KEY` yang sama, tidak mem-proxy file media besar, dan tidak menambah jumlah Vercel Function.
+
+Migration `database/migrations/030_danbooru_search.sql` menambahkan Danbooru Search. Route `/api/search/danbooru` dimultipleks melalui `api/tool-health.js`, memakai `KURONEKO_API_KEY` yang sama, dan hanya meneruskan tag serta mode pencarian yang sudah divalidasi.
 
 Migration `database/migrations/023_document_ai_vvip.sql` tetap mempertahankan kuota Document AI, tetapi v6.4.0 mengubah akses katalognya menjadi FREE. Jalankan ulang migration ini satu kali pada database lama agar Dashboard Admin menampilkan status yang sama dengan frontend.
 

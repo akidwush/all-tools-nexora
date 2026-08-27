@@ -121,6 +121,10 @@
       "destination": "/api/tool-health?mode=aio-download"
     },
     {
+      "source": "/api/search/danbooru",
+      "destination": "/api/tool-health?_service=danbooru-search"
+    },
+    {
       "source": "/api/space-explorer",
       "destination": "/api/tool-health?mode=space-explorer"
     },

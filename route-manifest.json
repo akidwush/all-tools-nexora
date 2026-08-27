@@ -25,6 +25,7 @@
     "/api/bmkg",
     "/api/genmail",
     "/api/download/aio",
+    "/api/search/danbooru",
     "/api/space-explorer",
     "/api/ocr-intelligence",
     "/api/vdeploy",

@@ -1,3 +1,12 @@
+## 6.4.0 HF32 Danbooru Search — 2026-08-27
+
+- Fitur: menambahkan Danbooru Search dengan pencarian manual, mode Safe sebagai default, gallery universal dua kolom, thumbnail lazy, dan viewer detail ringan.
+- API: route same-origin `/api/search/danbooru` meneruskan hanya `q` dan `mode` ke endpoint KuroNeko tetap; `KURONEKO_API_KEY` hanya ditambahkan di server.
+- Response nyata: probe tanpa secret memverifikasi HTTP 401 dengan envelope `creator`, `message`, dan `status:false`; schema sukses belum diklaim tanpa key terkonfigurasi.
+- Parser: response `result`/`data` serta koleksi gambar umum dinormalisasi terisolasi, tetapi hanya field dan URL yang benar-benar ada yang diteruskan ke UI.
+- Security/performance: whitelist method/query, URL publik HTTPS, secret reflection guard, batas respons, no-store, timeout, rate limit, deduplikasi request aktif, cache sesi lima menit, serta tanpa proxy file gambar besar.
+- Infrastruktur: katalog menjadi 57 tool dan route dimultipleks melalui `api/tool-health.js`, sehingga jumlah Vercel Functions tetap 12/12.
+
 ## 6.4.0 HF31 All In One Downloader — 2026-08-27
 
 - Fitur: menambahkan All In One Downloader mobile-first dengan Paste, loading stabil, thumbnail lazy, metadata dinamis, pilihan media, Open/Download, dan Copy Link.

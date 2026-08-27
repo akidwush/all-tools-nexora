@@ -12,6 +12,7 @@ const { handleIpIntelligence } = require("../lib/ipinfo-intelligence");
 const { handleBmkgOpenData } = require("../lib/bmkg-open-data");
 const { handleGenMail } = require("../lib/genmail");
 const { handleAioDownload } = require("../lib/kuroneko-aio");
+const { handleDanbooruSearch } = require("../lib/kuroneko-danbooru");
 const { authorizeTool, handleAccount } = require("../lib/account-membership");
 const { sendJson: send } = require("../lib/http-response");
 const {
@@ -111,6 +112,9 @@ module.exports = async function handler(request, response) {
   catch { return send(response, 400, { ok: false, error: "INVALID_REQUEST_HOST" }); }
 
   const url = new URL(request.url || "/api/tool-health", origin);
+  if (url.searchParams.get("_service") === "danbooru-search") {
+    return handleDanbooruSearch(request, response, url);
+  }
   const mode = url.searchParams.get("mode");
   if (mode === "account") return handleAccount(request, response);
   const protectedId = protectedToolId(mode, request, url);
