@@ -1,3 +1,9 @@
+## 6.4.0 HF34 Danbooru full file URL — 2026-08-27
+
+- Fix: normalizer kini mengenali `result.full_file_url`, nama field URL gambar yang terbukti dikirim endpoint produksi KuroNeko.
+- Regression: fixture mengikuti envelope produksi `status` + object `result` dengan `full_file_url`, `id`, `rating`, `source`, dan `tags`.
+- Scope: tidak mengubah query, mode Safe, UI, API key, routing, atau fitur Nexora lain.
+
 ## 6.4.0 HF33 Danbooru direct-result recovery — 2026-08-27
 
 - Fix: normalizer Danbooru kini menerima URL gambar tunggal dan array URL langsung selain object post bertingkat.

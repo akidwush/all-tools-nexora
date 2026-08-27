@@ -142,6 +142,23 @@ assert.deepEqual(normalized.items[0], {
   rating: "safe"
 });
 assert.equal(Object.hasOwn(normalized.items[1], "rating"), false, "Field yang tidak ada tidak boleh dibuat");
+const productionShape = danbooru.normalizeDanbooruResponse({
+  status: true,
+  result: {
+    full_file_url: "https://cdn.example.com/full-production.jpg",
+    id: 987,
+    rating: "s",
+    source: "https://artist.example.com/work/987",
+    tags: ["hatsune_miku", "vocaloid"]
+  }
+});
+assert.deepEqual(productionShape.items[0], {
+  id: "987",
+  imageUrl: "https://cdn.example.com/full-production.jpg",
+  sourceUrl: "https://artist.example.com/work/987",
+  tags: ["hatsune_miku", "vocaloid"],
+  rating: "s"
+});
 assert.equal(danbooru.normalizeDanbooruResponse({ data: { images: [] } }).items.length, 0);
 assert.deepEqual(danbooru.normalizeDanbooruResponse({ result: "https://cdn.example.com/direct.jpg" }), {
   items: [{ imageUrl: "https://cdn.example.com/direct.jpg" }]
@@ -223,7 +240,7 @@ const oldKey = process.env.KURONEKO_API_KEY;
   const post = await invoke("q=furina&mode=safe", async () => responsePayload({}), "POST");
   assert.equal(post.statusCode, 405);
 
-  console.log("Danbooru Search HF32/HF33 lulus: secret server-only, direct-result recovery, normalizer toleran, gallery dua kolom, viewer, cache sesi, timeout, dedup, dan 12-Function routing tervalidasi.");
+  console.log("Danbooru Search HF32/HF34 lulus: secret server-only, full_file_url produksi, direct-result recovery, normalizer toleran, gallery dua kolom, viewer, cache sesi, timeout, dedup, dan 12-Function routing tervalidasi.");
 })().catch((error) => {
   console.error(error);
   process.exitCode = 1;
