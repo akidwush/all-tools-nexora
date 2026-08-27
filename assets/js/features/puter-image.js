@@ -7,10 +7,11 @@
   var MODEL_IDS = Object.freeze([
     "gpt-image-1-mini",
     "gpt-image-2",
-    "google/gemini-2.5-flash-image",
+    "google/gemini-3.1-flash-image-preview",
     "google/imagen-4.0-fast",
     "black-forest-labs/flux-schnell",
-    "ideogram/ideogram-3.0"
+    "ideogram/ideogram-4.0",
+    "Qwen/Qwen-Image-2.0-Pro"
   ]);
   var RATIOS = Object.freeze({
     "1:1": { w: 1, h: 1 },
@@ -27,6 +28,13 @@
     "16:9": { w: 1536, h: 1024 }
   });
   var GPT_2_RATIOS = Object.freeze({
+    "1:1": { w: 1024, h: 1024 },
+    "3:4": { w: 768, h: 1024 },
+    "4:3": { w: 1024, h: 768 },
+    "9:16": { w: 576, h: 1024 },
+    "16:9": { w: 1024, h: 576 }
+  });
+  var TOGETHER_RATIOS = Object.freeze({
     "1:1": { w: 1024, h: 1024 },
     "3:4": { w: 768, h: 1024 },
     "4:3": { w: 1024, h: 768 },
@@ -120,6 +128,15 @@
       options.ratio = GPT_2_RATIOS[ratioKey] || GPT_2_RATIOS["1:1"];
       return options;
     }
+    if (modelId === "google/gemini-3.1-flash-image-preview") {
+      options.quality = "1K";
+      options.ratio = RATIOS[ratioKey] || RATIOS["1:1"];
+      return options;
+    }
+    if (modelId === "ideogram/ideogram-4.0" || modelId === "Qwen/Qwen-Image-2.0-Pro") {
+      options.ratio = TOGETHER_RATIOS[ratioKey] || TOGETHER_RATIOS["1:1"];
+      return options;
+    }
     options.ratio = RATIOS[ratioKey] || RATIOS["1:1"];
     return options;
   }
@@ -155,10 +172,11 @@
           '<label class="npi-field-label" for="npiModel">Model gambar</label>' +
           '<select id="npiModel">' +
             '<option value="gpt-image-1-mini">GPT Image Mini — paling hemat</option>' +
-            '<option value="google/gemini-2.5-flash-image">Gemini Flash Image</option>' +
+            '<option value="google/gemini-3.1-flash-image-preview">Gemini 3.1 Flash Image — 1K</option>' +
             '<option value="google/imagen-4.0-fast">Imagen 4 Fast</option>' +
             '<option value="black-forest-labs/flux-schnell">FLUX Schnell</option>' +
-            '<option value="ideogram/ideogram-3.0">Ideogram 3</option>' +
+            '<option value="ideogram/ideogram-4.0">Ideogram 4 — teks & poster</option>' +
+            '<option value="Qwen/Qwen-Image-2.0-Pro">Qwen Image 2 Pro — detail tinggi</option>' +
             '<option value="gpt-image-2">GPT Image 2</option>' +
           '</select>' +
           '<label class="npi-field-label" for="npiRatio">Ukuran gambar</label>' +

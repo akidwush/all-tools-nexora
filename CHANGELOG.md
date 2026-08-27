@@ -1,3 +1,11 @@
+## 6.4.0 HF27 Puter image model refresh — 2026-08-27
+
+- Model: mengganti Gemini 2.5 Flash Image dengan Gemini 3.1 Flash Image Preview pada kualitas 1K.
+- Model: mengganti Ideogram 3 dengan Ideogram 4 dan menambahkan Qwen Image 2 Pro.
+- Compatibility: mempertahankan GPT Image Mini, GPT Image 2, Imagen 4 Fast, dan FLUX Schnell.
+- Fix: Ideogram dan Qwen kini menerima dimensi piksel valid untuk Together AI; rasio kecil seperti `3x4` tidak lagi berubah menjadi gambar `64x64`.
+- Cache/QA: cache-bust HF27 dan regression khusus memblokir ID lama serta memvalidasi tujuh model dan opsi provider.
+
 ## 6.4.0 HF26 Puter runtime diagnostics — 2026-08-27
 
 - Fix: membaca error Puter bertingkat seperti `error.code`, `error.message`, dan status HTTP sehingga pesan allowance, konfirmasi email, login, rate limit, safety, jaringan, dan model tidak lagi disamarkan sebagai error umum.

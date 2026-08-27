@@ -31,8 +31,8 @@ assert.equal(test.canFallback({ error: { code: "bad_request", message: "Model no
 assert.deepEqual(JSON.parse(JSON.stringify(test.generationOptions("gpt-image-1-mini", "3:4"))), {
   model: "gpt-image-1-mini", quality: "low", ratio: { w: 1024, h: 1536 }
 });
-assert.deepEqual(JSON.parse(JSON.stringify(test.generationOptions("google/gemini-2.5-flash-image", "3:4"))), {
-  model: "google/gemini-2.5-flash-image", ratio: { w: 3, h: 4 }
+assert.deepEqual(JSON.parse(JSON.stringify(test.generationOptions("google/gemini-3.1-flash-image-preview", "3:4"))), {
+  model: "google/gemini-3.1-flash-image-preview", quality: "1K", ratio: { w: 3, h: 4 }
 });
 assert.deepEqual(JSON.parse(JSON.stringify(test.generationOptions("gpt-image-2", "9:16"))), {
   model: "gpt-image-2", quality: "low", ratio: { w: 576, h: 1024 }
@@ -41,7 +41,7 @@ assert.deepEqual(JSON.parse(JSON.stringify(test.generationOptions("gpt-image-2",
 assert.match(source, /console\.warn\("\[puter-image\] generation failed", \{ model: modelId, code:/);
 assert.doesNotMatch(source, /console\.(?:log|warn|error)\([^\n]*(?:prompt|value)/i, "Prompt tidak boleh dicatat ke console");
 assert.match(read("assets/css/features/puter-image.css"), /\.npi \[hidden\]\{display:none!important\}/);
-assert.match(read("assets/js/core/lazy-loader.js"), /puter-image-hf26/);
+assert.match(read("assets/js/core/lazy-loader.js"), /puter-image-hf2[67]/);
 assert.match(read("index.html"), /hf26-puter-runtime2/);
 
 console.log("Puter HF26 lulus: nested error, allowance guard, fallback aman, rasio provider, privasi log, hidden result, dan cache tervalidasi.");

@@ -18,6 +18,16 @@ Langkahnya mudah:
 6. Tekan **Buat Gambar**, lalu tunggu sampai gambarnya muncul.
 7. Tekan **Unduh Gambar** untuk menyimpan hasil ke HP atau komputer.
 
+Pilihan model yang tersedia:
+
+- **GPT Image Mini:** paling hemat dan menjadi pilihan awal.
+- **Gemini 3.1 Flash Image:** gambar 1K, cocok untuk hasil realistis dan mengikuti prompt panjang.
+- **Imagen 4 Fast:** cepat untuk penggunaan umum.
+- **FLUX Schnell:** cepat dan hemat untuk mencoba beberapa ide.
+- **Ideogram 4:** cocok untuk poster, logo, dan gambar yang berisi tulisan.
+- **Qwen Image 2 Pro:** cocok untuk gambar dengan detail tinggi.
+- **GPT Image 2:** pilihan kualitas tinggi untuk hasil akhir.
+
 Hal penting yang perlu diketahui:
 
 - Setiap pengguna harus menghubungkan akun Puter miliknya sendiri, termasuk pengguna VVIP Nexora.
@@ -26,7 +36,7 @@ Hal penting yang perlu diketahui:
 - Jika jatah habis, cek pemakaian akun Puter atau tunggu jatah tersedia lagi.
 - Jika muncul pesan email belum dikonfirmasi, buka Puter dan konfirmasi alamat email akunmu.
 - Jika muncul pesan permintaan terlalu cepat, tunggu sebentar sampai proses sebelumnya selesai.
-- GPT Image Mini memakai ukuran potret atau lanskap terdekat yang didukung model. Model lain mengikuti rasio yang dipilih.
+- GPT Image Mini memakai ukuran potret atau lanskap terdekat yang didukung model. Nexora otomatis mengubah pilihan rasio ke format ukuran yang benar untuk setiap provider.
 - Jangan membuat gambar yang melanggar hukum, merugikan orang lain, atau melanggar aturan Puter.
 
 Fitur ini memakai sistem [User-Pays dari Puter](https://developer.puter.com/tutorials/free-unlimited-image-generation-api/). Harga dan batas pemakaian mengikuti [ketentuan Puter](https://developer.puter.com/pricing/).

@@ -62,7 +62,7 @@
   var ASSET_PATCHES = [
     [/(?:assets\/(?:vendor\/flamo|js\/features\/flamo)\/|flamo-generators\.css(?:$|\?))/, 'flamo'],
     [/prompt-generator\.(?:js|css)(?:$|\?)/, 'prompt-android'],
-    [/puter-image\.(?:js|css)(?:$|\?)/, 'puter-image-hf26'],
+    [/puter-image\.(?:js|css)(?:$|\?)/, 'puter-image-hf27'],
     [/document-ai\.(?:js|css)(?:$|\?)/, 'document-android'],
     [/crypto-market\.(?:js|css)(?:$|\?)/, 'crypto-mtf'],
     [/comic-reader\.(?:js|css)(?:$|\?)/, 'comic-reader'],
