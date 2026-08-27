@@ -60,7 +60,11 @@ assert.match(lazy, /genmail:'genmail'/);
 assert.match(registry, /\["genmail","GenMail","api","genmail","renderGenMail"/);
 assert.match(read("lib/tool-health.js"), /id: "genmail"/);
 assert.match(read("database/schema.sql"), /'genmail'/);
-assert.match(read("database/migrations/028_genmail.sql"), /'genmail'/);
+const migration = read("database/migrations/028_genmail.sql");
+assert.match(migration, /'genmail'/);
+assert.match(migration, /add column if not exists access_level/);
+assert.match(migration, /'free'/);
+assert.doesNotMatch(migration, /'FREE'/);
 assert.match(envExample, /^KURONEKO_API_KEY=$/m);
 assert.match(readme, /https:\/\/all-tools-nexora\.vercel\.app\/#tool-genmail/);
 
