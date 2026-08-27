@@ -1,3 +1,9 @@
+## 6.4.0 HF33 Danbooru direct-result recovery — 2026-08-27
+
+- Fix: normalizer Danbooru kini menerima URL gambar tunggal dan array URL langsung selain object post bertingkat.
+- Diagnose: kegagalan produksi `hatsune_miku` mencapai provider tetapi berhenti sebagai `DANBOORU_EMPTY_RESULT`; scalar result sebelumnya memang tidak pernah menjadi item gallery.
+- Observability: schema yang belum dikenal hanya mencatat tipe dan nama key, tanpa nilai, URL gambar, query, payload mentah, atau API key.
+
 ## 6.4.0 HF32 Danbooru Search — 2026-08-27
 
 - Fitur: menambahkan Danbooru Search dengan pencarian manual, mode Safe sebagai default, gallery universal dua kolom, thumbnail lazy, dan viewer detail ringan.

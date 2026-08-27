@@ -143,9 +143,14 @@ assert.deepEqual(normalized.items[0], {
 });
 assert.equal(Object.hasOwn(normalized.items[1], "rating"), false, "Field yang tidak ada tidak boleh dibuat");
 assert.equal(danbooru.normalizeDanbooruResponse({ data: { images: [] } }).items.length, 0);
+assert.deepEqual(danbooru.normalizeDanbooruResponse({ result: "https://cdn.example.com/direct.jpg" }), {
+  items: [{ imageUrl: "https://cdn.example.com/direct.jpg" }]
+});
+assert.equal(danbooru.normalizeDanbooruResponse({ result: ["https://cdn.example.com/a.jpg", "https://cdn.example.com/b.jpg"] }).items.length, 2);
 assert.equal(danbooru.normalizeDanbooruResponse({ data: { posts: [{ file_url: "https://cdn.example.com/a.jpg?apikey=server-secret" }] } }, "server-secret").items.length, 0);
 assert.equal(danbooru.safeExternalUrl("http://cdn.example.com/a.jpg"), "");
 assert.equal(danbooru.safeExternalUrl("https://127.0.0.1/a.jpg"), "");
+assert.doesNotMatch(JSON.stringify(danbooru.responseShape({ result: { "test_key_not_a_real_secret": "value" } }, "test_key_not_a_real_secret")), /test_key_not_a_real_secret/);
 
 const oldKey = process.env.KURONEKO_API_KEY;
 
@@ -218,7 +223,7 @@ const oldKey = process.env.KURONEKO_API_KEY;
   const post = await invoke("q=furina&mode=safe", async () => responsePayload({}), "POST");
   assert.equal(post.statusCode, 405);
 
-  console.log("Danbooru Search HF32 lulus: secret server-only, envelope nyata, normalizer toleran, gallery dua kolom, viewer, cache sesi, timeout, dedup, dan 12-Function routing tervalidasi.");
+  console.log("Danbooru Search HF32/HF33 lulus: secret server-only, direct-result recovery, normalizer toleran, gallery dua kolom, viewer, cache sesi, timeout, dedup, dan 12-Function routing tervalidasi.");
 })().catch((error) => {
   console.error(error);
   process.exitCode = 1;
