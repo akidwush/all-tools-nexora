@@ -97,6 +97,14 @@
         "assets/js/features/puter-image.js"
       ]
     },
+    "genmail": {
+      "css": [
+        "assets/css/features/genmail.css"
+      ],
+      "js": [
+        "assets/js/features/genmail.js"
+      ]
+    },
     "image-vectorizer": {
       "css": [
         "assets/css/features/image-vectorizer.css"
@@ -232,6 +240,7 @@
     "fakedev": "source-features",
     "promptgenerate": "prompt-generator",
     "aiimage": "puter-image",
+    "genmail": "genmail",
     "fakeovo": "imported-tools",
     "quotegenerator": "imported-tools",
     "carifakta": "imported-tools",

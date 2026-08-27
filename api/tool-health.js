@@ -10,6 +10,7 @@ const { handleAlightPremium } = require("../lib/alight-premium-proxy");
 const { handleFreeConvertVectorizer } = require("../lib/freeconvert-vectorizer");
 const { handleIpIntelligence } = require("../lib/ipinfo-intelligence");
 const { handleBmkgOpenData } = require("../lib/bmkg-open-data");
+const { handleGenMail } = require("../lib/genmail");
 const { authorizeTool, handleAccount } = require("../lib/account-membership");
 const { sendJson: send } = require("../lib/http-response");
 const {
@@ -148,6 +149,9 @@ module.exports = async function handler(request, response) {
   }
   if (url.searchParams.get("mode") === "bmkg-open-data") {
     return handleBmkgOpenData(request, response, url);
+  }
+  if (url.searchParams.get("mode") === "genmail") {
+    return handleGenMail(request, response, url);
   }
 
   if (request.method !== "GET" && request.method !== "POST") {

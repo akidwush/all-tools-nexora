@@ -1,3 +1,21 @@
+## 6.4.0 HF29 GenMail — 2026-08-27
+
+- Fitur: menambahkan GenMail untuk mengambil domain, membuat email sementara, memeriksa inbox, dan membaca pesan melalui KuroNeko API.
+- Security: `KURONEKO_API_KEY` hanya dibaca proxy server `/api/genmail`; action dan parameter di-whitelist, input dibatasi, request diberi timeout, dan error provider tidak diteruskan mentah.
+- Parser: envelope `result`/`data` dan field turunannya dinormalisasi secara toleran tanpa membuat sender, subject, preview, identifier, atau isi pesan palsu.
+- Email safety: HTML pesan dibersihkan di server dan browser; script, iframe, object/embed, event handler, URL berbahaya, form, serta media pelacak diblokir.
+- Rate limit: daftar domain dicache 10 menit, request bersamaan digabung di server, refresh inbox manual memakai cooldown, dan request dibatalkan saat tab hidden atau tool ditinggalkan.
+- Infrastruktur: katalog menjadi 55 tool, migration 028, README Bahasa Indonesia, dan route dimultipleks lewat `api/tool-health.js` sehingga tetap 12/12 Vercel Functions.
+- QA: regression 79/79, audit 195 JavaScript, dan build 132 file lulus.
+
+## 6.4.0 HF28 Puter provider recovery — 2026-08-27
+
+- Diagnose: Qwen Image 2 Pro pada Puter dapat jatuh ke default Together `FLUX.1-schnell` karena ID canonical diubah menjadi lowercase sebelum dibandingkan secara case-sensitive oleh provider.
+- Recovery: kegagalan ekstraksi URL Replicate dan fallback non-serverless Together kini otomatis mencoba GPT Image Mini satu kali.
+- Guard: allowance, credit, autentikasi, safety, rate limit, dan pembatalan pengguna tetap tidak memicu request kedua.
+- UX: respons JSON provider yang panjang diganti pesan singkat; status sukses tetap menyebut saat model cadangan dipakai.
+- Cache/QA: cache-bust HF28 dan regression provider recovery memastikan dua error produksi tertangani tanpa menggandakan pemakaian pada error non-retryable.
+
 ## 6.4.0 HF27 Puter image model refresh — 2026-08-27
 
 - Model: mengganti Gemini 2.5 Flash Image dengan Gemini 3.1 Flash Image Preview pada kualitas 1K.

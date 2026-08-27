@@ -30,7 +30,7 @@ assert.match(loginJs, /location\.replace\("\/admin"\)/);
 assert.match(login, /adminLoginForm/);
 assert.match(env, /^GEMINI_API_KEY=/m);
 assert.match(env, /^GEMINI_MODEL=/m);
-assert.match(readme, /54 tool/);
+assert.match(readme, /55 tool/);
 assert.match(readme, /Node\.js 20 atau lebih baru/);
 
 console.log("HF12 loading cleanup regression lulus: startup splash dan loader login/dashboard dihapus tanpa melemahkan autentikasi, recovery tetap tersedia, dan konfigurasi Personal AI terdokumentasi.");

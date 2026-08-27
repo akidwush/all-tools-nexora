@@ -113,6 +113,10 @@
       "destination": "/api/tool-health?mode=bmkg-open-data"
     },
     {
+      "source": "/api/genmail",
+      "destination": "/api/tool-health?mode=genmail"
+    },
+    {
       "source": "/api/space-explorer",
       "destination": "/api/tool-health?mode=space-explorer"
     },

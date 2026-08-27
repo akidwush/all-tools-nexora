@@ -1,6 +1,6 @@
 # All Tools Nexora
 
-All Tools Nexora v6.4.0 adalah website toolkit statis dengan 54 tool, lazy-loaded feature modules, dashboard admin, Supabase, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency `@google/genai`.
+All Tools Nexora v6.4.0 adalah website toolkit statis dengan 55 tool, lazy-loaded feature modules, dashboard admin, Supabase, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency `@google/genai`.
 
 ## Cara memakai Nexora AI Image
 
@@ -28,6 +28,8 @@ Pilihan model yang tersedia:
 - **Qwen Image 2 Pro:** cocok untuk gambar dengan detail tinggi.
 - **GPT Image 2:** pilihan kualitas tinggi untuk hasil akhir.
 
+FLUX Schnell dan Qwen Image 2 Pro masih bergantung pada provider tambahan milik Puter. Jika provider tersebut gagal mengirim gambar atau salah mengarahkan model, Nexora akan mencoba GPT Image Mini satu kali dan memberi tahu model yang akhirnya dipakai. Nexora tidak melakukan percobaan kedua untuk masalah saldo, login, rate limit, atau safety.
+
 Hal penting yang perlu diketahui:
 
 - Setiap pengguna harus menghubungkan akun Puter miliknya sendiri, termasuk pengguna VVIP Nexora.
@@ -40,6 +42,31 @@ Hal penting yang perlu diketahui:
 - Jangan membuat gambar yang melanggar hukum, merugikan orang lain, atau melanggar aturan Puter.
 
 Fitur ini memakai sistem [User-Pays dari Puter](https://developer.puter.com/tutorials/free-unlimited-image-generation-api/). Harga dan batas pemakaian mengikuti [ketentuan Puter](https://developer.puter.com/pricing/).
+
+## Cara memakai GenMail
+
+GenMail membuat alamat email sementara. Fitur ini cocok saat kamu perlu menerima kode atau pesan tanpa memberikan email utama. Jangan memakai email sementara untuk akun penting karena alamat dan pesannya dapat berhenti tersedia kapan saja.
+
+**[Buka GenMail di sini](https://all-tools-nexora.vercel.app/#tool-genmail)**
+
+Cara memakainya:
+
+1. Buka link GenMail di atas.
+2. Tunggu sampai pilihan domain muncul.
+3. Isi **Username** jika ingin nama sendiri. Kosongkan jika ingin nama acak.
+4. Pilih domain, lalu tekan **Generate Email**.
+5. Tekan **Copy Email** untuk menyalin alamatnya.
+6. Gunakan alamat itu pada layanan yang ingin kamu coba.
+7. Kembali ke GenMail, tekan **Open Inbox**, lalu tekan **Refresh Inbox**.
+8. Pilih pesan yang masuk untuk membacanya.
+
+Hal penting:
+
+- Inbox tidak diperbarui setiap detik. Tekan **Refresh Inbox** seperlunya agar batas request tidak cepat habis.
+- Email aktif disimpan hanya selama tab browser yang sama masih terbuka.
+- Nexora membersihkan isi HTML email sebelum menampilkannya dan memblokir script, iframe, serta link berbahaya.
+- API key KuroNeko hanya berada di server Nexora dan tidak dikirim ke browser pengguna.
+- Jika muncul pesan batas request tercapai, tunggu beberapa saat atau sampai kuota KuroNeko tersedia lagi.
 
 ## Menjalankan secara lokal
 
@@ -102,7 +129,7 @@ Salin `.env.example` dan isi hanya layanan yang digunakan. Variable utama:
 
 - Database/admin: `SUPABASE_URL`, `SUPABASE_SECRET_KEY` atau `SUPABASE_SERVICE_ROLE_KEY`, serta `FEEDBACK_HASH_SALT`.
 - Operasional: `HEALTH_CHECK_TOKEN` dan pengaturan timeout/cache opsional.
-- Tool eksternal: `COINGECKO_API_KEY`, `GOOGLE_PAGESPEED_API_KEY`, `GOOGLE_SAFE_BROWSING_API_KEY`, `NASA_API_KEY`, `OCR_SPACE_API_KEY`, `FREECONVERT_API_KEY`, `SVGTOXML_ENGINE_KEY`, dan `GEMINI_API_KEY` untuk Personal AI, Document AI, serta Prompt Generator. Alias `GOOGLE_GENERATIVE_AI_API_KEY`, `GOOGLE_GEMINI_API_KEY`, dan `GOOGLE_API_KEY` juga didukung. Model dapat dioverride lewat `GEMINI_MODEL`, `DOCUMENT_AI_MODEL`, atau `PROMPT_GENERATOR_MODEL`. Setelah mengubah environment Vercel, lakukan redeploy agar Function menerima nilai terbaru.
+- Tool eksternal: `COINGECKO_API_KEY`, `GOOGLE_PAGESPEED_API_KEY`, `GOOGLE_SAFE_BROWSING_API_KEY`, `NASA_API_KEY`, `OCR_SPACE_API_KEY`, `FREECONVERT_API_KEY`, `SVGTOXML_ENGINE_KEY`, `KURONEKO_API_KEY` untuk GenMail, dan `GEMINI_API_KEY` untuk Personal AI, Document AI, serta Prompt Generator. Alias `GOOGLE_GENERATIVE_AI_API_KEY`, `GOOGLE_GEMINI_API_KEY`, dan `GOOGLE_API_KEY` juga didukung. Model dapat dioverride lewat `GEMINI_MODEL`, `DOCUMENT_AI_MODEL`, atau `PROMPT_GENERATOR_MODEL`. Setelah mengubah environment Vercel, lakukan redeploy agar Function menerima nilai terbaru.
 - SiteGrabber: `SITEGRABBER_API_BASE_URL` dan `SITEGRABBER_API_KEY`.
 - Deploy Center: `NEXUS_DEPLOY_ACCESS_KEY`, kemudian token `VERCEL_TOKEN` atau `NETLIFY_TOKEN`.
 
@@ -119,6 +146,8 @@ Untuk database lama, jalankan migration yang belum pernah diterapkan dari `datab
 Migration `database/migrations/026_flamo_native_generators.sql` menambahkan enam generator XML lokal ke katalog database. Frontend tetap mempertahankan katalog bundle jika database belum diperbarui, tetapi migration ini perlu dijalankan sekali agar Dashboard Admin dan data Supabase ikut sinkron.
 
 Migration `database/migrations/027_puter_ai_image.sql` menambahkan Nexora AI Image ke katalog database. Fitur berjalan langsung di browser melalui Puter, tidak memakai API key Nexora, dan tidak menambah Vercel Function.
+
+Migration `database/migrations/028_genmail.sql` menambahkan GenMail ke katalog database. Isi `KURONEKO_API_KEY` di Environment Variables Vercel lalu redeploy. Key hanya dibaca oleh proxy server `/api/genmail`; GenMail tetap memakai 12 Function karena route ini dimultipleks melalui `api/tool-health.js`.
 
 Migration `database/migrations/023_document_ai_vvip.sql` tetap mempertahankan kuota Document AI, tetapi v6.4.0 mengubah akses katalognya menjadi FREE. Jalankan ulang migration ini satu kali pada database lama agar Dashboard Admin menampilkan status yang sama dengan frontend.
 

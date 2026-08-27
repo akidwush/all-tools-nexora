@@ -23,6 +23,7 @@
     "/api/web-intelligence",
     "/api/ip-intelligence",
     "/api/bmkg",
+    "/api/genmail",
     "/api/space-explorer",
     "/api/ocr-intelligence",
     "/api/vdeploy",

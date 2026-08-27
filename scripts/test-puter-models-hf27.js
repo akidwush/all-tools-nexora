@@ -42,7 +42,7 @@ const readme = read("README.md");
 for (const label of ["Gemini 3.1 Flash Image", "Ideogram 4", "Qwen Image 2 Pro", "GPT Image 2", "FLUX Schnell"]) {
   assert.match(readme, new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")), `README belum menjelaskan ${label}`);
 }
-assert.match(read("assets/js/core/lazy-loader.js"), /puter-image-hf27/);
+assert.match(read("assets/js/core/lazy-loader.js"), /puter-image-hf2[78]/);
 assert.match(read("index.html"), /hf27-models1/);
 
 console.log("Puter HF27 lulus: Gemini 3.1, Ideogram 4, Qwen Image 2 Pro, model lama, ukuran Together, README, dan cache tervalidasi.");
