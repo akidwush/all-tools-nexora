@@ -1,3 +1,12 @@
+## 6.4.0 HF22 Original unified UI — 2026-08-27
+
+- Visual: tampilan Android original menjadi satu-satunya sumber layout untuk PC, tablet, dan ponsel; kanvas 430 px dipusatkan pada monitor dan katalog tetap tiga kolom dengan kartu compact yang sama.
+- Remove: media query desktop/tablet, hover/fine-pointer card tilt, custom cursor, pointer trail, FLIP ghost, dan animasi pembuka room desktop dihapus dari runtime publik.
+- Stabilitas: glass depth tetap memakai gradient, border, dan shadow statis; tidak ada backdrop blur atau transform kartu permanen yang dapat memicu blank saat scroll cepat.
+- Fitur: setiap workspace tool memakai cascade Android normal yang sama pada semua lebar viewport, sedangkan aturan layar sangat sempit tetap tersedia untuk mencegah clipping.
+- Cache: seluruh CSS publik yang berubah dan Liquid Reactor memakai cache-bust HF22.
+- QA: regression 72/72, audit 53 tool, 184 JavaScript, 12/12 Vercel Functions, dan build produksi 126 file lulus; tes khusus HF22 menolak kembalinya cabang visual desktop.
+
 ## 6.4.0 HF21 Android fling + hero loop — 2026-08-27
 
 - Fix: hero video kini autoplay muted dan loop pada desktop maupun mobile, pulih setelah pause/ended, dan kembali berjalan ketika masuk viewport.

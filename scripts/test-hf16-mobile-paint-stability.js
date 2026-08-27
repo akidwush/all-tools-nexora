@@ -18,20 +18,17 @@ assert.match(mobile, /\.tools-card\{[\s\S]*?-webkit-backdrop-filter:none!importa
 assert.match(mobile, /\.tools-card\{[\s\S]*?transform:none!important;[\s\S]*?transform-style:flat!important;[\s\S]*?will-change:auto!important/);
 assert.match(mobile, /\.tools-card>\*,[\s\S]*?\.tools-card \.icon\{[\s\S]*?transform:none!important/);
 assert.match(mobile, /\.video-banner video\{[\s\S]*?filter:none!important/);
-assert.match(core, /@media \(pointer:coarse\),\(hover:none\)\{[\s\S]*?\.touch-follower,[\s\S]*?\.cursor-trail\{display:none!important/);
+assert.doesNotMatch(core, /touch-follower|cursor-trail|pointer\s*:\s*fine|hover\s*:\s*hover/);
 assert.doesNotMatch(mobile, /\.nx-mercury-indicator\{[\s\S]*?display:none!important/);
 assert.doesNotMatch(core, /\.tab-content:not\(\.active\)\{content-visibility:hidden\}/);
 
-assert.match(reactor, /if\(reduced\|\|coarse\|\|!fine\)\{[\s\S]*?mobileTouch:false[\s\S]*?return;/);
-assert.doesNotMatch(reactor, /mobileTouch:coarse/);
-assert.match(reactor, /nexora:navigation-before[\s\S]*?captureFlip\(\)/);
-assert.match(reactor, /nexora:navigation-changed[\s\S]*?animateFlip/);
-assert.match(reactor, /indicator=document\.createElement\('span'\)/);
-assert.match(reactor, /if\(coarse\)\{raf\(moveIndicator\);return;\}/);
+assert.match(reactor, /unifiedOriginalUi:true/);
+assert.doesNotMatch(reactor, /coarse|fine|captureFlip|animateFlip|pointermove/);
+assert.match(reactor, /indicator=document\.createElement\(["']span["']\)/);
 assert.doesNotMatch(performance, /if\(mobileLike\)\{if\(!video\.paused\)video\.pause\(\);return;\}/);
 assert.match(performance, /heroMode="auto"/);
 assert.match(performance, /threshold:\[0,0\.01,0\.35\]/);
-assert.match(ai, /@media\(max-width:767px\)\{[\s\S]*?\.nx-ai-launcher-orb::after\{animation:none\}/);
+assert.match(ai, /@media all\{[\s\S]*?\.nx-ai-launcher-orb::after\{animation:none\}/);
 
 const assetVersions = {
       "core.css": "6.4.0-hf17-desktop-nav2",
@@ -43,4 +40,4 @@ for (const [asset, version] of Object.entries(assetVersions)) {
   assert.match(html, new RegExp(`${asset.replace(".", "\\.")}\\?v=${version.replaceAll(".", "\\.")}`));
 }
 
-console.log("HF16 paint stability lulus: layer kartu, tanpa touch trail Android, tab FLIP desktop, hero loop mobile, dan content visibility aman.");
+console.log("HF16 paint stability lulus: layer kartu statis, tanpa touch trail/FLIP desktop, hero loop, dan content visibility aman.");

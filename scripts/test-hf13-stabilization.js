@@ -56,7 +56,7 @@ async function main() {
 
   assert.match(core, /backdrop-filter:blur\(17px\) saturate\(138%\)/);
   assert.match(core, /backdrop-filter:blur\(10px\) saturate\(122%\)/);
-  assert.match(core, /@media \(max-width:767px\)\{[\s\S]*?\.tools-card\{[\s\S]*?backdrop-filter:none!important/);
+  assert.match(core, /@media all\{[\s\S]*?\.tools-card\{[\s\S]*?backdrop-filter:none!important/);
   assert.doesNotMatch(components, /@media\(min-width:320px\) and \(max-width:767px\)[\s\S]*?\.tools-grid/);
 
   assert.match(svgAlight, /API AUTH OK/);

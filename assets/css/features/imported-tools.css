@@ -110,7 +110,7 @@
 @keyframes nxImportedSpin{
   to{transform:rotate(360deg)}
 }
-@media(max-width:600px){
+@media all{
   .nx-imported-toolbar{
     padding:9px;
   }

@@ -164,7 +164,7 @@ async function main() {
   const ui = read("assets/js/features/web-intelligence.js");
   for (const token of ["renderWebIntelligence", "Evidence Scoring", "/api/web-intelligence", "drawRadar", "htmlReport", "Deep Intelligence", "body.__nxCleanup"]) assert.ok(ui.includes(token), `UI kehilangan ${token}`);
   const css = read("assets/css/features/web-intelligence.css");
-  for (const token of ["nwi-score-ring", "nwi-radar-wrap", "@media(max-width:480px)", "prefers-reduced-motion"]) assert.ok(css.includes(token));
+  for (const token of ["nwi-score-ring", "nwi-radar-wrap", "@media all", "prefers-reduced-motion"]) assert.ok(css.includes(token));
   const backend = read("lib/web-intelligence.js");
   for (const token of ["assertPublicUrl", "requestPinnedPage", "createPinnedLookup", "autoSelectFamily: false", "GOOGLE_PAGESPEED_API_KEY", "GOOGLE_SAFE_BROWSING_API_KEY", "MAX_HTML_BYTES"]) assert.ok(backend.includes(token));
   assert.ok(!ui.includes("GOOGLE_PAGESPEED_API_KEY"), "Nama/konfigurasi key tidak boleh diperlukan browser");

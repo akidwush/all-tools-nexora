@@ -21,7 +21,7 @@ assert.match(css, /content-visibility:visible/);
 assert.doesNotMatch(css, /\.tools-card\{\s*contain:layout paint style;/);
 assert.match(css, /\.tools-card\{[^}]*backdrop-filter:blur\(17px\) saturate\(138%\)/);
 assert.match(css, /HF16 — MOBILE PAINT-STABILITY \+ STATIC 3D GLASS/);
-assert.match(css, /@media \(max-width:767px\)\{[\s\S]*?\.tools-card\{[\s\S]*?backdrop-filter:none!important;[\s\S]*?transform-style:flat!important/);
+assert.match(css, /@media all\{[\s\S]*?\.tools-card\{[\s\S]*?backdrop-filter:none!important;[\s\S]*?transform-style:flat!important/);
 assert.match(css, /html\.nx-hero-video-auto \.video-banner video/);
 assert.doesNotMatch(css, /nx-hero-video-manual|nx-hero-video-toggle/);
 assert.match(perf, /heroMode:heroMode/);

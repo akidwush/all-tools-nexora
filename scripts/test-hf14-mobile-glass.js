@@ -11,17 +11,16 @@ const html = read("index.html");
 const vercel = JSON.parse(read("vercel.json"));
 
 assert.match(core, /HF16 — MOBILE PAINT-STABILITY \+ STATIC 3D GLASS/);
-assert.match(core, /@media \(min-width:320px\) and \(max-width:767px\)\{[\s\S]*?\.tools-grid\{display:grid;grid-template-columns:repeat\(3,minmax\(0,1fr\)\)!important/);
-assert.match(core, /@media \(max-width:767px\)\{[\s\S]*?#navTabs\{[\s\S]*?backdrop-filter:none!important/);
+assert.match(core, /@media all\{[\s\S]*?\.tools-grid\{display:grid;grid-template-columns:repeat\(3,minmax\(0,1fr\)\)!important/);
+assert.match(core, /@media all\{[\s\S]*?#navTabs\{[\s\S]*?backdrop-filter:none!important/);
 assert.doesNotMatch(core, /nx-mobile-stable-tabs/);
-assert.match(core, /\.nx-mercury-indicator\{position:absolute;[\s\S]*?transition:transform 520ms/);
-assert.match(core, /@media \(max-width:767px\)\{[\s\S]*?\.tools-card\{[\s\S]*?backdrop-filter:none!important;[\s\S]*?transform:none!important;[\s\S]*?transform-style:flat!important/);
+assert.match(core, /\.nx-mercury-indicator\{position:absolute;[\s\S]*?transition:transform 180ms/);
+assert.match(core, /@media all\{[\s\S]*?\.tools-card\{[\s\S]*?backdrop-filter:none!important;[\s\S]*?transform:none!important;[\s\S]*?transform-style:flat!important/);
 assert.match(core, /\.tools-card:active\{[\s\S]*?transform:translate3d\(0,1px,0\) scale\(\.986\)!important/);
 assert.doesNotMatch(components, /\.tools-card\{position:relative;overflow:hidden;isolation:isolate\}/);
-assert.match(motion, /indicator=document\.createElement\('span'\)/);
-assert.match(motion, /if\(coarse\)\{raf\(moveIndicator\);return;\}/);
-assert.match(motion, /nexora:navigation-before[\s\S]*?captureFlip\(\)/);
-assert.match(motion, /nexora:navigation-changed[\s\S]*?animateFlip/);
+assert.match(motion, /indicator=document\.createElement\(["']span["']\)/);
+assert.match(motion, /unifiedOriginalUi:true/);
+assert.doesNotMatch(motion, /coarse|fine|captureFlip|animateFlip|pointermove/);
 assert.match(html, /core\.css\?v=6\.4\.0-hf17-desktop-nav2/);
 assert.match(html, /liquid-reactor\.js\?v=6\.4\.0-hf18-desktop-hero1/);
 

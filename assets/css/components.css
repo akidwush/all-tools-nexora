@@ -111,7 +111,7 @@
   z-index:4;
   margin:0 0 14px!important;
 }
-@media(max-width:600px){
+@media all{
   #userCard{
     margin-bottom:12px!important;
   }
@@ -639,7 +639,7 @@ body.nx-about-dev-open{
   font-size:8px;
 }
 
-@media(max-width:520px){
+@media all{
   .nx-top-nav-block{
     padding:8px 10px;
   }
@@ -733,7 +733,7 @@ body.nx-about-dev-open{
   from{opacity:0;transform:translateY(14px) scale(.97)}
   to{opacity:1;transform:translateY(0) scale(1)}
 }
-@media(max-width:440px){
+@media all{
   .nx-access-lock-card{padding:17px;border-radius:17px}
   .nx-access-lock-actions{grid-template-columns:1fr}
 }
@@ -1113,7 +1113,7 @@ body.nx-universal-room-open{overflow:hidden!important}
 #nxUniversalRoom[data-category="tools"] .nx-room-hero-icon{border-radius:50%}
 #nxUniversalRoom[data-category="vault"] .nx-room-panel{background:linear-gradient(180deg,rgba(13,8,30,.92),rgba(5,2,16,.88))}
 
-@media(max-width:760px){
+@media all{
   #nxUniversalRoom .nx-room-topbar{grid-template-columns:auto minmax(0,1fr) auto;min-height:58px;padding:8px 10px;gap:8px}
   #nxUniversalRoom .nx-room-back{min-height:38px;padding:8px 11px;font-size:11px}
   #nxUniversalRoom .nx-room-back span{display:none}
@@ -1241,7 +1241,7 @@ body.nx-universal-room-open{overflow:hidden!important}
   grid-template-columns:190px minmax(0,1fr) auto!important;
 }
 
-@media(max-width:760px){
+@media all{
   #nxUniversalRoom .nx-room-back,
   #ttRoomOverlay .tt-room-back,
   #pixTopBack,
@@ -1280,7 +1280,7 @@ body.nx-universal-room-open{overflow:hidden!important}
   }
 }
 
-@media(max-width:430px){
+@media all{
   #nxUniversalRoom .nx-room-topbar{
     grid-template-columns:150px minmax(0,1fr) 36px!important;
     padding-left:8px!important;
@@ -1315,7 +1315,7 @@ body.nx-universal-room-open{overflow:hidden!important}
 #nxModuleToast.error{border-color:rgba(251,113,133,.45);color:#fecdd3}
 .tools-card.is-module-loading{pointer-events:none;opacity:.72;filter:saturate(.72)}
 .tools-card.is-module-loading::after{content:'Memuat…';position:absolute;inset:auto 12px 10px 12px;padding:6px 9px;border-radius:999px;background:rgba(10,1,24,.88);border:1px solid rgba(192,132,252,.32);color:#e9d5ff;font-size:10px;font-weight:800;text-align:center}
-@media(max-width:600px){#nxModuleToast{bottom:16px}}
+@media all{#nxModuleToast{bottom:16px}}
 
 /* =========================================================
    NEXORA v4.2 — TOOL HEALTH MONITORING
@@ -1365,8 +1365,7 @@ body.nx-health-lock{overflow:hidden}
 .nx-tool-health.is-loading .nx-health-summary-icon i{animation:nx-health-pulse 1s ease-in-out infinite}
 @keyframes nx-health-spin{to{transform:rotate(360deg)}}
 @keyframes nx-health-pulse{50%{opacity:.35;transform:scale(.85)}}
-@media(min-width:700px){.nx-health-dialog{align-items:center}.nx-health-panel{border-radius:24px}.nx-health-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:420px){.nx-health-summary{padding:12px}.nx-health-badge{min-width:68px;padding-inline:8px}.nx-health-summary-copy span{max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+@media all{.nx-health-summary{padding:12px}.nx-health-badge{min-width:68px;padding-inline:8px}.nx-health-summary-copy span{max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
 
 /* =========================================================
    NEXORA v6.2 — STABILITY STATUS + MOBILE CLEANUP
@@ -1387,7 +1386,7 @@ body.nx-health-lock{overflow:hidden}
 #nxStabilityNotice span{margin-top:3px;color:#a99ab6;font-size:9px;line-height:1.45}
 #nxStabilityNotice button{display:grid;place-items:center;width:30px;height:30px;border:0;border-radius:10px;background:rgba(255,255,255,.04);color:#b9aac6}
 
-@media(max-width:600px){
+@media all{
   #nxStabilityNotice{bottom:12px;width:calc(100vw - 22px);border-radius:15px}
   #nxUniversalRoom .nx-room-topbar{grid-template-columns:42px minmax(0,1fr) 36px!important;min-height:58px!important;padding:8px!important;gap:7px!important}
   #nxUniversalRoom .nx-room-back{width:42px!important;min-width:42px!important;max-width:42px!important;flex-basis:42px!important;height:42px!important;min-height:42px!important;padding:0!important;border-radius:13px!important}
@@ -1432,7 +1431,7 @@ body.nx-health-lock{overflow:hidden}
 .nx-public-wa-copy b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;font-weight:850;color:#f3fff7}
 .nx-public-wa-copy small{display:-webkit-box;overflow:hidden;-webkit-line-clamp:2;-webkit-box-orient:vertical;color:#9aafa2;font-size:8px;font-weight:650;line-height:1.45}
 .nx-public-wa-arrow{width:24px;height:24px;display:grid;place-items:center;border-radius:8px;background:rgba(37,211,102,.10);color:#54e78c;font-size:9px}
-@media (max-width:640px){
+@media all{
   .nx-public-wa-actions{grid-template-columns:1fr;gap:8px;margin-top:8px}
   .nx-public-wa-card{grid-template-columns:38px minmax(0,1fr) 24px;padding:10px;border-radius:13px}
   .nx-public-wa-icon{width:38px;height:38px;border-radius:11px}
@@ -1441,7 +1440,7 @@ body.nx-health-lock{overflow:hidden}
 
 /* v6.3 low-power compositing overrides */
 html.nx-low-power .nx-public-wa-icon,html.nx-low-power .nx-health-dot{animation:none!important;box-shadow:none!important}
-@media (max-width:768px){.nx-health-dialog,.nx-room-backdrop,.nx-access-backdrop,#nxStabilityNotice,#nxModuleToast{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}.nx-public-wa-card::before{display:none}.nx-public-wa-icon{animation:none!important}}
+@media all{.nx-health-dialog,.nx-room-backdrop,.nx-access-backdrop,#nxStabilityNotice,#nxModuleToast{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}.nx-public-wa-card::before{display:none}.nx-public-wa-icon{animation:none!important}}
 
 /* Downloader request states and official-provider capability cards. */
 .nx-downloader-lead{margin:0 0 14px;color:var(--nx-text-muted,#aaa0bd);font-size:.875rem;line-height:1.65}
@@ -1453,7 +1452,7 @@ html.nx-low-power .nx-public-wa-icon,html.nx-low-power .nx-health-dot{animation:
 .nx-official-link{display:inline-flex!important;width:auto!important;min-height:44px;margin-top:4px;text-decoration:none}
 #instaBtn,#ytFetchBtn,#spBtn,[data-official-button],#nxTbFetch,#ttBtn{min-height:44px;margin-top:8px}
 #instaResult,#ytResult,#spResult,[data-official-result]{min-width:0;overflow-wrap:anywhere}
-@media(max-width:560px){.nx-official-result{grid-template-columns:minmax(0,1fr);padding:13px}.nx-official-result .nx-downloader-preview{max-height:220px}.dl-option{min-width:0}.dl-option-info{min-width:0}.dl-option-title,.dl-option-desc{overflow-wrap:anywhere}.dl-dl-btn,.nx-cloud-download{min-width:44px;min-height:44px}}
+@media all{.nx-official-result{grid-template-columns:minmax(0,1fr);padding:13px}.nx-official-result .nx-downloader-preview{max-height:220px}.dl-option{min-width:0}.dl-option-info{min-width:0}.dl-option-title,.dl-option-desc{overflow-wrap:anywhere}.dl-dl-btn,.nx-cloud-download{min-width:44px;min-height:44px}}
 
 
 /* =========================================================
@@ -1481,7 +1480,7 @@ html.nx-low-power .nx-public-wa-icon,html.nx-low-power .nx-health-dot{animation:
   contain:paint;
   background:#050506;
 }
-@media (pointer:coarse),(max-width:768px){
+@media all{
   .nx-about-dev-room,.nx-about-dev-stage,.nx-about-dev-frame{
     -webkit-backface-visibility:hidden;
     backface-visibility:hidden;

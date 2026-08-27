@@ -1,18 +1,19 @@
-const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const read = file => fs.readFileSync(file, 'utf8');
+"use strict";
 
-const html = read('index.html');
-const css = read('assets/css/core.css');
-const motion = read('assets/js/core/liquid-reactor.js');
-const shell = read('assets/js/core/shell.js');
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const read = file => fs.readFileSync(file, "utf8");
+const html = read("index.html");
+const css = read("assets/css/core.css");
+const motion = read("assets/js/core/liquid-reactor.js");
 
-assert.match(html, /liquid-reactor\.js\?v=6\.4\.0-hf18-desktop-hero1/);
-for (const token of ['nx-mercury-indicator', 'nxCardForming', 'nxDropletRoomIn', 'prefers-reduced-motion:reduce']) assert.ok(css.includes(token), `CSS motion kehilangan ${token}`);
-assert.doesNotMatch(css + motion, /nxLiquidAperture|nxAperture|nx-aperture-reveal|setupAperture/);
-for (const token of ['requestAnimationFrame', 'IntersectionObserver', 'pointermove', 'positionIndicator', 'nexora:tool-room-open']) assert.ok(motion.includes(token), `runtime motion kehilangan ${token}`);
-for (const event of ['nexora:tool-room-open', 'nexora:tool-room-close']) assert.ok(shell.includes(`new CustomEvent('${event}'`), `tool room harus memberi sinyal ${event}`);
-for (const attribute of ['muted', 'playsinline', 'loop']) assert.match(html, new RegExp(`<video[^>]*\\b${attribute}`, 'i'));
+assert.match(html, /liquid-reactor\.js\?v=6\.4\.0-hf18-desktop-hero1-hf22-original-unified1/);
+for (const token of ["nx-mercury-indicator", "positionIndicator", "nexora:navigation-changed", "nexora:tools-rendered", "ArrowRight"]) {
+  assert.ok((css + motion).includes(token), `runtime unified kehilangan ${token}`);
+}
+assert.doesNotMatch(css + motion, /nxLiquidAperture|nxAperture|setupAperture|captureFlip|animateFlip|nx-reactor-ghost|pointermove/);
+assert.match(motion, /unifiedOriginalUi:true/);
+for (const attribute of ["muted", "playsinline", "loop"]) assert.match(html, new RegExp(`<video[^>]*\\b${attribute}`, "i"));
 assert.match(html, /<video[^>]*autoplay/i);
 
-console.log('Liquid Reactor Step 2 tests lulus: desktop motion tetap tersedia dan jalur mobile stabil terpasang.');
+console.log("Liquid Reactor Step 2 lulus: navigasi asli tetap aktif tanpa cabang motion desktop.");

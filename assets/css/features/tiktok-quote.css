@@ -78,7 +78,7 @@
   border-right-color:#ec4899;
   animation:spin .85s linear infinite;
 }
-@media(max-width:600px){
+@media all{
   .nx-ttquote-embed{
     height:calc(100dvh - 64px);
     min-height:520px;

@@ -29,10 +29,9 @@ for (const source of [app, read("assets/js/core/social-links.js"), read("assets/
   assert.doesNotMatch(source, /nexus_country_cache|nexora_social_links_v63|nexora_tool_health_v42/);
 }
 
-const coarseGuard = reactor.indexOf("if(reduced||coarse||!fine)");
-const cursorAllocation = reactor.indexOf("ring=document.createElement", reactor.indexOf("function setupCursorReactor"));
-assert.ok(coarseGuard > 0 && coarseGuard < cursorAllocation, "Android harus keluar sebelum layer cursor dialokasikan.");
-assert.match(core, /@media \(pointer:coarse\),\(hover:none\)\{[\s\S]*?\.cursor-trail\{display:none!important;animation:none!important;will-change:auto!important/);
+assert.match(reactor, /unifiedOriginalUi:true/);
+assert.match(reactor, /enabled:false,reason:"unified-original-ui"/);
+assert.doesNotMatch(reactor + core, /setupCursorReactor|cursor-trail|touch-follower|pointermove|captureFlip|animateFlip/);
 assert.match(performance, /heroMode="auto"/);
 assert.doesNotMatch(performance, /if\(mobileLike\)\{if\(!video\.paused\)video\.pause\(\);return;\}/);
 assert.match(html, /<video[^>]*autoplay/i);
@@ -56,4 +55,4 @@ assert.doesNotMatch(healthApi, /authorizeTool\(request, response, "documentai"\)
 assert.match(lazy, /ASSET_PATCHES\.find/);
 assert.doesNotMatch(lazy, /prompt-generator[\s\S]{0,500}\? ASSET_VERSION[\s\S]{0,500}\? ASSET_VERSION/, "Resolver versi bertumpuk tidak boleh kembali.");
 
-console.log("Final mobile workflow lulus: no-store, scroll compositor guard, picker Android native, Doc AI FREE, dan lazy resolver bersih.");
+console.log("Final mobile workflow lulus: no-store, UI Android universal, picker native, Doc AI FREE, dan lazy resolver bersih.");

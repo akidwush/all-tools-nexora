@@ -27,7 +27,7 @@ assert.match(feature, /\/api\/bmkg/);
 assert.match(feature, /Sumber: BMKG/);
 assert.match(feature, /NO API KEY/);
 assert.ok(css.includes(".nbmkg-hero"));
-assert.ok(css.includes("@media (max-width:680px)"));
+assert.ok(css.includes("@media all"));
 assert.ok(css.includes("overflow-wrap:anywhere"), "Teks feed BMKG panjang harus tetap berada di dalam kartu.");
 assert.ok(css.includes(".nbmkg-weather-metrics{grid-template-columns:1fr"), "Metrik cuaca mobile harus menjadi satu kolom agar terbaca.");
 assert.ok(css.includes(".nbmkg-tabs{position:sticky"), "Navigasi tab BMKG harus tetap mudah dijangkau di mobile.");

@@ -152,7 +152,7 @@ async function main() {
   assert.ok(!ui.includes("DEMO_KEY"));
   assert.match(ui, /function closeModal\(\)\{[\s\S]*?document\.body\.style\.overflow='';\}/, "menutup modal harus membuka kembali scroll halaman");
   const css = read("assets/css/features/space-explorer.css");
-  for (const token of ["nse-orbit-scene", "nse-radar-layout", "@media(max-width:430px)", "prefers-reduced-motion"]) assert.ok(css.includes(token));
+  for (const token of ["nse-orbit-scene", "nse-radar-layout", "@media all", "prefers-reduced-motion"]) assert.ok(css.includes(token));
   assert.ok(read("database/migrations/010_nasa_space_explorer.sql").includes("on conflict (id) do update"));
 
   const serverless = [];

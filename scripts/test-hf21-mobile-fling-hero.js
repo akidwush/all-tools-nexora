@@ -12,14 +12,14 @@ const hf21Start = core.indexOf("HF21 — ANDROID FLING PAINT BUDGET");
 assert.ok(hf21Start > 0, "HF21 paint budget harus tersedia.");
 const hf21 = core.slice(hf21Start);
 
-assert.match(hf21, /@media \(max-width:767px\),\(pointer:coarse\)/);
+assert.match(hf21, /@media all/);
 assert.match(hf21, /\.bg-glow\{[\s\S]*?display:none!important/);
 assert.match(hf21, /\.tab-content\.active,[\s\S]*?content-visibility:visible!important;[\s\S]*?visibility:visible!important;[\s\S]*?opacity:1!important/);
 assert.match(hf21, /\.tools-card\{[\s\S]*?-webkit-backdrop-filter:none!important;[\s\S]*?backdrop-filter:none!important/);
 assert.match(hf21, /\.tools-card::after\{[\s\S]*?display:none!important/);
 assert.match(hf21, /html,body\{[\s\S]*?overflow-x:hidden!important/);
 
-assert.match(html, /core\.css\?v=6\.4\.0-hf17-desktop-nav2-hf21-fling1/);
+assert.match(html, /core\.css\?v=6\.4\.0-hf17-desktop-nav2-hf21-fling1-hf22-original-unified1/);
 assert.match(html, /performance\.js\?v=6\.4\.0-hf18-desktop-hero3-hf21-mobile-loop1/);
 assert.match(html, /<video[^>]*autoplay[^>]*loop[^>]*muted[^>]*playsinline/i);
 assert.match(performance, /var heroMode="auto"/);

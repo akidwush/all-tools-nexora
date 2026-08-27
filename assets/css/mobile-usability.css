@@ -1,24 +1,37 @@
-/* Nexora mobile readable mode
-   Keep the catalog efficient without sacrificing readable cards or workspaces. */
-@media (max-width:767px){
-  /* Public catalog: the former three-column layout reduced cards to about
-     91px at 320px, making labels unreadable and wider than their cards. */
-  .tools-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
-  .tools-card{min-height:184px!important;padding:12px!important}
-  .tools-card .icon{width:42px!important;height:42px!important;font-size:18px!important}
-  .tools-card .badge{max-width:76px!important;padding:4px 6px!important;font-size:9px!important;line-height:1.25!important}
-  .nx-card-copy{margin-top:11px!important}
-  .tools-card h4{min-height:32px;font-size:13px!important;line-height:1.28!important}
-  .tools-card p{display:-webkit-box!important;min-height:34px!important;margin-top:6px!important;-webkit-line-clamp:2!important;font-size:11px!important;line-height:1.45!important}
-  .nx-card-footer{padding-top:9px!important}
-  .nx-card-readiness{position:static!important;max-width:100%!important;min-height:24px!important;padding:4px 6px!important;font-size:9px!important}
+/* Nexora original unified mode.
+   Android is the only visual source of truth; the same rules apply at every
+   viewport width, including desktop. */
+:root{--nx-original-ui-width:430px}
+@media all{
+  /* Keep the physical composition mobile-sized on wide monitors too. */
+  .nx-top-nav-block,
+  .container{
+    width:min(100%,var(--nx-original-ui-width))!important;
+    max-width:var(--nx-original-ui-width)!important;
+    margin-inline:auto!important;
+  }
+  .video-banner{
+    width:min(calc(100% - 20px),calc(var(--nx-original-ui-width) - 20px))!important;
+    max-width:calc(var(--nx-original-ui-width) - 20px)!important;
+    margin-inline:auto!important;
+  }
+  .tools-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:clamp(6px,2vw,10px)!important}
+  .tools-card{min-height:146px!important;padding:8px!important;border-radius:13px!important}
+  .tools-card .icon{width:34px!important;height:34px!important;font-size:16px!important}
+  .tools-card .badge{max-width:42px!important;padding:3px 4px!important;font-size:5.5px!important;line-height:1.2!important}
+  .nx-card-copy{margin-top:8px!important}
+  .tools-card h4{min-height:28px;font-size:11px!important;line-height:1.25!important}
+  .tools-card p{display:none!important}
+  .nx-card-footer{min-height:20px!important;padding-top:6px!important}
+  .nx-card-readiness{position:static!important;max-width:100%!important;min-height:18px!important;padding:3px 5px!important;font-size:5.5px!important}
 
   #nxUniversalRoom .nx-room-scroll{
     padding:8px 0 max(30px,env(safe-area-inset-bottom))!important;
   }
   #nxUniversalRoom .nx-room-wrap{
-    width:100%!important;
-    max-width:none!important;
+    width:min(100%,var(--nx-original-ui-width))!important;
+    max-width:var(--nx-original-ui-width)!important;
+    margin-inline:auto!important;
     padding:0 8px 30px!important;
   }
   #nxUniversalRoom .nx-room-hero{
@@ -123,8 +136,8 @@
   /* Legacy modal tools use the same full-width, readable surface. */
   .tool-viewer{padding:6px!important;align-items:flex-start!important;overflow-y:auto!important}
   .tool-viewer-content{
-    width:calc(100vw - 12px)!important;
-    max-width:none!important;
+    width:min(calc(100vw - 12px),calc(var(--nx-original-ui-width) - 12px))!important;
+    max-width:calc(var(--nx-original-ui-width) - 12px)!important;
     margin:0!important;
     padding:14px!important;
     border-radius:17px!important;
@@ -178,6 +191,17 @@
   :is(#nxGetCodeOverlay,#ttRoomOverlay) :where(input,select,textarea){
     min-height:50px!important;
     font-size:16px!important;
+  }
+
+  /* Backdrops stay full screen; their work canvas remains Android-sized. */
+  #ttRoomOverlay .tt-full-wrap,
+  #nxGetCodeStage>.nxgc-wrap,
+  #deployTopBar,
+  #deployStage,
+  #deployFallback{
+    width:min(100%,var(--nx-original-ui-width))!important;
+    max-width:var(--nx-original-ui-width)!important;
+    margin-inline:auto!important;
   }
 
   /* Personal AI is also a feature surface on mobile. */

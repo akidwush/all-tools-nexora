@@ -93,8 +93,7 @@ assert.ok(
 for (const token of [
   "overflow-x:clip",
   "100dvh",
-  "@media(max-width:720px)",
-  "@media(max-width:430px)",
+  "@media all",
   "width:auto!important",
   "max-height:min(68dvh,720px)"
 ]) {

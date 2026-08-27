@@ -129,7 +129,7 @@ async function main() {
     assert.equal(manifest.tools.cryptomarket, "crypto-market");
     for (const asset of [...manifest.modules["crypto-market"].css, ...manifest.modules["crypto-market"].js]) assert.ok(fs.existsSync(path.join(root, asset)));
     for (const token of ["renderCryptoMarket", "/api/crypto-market?currency=", "CoinPaprika Fallback", "bukan saran finansial"]) assert.ok(read("assets/js/features/crypto-market.js").includes(token));
-    assert.ok(read("assets/css/features/crypto-market.css").includes("@media(max-width:420px)"));
+    assert.ok(read("assets/css/features/crypto-market.css").includes("@media all"));
     assert.ok(read("database/migrations/008_crypto_market_scanner.sql").includes("on conflict (id) do update"));
     for (const publicFile of ["index.html", "assets/js/core/app.js", "assets/js/features/crypto-market.js", "assets/module-manifest.json"]) {
       assert.ok(!read(publicFile).includes("cg_demo_test_secret"), `${publicFile} membocorkan key`);

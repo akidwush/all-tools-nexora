@@ -105,7 +105,7 @@ async function main() {
     const client = read("assets/js/features/crypto-market.js");
     for (const token of ["analysis=1", "Analisis 15M · 1H · Makro", "Referensi Risiko", "candle tertutup", "bukan saran"]) assert.ok(client.includes(token));
     const css = read("assets/css/features/crypto-market.css");
-    for (const token of [".nx-crypto-timeframes", ".nx-crypto-bias-card", ".nx-crypto-risk", "@media(max-width:430px)"]) assert.ok(css.includes(token));
+    for (const token of [".nx-crypto-timeframes", ".nx-crypto-bias-card", ".nx-crypto-risk", "@media all"]) assert.ok(css.includes(token));
 
     console.log("Crypto MTF lulus: candle tertutup Binance 15m/1h/1d, indikator, mikro/makro, referensi risiko, validasi, dan UI responsif aktif.");
   } finally {

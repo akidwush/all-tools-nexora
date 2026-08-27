@@ -76,7 +76,7 @@
   opacity:0;
   visibility:hidden;
 }
-@media(max-width:600px){
+@media all{
   .nx-comic-embed{
     height:calc(100dvh - 64px);
     min-height:520px;

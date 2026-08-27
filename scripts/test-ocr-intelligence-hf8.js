@@ -161,7 +161,7 @@ async function main() {
   assert.ok(!ui.includes("OCR_SPACE_API_KEY"), "Nama/key server tidak boleh masuk UI");
   assert.ok(ui.includes("drawn<200"), "Highlight hasil pencarian harus dibatasi agar tetap ringan");
   const css = read("assets/css/features/ocr-intelligence.css");
-  for (const token of ["overflow-x:clip", "min-width:0", "@media(max-width:720px)", "@media(max-width:430px)", "prefers-reduced-motion"]) assert.ok(css.includes(token), `CSS OCR kehilangan ${token}`);
+  for (const token of ["overflow-x:clip", "min-width:0", "@media all", "prefers-reduced-motion"]) assert.ok(css.includes(token), `CSS OCR kehilangan ${token}`);
   assertBalancedCss(css);
   assert.ok(read("database/migrations/011_nexora_ocr_intelligence.sql").includes("on conflict (id) do update"));
   assert.ok(read(".env.example").includes("OCR_SPACE_API_KEY="));

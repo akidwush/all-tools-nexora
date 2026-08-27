@@ -129,11 +129,11 @@
 }
 .nx-spotify-track b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff;font-size:12px}
 .nx-spotify-track span{display:block;margin-top:4px;color:#8fa997;font-size:9px}
-@media(max-width:780px){
+@media all{
   .nx-source-grid{grid-template-columns:1fr}
   .nx-source-stage{min-height:250px}
 }
-@media(max-width:520px){
+@media all{
   .nx-source-intro{align-items:flex-start;padding:16px}
   .nx-source-intro-icon{width:48px;height:48px;border-radius:15px}
   .nx-source-card{padding:14px;border-radius:19px}
@@ -439,7 +439,7 @@
   background:linear-gradient(135deg,#eab308,#f97316);
   color:#1b1000;
 }
-@media(max-width:560px){
+@media all{
   .nx-sp-search-row{
     grid-template-columns:1fr;
   }
@@ -574,6 +574,6 @@
   line-height:1.55;
   font-weight:700;
 }
-@media(max-width:600px){
+@media all{
   .nx-sp-actions{grid-template-columns:1fr}
 }

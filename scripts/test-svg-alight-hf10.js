@@ -40,7 +40,7 @@ assert.ok(safeSvg(corelSvg).startsWith('<svg'));
 assert.throws(()=>safeSvg('<!DOCTYPE svg [<!ENTITY xxe SYSTEM "file:///etc/passwd">]><svg>&xxe;</svg>'),/ENTITY/);
 
 assert.ok(route.includes('handleSvgToXml'),'route handler missing');
-assert.ok(css.includes('@media(max-width:760px)'),'mobile CSS missing');
+assert.ok(css.includes('@media all'),'unified original CSS missing');
 assert.ok(css.includes('min-height:44px'),'44px touch target CSS missing');
 assert.ok(local.includes('mode === "svg-alight") return 4_250_000'),'local 2 MB SVG JSON body limit missing');
 assert.ok(!ui.includes('SVGTOXML_API_KEY'),'secret leaked to UI');

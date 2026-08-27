@@ -128,7 +128,7 @@ async function main() {
     assert.ok(!/GEMINI_API_KEY\s*=/.test(client));
     assert.match(client, /finally\{if\(state\.controller===controller\)\{state\.controller=null;waiting\.hidden=true;setBusy\(false\);\}\}/);
     const css = read("assets/css/features/prompt-generator.css");
-    for (const token of [".nx-prompt-layout", ".nx-prompt-details", "@media(max-width:520px)", "min-height:44px", ".nx-prompt-file-input"]) assert.ok(css.includes(token));
+    for (const token of [".nx-prompt-layout", ".nx-prompt-details", "@media all", "min-height:44px", ".nx-prompt-file-input"]) assert.ok(css.includes(token));
     assert.match(css, /\.nx-prompt-waiting\[hidden\]\{display:none!important\}/);
     assert.match(read("assets/js/core/lazy-loader.js"), /'prompt-android'/);
     assert.match(read("index.html"), /prompt-v2-responsive-audit2/);

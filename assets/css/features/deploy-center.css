@@ -68,7 +68,7 @@
 }
 @keyframes nxDeployRoomSpin{to{transform:rotate(360deg)}}
 body.nx-deploy-open{overflow:hidden!important}
-@media(max-width:520px){
+@media all{
   #deployTopBar{gap:9px;padding-left:9px;padding-right:9px}
   #deployTopTitle b{font-size:10px}
   #deployTopTitle span{font-size:6px;letter-spacing:.07em}
@@ -97,7 +97,7 @@ body.nx-deploy-open{overflow:hidden!important}
   font-size:0!important;letter-spacing:0!important
 }
 #deployTopBack i{font-size:13px!important}
-@media(max-width:760px){
+@media all{
   #deployTopBack{
     width:40px!important;min-width:40px!important;max-width:40px!important;
     height:40px!important;min-height:40px!important;flex-basis:40px!important;
