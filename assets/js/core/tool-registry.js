@@ -21,6 +21,7 @@
     ["tanyaustadz","Tanya Ustadz","local",null,"renderTanyaUstadz",null],
     ["mltools","ML Tools","module","imported-tools","renderMlTools",null],
     ["comicreader","Baca Komik Full","module","comic-reader","renderComicReader",null],
+    ["aiimage","Nexora AI Image","module","puter-image","renderPuterImage",null],
     ["promptgenerate","Prompt Generator","module","prompt-generator","renderPromptGenerator",null],
     ["fakeovo","Fake OVO","module","imported-tools","renderFakeOvo",null],
     ["quotegenerator","Quote Generator","module","imported-tools","renderQuoteGenerator",null],

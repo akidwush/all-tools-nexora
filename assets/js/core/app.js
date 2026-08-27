@@ -1588,6 +1588,7 @@ let toolsData = {
         { id: 'tanyaustadz', icon: 'fa-solid fa-user-tie', name: 'Tanya Ustadz', desc: 'Meme generator', badge: 'Lucu' }
     ],
     tools: [{ id: 'mltools', icon: 'fa-solid fa-gamepad', name: 'ML Tools', desc: 'Script ML, Winrate dan Stalk MLBB', badge: 'MLBB' },{ id: 'comicreader', icon: 'fa-solid fa-book-open-reader', name: 'Baca Komik Full', desc: 'Manga, manhwa, manhua + reader', badge: 'FULL' },
+        { id: 'aiimage', icon: 'fa-solid fa-image', name: 'Nexora AI Image', desc: 'Buat gambar AI memakai akun dan allowance Puter milikmu', badge: 'PUTER AI' },
         { id: 'promptgenerate', icon: 'fa-solid fa-wand-magic-sparkles', name: 'Prompt Generator', desc: 'Analisis gambar dengan Gemini Vision menjadi prompt produksi profesional', badge: 'VISION AI' },
         { id: 'fakeovo', icon: 'fa-solid fa-wallet', name: 'Fake OVO', desc: 'Generator tampilan saldo OVO', badge: 'CANVAS' },
         { id: 'quotegenerator', icon: 'fa-solid fa-quote-left', name: 'Quote Generator', desc: 'Buat gambar quote monokrom', badge: 'JPG' },
@@ -1986,6 +1987,7 @@ function showTool(toolId) {
         case 'trimpath': renderFlamoTrimpath(body); break;
         case 'logoanimate': renderFlamoLogoAnimate(body); break;
         case 'promptgenerate': renderPromptGenerator(body); break;
+        case 'aiimage': renderPuterImage(body); break;
         case 'fakeovo': renderFakeOvo(body); break;
         case 'quotegenerator': renderQuoteGenerator(body); break;
         case 'carifakta': renderCariFakta(body); break;

@@ -1,3 +1,12 @@
+## 6.4.0 HF25 Puter AI Image — 2026-08-27
+
+- Fitur: menambahkan Nexora AI Image berbasis Puter untuk membuat gambar dari prompt, memilih model, rasio, preview, dan mengunduh hasil.
+- Akun: login Puter hanya dibuka setelah pengguna menekan tombol; setiap pengguna memakai allowance Puter miliknya sendiri, termasuk pengguna VVIP Nexora.
+- Privasi: tidak ada API key atau token Puter di source; Nexora tidak menyimpan password, prompt, maupun gambar hasil.
+- Stabilitas: workspace memakai satu layout original yang sama di PC dan Android, tanpa media query desktop, backdrop blur, atau animasi berat.
+- Infrastruktur: lazy module, CSP Puter, katalog 54 tool, health catalog, seed, migration 027, tautan langsung README, dan cache-bust HF25 aktif tanpa menambah Vercel Function.
+- QA: regression khusus memvalidasi login eksplisit, user-pays, daftar model, batas prompt, CSP, routing, privasi, dan panduan Bahasa Indonesia.
+
 ## 6.4.0 HF24 Persistent Android cursor — 2026-08-27
 
 - Android: dot dan ring merah kini dibuat pada perangkat sentuh, tampil sejak halaman dimuat, mengikuti `pointerdown`/`pointermove`, dan menetap pada posisi terakhir setelah jari terangkat.

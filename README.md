@@ -1,6 +1,32 @@
 # All Tools Nexora
 
-All Tools Nexora v6.4.0 adalah website toolkit statis dengan 53 tool, lazy-loaded feature modules, dashboard admin, Supabase, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency `@google/genai`.
+All Tools Nexora v6.4.0 adalah website toolkit statis dengan 54 tool, lazy-loaded feature modules, dashboard admin, Supabase, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency `@google/genai`.
+
+## Cara memakai Nexora AI Image
+
+Fitur ini dipakai untuk membuat gambar dari tulisan. Contohnya, kamu bisa menulis “kucing memakai baju astronot”, lalu AI akan membuat gambarnya.
+
+**[Buka Nexora AI Image di sini](https://all-tools-nexora.vercel.app/#tool-aiimage)**
+
+Langkahnya mudah:
+
+1. Buka link di atas.
+2. Tekan tombol **Hubungkan Puter**.
+3. Login atau buat akun Puter. Login dilakukan di Puter, jadi Nexora tidak melihat password kamu.
+4. Tulis gambar yang kamu inginkan pada kotak prompt.
+5. Pilih model dan ukuran gambar. Kalau bingung, pakai pilihan yang sudah terpasang.
+6. Tekan **Buat Gambar**, lalu tunggu sampai gambarnya muncul.
+7. Tekan **Unduh Gambar** untuk menyimpan hasil ke HP atau komputer.
+
+Hal penting yang perlu diketahui:
+
+- Setiap pengguna harus menghubungkan akun Puter miliknya sendiri, termasuk pengguna VVIP Nexora.
+- Gambar memakai allowance atau jatah dari akun Puter pengguna. Jatah developer Nexora tidak dipakai.
+- Nexora tidak meminta API key Puter dan tidak menyimpan password, prompt, atau gambar hasil.
+- Jika jatah habis, cek pemakaian akun Puter atau tunggu jatah tersedia lagi.
+- Jangan membuat gambar yang melanggar hukum, merugikan orang lain, atau melanggar aturan Puter.
+
+Fitur ini memakai sistem [User-Pays dari Puter](https://developer.puter.com/tutorials/free-unlimited-image-generation-api/). Harga dan batas pemakaian mengikuti [ketentuan Puter](https://developer.puter.com/pricing/).
 
 ## Menjalankan secara lokal
 
@@ -78,6 +104,8 @@ Untuk instalasi baru, jalankan `database/schema.sql` melalui Supabase SQL Editor
 Untuk database lama, jalankan migration yang belum pernah diterapkan dari `database/migrations/` sesuai urutan nomor. Backup database terlebih dahulu.
 
 Migration `database/migrations/026_flamo_native_generators.sql` menambahkan enam generator XML lokal ke katalog database. Frontend tetap mempertahankan katalog bundle jika database belum diperbarui, tetapi migration ini perlu dijalankan sekali agar Dashboard Admin dan data Supabase ikut sinkron.
+
+Migration `database/migrations/027_puter_ai_image.sql` menambahkan Nexora AI Image ke katalog database. Fitur berjalan langsung di browser melalui Puter, tidak memakai API key Nexora, dan tidak menambah Vercel Function.
 
 Migration `database/migrations/023_document_ai_vvip.sql` tetap mempertahankan kuota Document AI, tetapi v6.4.0 mengubah akses katalognya menjadi FREE. Jalankan ulang migration ini satu kali pada database lama agar Dashboard Admin menampilkan status yang sama dengan frontend.
 

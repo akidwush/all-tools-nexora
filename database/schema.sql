@@ -181,6 +181,7 @@ values
   ('tanyaustadz', 'Tanya Ustadz', 'Meme generator', 'maker', 'Lucu', 'fa-solid fa-user-tie', null, true, 100, '{}'::jsonb),
   ('mltools', 'ML Tools', 'Script ML, Winrate dan Stalk MLBB', 'tools', 'MLBB', 'fa-solid fa-gamepad', null, true, 0, '{}'::jsonb),
   ('comicreader', 'Baca Komik Full', 'Manga, manhwa, manhua + reader', 'tools', 'FULL', 'fa-solid fa-book-open-reader', null, true, 10, '{}'::jsonb),
+  ('aiimage', 'Nexora AI Image', 'Buat gambar AI memakai akun dan allowance Puter milik pengguna', 'tools', 'PUTER AI', 'fa-solid fa-image', null, true, 15, '{"provider":"puter","billing":"user-pays","apiKeyRequired":false,"privacy":"not-stored"}'::jsonb),
   ('promptgenerate', 'Prompt Generator', 'Analisis gambar dengan Gemini Vision menjadi prompt produksi profesional', 'tools', 'VISION AI', 'fa-solid fa-wand-magic-sparkles', null, true, 20, '{"provider":"gemini","privacy":"not-stored","targets":["midjourney","flux","stable-diffusion","ideogram","video"]}'::jsonb),
   ('fakeovo', 'Fake OVO', 'Generator tampilan saldo OVO', 'tools', 'CANVAS', 'fa-solid fa-wallet', null, true, 30, '{}'::jsonb),
   ('quotegenerator', 'Quote Generator', 'Buat gambar quote monokrom', 'tools', 'JPG', 'fa-solid fa-quote-left', null, true, 40, '{}'::jsonb),

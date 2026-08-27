@@ -89,6 +89,14 @@
         "assets/js/features/prompt-generator.js"
       ]
     },
+    "puter-image": {
+      "css": [
+        "assets/css/features/puter-image.css"
+      ],
+      "js": [
+        "assets/js/features/puter-image.js"
+      ]
+    },
     "image-vectorizer": {
       "css": [
         "assets/css/features/image-vectorizer.css"
@@ -223,6 +231,7 @@
     "sertifikat": "source-features",
     "fakedev": "source-features",
     "promptgenerate": "prompt-generator",
+    "aiimage": "puter-image",
     "fakeovo": "imported-tools",
     "quotegenerator": "imported-tools",
     "carifakta": "imported-tools",
