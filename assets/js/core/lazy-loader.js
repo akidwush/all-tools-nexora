@@ -69,7 +69,7 @@
     [/crypto-market\.(?:js|css)(?:$|\?)/, 'crypto-mtf'],
     [/comic-reader\.(?:js|css)(?:$|\?)/, 'comic-reader'],
     [/svg-alight\.(?:js|css)(?:$|\?)/, 'svg-alight'],
-    [/alight-premium\.js(?:$|\?)/, 'alight-premium'],
+    [/alight-premium\.(?:js|css)(?:$|\?)/, 'alight-premium-hf30'],
     [/(?:tiktok|download-pack|source-features)\.js(?:$|\?)/, 'download']
   ];
   var baseShowTool = typeof window.showTool === 'function' ? window.showTool : null;

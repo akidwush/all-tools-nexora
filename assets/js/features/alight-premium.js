@@ -28,8 +28,12 @@
     return fallback;
   }
 
-  function validGmail(email){
-    return /^[^\s@]+@gmail\.com$/i.test(String(email||'').trim());
+  function validEmail(value){
+    var email=String(value||'').trim();
+    var separator=email.lastIndexOf('@');
+    var local=separator>0?email.slice(0,separator):'';
+    var domain=separator>0?email.slice(separator+1):'';
+    return email.length<=254 && separator===email.indexOf('@') && local.length>0 && local.length<=64 && !/^\.|\.$|\.\./.test(local) && /^[^\s@\u0000-\u001f\u007f]+$/.test(local) && /^(?=.{1,189}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+(?:[a-z]{2,63}|xn--[a-z0-9-]{2,59})$/i.test(domain);
   }
 
   async function providerGet(action,payload){
@@ -89,7 +93,7 @@
           <article class="nap-card">
             <header><span>01</span><div><small>STEP ONE</small><h3>Request Magic Link</h3></div></header>
             <label for="napEmailOne">Email Alight Motion</label>
-            <div class="nap-field"><i class="fa-regular fa-envelope"></i><input id="napEmailOne" type="email" inputmode="email" autocomplete="email" placeholder="name@gmail.com"></div>
+            <div class="nap-field"><i class="fa-regular fa-envelope"></i><input id="napEmailOne" type="email" inputmode="email" autocomplete="email" maxlength="254" placeholder="nama@email.com"></div>
             <button class="nap-primary" id="napMagicBtn" type="button"><i class="fa-solid fa-paper-plane"></i><span>Request Magic Link</span></button>
             <div class="nap-result" id="napMagicResult" hidden></div>
           </article>
@@ -97,7 +101,7 @@
           <article class="nap-card">
             <header><span>02</span><div><small>STEP TWO</small><h3>Apply Premium</h3></div></header>
             <label for="napEmailTwo">Email Alight Motion</label>
-            <div class="nap-field"><i class="fa-regular fa-envelope"></i><input id="napEmailTwo" type="email" inputmode="email" autocomplete="email" placeholder="name@gmail.com"></div>
+            <div class="nap-field"><i class="fa-regular fa-envelope"></i><input id="napEmailTwo" type="email" inputmode="email" autocomplete="email" maxlength="254" placeholder="nama@email.com"></div>
             <label for="napMagicLink">Magic Link</label>
             <div class="nap-field nap-field-link"><i class="fa-solid fa-link"></i><input id="napMagicLink" type="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Paste magic link dari email"></div>
             <button class="nap-primary nap-apply" id="napApplyBtn" type="button"><i class="fa-solid fa-bolt"></i><span>Apply Premium 1 Tahun</span></button>
@@ -135,8 +139,8 @@
     }
 
     magicButton.addEventListener('click',async function(){
-      var email=emailOne.value.trim().toLowerCase();
-      if(!validGmail(email)){showResult(magicResult,'error','Gunakan alamat email @gmail.com yang valid.');emailOne.focus();return;}
+      var email=emailOne.value.trim();
+      if(!validEmail(email)){showResult(magicResult,'error','Masukkan alamat email yang valid.');emailOne.focus();return;}
       setBusy(magicButton,true,'Requesting…');sessionStatus.textContent='REQUESTING MAGIC LINK';magicResult.hidden=true;
       try{
         var result=await providerGet('magic-link',{email:email});
@@ -150,9 +154,9 @@
     });
 
     applyButton.addEventListener('click',async function(){
-      var email=(emailTwo.value.trim()||emailOne.value.trim()).toLowerCase();
+      var email=emailTwo.value.trim()||emailOne.value.trim();
       var link=magicLink.value.trim();
-      if(!validGmail(email)){showResult(applyResult,'error','Gunakan alamat email @gmail.com yang valid.');emailTwo.focus();return;}
+      if(!validEmail(email)){showResult(applyResult,'error','Masukkan alamat email yang valid.');emailTwo.focus();return;}
       if(!/^https:\/\//i.test(link)){showResult(applyResult,'error','Paste magic link HTTPS lengkap dari email.');magicLink.focus();return;}
       setBusy(applyButton,true,'Applying…');sessionStatus.textContent='APPLYING PREMIUM';applyResult.hidden=true;
       try{

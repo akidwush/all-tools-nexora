@@ -38,6 +38,10 @@ assert.ok(ui.includes("url.searchParams.set('link'"));
 assert.ok(!ui.includes("method:'POST'"));
 assert.ok(!ui.includes("https://api.kyzznekoo.my.id"), "browser tidak boleh fetch provider secara cross-origin");
 assert.ok(!ui.includes("AbortController"));
+assert.ok(ui.includes("function validEmail"));
+assert.ok(ui.includes('placeholder="nama@email.com"'));
+assert.ok(!ui.includes("validGmail"));
+assert.ok(!ui.includes("@gmail.com"));
 
 assert.ok(local.includes('"/api/alight-premium/magic-link"'));
 assert.ok(local.includes('"/api/alight-premium/apply-premium"'));
@@ -47,6 +51,11 @@ assert.ok(proxy.includes('const https = require("node:https")'));
 assert.ok(proxy.includes("family: 4"));
 assert.ok(!proxy.includes("await fetch("));
 assert.ok(!proxy.includes("AbortController"));
+assert.ok(!proxy.includes("@gmail.com"));
+assert.equal(require(path.join(root, "lib/alight-premium-proxy.js")).normalizeEmail("ellampremmm@fboxmail.com"), "ellampremmm@fboxmail.com");
+assert.equal(require(path.join(root, "lib/alight-premium-proxy.js")).normalizeEmail("User.Name+tag@OUTLOOK.COM"), "User.Name+tag@outlook.com");
+assert.throws(() => require(path.join(root, "lib/alight-premium-proxy.js")).normalizeEmail("email-tidak-valid"), /alamat email yang valid/i);
+assert.match(read("assets/js/core/lazy-loader.js"), /alight-premium-hf30/);
 
 assert.ok(ui.includes("renderAlightPremium"));
 assert.ok(ui.includes("Apply Premium 1 Tahun"));

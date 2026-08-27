@@ -1,3 +1,10 @@
+## 6.4.0 HF30 Alight Premium all-email — 2026-08-27
+
+- Compatibility: Request Magic Link dan Apply Premium kini menerima alamat email valid dari provider mana pun, termasuk Gmail, Outlook, Yahoo, dan domain temp mail seperti GenMail.
+- Validation: pembatas hard-code `@gmail.com` dihapus dari frontend dan proxy server; batas panjang, format local-part, hostname domain, karakter kontrol, dan multiple-`@` tetap ditolak.
+- Privacy: alamat email tetap dikirim hanya melalui protected same-origin gateway Nexora menuju provider Alight Motion.
+- Cache/QA: asset Alight Premium memakai cache-bust HF30 dan regression memastikan email non-Gmail diterima tanpa melemahkan validasi.
+
 ## 6.4.0 HF29 GenMail — 2026-08-27
 
 - Fitur: menambahkan GenMail untuk mengambil domain, membuat email sementara, memeriksa inbox, dan membaca pesan melalui KuroNeko API.
