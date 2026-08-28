@@ -31,9 +31,9 @@ assert.match(shell, /aivideo:\{renderer:'renderPuterVideo'/);
 assert.match(registry, /\["aivideo","Nexora AI Video Generator","module","puter-video","renderPuterVideo",null\]/);
 assert.match(health, /id: "aivideo", name: "Nexora AI Video Generator"/);
 assert.match(lazy, /aivideo:'puter-video'/);
-assert.match(lazy, /puter-video-hf45/);
+assert.match(lazy, /puter-video-hf46/);
 assert.match(lazy, /'puter-video':'Nexora AI Video Generator'/);
-assert.match(index, /hf45-puter-video1/);
+assert.match(index, /hf46-puter-video1/);
 assert.match(readme, /#tool-aivideo/);
 assert.match(readme, /60 tool/);
 
@@ -59,6 +59,9 @@ assert.match(connectHelper, /var puter = window\.puter;[\s\S]*?await puter\.auth
 const generationHelper = feature.match(/function generateVideoWithPuter\(params\) \{[\s\S]*?\n  \}/)[0];
 assert.doesNotMatch(generationHelper, /\bawait\b|loadSdk\(/);
 assert.match(generationHelper, /var request = sdk\.ai\.txt2vid\(params\.prompt, options\)/);
+assert.match(generationHelper, /options\.puter_output_path = outputPath/);
+assert.match(feature, /sdk\.fs\.read\(outputPath\)/);
+assert.match(feature, /sdk\.fs\.delete\(outputPath\)/);
 assert.match(css, /\.nvg-auth-retry/);
 assert.match(feature, /body\.__nxCleanup/);
 assert.match(feature, /URL\.revokeObjectURL/);
@@ -202,17 +205,47 @@ async function verifyMediaNormalization() {
         callOrder.push({ prompt, options });
         return Promise.resolve({ asset_url: "https://assets.puter.site/direct-tap.mp4" });
       }
+    },
+    fs: {
+      read() { throw new Error("fallback tidak seharusnya dipakai"); },
+      delete() { return Promise.resolve(); }
     }
   };
   const generation = helpers.generate({ prompt: "Direct tap", modelId: "sora-2", duration: 4, aspect: "9:16", mode: "text" });
   assert.equal(callOrder.length, 1, "txt2vid harus terpanggil sinkron sebelum promise ditunggu");
   assert.equal(callOrder[0].prompt, "Direct tap");
+  assert.match(callOrder[0].options.puter_output_path, /^nexora-ai-video-\d+\.mp4$/);
   const generated = await generation;
   assert.match(generated.videoUrl, /direct-tap\.mp4$/);
+
+  let fallbackRead = 0;
+  let temporaryDeleted = 0;
+  sandbox.window.puter = {
+    ai: {
+      txt2vid() { return Promise.resolve({ success: true, result: { unknown_media: true } }); }
+    },
+    fs: {
+      read(path) {
+        fallbackRead += 1;
+        assert.match(path, /^nexora-ai-video-\d+\.mp4$/);
+        return Promise.resolve(new Blob(["recovered video"], { type: "video/mp4" }));
+      },
+      delete(path) {
+        temporaryDeleted += 1;
+        assert.match(path, /^nexora-ai-video-\d+\.mp4$/);
+        return Promise.resolve();
+      }
+    }
+  };
+  const recovered = await helpers.generate({ prompt: "Recover file", modelId: "sora-2", duration: 4, aspect: "9:16", mode: "text" });
+  assert.equal(recovered.metadata.sourceType, "PuterFS");
+  assert.equal(recovered.blob.type, "video/mp4");
+  assert.equal(fallbackRead, 1);
+  assert.equal(temporaryDeleted, 1);
 }
 
 Promise.all([verifyImageValidation(), verifyMediaNormalization()]).then(() => {
-  console.log("Nexora AI Video HF45 lulus: txt2vid sinkron dari tap Android, re-auth inline, validasi sesi, result normalizer, image prep, player, cleanup, mobile, dan zero-backend tervalidasi.");
+  console.log("Nexora AI Video HF46 lulus: fallback Blob Puter FS, cleanup file sementara, txt2vid direct-tap Android, auth, player, mobile, dan zero-backend tervalidasi.");
 }).catch((error) => {
   console.error(error);
   process.exit(1);

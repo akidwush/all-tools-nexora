@@ -316,3 +316,8 @@
 - Mengganti audit/build historis dengan pemeriksaan berbasis registry dan manifest aktual.
 - Menambahkan test runner, test server lokal, dan regression test keamanan.
 - Menghapus catatan patch/validasi per-rilis yang usang dan merapikan README.
+# 6.4.0 HF46 Puter video Blob recovery — 2026-08-28
+
+- AI Video sekarang meminta Puter menyimpan hasil ke file aplikasi sementara, lalu memakai `puter.fs.read()` sebagai fallback resmi ketika payload langsung SDK tidak dapat dinormalisasi.
+- File sementara dihapus segera setelah hasil menjadi Blob/browser URL; Nexora tetap tidak memakai Supabase, backend proxy, atau penyimpanan video permanen.
+- Jalur `txt2vid()` tetap dipanggil langsung dari gesture tap Android agar otorisasi browser tidak kembali terblokir.

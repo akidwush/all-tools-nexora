@@ -213,6 +213,25 @@
     ]);
   }
 
+  function isUnreadableVideoError(error) {
+    return /PUTER_VIDEO_(?:EMPTY|INVALID)_RESULT/.test(String(error && error.message || error || ""));
+  }
+
+  function removeTemporaryPuterVideo(sdk, outputPath) {
+    if (!sdk || !sdk.fs || typeof sdk.fs.delete !== "function" || !outputPath) return Promise.resolve();
+    return Promise.resolve(sdk.fs.delete(outputPath)).catch(function () { return null; });
+  }
+
+  function normalizeGeneratedPuterVideo(sdk, raw, outputPath) {
+    return normalizePuterVideoResult(raw).catch(function (error) {
+      if (!isUnreadableVideoError(error) || !sdk.fs || typeof sdk.fs.read !== "function") throw error;
+      return sdk.fs.read(outputPath).then(function (blob) {
+        if (typeof Blob === "undefined" || !(blob instanceof Blob) || !blob.size) throw error;
+        return ownedBlobResult(blob, "PuterFS");
+      });
+    });
+  }
+
   function generateVideoWithPuter(params) {
     var sdk = window.puter;
     if (!sdk || !sdk.ai || typeof sdk.ai.txt2vid !== "function") throw new Error("PUTER_SDK_UNAVAILABLE");
@@ -225,8 +244,12 @@
       if (!inputReference) throw new Error("PUTER_VIDEO_IMAGE_READ_FAILED");
     }
     var options = buildVideoOptions(model, params.duration, params.aspect, inputReference);
+    var outputPath = "nexora-ai-video-" + Date.now() + ".mp4";
+    options.puter_output_path = outputPath;
     var request = sdk.ai.txt2vid(params.prompt, options);
-    return withTimeout(request, GENERATION_TIMEOUT_MS).then(normalizePuterVideoResult);
+    return withTimeout(request, GENERATION_TIMEOUT_MS)
+      .then(function (raw) { return normalizeGeneratedPuterVideo(sdk, raw, outputPath); })
+      .finally(function () { return removeTemporaryPuterVideo(sdk, outputPath); });
   }
 
   function videoErrorMessage(error) {
