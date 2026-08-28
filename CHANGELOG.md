@@ -1,3 +1,10 @@
+## 6.4.0 HF35 Danbooru Android CDN recovery — 2026-08-28
+
+- Fix: gambar dari `cdn.donmai.us` ditampilkan melalui image CDN HTTPS terverifikasi karena sebagian jaringan Android menerima sertifikat origin sebagai `NET::ERR_CERT_AUTHORITY_INVALID`.
+- Performance: gallery memakai lebar 640 piksel dan viewer 1600 piksel; file tidak diproxy melalui Vercel dan gambar tetap lazy/async.
+- Privacy/security: fallback hanya berlaku untuk hostname Danbooru yang persis, memakai `no-referrer`, serta tidak membawa query, cookie, API key, atau payload KuroNeko.
+- Cache: versi lazy asset dinaikkan ke `danbooru-search-hf35` agar browser tidak memakai JavaScript lama.
+
 ## 6.4.0 HF34 Danbooru full file URL — 2026-08-27
 
 - Fix: normalizer kini mengenali `result.full_file_url`, nama field URL gambar yang terbukti dikirim endpoint produksi KuroNeko.

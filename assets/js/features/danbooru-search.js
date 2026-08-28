@@ -19,6 +19,22 @@
     return String(value == null ? "" : value).trim().slice(0, maximum || 500);
   }
 
+  function displayImageUrl(value, width) {
+    var raw = text(value, 8192);
+    if (!raw) return "";
+    try {
+      var source = new URL(raw);
+      if (source.protocol !== "https:" || source.hostname.toLowerCase() !== "cdn.donmai.us") return raw;
+      var proxy = new URL("https://i0.wp.com/" + source.hostname + source.pathname);
+      proxy.searchParams.set("ssl", "1");
+      proxy.searchParams.set("quality", width ? "82" : "94");
+      if (width) proxy.searchParams.set("w", String(width));
+      return proxy.toString();
+    } catch (_) {
+      return raw;
+    }
+  }
+
   function copyText(value) {
     if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(value);
     var field = document.createElement("textarea");
@@ -164,9 +180,10 @@
       if (imageUrl) {
         var frame = element("div", "ndb-viewer-frame");
         var image = document.createElement("img");
-        image.src = imageUrl;
+        image.src = displayImageUrl(imageUrl, 1600);
         image.alt = "Preview hasil Danbooru";
         image.decoding = "async";
+        image.referrerPolicy = "no-referrer";
         image.addEventListener("error", function () {
           image.hidden = true;
           frame.classList.add("is-broken");
@@ -187,14 +204,15 @@
 
       var actions = element("div", "ndb-actions");
       if (item.imageUrl) {
-        actions.appendChild(actionLink("Open Image", "fa-solid fa-arrow-up-right-from-square", item.imageUrl, false));
+        var accessibleImageUrl = displayImageUrl(item.imageUrl, 0);
+        actions.appendChild(actionLink("Open Image", "fa-solid fa-arrow-up-right-from-square", accessibleImageUrl, false));
         var copy = element("button", "ndb-action", "Copy Image Link");
         copy.type = "button";
         copy.addEventListener("click", function () {
-          copyText(item.imageUrl).then(function () { showToast("Link copied"); }).catch(function () { showToast("Gagal menyalin link"); });
+          copyText(accessibleImageUrl).then(function () { showToast("Link copied"); }).catch(function () { showToast("Gagal menyalin link"); });
         });
         actions.appendChild(copy);
-        actions.appendChild(actionLink("Download", "fa-solid fa-download", item.imageUrl, true));
+        actions.appendChild(actionLink("Download", "fa-solid fa-download", accessibleImageUrl, true));
       }
       if (item.sourceUrl) actions.appendChild(actionLink("Buka Sumber", "fa-solid fa-link", item.sourceUrl, false));
       if (actions.childNodes.length) viewerContent.appendChild(actions);
@@ -228,10 +246,11 @@
         tile.setAttribute("aria-label", "Buka gambar " + (index + 1));
         var frame = element("span", "ndb-thumb");
         var image = document.createElement("img");
-        image.src = item.thumbnail || item.imageUrl;
+        image.src = displayImageUrl(item.thumbnail || item.imageUrl, 640);
         image.alt = "Hasil Danbooru " + (index + 1);
         image.loading = "lazy";
         image.decoding = "async";
+        image.referrerPolicy = "no-referrer";
         image.addEventListener("error", function () {
           image.hidden = true;
           frame.classList.add("is-broken");
