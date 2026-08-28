@@ -93,15 +93,15 @@ Gallery memakai thumbnail jika server memberikannya. Jika server hanya memberika
 
 **[Buka Anime to Real](https://all-tools-nexora.vercel.app/#tool-animetoreal)**
 
-Anime to Real mengubah gambar anime menjadi gambar bergaya realistis. Kamu hanya perlu menyiapkan link gambar yang dapat dibuka tanpa login.
+Anime to Real mengubah gambar anime menjadi gambar bergaya realistis. Kamu dapat memakai link gambar langsung atau memilih gambar dari galeri HP.
 
-1. Salin URL gambar anime. URL harus dimulai dengan `http://` atau `https://`.
-2. Buka **Anime to Real**, lalu tempel URL ke kotak **Image URL**. Kamu juga dapat menekan **Paste**.
-3. Tekan **Convert** satu kali dan tunggu. Proses AI dapat membutuhkan waktu hingga satu menit.
-4. Jika berhasil, hasil akan muncul di bawah gambar asli.
-5. Gunakan **Open Image**, **Download Result**, atau **Copy Link** sesuai kebutuhan.
+1. Untuk memakai link, tempel URL file gambar ke kotak **Image URL**. URL harus dimulai dengan `http://` atau `https://`.
+2. Link Google Share dan Pinterest biasanya membuka halaman, bukan file gambar langsung. Jika link seperti itu gagal, tekan **Pilih Gambar** lalu pilih file dari galeri.
+3. Format upload yang didukung adalah JPG, PNG, dan WebP. Gambar besar diperkecil otomatis sebelum dikirim.
+4. Tekan **Convert** satu kali dan tunggu. Proses AI dapat membutuhkan waktu sekitar satu menit.
+5. Jika berhasil, gunakan **Open Image**, **Download Result**, atau **Copy Link**.
 
-API key KuroNeko hanya dibaca oleh server melalui `KURONEKO_API_KEY`. Browser tidak menerima key tersebut. Fitur ini tidak memakai database, Supabase client, Supabase Edge Function, atau Supabase Storage; gambar juga tidak disimpan oleh Nexora.
+API key KuroNeko hanya dibaca oleh server melalui `KURONEKO_API_KEY`. Browser tidak menerima key tersebut. Fitur ini tidak memakai database, Supabase client, Supabase Edge Function, atau Supabase Storage. Saat memilih file, gambar dibuat publik sementara melalui Litterbox selama maksimal satu jam agar KuroNeko dapat membacanya; Nexora tidak menyimpan file secara permanen.
 
 Jika gambar asli tidak tampil tetapi URL sudah benar, kamu tetap boleh mencoba konversi. Jika provider menolak gambar, gunakan gambar publik lain dan jangan mencoba melewati pembatasan keamanan provider.
 

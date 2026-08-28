@@ -70,7 +70,7 @@
     [/genmail\.(?:js|css)(?:$|\?)/, 'genmail-v1'],
     [/aio-downloader\.(?:js|css)(?:$|\?)/, 'aio-downloader-hf31'],
     [/danbooru-search\.(?:js|css)(?:$|\?)/, 'danbooru-search-hf35'],
-    [/anime-to-real\.(?:js|css)(?:$|\?)/, 'anime-to-real-hf36'],
+    [/anime-to-real\.(?:js|css)(?:$|\?)/, 'anime-to-real-hf37'],
     [/document-ai\.(?:js|css)(?:$|\?)/, 'document-android'],
     [/crypto-market\.(?:js|css)(?:$|\?)/, 'crypto-mtf'],
     [/comic-reader\.(?:js|css)(?:$|\?)/, 'comic-reader'],

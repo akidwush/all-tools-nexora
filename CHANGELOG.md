@@ -1,3 +1,12 @@
+## 6.4.0 HF37 Anime to Real gallery upload — 2026-08-28
+
+- UX: mempertahankan input Image URL dan menambahkan pilihan gambar langsung dari galeri Android sebagai sumber kedua.
+- Compatibility: link Google Share/Pinterest yang bukan direct image dapat diganti dengan upload file tanpa menghapus fitur tautan.
+- Upload: JPG, PNG, dan WebP divalidasi, diperkecil maksimal 1600 piksel, lalu dikirim ke URL publik sementara satu jam agar endpoint KuroNeko berbasis URL dapat membacanya.
+- Privacy: Nexora tidak menyimpan file; upload sementara memakai Litterbox, tidak menambah database, Supabase, Storage, dependency, atau environment variable.
+- Security: magic-byte file, MIME, ukuran 2,5 MB, body/query whitelist, rate limit, deduplikasi, timeout, error sanitization, dan API key server-only tetap aktif.
+- Cache: asset Anime to Real dinaikkan ke `anime-to-real-hf37` agar browser tidak mempertahankan UI HF36.
+
 ## 6.4.0 HF36 Anime to Real — 2026-08-28
 
 - Fitur: menambahkan Anime to Real mobile-first dengan input URL, Paste, preview Original, hasil Realistic, Open Image, Download, dan Copy Link.

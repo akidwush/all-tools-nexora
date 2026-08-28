@@ -70,7 +70,7 @@ assert.match(localServer, /"\/api\/ai\/anime-to-real"[^\n]+service: "anime-to-re
 assert.match(app, /case 'animetoreal': renderAnimeToReal\(body\); break;/);
 assert.match(shell, /animetoreal:\{renderer:'renderAnimeToReal'/);
 assert.match(lazy, /animetoreal:'anime-to-real'/);
-assert.match(lazy, /anime-to-real-hf36/);
+assert.match(lazy, /anime-to-real-hf3[67]/);
 assert.match(registry, /\["animetoreal","Anime to Real","api","anime-to-real","renderAnimeToReal"/);
 assert.match(read("lib/tool-health.js"), /id: "animetoreal"/);
 assert.match(schema, /'animetoreal'/);
@@ -192,8 +192,8 @@ const oldKey = process.env.KURONEKO_API_KEY;
   assert.equal(second.statusCode, 200);
   assert.equal(calls, 1, "URL identik saat aktif harus berbagi satu request upstream");
 
-  const post = await invoke("url=https%3A%2F%2Fexample.com%2Fa.jpg", async () => responsePayload({}), "POST");
-  assert.equal(post.statusCode, 405);
+  const unsupportedMethod = await invoke("url=https%3A%2F%2Fexample.com%2Fa.jpg", async () => responsePayload({}), "PUT");
+  assert.equal(unsupportedMethod.statusCode, 405);
 
   console.log("Anime to Real HF36 lulus: KuroNeko server-only, tanpa Supabase, normalizer toleran, no-store, timeout, dedup, error aman, UI mobile, dan routing 12-Function tervalidasi.");
 })().catch((error) => {
