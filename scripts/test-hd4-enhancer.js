@@ -30,13 +30,13 @@ function mockResponse() {
 }
 
 let requestNumber = 0;
-async function invoke(params, fetchImpl, method = "GET", runtime = {}) {
+async function invoke(params, fetchImpl, method = "GET", runtime = {}, body = {}) {
   requestNumber += 1;
   const response = mockResponse();
   const query = params instanceof URLSearchParams ? params : new URLSearchParams(params);
   const url = new URL("https://nexora.test/api/tools/hd4?_service=hd4-enhancer&" + query.toString());
   await hd4.handleHD4(
-    { method, headers: { "x-forwarded-for": "198.51.100." + requestNumber } },
+    { method, headers: { "x-forwarded-for": "198.51.100." + requestNumber, "content-type": "application/json" }, body },
     response,
     url,
     { fetch: fetchImpl, ...runtime }
@@ -70,7 +70,7 @@ assert.match(app, /case 'enhancer': renderHd4Enhancer\(body\); break;/);
 assert.doesNotMatch(app, /function renderEnhancer\s*\(/);
 assert.match(shell, /enhancer:\s+\{renderer:'renderHd4Enhancer'/);
 assert.match(lazy, /enhancer:'hd4-enhancer'/);
-assert.match(lazy, /hd4-enhancer-v1/);
+assert.match(lazy, /hd4-enhancer-v2/);
 assert.match(registry, /\["enhancer","Nexora Image HD Enhancer V4","api","hd4-enhancer","renderHd4Enhancer"/);
 assert.match(read("lib/tool-health.js"), /id: "enhancer", name: "Nexora Image HD Enhancer V4"/);
 assert.equal((read(".env.example").match(/^KURONEKO_API_KEY=$/gm) || []).length, 1);
@@ -81,6 +81,12 @@ assert.match(frontend, /new AbortController\(\)/);
 assert.match(frontend, /new URLSearchParams\(\{ url: inputUrl \}\)/);
 assert.match(frontend, /if \(sessionState\.loading\) return/);
 assert.match(frontend, /body\.__nxCleanup/);
+assert.match(frontend, /id="nxhd4File"/);
+assert.match(frontend, /Pilih Gambar/);
+assert.match(frontend, /prepareUpload/);
+assert.match(frontend, /MAX_IMAGE_EDGE = 1600/);
+assert.match(frontend, /method: useUpload \? "POST" : "GET"/);
+assert.match(frontend, /JSON\.stringify\(\{ imageData: sessionState\.fileData \}\)/);
 assert.match(frontend, /loading = "lazy"/);
 assert.match(frontend, /decoding = "async"/);
 assert.match(frontend, /Download/);
@@ -89,6 +95,9 @@ assert.match(frontend, /Copy Link/);
 assert.doesNotMatch(frontend, /sylvatica\.my\.id|KURONEKO_API_KEY|apikey|supabase|localStorage|sessionStorage|setInterval/i);
 assert.doesNotMatch(backend, /require\(["']\.\/database|supabase|fetch\(inputUrl\)|fetch\(userUrl\)|setInterval/i);
 assert.match(backend, /new URLSearchParams\(\{ url: inputUrl, apikey: apiKey \}\)/);
+assert.match(backend, /decodeHD4Upload/);
+assert.match(backend, /uploadTemporaryImage/);
+assert.match(backend, /request\.method === "POST"/);
 assert.match(backend, /redirect: "manual"/);
 assert.match(css, /overflow-x:clip/);
 assert.match(css, /max-width:100%/);
@@ -172,6 +181,31 @@ const oldKey = process.env.KURONEKO_API_KEY;
   assert.equal(timeout.payload.error, "HD4_TIMEOUT");
 
   hd4.resetHD4State();
+  let stagedUrl = "";
+  const uploadResult = await invoke({}, async (url) => {
+    if (String(url).includes("litterbox.catbox.moe")) {
+      return {
+        ok: true,
+        status: 200,
+        headers: { get() { return null; } },
+        text: async () => "https://litter.catbox.moe/temporary-hd4.jpg"
+      };
+    }
+    stagedUrl = new URL(url).searchParams.get("url") || "";
+    return upstreamResponse({ result: { image_url: "https://cdn.example.com/upload-enhanced.jpg" } }, 200, { "content-type": "application/json" });
+  }, "POST", {}, { imageData: "data:image/jpeg;base64,/9j/" });
+  assert.equal(uploadResult.statusCode, 200);
+  assert.equal(stagedUrl, "https://litter.catbox.moe/temporary-hd4.jpg");
+  assert.equal(uploadResult.payload.data.imageUrl, "https://cdn.example.com/upload-enhanced.jpg");
+  assert.doesNotMatch(JSON.stringify(uploadResult.payload), /litter|temporary-hd4|test_key_not_a_real_secret/);
+
+  const fakeUpload = await invoke({}, async () => upstreamResponse({}), "POST", {}, { imageData: "data:image/jpeg;base64,ZmFrZQ==" });
+  assert.equal(fakeUpload.statusCode, 415);
+  assert.equal(fakeUpload.payload.error, "HD4_UPLOAD_INVALID");
+  const injectedUpload = await invoke({ url: "https://cdn.example.com/injected.jpg" }, async () => upstreamResponse({}), "POST", {}, { imageData: "data:image/jpeg;base64,/9j/" });
+  assert.equal(injectedUpload.statusCode, 400);
+
+  hd4.resetHD4State();
   let calls = 0;
   const sharedFetch = async () => {
     calls += 1;
@@ -184,8 +218,8 @@ const oldKey = process.env.KURONEKO_API_KEY;
   assert.equal(second.statusCode, 200);
   assert.equal(calls, 1, "Double tap harus berbagi satu request upstream");
 
-  const post = await invoke({ url: "https://cdn.example.com/a.webp" }, async () => upstreamResponse({}), "POST");
-  assert.equal(post.statusCode, 405);
+  const put = await invoke({ url: "https://cdn.example.com/a.webp" }, async () => upstreamResponse({}), "PUT");
+  assert.equal(put.statusCode, 405);
 
   console.log("Nexora Image HD Enhancer V4 lulus: URL, JPG/PNG/WebP, JSON/direct image/redirect, normalizer, timeout, dedup, download, mobile, keamanan, dan routing tervalidasi.");
 })().catch((error) => {

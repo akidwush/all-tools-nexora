@@ -1354,7 +1354,7 @@ let toolsData = {
         { id: 'pwgen', icon: 'fa-solid fa-key', name: 'Password Gen', desc: 'Password aman', badge: 'Secure' },
         { id: 'morse', icon: 'fa-solid fa-tower-broadcast', name: 'Morse Code', desc: 'Konversi morse', badge: 'Audio' },
         { id: 'removebg', icon: 'fa-solid fa-eraser', name: 'Remove BG', desc: 'Hapus background', badge: 'AI' },
-        { id: 'enhancer', icon: 'fa-solid fa-wand-magic-sparkles', name: 'Nexora Image HD Enhancer V4', desc: 'Tingkatkan detail dan kualitas gambar dari URL', badge: 'HD V4' }
+        { id: 'enhancer', icon: 'fa-solid fa-wand-magic-sparkles', name: 'Nexora Image HD Enhancer V4', desc: 'Tingkatkan kualitas gambar dari link atau galeri', badge: 'HD V4' }
     ],
     vault: [
 
@@ -1590,7 +1590,7 @@ async function applyDatabaseToolConfiguration() {
             },
             enhancer: {
                 name: 'Nexora Image HD Enhancer V4',
-                description: 'Tingkatkan detail dan kualitas gambar dari URL melalui gateway aman Nexora',
+                description: 'Tingkatkan detail dan kualitas gambar dari link atau galeri melalui gateway aman Nexora',
                 badge: 'HD V4'
             }
         };

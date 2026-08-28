@@ -1,3 +1,11 @@
+## 6.4.0 HF41 HD4 gallery upload — 2026-08-28
+
+- UX: input link tetap tersedia dan Nexora Image HD Enhancer V4 kini menerima gambar langsung dari galeri Android.
+- Client: JPG, PNG, dan WebP maksimal 12 MB diperkecil hingga sisi 1600 px dan payload maksimal sekitar 2,35 MB sebelum dikirim.
+- Server: POST same-origin memakai validator magic-byte dan uploader sementara satu jam yang sudah dipakai Anime to Real; URL staging tidak pernah dikembalikan ke browser.
+- Security: tidak ada Supabase, database, Storage, migration, dependency, environment baru, API key client-side, atau penyimpanan permanen.
+- Cache: modul HD4 dinaikkan ke hd4-enhancer-v2 agar browser Android mengambil UI galeri terbaru.
+
 ## 6.4.0 Nexora Image HD Enhancer V4 — 2026-08-28
 
 - Replacement: menghapus renderer, slider kekuatan, runtime ESRGAN, TensorFlow.js, dan UpscalerJS milik Image Enhancer lokal; ID enhancer dipertahankan agar bookmark/rute lama tetap kompatibel.

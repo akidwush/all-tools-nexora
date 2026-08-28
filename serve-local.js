@@ -106,7 +106,7 @@ function bodyLimit(pathname, requestUrl) {
   if (pathname === "/api/svg-alight" || mode === "svg-alight") return 4_250_000;
   if (pathname === "/api/ai/anime-to-real" || requestUrl.searchParams.get("_service") === "anime-to-real") return 3_600_000;
   if (pathname === "/api/ai/song" || requestUrl.searchParams.get("_service") === "ai-song") return 550_000;
-  if (pathname === "/api/tools/hd4" || requestUrl.searchParams.get("_service") === "hd4-enhancer") return 550_000;
+  if (pathname === "/api/tools/hd4" || requestUrl.searchParams.get("_service") === "hd4-enhancer") return 3_600_000;
   if (mode === "image-vectorizer") return 4_200_000;
   if (pathname === "/api/audit") return 230_000;
   if (pathname === "/api/ai/chat" || pathname === "/api/admin/ai") return 80_000;

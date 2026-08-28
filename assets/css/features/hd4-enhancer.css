@@ -12,9 +12,24 @@
 .nxhd4-input-row{display:grid;grid-template-columns:minmax(0,1fr) 72px;gap:9px}
 .nxhd4 input{width:100%;height:52px;padding:0 14px;border:1px solid rgba(192,132,252,.2);border-radius:15px;outline:0;background:rgba(3,3,12,.58);color:#f4efff;font:inherit}
 .nxhd4 input:focus{border-color:rgba(168,85,247,.66);box-shadow:0 0 0 3px rgba(168,85,247,.1)}
+.nxhd4 input.is-active{border-color:rgba(34,211,238,.44)}
 .nxhd4-paste,.nxhd4-primary,.nxhd4-action{min-height:48px;border-radius:14px;border:1px solid transparent;color:#fff;font:inherit;font-weight:850;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;text-decoration:none}
 .nxhd4-paste{min-width:0;padding:0 8px;color:#e9d5ff;border-color:rgba(192,132,252,.27);background:rgba(126,34,206,.13)}
 .nxhd4-primary{width:100%;margin-top:8px;background:linear-gradient(135deg,#a855f7,#7c3aed);box-shadow:0 11px 25px rgba(126,34,206,.2)}
+.nxhd4-or{display:flex;align-items:center;gap:10px;margin:3px 0;color:#756781;font-size:9px;font-weight:900;letter-spacing:.16em}
+.nxhd4-or:before,.nxhd4-or:after{content:"";height:1px;flex:1;background:rgba(192,132,252,.15)}
+.nxhd4-file-input{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0 0 0 0)!important;white-space:nowrap!important}
+.nxhd4-upload-box{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:9px;align-items:center;padding:9px;border:1px solid rgba(192,132,252,.2);border-radius:16px;background:rgba(3,3,12,.42)}
+.nxhd4-upload-box.is-selected{border-color:rgba(192,132,252,.34)}
+.nxhd4-upload-box.is-active{border-color:rgba(34,211,238,.5);box-shadow:0 0 0 3px rgba(34,211,238,.06)}
+.nxhd4-choose,.nxhd4-clear-file,.nxhd4-file-meta{border:0;color:inherit;font:inherit;cursor:pointer}
+.nxhd4-choose{min-height:48px;padding:0 12px;border-radius:13px;color:#e9d5ff;background:rgba(126,34,206,.16);font-size:11px;font-weight:850;display:flex;align-items:center;justify-content:center;gap:7px}
+.nxhd4-file-meta{display:block;padding:5px 2px;text-align:left;background:transparent}
+.nxhd4-file-meta strong,.nxhd4-file-meta span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nxhd4-file-meta strong{color:#eee8f6;font-size:11px}
+.nxhd4-file-meta span{margin-top:4px;color:#8e819e;font-size:9px}
+.nxhd4-file-meta:disabled{cursor:default}
+.nxhd4-clear-file{width:40px;height:40px;border-radius:12px;color:#fda4af;background:rgba(251,113,133,.09)}
 .nxhd4 button:disabled,.nxhd4 input:disabled{opacity:.58;cursor:wait}
 .nxhd4-hint,.nxhd4-feedback,.nxhd4-note{font-size:11px;line-height:1.55}
 .nxhd4-hint{margin:0 2px;color:#8e819e}
