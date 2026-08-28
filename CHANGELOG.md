@@ -1,3 +1,10 @@
+## 6.4.0 HF44 Puter Android re-auth recovery — 2026-08-28
+
+- Fix: token lokal Puter tidak lagi dianggap sebagai sesi aktif sebelum `getUser()` berhasil memvalidasinya.
+- Android: login ulang dipanggil langsung dari tap tombol Hubungkan Ulang tanpa `await` pemuatan SDK sebelumnya, sehingga user activation Chrome tidak hilang sebelum popup dibuka.
+- Recovery: sesi 401/403, auth error, dan popup failure menonaktifkan Generate serta mengarahkan pengguna ke aksi re-auth yang eksplisit.
+- Cache: versi modul AI Video dinaikkan ke HF44 agar Chrome Android mengambil alur autentikasi baru.
+
 ## 6.4.0 HF43 Puter video result recovery — 2026-08-28
 
 - Fix: normalizer AI Video kini menerima data URI video dengan MIME generik `application/octet-stream` yang dapat dihasilkan Blob Puter pada Chrome Android.

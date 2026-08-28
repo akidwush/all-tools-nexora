@@ -31,9 +31,9 @@ assert.match(shell, /aivideo:\{renderer:'renderPuterVideo'/);
 assert.match(registry, /\["aivideo","Nexora AI Video Generator","module","puter-video","renderPuterVideo",null\]/);
 assert.match(health, /id: "aivideo", name: "Nexora AI Video Generator"/);
 assert.match(lazy, /aivideo:'puter-video'/);
-assert.match(lazy, /puter-video-hf43/);
+assert.match(lazy, /puter-video-hf44/);
 assert.match(lazy, /'puter-video':'Nexora AI Video Generator'/);
-assert.match(index, /hf43-puter-video1/);
+assert.match(index, /hf44-puter-video1/);
 assert.match(readme, /#tool-aivideo/);
 assert.match(readme, /60 tool/);
 
@@ -47,6 +47,11 @@ assert.match(feature, /input_reference/);
 assert.match(feature, /controls playsinline preload="metadata"/);
 assert.doesNotMatch(feature, /autoplay/i);
 assert.match(feature, /if \(busy\) return;/);
+assert.match(feature, /accountVerified = false/);
+assert.match(feature, /getUser\(\)/);
+assert.match(feature, /Sesi perlu dihubungkan ulang/);
+assert.match(feature, /var puter = window\.puter;[\s\S]*?puter\.auth\.signIn\(\{ request_auth: true \}\)/);
+assert.doesNotMatch(feature.match(/connect\.addEventListener\("click"[\s\S]*?\n    \}\);/)[0], /await runtime\.loadSdk/);
 assert.match(feature, /body\.__nxCleanup/);
 assert.match(feature, /URL\.revokeObjectURL/);
 assert.match(feature, /generationToken \+= 1/);
@@ -184,7 +189,7 @@ async function verifyMediaNormalization() {
 }
 
 Promise.all([verifyImageValidation(), verifyMediaNormalization()]).then(() => {
-  console.log("Nexora AI Video HF43 lulus: hasil Puter DOM/Blob/ArrayBuffer/Response/nested, MIME generik Android, model resmi, auth, player, download, cleanup, mobile, dan zero-backend tervalidasi.");
+  console.log("Nexora AI Video HF44 lulus: re-auth sinkron dari tap Android, validasi sesi, hasil Puter DOM/Blob/ArrayBuffer/Response/nested, model resmi, player, download, cleanup, mobile, dan zero-backend tervalidasi.");
 }).catch((error) => {
   console.error(error);
   process.exit(1);

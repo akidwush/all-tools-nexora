@@ -261,6 +261,7 @@
     if (!body) return;
     var alive = true;
     var busy = false;
+    var accountVerified = false;
     var mode = "text";
     var referenceFile = null;
     var referenceUrl = "";
@@ -337,7 +338,7 @@
 
     function setBusy(next) {
       busy = next;
-      generate.disabled = next || !signedIn();
+      generate.disabled = next || !accountVerified;
       modelSelect.disabled = next;
       durationSelect.disabled = next;
       textMode.disabled = next;
@@ -406,6 +407,7 @@
     async function refreshAccount() {
       if (!alive || !window.puter || !window.puter.auth) return;
       if (!signedIn()) {
+        accountVerified = false;
         account.textContent = "Belum terhubung";
         usage.textContent = "Tekan tombol untuk login ke Puter.";
         connect.disabled = false;
@@ -413,13 +415,27 @@
         generate.disabled = true;
         return;
       }
+      var user = null;
+      try {
+        user = await window.puter.auth.getUser();
+      } catch (error) {
+        if (!alive) return;
+        var authDetails = runtime.errorDetails(error);
+        accountVerified = false;
+        if ((authDetails.status === 401 || authDetails.status === 403) && typeof window.puter.auth.signOut === "function") window.puter.auth.signOut();
+        account.textContent = "Sesi perlu dihubungkan ulang";
+        usage.textContent = "Tekan Hubungkan Ulang untuk membuka login Puter.";
+        connect.disabled = false;
+        connect.querySelector("span").textContent = "Hubungkan Ulang";
+        generate.disabled = true;
+        setMessage("Sesi Puter sudah kedaluwarsa. Hubungkan ulang sebelum generate.", "error");
+        return;
+      }
+      accountVerified = true;
       connect.disabled = false;
       connect.querySelector("span").textContent = "Akun Terhubung";
       generate.disabled = busy;
-      try {
-        var user = await window.puter.auth.getUser();
-        if (alive) account.textContent = runtime.safeName(user);
-      } catch (_) { account.textContent = "Akun Puter terhubung"; }
+      account.textContent = runtime.safeName(user);
       try {
         var monthly = await window.puter.auth.getMonthlyUsage();
         if (alive) usage.textContent = runtime.percentRemaining(monthly) || "Allowance mengikuti akun Puter kamu.";
@@ -432,12 +448,19 @@
       connect.disabled = true;
       setMessage("Membuka login Puter…", "loading");
       try {
-        var puter = await runtime.loadSdk();
-        if (!puter.auth.isSignedIn()) await puter.auth.signIn();
+        var puter = window.puter;
+        if (!puter || !puter.auth || typeof puter.auth.signIn !== "function") throw new Error("PUTER_SDK_UNAVAILABLE");
+        if (!puter.auth.isSignedIn() || !accountVerified) {
+          if (puter.auth.isSignedIn() && typeof puter.auth.signOut === "function") puter.auth.signOut();
+          await puter.auth.signIn({ request_auth: true });
+        }
         if (alive) await refreshAccount();
       } catch (error) {
         if (!alive) return;
+        accountVerified = false;
         connect.disabled = false;
+        connect.querySelector("span").textContent = "Coba Hubungkan Lagi";
+        generate.disabled = true;
         setMessage(videoErrorMessage(error), "error");
       }
     });
@@ -492,8 +515,8 @@
         setMessage("Gambar referensi tidak didukung oleh model ini.", "error");
         return;
       }
-      if (!signedIn()) {
-        setMessage("Login Puter diperlukan untuk menggunakan AI Video.", "error");
+      if (!signedIn() || !accountVerified) {
+        setMessage("Hubungkan ulang akun Puter sebelum menggunakan AI Video.", "error");
         return;
       }
 
@@ -537,6 +560,12 @@
         if (alive && token === generationToken) {
           var details = runtime.errorDetails(error);
           console.warn("[puter-video] request stopped", { model: selectedModel.id, mode: mode, code: details.code, status: details.status });
+          if (details.status === 401 || details.status === 403 || /popup|auth|sign.?in|login/.test((details.code + " " + details.message).toLowerCase())) {
+            accountVerified = false;
+            generate.disabled = true;
+            connect.disabled = false;
+            connect.querySelector("span").textContent = "Hubungkan Ulang";
+          }
           setMessage(videoErrorMessage(error), "error");
         }
       } finally {
