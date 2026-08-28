@@ -129,6 +129,10 @@
       "destination": "/api/tool-health?_service=anime-to-real"
     },
     {
+      "source": "/api/ai/song",
+      "destination": "/api/tool-health?_service=ai-song"
+    },
+    {
       "source": "/api/space-explorer",
       "destination": "/api/tool-health?mode=space-explorer"
     },

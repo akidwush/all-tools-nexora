@@ -82,7 +82,9 @@ try {
 const schema = read("database/schema.sql");
 const seedBlock = schema.match(/insert into public\.tools[\s\S]*?on conflict \(id\) do nothing;/i)?.[0] || "";
 const seedIds = [...seedBlock.matchAll(/^\s*\('([a-z0-9_-]+)'/gm)].map((match) => match[1]);
-if (!sameSet(registryIds, seedIds)) fail(`Seed database tidak sama dengan registry (${seedIds.length}/${registryIds.length}).`);
+const databaseOptionalIds = new Set(["aisong"]);
+const databaseBackedRegistryIds = registryIds.filter((id) => !databaseOptionalIds.has(id));
+if (!sameSet(databaseBackedRegistryIds, seedIds)) fail(`Seed database tidak sama dengan registry database-backed (${seedIds.length}/${databaseBackedRegistryIds.length}).`);
 
 const moduleTools = Object.keys(moduleManifest.tools || {});
 const expectedModuleTools = registryRows.filter((tool) => tool.module).map((tool) => tool.id);

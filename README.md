@@ -1,6 +1,6 @@
 # All Tools Nexora
 
-All Tools Nexora v6.4.0 adalah website toolkit statis dengan 58 tool, lazy-loaded feature modules, dashboard admin, Supabase opsional untuk fitur lama, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency `@google/genai`.
+All Tools Nexora v6.4.0 adalah website toolkit statis dengan 59 tool, lazy-loaded feature modules, dashboard admin, Supabase opsional untuk fitur lama, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency `@google/genai`.
 
 ## Cara memakai Nexora AI Image
 
@@ -104,6 +104,18 @@ Anime to Real mengubah gambar anime menjadi gambar bergaya realistis. Kamu dapat
 API key KuroNeko hanya dibaca oleh server melalui `KURONEKO_API_KEY`. Browser tidak menerima key tersebut. Fitur ini tidak memakai database, Supabase client, Supabase Edge Function, atau Supabase Storage. Saat memilih file, gambar dibuat publik sementara melalui Litterbox selama maksimal satu jam agar KuroNeko dapat membacanya; Nexora tidak menyimpan file secara permanen.
 
 Jika gambar asli tidak tampil tetapi URL sudah benar, kamu tetap boleh mencoba konversi. Jika provider menolak gambar, gunakan gambar publik lain dan jangan mencoba melewati pembatasan keamanan provider.
+
+## Cara memakai Nexora AI Song Generator
+
+**[Buka Nexora AI Song Generator](https://all-tools-nexora.vercel.app/#tool-aisong)**
+
+1. Tulis ide, cerita, mood, vokal, dan suasana lagu pada **Describe your song**.
+2. Isi **Song Title** dan **Style / Genre** bila dibutuhkan, atau pilih preset genre yang tersedia.
+3. Tekan **Generate Song** satu kali lalu tunggu. Pembuatan dapat membutuhkan waktu hingga sekitar dua menit.
+4. Jika audio tersedia, tekan Play pada player. Audio tidak berjalan otomatis.
+5. Gunakan **Download Song**, **Open Audio**, atau **Copy Link** untuk hasilnya. Lyrics hanya muncul bila memang dikirim provider.
+
+Route `/api/ai/song` memakai `KURONEKO_API_KEY` hanya di server. Generator tidak memakai Supabase, database runtime, Storage, migration, atau dependency baru, dan file audio tidak diproxy melalui Vercel.
 
 Hal penting:
 

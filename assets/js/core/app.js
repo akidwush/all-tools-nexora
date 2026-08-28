@@ -1592,6 +1592,7 @@ let toolsData = {
         { id: 'genmail', icon: 'fa-solid fa-envelope-open-text', name: 'GenMail', desc: 'Buat email sementara, periksa inbox, dan baca pesan dengan aman', badge: 'TEMP MAIL' },
         { id: 'danbooru', icon: 'fa-solid fa-images', name: 'Danbooru Search', desc: 'Cari ilustrasi anime berdasarkan tag dalam gallery ringan', badge: 'SAFE DEFAULT' },
         { id: 'animetoreal', icon: 'fa-solid fa-wand-magic-sparkles', name: 'Anime to Real', desc: 'Ubah ilustrasi anime dari URL menjadi gambar realistis', badge: 'AI TRANSFORM' },
+        { id: 'aisong', icon: 'fa-solid fa-music', name: 'Nexora AI Song Generator', desc: 'Ubah ide, cerita, dan suasana menjadi lagu yang siap diputar', badge: 'AI MUSIC' },
         { id: 'promptgenerate', icon: 'fa-solid fa-wand-magic-sparkles', name: 'Nexora Prompt Generator', desc: 'Analisis gambar dengan Nexora Vision AI menjadi prompt produksi profesional', badge: 'VISION AI' },
         { id: 'fakeovo', icon: 'fa-solid fa-wallet', name: 'Fake OVO', desc: 'Generator tampilan saldo OVO', badge: 'CANVAS' },
         { id: 'quotegenerator', icon: 'fa-solid fa-quote-left', name: 'Quote Generator', desc: 'Buat gambar quote monokrom', badge: 'JPG' },
@@ -1995,6 +1996,7 @@ function showTool(toolId) {
         case 'genmail': renderGenMail(body); break;
         case 'danbooru': renderDanbooruSearch(body); break;
         case 'animetoreal': renderAnimeToReal(body); break;
+        case 'aisong': renderAiSong(body); break;
         case 'fakeovo': renderFakeOvo(body); break;
         case 'quotegenerator': renderQuoteGenerator(body); break;
         case 'carifakta': renderCariFakta(body); break;

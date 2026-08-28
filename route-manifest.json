@@ -27,6 +27,7 @@
     "/api/download/aio",
     "/api/search/danbooru",
     "/api/ai/anime-to-real",
+    "/api/ai/song",
     "/api/space-explorer",
     "/api/ocr-intelligence",
     "/api/vdeploy",

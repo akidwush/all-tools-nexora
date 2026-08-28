@@ -5,7 +5,7 @@ const vm = require("node:vm");
 
 const root = path.resolve(__dirname, "..");
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
-const EXPECTED_TOOL_COUNT = 58;
+const EXPECTED_TOOL_COUNT = 59;
 
 const events = [];
 const sandbox = {
@@ -29,7 +29,9 @@ assert.deepEqual(new Set(healthCatalog.map((item) => item.id)), new Set(registry
 
 const seed = read("database/schema.sql");
 const seedIds = [...seed.matchAll(/\('([a-z0-9_-]+)',\s*'[^']+'/g)].map((match) => match[1]).filter((id) => registry.get(id));
-assert.equal(new Set(seedIds).size, EXPECTED_TOOL_COUNT, "Seed database harus memuat seluruh tool registry");
+assert.equal(new Set(seedIds).size, EXPECTED_TOOL_COUNT - 1, "Seed database hanya memuat tool yang memang database-backed");
+assert.equal(registry.get("aisong").id, "aisong", "AI Song tetap tersedia dari source registry tanpa database");
+assert.equal(seedIds.includes("aisong"), false, "AI Song tidak boleh ditambahkan ke seed database");
 
 const moduleManifest = JSON.parse(read("assets/module-manifest.json"));
 for (const tool of registry.list()) {

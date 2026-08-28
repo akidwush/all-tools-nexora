@@ -64,6 +64,7 @@ const API_ROUTES = Object.freeze({
   "/api/download/aio": { file: "api/tool-health.js", mode: "aio-download" },
   "/api/search/danbooru": { file: "api/tool-health.js", service: "danbooru-search" },
   "/api/ai/anime-to-real": { file: "api/tool-health.js", service: "anime-to-real" },
+  "/api/ai/song": { file: "api/tool-health.js", service: "ai-song" },
   "/api/tool-health": { file: "api/tool-health.js" },
   "/api/account": { file: "api/tool-health.js", mode: "account" },
   "/api/media-download": { file: "api/tool-health.js", mode: "media-download" },
@@ -103,6 +104,7 @@ function bodyLimit(pathname, requestUrl) {
   if (pathname === "/api/ocr-intelligence" || mode === "ocr-intelligence") return 1_600_000;
   if (pathname === "/api/svg-alight" || mode === "svg-alight") return 4_250_000;
   if (pathname === "/api/ai/anime-to-real" || requestUrl.searchParams.get("_service") === "anime-to-real") return 3_600_000;
+  if (pathname === "/api/ai/song" || requestUrl.searchParams.get("_service") === "ai-song") return 550_000;
   if (mode === "image-vectorizer") return 4_200_000;
   if (pathname === "/api/audit") return 230_000;
   if (pathname === "/api/ai/chat" || pathname === "/api/admin/ai") return 80_000;

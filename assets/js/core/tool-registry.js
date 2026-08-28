@@ -26,6 +26,7 @@
     ["genmail","GenMail","api","genmail","renderGenMail","https://all-tools-nexora.vercel.app/api/genmail"],
     ["danbooru","Danbooru Search","api","danbooru-search","renderDanbooruSearch","https://all-tools-nexora.vercel.app/api/search/danbooru"],
     ["animetoreal","Anime to Real","api","anime-to-real","renderAnimeToReal","https://all-tools-nexora.vercel.app/api/ai/anime-to-real"],
+    ["aisong","Nexora AI Song Generator","api","ai-song","renderAiSong","https://all-tools-nexora.vercel.app/api/ai/song"],
     ["promptgenerate","Nexora Prompt Generator","module","prompt-generator","renderPromptGenerator",null],
     ["fakeovo","Fake OVO","module","imported-tools","renderFakeOvo",null],
     ["quotegenerator","Quote Generator","module","imported-tools","renderQuoteGenerator",null],

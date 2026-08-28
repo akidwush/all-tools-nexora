@@ -14,6 +14,7 @@ const { handleGenMail } = require("../lib/genmail");
 const { handleAioDownload } = require("../lib/kuroneko-aio");
 const { handleDanbooruSearch } = require("../lib/kuroneko-danbooru");
 const { handleAnimeToReal } = require("../lib/kuroneko-anime-to-real");
+const { handleAiSong } = require("../lib/kuroneko-ai-song");
 const { authorizeTool, handleAccount } = require("../lib/account-membership");
 const { sendJson: send } = require("../lib/http-response");
 const {
@@ -118,6 +119,9 @@ module.exports = async function handler(request, response) {
   }
   if (url.searchParams.get("_service") === "anime-to-real") {
     return handleAnimeToReal(request, response, url);
+  }
+  if (url.searchParams.get("_service") === "ai-song") {
+    return handleAiSong(request, response, url);
   }
   const mode = url.searchParams.get("mode");
   if (mode === "account") return handleAccount(request, response);
