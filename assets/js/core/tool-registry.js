@@ -23,6 +23,7 @@
     ["mltools","ML Tools","module","imported-tools","renderMlTools",null],
     ["comicreader","Baca Komik Full","module","comic-reader","renderComicReader",null],
     ["aiimage","Nexora AI Image","module","puter-image","renderPuterImage",null],
+    ["aivideo","Nexora AI Video Generator","module","puter-video","renderPuterVideo",null],
     ["genmail","GenMail","api","genmail","renderGenMail","https://all-tools-nexora.vercel.app/api/genmail"],
     ["danbooru","Danbooru Search","api","danbooru-search","renderDanbooruSearch","https://all-tools-nexora.vercel.app/api/search/danbooru"],
     ["animetoreal","Anime to Real","api","anime-to-real","renderAnimeToReal","https://all-tools-nexora.vercel.app/api/ai/anime-to-real"],

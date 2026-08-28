@@ -97,6 +97,15 @@
         "assets/js/features/puter-image.js"
       ]
     },
+    "puter-video": {
+      "css": [
+        "assets/css/features/puter-video.css"
+      ],
+      "js": [
+        "assets/js/features/puter-runtime.js",
+        "assets/js/features/puter-video.js"
+      ]
+    },
     "genmail": {
       "css": [
         "assets/css/features/genmail.css"
@@ -280,6 +289,7 @@
     "fakedev": "source-features",
     "promptgenerate": "prompt-generator",
     "aiimage": "puter-image",
+    "aivideo": "puter-video",
     "genmail": "genmail",
     "aiodownloader": "aio-downloader",
     "danbooru": "danbooru-search",

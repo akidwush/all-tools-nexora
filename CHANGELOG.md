@@ -1,3 +1,13 @@
+## 6.4.0 HF42 Nexora AI Video Generator — 2026-08-28
+
+- Fitur: menambahkan Text to Video dan Image to Video melalui `puter.ai.txt2vid()` dengan player native, Download, Open Video, dan Generate Again.
+- Model nyata: Sora 2, Sora 2 Pro, Veo 3.1 Fast, dan Veo 3.1 berdasarkan dokumentasi serta registry source resmi Puter; durasi dan ukuran dikunci per model.
+- Result: normalizer menerima `HTMLVideoElement` resmi Puter serta fallback Blob, URL, dan object asset; video memakai controls, playsInline, preload metadata, tanpa autoplay.
+- Auth: login eksplisit Puter User-Pays, allowance akun pengguna, double-generation guard, timeout 11 menit, error aman, dan cleanup saat keluar halaman.
+- Image to Video: JPG, PNG, atau WebP maksimal 10 MB divalidasi magic-byte; Sora menerima File dan Veo menerima data URI langsung dari browser.
+- Architecture: seluruh fitur lazy-loaded dan session-only tanpa API route, Vercel Function, API key provider, Supabase, database, Storage, migration, dependency, atau backend proxy baru.
+- Mobile: layout tunggal responsif untuk 360, 375, 390, dan 412 px dengan touch target minimal 44 px serta video yang tidak dapat menyebabkan overflow horizontal.
+
 ## 6.4.0 HF41 HD4 gallery upload — 2026-08-28
 
 - UX: input link tetap tersedia dan Nexora Image HD Enhancer V4 kini menerima gambar langsung dari galeri Android.

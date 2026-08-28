@@ -469,6 +469,7 @@
     
     comicreader:{renderer:'renderComicReader', category:'tools', icon:'fa-solid fa-book-open-reader', title:'Komik Indonesia', desc:'Manga, manhwa, dan manhua lengkap dengan pencarian, favorit, riwayat, chapter, bahasa, serta reader vertikal.', accent:'#c084fc', accent2:'#ec4899', rgb:'192,132,252', badge:'Nexora Comic Core'},
     aiimage:{renderer:'renderPuterImage', category:'tools', icon:'fa-solid fa-image', title:'Nexora AI Image', desc:'Buat gambar AI dengan akun dan allowance Puter milik pengguna. Nexora tidak menyimpan prompt, password, atau gambar hasil.', accent:'#a78bfa', accent2:'#22d3ee', rgb:'167,139,250', badge:'Puter User-Pays AI'},
+    aivideo:{renderer:'renderPuterVideo', category:'tools', icon:'fa-solid fa-clapperboard', title:'Nexora AI Video Generator', desc:'Buat video dari prompt atau gambar referensi memakai akun dan allowance Puter milik pengguna.', accent:'#a855f7', accent2:'#22d3ee', rgb:'168,85,247', badge:'Puter AI Video'},
     genmail:{renderer:'renderGenMail', category:'tools', icon:'fa-solid fa-envelope-open-text', title:'GenMail', desc:'Buat alamat email sementara, periksa inbox, dan baca pesan melalui proxy aman Nexora.', accent:'#a78bfa', accent2:'#22d3ee', rgb:'167,139,250', badge:'Advanced Temp Mail'},
     danbooru:{renderer:'renderDanbooruSearch', category:'tools', icon:'fa-solid fa-images', title:'Danbooru Search', desc:'Cari ilustrasi anime berdasarkan tag melalui proxy aman Nexora dengan gallery ringan dan mode Safe sebagai pilihan awal.', accent:'#c084fc', accent2:'#22d3ee', rgb:'192,132,252', badge:'Anime Art Search'},
     animetoreal:{renderer:'renderAnimeToReal', category:'tools', icon:'fa-solid fa-wand-magic-sparkles', title:'Anime to Real', desc:'Ubah URL ilustrasi anime menjadi gambar realistis melalui proxy AI aman Nexora.', accent:'#a78bfa', accent2:'#22d3ee', rgb:'167,139,250', badge:'AI Image Transform'},
@@ -704,6 +705,7 @@ instagram:  {renderer:'renderInstagram',   category:'downloader', icon:'fa-brand
         if(id === 'pwgen') aliases.push('password gen','password generator');
         if(id === 'morse') aliases.push('morse code');
         if(id === 'removebg') aliases.push('remove bg','remove background');
+        if(id === 'aivideo') aliases.push('ai video generator','text to video','image to video','nexora ai video generator');
         if(id === 'enhancer') aliases.push('image enhancer','image hd enhancer','image upscaler','hd4','nexora image hd enhancer v4');
         if(id === 'ttquote') aliases.push('tiktok quote');
         if(id === 'qrgen') aliases.push('qr generator');

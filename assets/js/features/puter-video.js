@@ -1,0 +1,503 @@
+(function () {
+  "use strict";
+
+  var MAX_PROMPT_LENGTH = 3000;
+  var MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+  var GENERATION_TIMEOUT_MS = 11 * 60 * 1000;
+  var IMAGE_TYPES = Object.freeze(["image/jpeg", "image/png", "image/webp"]);
+  var videoModels = Object.freeze([
+    Object.freeze({
+      id: "sora-2",
+      label: "Sora 2",
+      detail: "Seimbang",
+      supportsImageInput: true,
+      imageInput: "file",
+      durations: Object.freeze([4, 8, 12]),
+      sizes: Object.freeze({ "9:16": "720x1280", "16:9": "1280x720" })
+    }),
+    Object.freeze({
+      id: "sora-2-pro",
+      label: "Sora 2 Pro",
+      detail: "Kualitas tinggi",
+      supportsImageInput: true,
+      imageInput: "file",
+      durations: Object.freeze([4, 8, 12]),
+      sizes: Object.freeze({ "9:16": "720x1280", "16:9": "1280x720" })
+    }),
+    Object.freeze({
+      id: "veo-3.1-fast-generate-preview",
+      label: "Veo 3.1 Fast",
+      detail: "Lebih cepat",
+      supportsImageInput: true,
+      imageInput: "data-uri",
+      durations: Object.freeze([4, 6, 8]),
+      sizes: Object.freeze({ "9:16": "720x1280", "16:9": "1280x720" })
+    }),
+    Object.freeze({
+      id: "veo-3.1-generate-preview",
+      label: "Veo 3.1",
+      detail: "Kualitas tinggi",
+      supportsImageInput: true,
+      imageInput: "data-uri",
+      durations: Object.freeze([4, 6, 8]),
+      sizes: Object.freeze({ "9:16": "720x1280", "16:9": "1280x720" })
+    })
+  ]);
+
+  function modelById(id) {
+    return videoModels.find(function (model) { return model.id === id; }) || videoModels[0];
+  }
+
+  function isAllowedVideoUrl(value) {
+    return /^(?:https:\/\/|blob:|data:video\/)/i.test(String(value || ""));
+  }
+
+  function sourceFromObject(value) {
+    if (!value || typeof value !== "object") return "";
+    var direct = [value.videoUrl, value.video_url, value.asset_url, value.url, value.href, value.src];
+    for (var index = 0; index < direct.length; index += 1) {
+      if (isAllowedVideoUrl(direct[index])) return String(direct[index]);
+      if (direct[index] && typeof direct[index] === "object" && isAllowedVideoUrl(direct[index].url)) return String(direct[index].url);
+    }
+    return "";
+  }
+
+  function normalizePuterVideoResult(raw) {
+    if (!raw) throw new Error("PUTER_VIDEO_EMPTY_RESULT");
+    if (typeof HTMLVideoElement !== "undefined" && raw instanceof HTMLVideoElement) {
+      var elementUrl = String(raw.currentSrc || raw.src || raw.getAttribute("data-source") || "");
+      if (!isAllowedVideoUrl(elementUrl)) throw new Error("PUTER_VIDEO_INVALID_RESULT");
+      return { videoUrl: elementUrl, blob: null, element: raw, metadata: { sourceType: "HTMLVideoElement", ownsObjectUrl: false } };
+    }
+    if (raw && String(raw.tagName || "").toUpperCase() === "VIDEO") {
+      var duckUrl = String(raw.currentSrc || raw.src || (typeof raw.getAttribute === "function" ? raw.getAttribute("data-source") : "") || "");
+      if (!isAllowedVideoUrl(duckUrl)) throw new Error("PUTER_VIDEO_INVALID_RESULT");
+      return { videoUrl: duckUrl, blob: null, element: raw, metadata: { sourceType: "HTMLVideoElement", ownsObjectUrl: false } };
+    }
+    if (typeof Blob !== "undefined" && raw instanceof Blob) {
+      if (!raw.size) throw new Error("PUTER_VIDEO_EMPTY_RESULT");
+      var objectUrl = URL.createObjectURL(raw);
+      return { videoUrl: objectUrl, blob: raw, element: null, metadata: { sourceType: "Blob", mimeType: raw.type || "video/mp4", ownsObjectUrl: true } };
+    }
+    if (typeof raw === "string" && isAllowedVideoUrl(raw)) {
+      return { videoUrl: raw, blob: null, element: null, metadata: { sourceType: "URL", ownsObjectUrl: false } };
+    }
+    var objectUrlValue = sourceFromObject(raw);
+    if (objectUrlValue) {
+      return { videoUrl: objectUrlValue, blob: null, element: null, metadata: { sourceType: "Object", ownsObjectUrl: false } };
+    }
+    throw new Error("PUTER_VIDEO_INVALID_RESULT");
+  }
+
+  function disposeVideoResult(result) {
+    if (!result || !result.metadata || !result.metadata.ownsObjectUrl) return;
+    if (result.videoUrl && window.URL && typeof window.URL.revokeObjectURL === "function") window.URL.revokeObjectURL(result.videoUrl);
+  }
+
+  function readFileAsDataUrl(file) {
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function () { resolve(String(reader.result || "")); };
+      reader.onerror = function () { reject(new Error("PUTER_VIDEO_IMAGE_READ_FAILED")); };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function detectImageType(file) {
+    var bytes = new Uint8Array(await file.slice(0, 16).arrayBuffer());
+    if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return "image/jpeg";
+    if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) return "image/png";
+    if (bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46 && bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50) return "image/webp";
+    return "";
+  }
+
+  async function validateReferenceImage(file) {
+    if (!file || typeof file.arrayBuffer !== "function") throw new Error("PUTER_VIDEO_IMAGE_REQUIRED");
+    if (!file.size || file.size > MAX_IMAGE_BYTES) throw new Error("PUTER_VIDEO_IMAGE_TOO_LARGE");
+    var detected = await detectImageType(file);
+    if (IMAGE_TYPES.indexOf(detected) === -1 || (file.type && file.type !== detected)) throw new Error("PUTER_VIDEO_IMAGE_INVALID");
+    return file;
+  }
+
+  function buildVideoOptions(model, duration, aspect, inputReference) {
+    var seconds = model.durations.indexOf(Number(duration)) !== -1 ? Number(duration) : model.durations[0];
+    var ratio = model.sizes[aspect] ? aspect : "9:16";
+    var options = { model: model.id, seconds: seconds, size: model.sizes[ratio] };
+    if (inputReference) options.input_reference = inputReference;
+    return options;
+  }
+
+  function withTimeout(promise, timeoutMs) {
+    var timer = 0;
+    return Promise.race([
+      Promise.resolve(promise).finally(function () { clearTimeout(timer); }),
+      new Promise(function (_, reject) {
+        timer = setTimeout(function () { reject(new Error("PUTER_VIDEO_TIMEOUT")); }, timeoutMs);
+      })
+    ]);
+  }
+
+  async function generateVideoWithPuter(params) {
+    var runtime = window.NexoraPuterRuntime;
+    if (!runtime || typeof runtime.loadSdk !== "function") throw new Error("PUTER_SDK_UNAVAILABLE");
+    var sdk = await runtime.loadSdk();
+    var model = modelById(params.modelId);
+    var inputReference = null;
+    if (params.mode === "image") {
+      if (!model.supportsImageInput) throw new Error("PUTER_VIDEO_IMAGE_UNSUPPORTED");
+      var image = await validateReferenceImage(params.file);
+      inputReference = model.imageInput === "file" ? image : await readFileAsDataUrl(image);
+    }
+    var options = buildVideoOptions(model, params.duration, params.aspect, inputReference);
+    var raw = await withTimeout(sdk.ai.txt2vid(params.prompt, options), GENERATION_TIMEOUT_MS);
+    return normalizePuterVideoResult(raw);
+  }
+
+  function videoErrorMessage(error) {
+    var runtime = window.NexoraPuterRuntime;
+    var details = runtime && runtime.errorDetails ? runtime.errorDetails(error) : { code: "", status: 0, message: String(error || "") };
+    var raw = (details.code + " " + details.status + " " + details.message).toLowerCase();
+    if (/image_required/.test(raw)) return "Pilih gambar referensi terlebih dahulu.";
+    if (/image_too_large/.test(raw)) return "Ukuran gambar maksimal 10 MB.";
+    if (/image_invalid|unsupported image|invalid.*image/.test(raw)) return "Gambar referensi harus berupa JPG, PNG, atau WebP yang valid.";
+    if (/image_unsupported/.test(raw)) return "Gambar referensi tidak didukung oleh model ini.";
+    if (/popup|blocked/.test(raw)) return "Jendela login diblokir browser. Izinkan pop-up lalu coba lagi.";
+    if (/email_must_be_confirmed|confirm.*email|email.*confirm/.test(raw)) return "Email akun Puter belum dikonfirmasi.";
+    if (details.status === 401 || details.status === 403 || /unauthor|auth|sign.?in|login|cancel|closed|denied/.test(raw)) return "Login Puter diperlukan untuk menggunakan AI Video.";
+    if (details.status === 402 || /allowance|credit|quota|insufficient|payment|fund/.test(raw)) return "Allowance atau credit Puter tidak cukup untuk membuat video ini.";
+    if (details.status === 429 || /rate|too many|concurren/.test(raw)) return "Permintaan terlalu banyak. Coba lagi nanti.";
+    if (/safety|moderation|policy|filtered|rai|disallowed/.test(raw)) return "Prompt atau gambar ditolak oleh aturan keamanan model.";
+    if (/timeout|timed out/.test(raw)) return "Pembuatan video melewati batas waktu. Silakan coba lagi.";
+    if (/model not found|unknown video model|model.*unavailable|unsupported model|no provider/.test(raw)) return "Model video sedang tidak tersedia.";
+    if (/network|fetch|offline|load_failed/.test(raw)) return "Koneksi ke layanan video terputus. Periksa internet lalu coba lagi.";
+    if (/empty_result|invalid_result|unexpected.*video/.test(raw)) return "Hasil video tidak dapat dibaca. Coba model lain.";
+    if (/cancel|abort/.test(raw)) return "Video generation dibatalkan.";
+    return "Video gagal dibuat. Coba lagi.";
+  }
+
+  function formatBytes(value) {
+    if (value >= 1024 * 1024) return (value / (1024 * 1024)).toFixed(1) + " MB";
+    return Math.max(1, Math.round(value / 1024)) + " KB";
+  }
+
+  window.NexoraVideoModels = videoModels;
+  window.renderPuterVideo = function renderPuterVideo(body) {
+    if (!body) return;
+    var alive = true;
+    var busy = false;
+    var mode = "text";
+    var referenceFile = null;
+    var referenceUrl = "";
+    var normalizedResult = null;
+    var generationToken = 0;
+    var statusTimers = [];
+
+    body.innerHTML = "" +
+      '<main class="nvg">' +
+        '<section class="nvg-note" aria-label="Privasi dan akun Puter"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i><div><strong>Diproses melalui akun Puter kamu</strong><p>Nexora tidak meminta API key, tidak menyimpan prompt, gambar referensi, atau video hasil.</p></div></section>' +
+        '<section class="nvg-card nvg-account"><div><span class="nvg-kicker">STATUS AKUN</span><strong id="nvgAccount">Menyiapkan Puter…</strong><small id="nvgUsage">Login tidak dilakukan otomatis.</small></div><button class="nvg-secondary" id="nvgConnect" type="button" disabled><i class="fa-solid fa-right-to-bracket"></i><span>Hubungkan Puter</span></button></section>' +
+        '<section class="nvg-card nvg-create">' +
+          '<div class="nvg-tabs" role="tablist" aria-label="Mode video"><button class="is-active" id="nvgTextMode" type="button" role="tab" aria-selected="true"><i class="fa-solid fa-font"></i>Text to Video</button><button id="nvgImageMode" type="button" role="tab" aria-selected="false"><i class="fa-regular fa-image"></i>Image to Video</button></div>' +
+          '<div class="nvg-reference" id="nvgReference" hidden><label class="nvg-field-label">Gambar referensi</label><input id="nvgFile" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="nvg-file-button" id="nvgChoose" type="button"><i class="fa-solid fa-image"></i><span>Pilih Gambar</span></button><div class="nvg-preview" id="nvgPreview" hidden><img id="nvgPreviewImage" alt="Preview gambar referensi" loading="lazy" decoding="async"><div><strong id="nvgFileName"></strong><small id="nvgFileSize"></small></div><button id="nvgRemoveImage" type="button" aria-label="Hapus gambar referensi"><i class="fa-solid fa-xmark"></i></button></div><p>JPG, PNG, atau WebP · maksimal 10 MB · langsung ke Puter.</p></div>' +
+          '<label class="nvg-field-label" for="nvgPrompt">Prompt video <span>Wajib</span></label><textarea id="nvgPrompt" minlength="3" maxlength="3000" rows="6" placeholder="Contoh: Kota futuristik pada malam hari, hujan deras, pantulan neon di jalan basah, gerakan kamera perlahan."></textarea><div class="nvg-count"><span>Jelaskan subjek, gerakan, kamera, dan suasana.</span><span id="nvgCount">0 / 3000</span></div>' +
+          '<div class="nvg-control-grid"><label><span>Model</span><select id="nvgModel"></select></label><label><span>Durasi</span><select id="nvgDuration"></select></label></div>' +
+          '<fieldset class="nvg-aspect"><legend>Rasio video</legend><label><input type="radio" name="nvgAspect" value="9:16" checked><span><i class="fa-solid fa-mobile-screen"></i>9:16</span></label><label><input type="radio" name="nvgAspect" value="16:9"><span><i class="fa-solid fa-display"></i>16:9</span></label></fieldset>' +
+          '<button class="nvg-primary" id="nvgGenerate" type="button" disabled><i class="fa-solid fa-clapperboard"></i><span>Generate Video</span></button><p class="nvg-message" id="nvgMessage" role="status" aria-live="polite">Hubungkan akun Puter terlebih dahulu.</p>' +
+        '</section>' +
+        '<section class="nvg-card nvg-result" aria-label="Video hasil"><div class="nvg-result-head"><div><span class="nvg-kicker">HASIL</span><h2>Generated Video</h2></div><span id="nvgResultMeta">Session only</span></div><div class="nvg-placeholder" id="nvgPlaceholder"><i class="fa-solid fa-film"></i><strong>Video akan muncul di sini</strong><span>Proses dapat memerlukan beberapa menit.</span></div><video id="nvgVideo" controls playsinline preload="metadata" hidden></video><div class="nvg-actions" id="nvgActions" hidden><a id="nvgDownload" href="#" download="nexora-ai-video.mp4"><i class="fa-solid fa-download"></i>Download Video</a><a id="nvgOpen" href="#" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i>Open Video</a><button id="nvgAgain" type="button"><i class="fa-solid fa-rotate-right"></i>Generate Again</button></div></section>' +
+        '<p class="nvg-help">Video memakai allowance akun Puter pengguna. Durasi dan ukuran yang tampil mengikuti model resmi yang dipilih.</p>' +
+      '</main>';
+
+    var runtime = window.NexoraPuterRuntime;
+    var connect = body.querySelector("#nvgConnect");
+    var account = body.querySelector("#nvgAccount");
+    var usage = body.querySelector("#nvgUsage");
+    var textMode = body.querySelector("#nvgTextMode");
+    var imageMode = body.querySelector("#nvgImageMode");
+    var reference = body.querySelector("#nvgReference");
+    var fileInput = body.querySelector("#nvgFile");
+    var choose = body.querySelector("#nvgChoose");
+    var preview = body.querySelector("#nvgPreview");
+    var previewImage = body.querySelector("#nvgPreviewImage");
+    var fileName = body.querySelector("#nvgFileName");
+    var fileSize = body.querySelector("#nvgFileSize");
+    var removeImage = body.querySelector("#nvgRemoveImage");
+    var prompt = body.querySelector("#nvgPrompt");
+    var count = body.querySelector("#nvgCount");
+    var modelSelect = body.querySelector("#nvgModel");
+    var durationSelect = body.querySelector("#nvgDuration");
+    var generate = body.querySelector("#nvgGenerate");
+    var message = body.querySelector("#nvgMessage");
+    var placeholder = body.querySelector("#nvgPlaceholder");
+    var video = body.querySelector("#nvgVideo");
+    var actions = body.querySelector("#nvgActions");
+    var download = body.querySelector("#nvgDownload");
+    var open = body.querySelector("#nvgOpen");
+    var again = body.querySelector("#nvgAgain");
+    var resultMeta = body.querySelector("#nvgResultMeta");
+
+    videoModels.forEach(function (item, index) {
+      var option = document.createElement("option");
+      option.value = item.id;
+      option.textContent = item.label + " — " + item.detail;
+      if (index === 0) option.selected = true;
+      modelSelect.appendChild(option);
+    });
+
+    function setMessage(text, type) {
+      if (!alive) return;
+      message.textContent = text;
+      message.className = "nvg-message" + (type ? " is-" + type : "");
+    }
+
+    function clearStatusTimers() {
+      statusTimers.forEach(clearTimeout);
+      statusTimers = [];
+    }
+
+    function signedIn() {
+      return Boolean(window.puter && window.puter.auth && window.puter.auth.isSignedIn());
+    }
+
+    function setBusy(next) {
+      busy = next;
+      generate.disabled = next || !signedIn();
+      modelSelect.disabled = next;
+      durationSelect.disabled = next;
+      textMode.disabled = next;
+      imageMode.disabled = next;
+      choose.disabled = next;
+      generate.querySelector("i").className = next ? "fa-solid fa-circle-notch fa-spin" : "fa-solid fa-clapperboard";
+      generate.querySelector("span").textContent = next ? "Generating your video…" : "Generate Video";
+    }
+
+    function updateDurations() {
+      var selected = modelById(modelSelect.value);
+      var previous = Number(durationSelect.value);
+      durationSelect.innerHTML = "";
+      selected.durations.forEach(function (seconds) {
+        var option = document.createElement("option");
+        option.value = String(seconds);
+        option.textContent = seconds + " detik";
+        if (seconds === previous || (!previous && seconds === selected.durations[0])) option.selected = true;
+        durationSelect.appendChild(option);
+      });
+      if (mode === "image" && !selected.supportsImageInput) {
+        setMessage("Gambar referensi tidak didukung oleh model ini.", "error");
+        generate.disabled = true;
+      } else if (!busy && signedIn()) {
+        generate.disabled = false;
+      }
+    }
+
+    function setMode(next) {
+      if (busy || (next !== "text" && next !== "image")) return;
+      mode = next;
+      var imageActive = mode === "image";
+      textMode.classList.toggle("is-active", !imageActive);
+      imageMode.classList.toggle("is-active", imageActive);
+      textMode.setAttribute("aria-selected", String(!imageActive));
+      imageMode.setAttribute("aria-selected", String(imageActive));
+      reference.hidden = !imageActive;
+      updateDurations();
+      setMessage(imageActive ? "Pilih gambar, tulis gerakannya, lalu generate video." : "Tulis prompt lalu generate video.", "ok");
+    }
+
+    function clearReference() {
+      referenceFile = null;
+      fileInput.value = "";
+      if (referenceUrl && window.URL && typeof window.URL.revokeObjectURL === "function") window.URL.revokeObjectURL(referenceUrl);
+      referenceUrl = "";
+      previewImage.removeAttribute("src");
+      preview.hidden = true;
+      choose.querySelector("span").textContent = "Pilih Gambar";
+    }
+
+    function clearResult() {
+      video.pause();
+      video.removeAttribute("src");
+      video.load();
+      disposeVideoResult(normalizedResult);
+      normalizedResult = null;
+      video.hidden = true;
+      actions.hidden = true;
+      placeholder.hidden = false;
+      download.removeAttribute("href");
+      open.removeAttribute("href");
+      resultMeta.textContent = "Session only";
+    }
+
+    async function refreshAccount() {
+      if (!alive || !window.puter || !window.puter.auth) return;
+      if (!signedIn()) {
+        account.textContent = "Belum terhubung";
+        usage.textContent = "Tekan tombol untuk login ke Puter.";
+        connect.disabled = false;
+        connect.querySelector("span").textContent = "Hubungkan Puter";
+        generate.disabled = true;
+        return;
+      }
+      connect.disabled = false;
+      connect.querySelector("span").textContent = "Akun Terhubung";
+      generate.disabled = busy;
+      try {
+        var user = await window.puter.auth.getUser();
+        if (alive) account.textContent = runtime.safeName(user);
+      } catch (_) { account.textContent = "Akun Puter terhubung"; }
+      try {
+        var monthly = await window.puter.auth.getMonthlyUsage();
+        if (alive) usage.textContent = runtime.percentRemaining(monthly) || "Allowance mengikuti akun Puter kamu.";
+      } catch (_) { usage.textContent = "Allowance mengikuti akun Puter kamu."; }
+      setMessage("Puter sudah terhubung. Video siap dibuat.", "ok");
+    }
+
+    connect.addEventListener("click", async function () {
+      if (busy) return;
+      connect.disabled = true;
+      setMessage("Membuka login Puter…", "loading");
+      try {
+        var puter = await runtime.loadSdk();
+        if (!puter.auth.isSignedIn()) await puter.auth.signIn();
+        if (alive) await refreshAccount();
+      } catch (error) {
+        if (!alive) return;
+        connect.disabled = false;
+        setMessage(videoErrorMessage(error), "error");
+      }
+    });
+
+    textMode.addEventListener("click", function () { setMode("text"); });
+    imageMode.addEventListener("click", function () { setMode("image"); });
+    modelSelect.addEventListener("change", updateDurations);
+    prompt.addEventListener("input", function () { count.textContent = prompt.value.length + " / " + MAX_PROMPT_LENGTH; });
+    choose.addEventListener("click", function () { if (!busy) fileInput.click(); });
+    removeImage.addEventListener("click", clearReference);
+
+    fileInput.addEventListener("change", async function () {
+      var selected = fileInput.files && fileInput.files[0];
+      if (!selected) return;
+      try {
+        await validateReferenceImage(selected);
+        if (!alive) return;
+        clearReference();
+        referenceFile = selected;
+        referenceUrl = URL.createObjectURL(selected);
+        previewImage.src = referenceUrl;
+        fileName.textContent = selected.name || "Gambar referensi";
+        fileSize.textContent = formatBytes(selected.size);
+        preview.hidden = false;
+        choose.querySelector("span").textContent = "Ganti Gambar";
+        setMessage("Gambar siap digunakan sebagai frame referensi.", "ok");
+      } catch (error) {
+        clearReference();
+        setMessage(videoErrorMessage(error), "error");
+      }
+    });
+
+    generate.addEventListener("click", async function () {
+      if (busy) return;
+      var promptValue = prompt.value.trim();
+      var selectedModel = modelById(modelSelect.value);
+      if (!promptValue) {
+        setMessage("Masukkan prompt video terlebih dahulu.", "error");
+        prompt.focus();
+        return;
+      }
+      if (promptValue.length < 3 || promptValue.length > MAX_PROMPT_LENGTH) {
+        setMessage("Prompt video harus berisi 3–3000 karakter.", "error");
+        prompt.focus();
+        return;
+      }
+      if (mode === "image" && !referenceFile) {
+        setMessage("Pilih gambar referensi terlebih dahulu.", "error");
+        return;
+      }
+      if (mode === "image" && !selectedModel.supportsImageInput) {
+        setMessage("Gambar referensi tidak didukung oleh model ini.", "error");
+        return;
+      }
+      if (!signedIn()) {
+        setMessage("Login Puter diperlukan untuk menggunakan AI Video.", "error");
+        return;
+      }
+
+      var token = ++generationToken;
+      clearStatusTimers();
+      setBusy(true);
+      setMessage("Menyiapkan model video…", "loading");
+      statusTimers.push(setTimeout(function () { if (alive && busy && token === generationToken) setMessage("Generating your video…", "loading"); }, 1800));
+      statusTimers.push(setTimeout(function () { if (alive && busy && token === generationToken) setMessage("Video AI dapat memerlukan beberapa menit. Jangan tutup halaman ini.", "loading"); }, 30000));
+
+      try {
+        var selectedAspect = (body.querySelector('input[name="nvgAspect"]:checked') || {}).value || "9:16";
+        var result = await generateVideoWithPuter({
+          prompt: promptValue,
+          modelId: selectedModel.id,
+          duration: Number(durationSelect.value),
+          aspect: selectedAspect,
+          mode: mode,
+          file: referenceFile
+        });
+        if (!alive || token !== generationToken) {
+          disposeVideoResult(result);
+          return;
+        }
+        clearResult();
+        normalizedResult = result;
+        video.style.aspectRatio = selectedAspect === "16:9" ? "16 / 9" : "9 / 16";
+        video.src = result.videoUrl;
+        video.controls = true;
+        video.playsInline = true;
+        video.preload = "metadata";
+        video.hidden = false;
+        placeholder.hidden = true;
+        download.href = result.videoUrl;
+        download.download = "nexora-ai-video-" + Date.now() + ".mp4";
+        open.href = result.videoUrl;
+        actions.hidden = false;
+        resultMeta.textContent = selectedModel.label + " · " + durationSelect.value + "s · " + selectedAspect;
+        setMessage("Video selesai. Tekan play untuk melihat hasilnya.", "ok");
+      } catch (error) {
+        if (alive && token === generationToken) {
+          var details = runtime.errorDetails(error);
+          console.warn("[puter-video] request stopped", { model: selectedModel.id, mode: mode, code: details.code, status: details.status });
+          setMessage(videoErrorMessage(error), "error");
+        }
+      } finally {
+        clearStatusTimers();
+        if (alive && token === generationToken) setBusy(false);
+      }
+    });
+
+    again.addEventListener("click", function () {
+      prompt.focus();
+      prompt.scrollIntoView({ behavior: "smooth", block: "center" });
+      setMessage("Prompt siap diedit untuk generasi berikutnya.", "ok");
+    });
+
+    runtime.loadSdk().then(function () {
+      if (!alive) return;
+      connect.disabled = false;
+      refreshAccount();
+    }).catch(function (error) {
+      if (!alive) return;
+      account.textContent = "Puter belum tersedia";
+      usage.textContent = "Periksa internet atau pemblokir iklan.";
+      connect.disabled = false;
+      setMessage(videoErrorMessage(error), "error");
+    });
+
+    updateDurations();
+    body.__nxCleanup = function () {
+      alive = false;
+      busy = false;
+      generationToken += 1;
+      clearStatusTimers();
+      clearReference();
+      clearResult();
+    };
+  };
+
+  window.normalizePuterVideoResult = normalizePuterVideoResult;
+  window.generateVideoWithPuter = generateVideoWithPuter;
+})();

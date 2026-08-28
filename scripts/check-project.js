@@ -82,7 +82,7 @@ try {
 const schema = read("database/schema.sql");
 const seedBlock = schema.match(/insert into public\.tools[\s\S]*?on conflict \(id\) do nothing;/i)?.[0] || "";
 const seedIds = [...seedBlock.matchAll(/^\s*\('([a-z0-9_-]+)'/gm)].map((match) => match[1]);
-const databaseOptionalIds = new Set(["aisong"]);
+const databaseOptionalIds = new Set(["aisong", "aivideo"]);
 const databaseBackedRegistryIds = registryIds.filter((id) => !databaseOptionalIds.has(id));
 if (!sameSet(databaseBackedRegistryIds, seedIds)) fail(`Seed database tidak sama dengan registry database-backed (${seedIds.length}/${databaseBackedRegistryIds.length}).`);
 

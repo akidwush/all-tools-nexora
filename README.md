@@ -1,6 +1,6 @@
 # All Tools Nexora
 
-All Tools Nexora v6.4.0 adalah website toolkit statis dengan 59 tool, lazy-loaded feature modules, dashboard admin, Supabase opsional untuk fitur lama, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency `@google/genai`.
+All Tools Nexora v6.4.0 adalah website toolkit statis dengan 60 tool, lazy-loaded feature modules, dashboard admin, Supabase opsional untuk fitur lama, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency `@google/genai`.
 
 ## Cara memakai Nexora AI Image
 
@@ -42,6 +42,21 @@ Hal penting yang perlu diketahui:
 - Jangan membuat gambar yang melanggar hukum, merugikan orang lain, atau melanggar aturan Puter.
 
 Fitur ini memakai sistem [User-Pays dari Puter](https://developer.puter.com/tutorials/free-unlimited-image-generation-api/). Harga dan batas pemakaian mengikuti [ketentuan Puter](https://developer.puter.com/pricing/).
+
+## Cara memakai Nexora AI Video Generator
+
+**[Buka Nexora AI Video Generator](https://all-tools-nexora.vercel.app/#tool-aivideo)**
+
+Tool ini membuat video langsung melalui Puter.js dan allowance akun Puter pengguna. Nexora tidak memiliki API key provider, tidak membuat backend video, dan tidak menyimpan prompt, gambar referensi, atau hasil video.
+
+1. Tekan **Hubungkan Puter**, lalu selesaikan login resmi Puter.
+2. Pilih **Text to Video** untuk membuat video dari prompt saja, atau **Image to Video** untuk memakai gambar awal.
+3. Tulis subjek, gerakan, kamera, dan suasana video.
+4. Pilih model, durasi, serta rasio 9:16 atau 16:9.
+5. Tekan **Generate Video** dan tunggu. Proses video dapat memerlukan beberapa menit.
+6. Setelah selesai, gunakan player tanpa autoplay, lalu tekan **Download Video** atau **Open Video**.
+
+Model yang dikonfirmasi dari dokumentasi resmi Puter saat implementasi adalah Sora 2, Sora 2 Pro, Veo 3.1 Fast, dan Veo 3.1. Sora mendukung durasi 4/8/12 detik, sedangkan Veo 3.1 mendukung 4/6/8 detik. Semua pilihan yang ditampilkan mendukung gambar referensi. Biaya dan ketersediaan tetap mengikuti allowance serta provider Puter milik pengguna.
 
 ## Cara memakai GenMail
 

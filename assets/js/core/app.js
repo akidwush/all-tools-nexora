@@ -1325,6 +1325,7 @@ let toolsData = {
     ],
     tools: [{ id: 'mltools', icon: 'fa-solid fa-gamepad', name: 'ML Tools', desc: 'Script ML, Winrate dan Stalk MLBB', badge: 'MLBB' },{ id: 'comicreader', icon: 'fa-solid fa-book-open-reader', name: 'Baca Komik Full', desc: 'Manga, manhwa, manhua + reader', badge: 'FULL' },
         { id: 'aiimage', icon: 'fa-solid fa-image', name: 'Nexora AI Image', desc: 'Buat gambar AI memakai akun dan allowance Puter milikmu', badge: 'PUTER AI' },
+        { id: 'aivideo', icon: 'fa-solid fa-clapperboard', name: 'Nexora AI Video Generator', desc: 'Buat video dari prompt atau gambar melalui akun Puter milikmu', badge: 'AI VIDEO' },
         { id: 'genmail', icon: 'fa-solid fa-envelope-open-text', name: 'GenMail', desc: 'Buat email sementara, periksa inbox, dan baca pesan dengan aman', badge: 'TEMP MAIL' },
         { id: 'danbooru', icon: 'fa-solid fa-images', name: 'Danbooru Search', desc: 'Cari ilustrasi anime berdasarkan tag dalam gallery ringan', badge: 'SAFE DEFAULT' },
         { id: 'animetoreal', icon: 'fa-solid fa-wand-magic-sparkles', name: 'Anime to Real', desc: 'Ubah ilustrasi anime dari URL menjadi gambar realistis', badge: 'AI TRANSFORM' },
@@ -1734,6 +1735,7 @@ function showTool(toolId) {
         case 'logoanimate': renderNexoraLogoAnimate(body); break;
         case 'promptgenerate': renderPromptGenerator(body); break;
         case 'aiimage': renderPuterImage(body); break;
+        case 'aivideo': renderPuterVideo(body); break;
         case 'genmail': renderGenMail(body); break;
         case 'danbooru': renderDanbooruSearch(body); break;
         case 'animetoreal': renderAnimeToReal(body); break;
