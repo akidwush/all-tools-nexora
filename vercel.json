@@ -125,6 +125,10 @@
       "destination": "/api/tool-health?_service=danbooru-search"
     },
     {
+      "source": "/api/ai/anime-to-real",
+      "destination": "/api/tool-health?_service=anime-to-real"
+    },
+    {
       "source": "/api/space-explorer",
       "destination": "/api/tool-health?mode=space-explorer"
     },

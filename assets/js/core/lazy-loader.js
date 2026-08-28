@@ -19,6 +19,7 @@
     'genmail': {css:['assets/css/features/genmail.css'],js:['assets/js/features/genmail.js']},
     'aio-downloader': {css:['assets/css/features/aio-downloader.css'],js:['assets/js/features/aio-downloader.js']},
     'danbooru-search': {css:['assets/css/features/danbooru-search.css'],js:['assets/js/features/danbooru-search.js']},
+    'anime-to-real': {css:['assets/css/features/anime-to-real.css'],js:['assets/js/features/anime-to-real.js']},
     'image-vectorizer': {css:['assets/css/features/image-vectorizer.css'],js:['assets/js/features/image-vectorizer.js']},
     'svg-alight': {css:['assets/css/features/svg-alight.css'],js:['assets/js/features/svg-alight.js']},
     'alight-premium': {css:['assets/css/features/alight-premium.css'],js:['assets/js/features/alight-premium.js']},
@@ -41,7 +42,7 @@
   var toolModules = {
     getcode:'get-code',tiktok:'tiktok',ttquote:'tiktok-quote',virusscan:'virus-scan',cryptomarket:'crypto-market',webintel:'web-intelligence',ipintel:'ip-intelligence',bmkg:'bmkg-open-data',spaceexplorer:'space-explorer',ocrintel:'ocr-intelligence',documentai:'document-ai',svgalight:'svg-alight',alightpremium:'alight-premium',imagevectorizer:'image-vectorizer',comicreader:'comic-reader',
     sertifikat:'source-features',fakedev:'source-features',
-    promptgenerate:'prompt-generator',aiimage:'puter-image',genmail:'genmail',aiodownloader:'aio-downloader',danbooru:'danbooru-search',fakeovo:'imported-tools',quotegenerator:'imported-tools',carifakta:'imported-tools',mltools:'imported-tools',
+    promptgenerate:'prompt-generator',aiimage:'puter-image',genmail:'genmail',aiodownloader:'aio-downloader',danbooru:'danbooru-search',animetoreal:'anime-to-real',fakeovo:'imported-tools',quotegenerator:'imported-tools',carifakta:'imported-tools',mltools:'imported-tools',
     iqc:'generator-pack',winquotes:'generator-pack',nokiamsg:'generator-pack',
     terabox:'download-pack',fakebankjago:'download-pack',
     unbanwa:'unban-whatsapp',vdeploy:'deploy-center',webencryption:'web-encryption',
@@ -50,7 +51,7 @@
 
   var labels = {
     'get code html':'getcode','tiktok':'tiktok','quote tiktok nexus':'ttquote','virus scan':'virusscan','crypto market scanner':'cryptomarket','nexora web intelligence':'webintel','ip & asn intelligence':'ipintel','ip asn intelligence':'ipintel','bmkg indonesia':'bmkg','bmkg':'bmkg','space explorer':'spaceexplorer','nexora ocr intelligence':'ocrintel','ocr intelligence':'ocrintel','nexora document ai':'documentai','document ai':'documentai','svg → alight xml':'svgalight','svg alight xml':'svgalight','anime vector atelier':'svgalight','alight motion premium 1 tahun':'alightpremium','alight premium':'alightpremium','nexora image vectorizer':'imagevectorizer','image vectorizer':'imagevectorizer','baca komik full':'comicreader',
-    'sertifikat custom':'sertifikat','fakedev':'fakedev','prompt generator':'promptgenerate','nexora ai image':'aiimage','ai image':'aiimage','genmail':'genmail','advanced temp mail':'genmail','temp mail nexora':'genmail','all in one downloader':'aiodownloader','aio downloader':'aiodownloader','universal downloader':'aiodownloader','danbooru search':'danbooru','danbooru':'danbooru','anime art search':'danbooru','fake ovo':'fakeovo',
+    'sertifikat custom':'sertifikat','fakedev':'fakedev','prompt generator':'promptgenerate','nexora ai image':'aiimage','ai image':'aiimage','genmail':'genmail','advanced temp mail':'genmail','temp mail nexora':'genmail','all in one downloader':'aiodownloader','aio downloader':'aiodownloader','universal downloader':'aiodownloader','danbooru search':'danbooru','danbooru':'danbooru','anime art search':'danbooru','anime to real':'animetoreal','anime realistic':'animetoreal','fake ovo':'fakeovo',
     'quote generator':'quotegenerator','carifakta':'carifakta','ml tools':'mltools','iqc generator':'iqc',
     'windows quotes':'winquotes','nokia message':'nokiamsg','terabox downloader':'terabox','fake bank jago':'fakebankjago',
     'spotify downloader':'spotify','unban whatsapp':'unbanwa',
@@ -69,6 +70,7 @@
     [/genmail\.(?:js|css)(?:$|\?)/, 'genmail-v1'],
     [/aio-downloader\.(?:js|css)(?:$|\?)/, 'aio-downloader-hf31'],
     [/danbooru-search\.(?:js|css)(?:$|\?)/, 'danbooru-search-hf35'],
+    [/anime-to-real\.(?:js|css)(?:$|\?)/, 'anime-to-real-hf36'],
     [/document-ai\.(?:js|css)(?:$|\?)/, 'document-android'],
     [/crypto-market\.(?:js|css)(?:$|\?)/, 'crypto-mtf'],
     [/comic-reader\.(?:js|css)(?:$|\?)/, 'comic-reader'],

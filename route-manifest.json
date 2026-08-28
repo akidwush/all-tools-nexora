@@ -26,6 +26,7 @@
     "/api/genmail",
     "/api/download/aio",
     "/api/search/danbooru",
+    "/api/ai/anime-to-real",
     "/api/space-explorer",
     "/api/ocr-intelligence",
     "/api/vdeploy",

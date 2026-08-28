@@ -13,6 +13,7 @@ const { handleBmkgOpenData } = require("../lib/bmkg-open-data");
 const { handleGenMail } = require("../lib/genmail");
 const { handleAioDownload } = require("../lib/kuroneko-aio");
 const { handleDanbooruSearch } = require("../lib/kuroneko-danbooru");
+const { handleAnimeToReal } = require("../lib/kuroneko-anime-to-real");
 const { authorizeTool, handleAccount } = require("../lib/account-membership");
 const { sendJson: send } = require("../lib/http-response");
 const {
@@ -114,6 +115,9 @@ module.exports = async function handler(request, response) {
   const url = new URL(request.url || "/api/tool-health", origin);
   if (url.searchParams.get("_service") === "danbooru-search") {
     return handleDanbooruSearch(request, response, url);
+  }
+  if (url.searchParams.get("_service") === "anime-to-real") {
+    return handleAnimeToReal(request, response, url);
   }
   const mode = url.searchParams.get("mode");
   if (mode === "account") return handleAccount(request, response);

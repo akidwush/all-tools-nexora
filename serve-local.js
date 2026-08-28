@@ -63,6 +63,7 @@ const API_ROUTES = Object.freeze({
   "/api/genmail": { file: "api/tool-health.js", mode: "genmail" },
   "/api/download/aio": { file: "api/tool-health.js", mode: "aio-download" },
   "/api/search/danbooru": { file: "api/tool-health.js", service: "danbooru-search" },
+  "/api/ai/anime-to-real": { file: "api/tool-health.js", service: "anime-to-real" },
   "/api/tool-health": { file: "api/tool-health.js" },
   "/api/account": { file: "api/tool-health.js", mode: "account" },
   "/api/media-download": { file: "api/tool-health.js", mode: "media-download" },

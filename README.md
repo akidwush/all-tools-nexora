@@ -1,6 +1,6 @@
 # All Tools Nexora
 
-All Tools Nexora v6.4.0 adalah website toolkit statis dengan 57 tool, lazy-loaded feature modules, dashboard admin, Supabase, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency `@google/genai`.
+All Tools Nexora v6.4.0 adalah website toolkit statis dengan 58 tool, lazy-loaded feature modules, dashboard admin, Supabase opsional untuk fitur lama, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency `@google/genai`.
 
 ## Cara memakai Nexora AI Image
 
@@ -88,6 +88,22 @@ Cara pakainya:
 5. Jika link gambar tersedia, gunakan **Open Image**, **Copy Image Link**, atau **Download**.
 
 Gallery memakai thumbnail jika server memberikannya. Jika server hanya memberikan gambar asli, Nexora memakai URL itu langsung tanpa memindahkan file besar melalui Vercel. Hasil pencarian yang sama disimpan sebentar selama sesi agar jatah request tidak cepat habis. API key KuroNeko tetap berada di server Nexora.
+
+## Cara memakai Anime to Real
+
+**[Buka Anime to Real](https://all-tools-nexora.vercel.app/#tool-animetoreal)**
+
+Anime to Real mengubah gambar anime menjadi gambar bergaya realistis. Kamu hanya perlu menyiapkan link gambar yang dapat dibuka tanpa login.
+
+1. Salin URL gambar anime. URL harus dimulai dengan `http://` atau `https://`.
+2. Buka **Anime to Real**, lalu tempel URL ke kotak **Image URL**. Kamu juga dapat menekan **Paste**.
+3. Tekan **Convert** satu kali dan tunggu. Proses AI dapat membutuhkan waktu hingga satu menit.
+4. Jika berhasil, hasil akan muncul di bawah gambar asli.
+5. Gunakan **Open Image**, **Download Result**, atau **Copy Link** sesuai kebutuhan.
+
+API key KuroNeko hanya dibaca oleh server melalui `KURONEKO_API_KEY`. Browser tidak menerima key tersebut. Fitur ini tidak memakai database, Supabase client, Supabase Edge Function, atau Supabase Storage; gambar juga tidak disimpan oleh Nexora.
+
+Jika gambar asli tidak tampil tetapi URL sudah benar, kamu tetap boleh mencoba konversi. Jika provider menolak gambar, gunakan gambar publik lain dan jangan mencoba melewati pembatasan keamanan provider.
 
 Hal penting:
 

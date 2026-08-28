@@ -121,6 +121,14 @@
         "assets/js/features/danbooru-search.js"
       ]
     },
+    "anime-to-real": {
+      "css": [
+        "assets/css/features/anime-to-real.css"
+      ],
+      "js": [
+        "assets/js/features/anime-to-real.js"
+      ]
+    },
     "image-vectorizer": {
       "css": [
         "assets/css/features/image-vectorizer.css"
@@ -259,6 +267,7 @@
     "genmail": "genmail",
     "aiodownloader": "aio-downloader",
     "danbooru": "danbooru-search",
+    "animetoreal": "anime-to-real",
     "fakeovo": "imported-tools",
     "quotegenerator": "imported-tools",
     "carifakta": "imported-tools",

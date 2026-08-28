@@ -1,3 +1,12 @@
+## 6.4.0 HF36 Anime to Real — 2026-08-28
+
+- Fitur: menambahkan Anime to Real mobile-first dengan input URL, Paste, preview Original, hasil Realistic, Open Image, Download, dan Copy Link.
+- API: route `/api/ai/anime-to-real` dimultipleks melalui `api/tool-health.js` ke KuroNeko; `KURONEKO_API_KEY` hanya ditambahkan server-side.
+- Security: hanya parameter `url` yang diterima, upstream hardcoded, backend tidak pernah mengambil URL input secara langsung, secret reflection diblokir, serta error provider disanitasi.
+- Runtime: timeout 55 detik, rate limit, deduplikasi request aktif, batas respons, `no-store`, AbortController, dan cleanup navigasi aktif tanpa dependency baru.
+- Data: tidak ada tabel, migration, Supabase client, Supabase Edge Function, atau Supabase Storage baru; schema hanya memuat metadata katalog bawaan agar audit registry tetap sinkron.
+- Response nyata: probe tanpa key mengonfirmasi HTTP 401 dengan envelope `creator`, `message`, dan `status:false`; schema sukses dinormalisasi toleran dan diagnostics hanya mencatat tipe serta nama field.
+
 ## 6.4.0 HF35 Danbooru Android CDN recovery — 2026-08-28
 
 - Fix: gambar dari `cdn.donmai.us` ditampilkan melalui image CDN HTTPS terverifikasi karena sebagian jaringan Android menerima sertifikat origin sebagai `NET::ERR_CERT_AUTHORITY_INVALID`.
