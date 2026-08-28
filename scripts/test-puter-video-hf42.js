@@ -31,9 +31,9 @@ assert.match(shell, /aivideo:\{renderer:'renderPuterVideo'/);
 assert.match(registry, /\["aivideo","Nexora AI Video Generator","module","puter-video","renderPuterVideo",null\]/);
 assert.match(health, /id: "aivideo", name: "Nexora AI Video Generator"/);
 assert.match(lazy, /aivideo:'puter-video'/);
-assert.match(lazy, /puter-video-hf44/);
+assert.match(lazy, /puter-video-hf45/);
 assert.match(lazy, /'puter-video':'Nexora AI Video Generator'/);
-assert.match(index, /hf44-puter-video1/);
+assert.match(index, /hf45-puter-video1/);
 assert.match(readme, /#tool-aivideo/);
 assert.match(readme, /60 tool/);
 
@@ -48,10 +48,18 @@ assert.match(feature, /controls playsinline preload="metadata"/);
 assert.doesNotMatch(feature, /autoplay/i);
 assert.match(feature, /if \(busy\) return;/);
 assert.match(feature, /accountVerified = false/);
+assert.match(feature, /id="nvgAuthRetry"/);
+assert.match(feature, /referenceDataUrl = preparedDataUrl/);
 assert.match(feature, /getUser\(\)/);
 assert.match(feature, /Sesi perlu dihubungkan ulang/);
 assert.match(feature, /var puter = window\.puter;[\s\S]*?puter\.auth\.signIn\(\{ request_auth: true \}\)/);
-assert.doesNotMatch(feature.match(/connect\.addEventListener\("click"[\s\S]*?\n    \}\);/)[0], /await runtime\.loadSdk/);
+const connectHelper = feature.match(/async function connectPuter\(\) \{[\s\S]*?\n    \}/)[0];
+assert.doesNotMatch(connectHelper, /runtime\.loadSdk/);
+assert.match(connectHelper, /var puter = window\.puter;[\s\S]*?await puter\.auth\.signIn/);
+const generationHelper = feature.match(/function generateVideoWithPuter\(params\) \{[\s\S]*?\n  \}/)[0];
+assert.doesNotMatch(generationHelper, /\bawait\b|loadSdk\(/);
+assert.match(generationHelper, /var request = sdk\.ai\.txt2vid\(params\.prompt, options\)/);
+assert.match(css, /\.nvg-auth-retry/);
 assert.match(feature, /body\.__nxCleanup/);
 assert.match(feature, /URL\.revokeObjectURL/);
 assert.match(feature, /generationToken \+= 1/);
@@ -76,7 +84,7 @@ for (const token of [
 
 const instrumented = feature.replace(
   /window\.normalizePuterVideoResult = normalizePuterVideoResult;[\s\S]*?\}\)\(\);\s*$/,
-  "window.__puterVideoTest={models:videoModels,normalize:normalizePuterVideoResult,buildOptions:buildVideoOptions,errorMessage:videoErrorMessage,validateImage:validateReferenceImage};})();"
+  "window.__puterVideoTest={models:videoModels,normalize:normalizePuterVideoResult,generate:generateVideoWithPuter,buildOptions:buildVideoOptions,errorMessage:videoErrorMessage,validateImage:validateReferenceImage};})();"
 );
 const revoked = [];
 const sandbox = {
@@ -186,10 +194,25 @@ async function verifyMediaNormalization() {
   const arrayEnvelope = await helpers.normalize([{ href: "https://assets.puter.site/array.mp4" }]);
   assert.match(arrayEnvelope.videoUrl, /array\.mp4$/);
   await assert.rejects(() => helpers.normalize({ result: "missing" }), /PUTER_VIDEO_INVALID_RESULT/);
+
+  const callOrder = [];
+  sandbox.window.puter = {
+    ai: {
+      txt2vid(prompt, options) {
+        callOrder.push({ prompt, options });
+        return Promise.resolve({ asset_url: "https://assets.puter.site/direct-tap.mp4" });
+      }
+    }
+  };
+  const generation = helpers.generate({ prompt: "Direct tap", modelId: "sora-2", duration: 4, aspect: "9:16", mode: "text" });
+  assert.equal(callOrder.length, 1, "txt2vid harus terpanggil sinkron sebelum promise ditunggu");
+  assert.equal(callOrder[0].prompt, "Direct tap");
+  const generated = await generation;
+  assert.match(generated.videoUrl, /direct-tap\.mp4$/);
 }
 
 Promise.all([verifyImageValidation(), verifyMediaNormalization()]).then(() => {
-  console.log("Nexora AI Video HF44 lulus: re-auth sinkron dari tap Android, validasi sesi, hasil Puter DOM/Blob/ArrayBuffer/Response/nested, model resmi, player, download, cleanup, mobile, dan zero-backend tervalidasi.");
+  console.log("Nexora AI Video HF45 lulus: txt2vid sinkron dari tap Android, re-auth inline, validasi sesi, result normalizer, image prep, player, cleanup, mobile, dan zero-backend tervalidasi.");
 }).catch((error) => {
   console.error(error);
   process.exit(1);

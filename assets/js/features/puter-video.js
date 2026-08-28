@@ -213,20 +213,20 @@
     ]);
   }
 
-  async function generateVideoWithPuter(params) {
-    var runtime = window.NexoraPuterRuntime;
-    if (!runtime || typeof runtime.loadSdk !== "function") throw new Error("PUTER_SDK_UNAVAILABLE");
-    var sdk = await runtime.loadSdk();
+  function generateVideoWithPuter(params) {
+    var sdk = window.puter;
+    if (!sdk || !sdk.ai || typeof sdk.ai.txt2vid !== "function") throw new Error("PUTER_SDK_UNAVAILABLE");
     var model = modelById(params.modelId);
     var inputReference = null;
     if (params.mode === "image") {
       if (!model.supportsImageInput) throw new Error("PUTER_VIDEO_IMAGE_UNSUPPORTED");
-      var image = await validateReferenceImage(params.file);
-      inputReference = model.imageInput === "file" ? image : await readFileAsDataUrl(image);
+      if (!params.file) throw new Error("PUTER_VIDEO_IMAGE_REQUIRED");
+      inputReference = model.imageInput === "file" ? params.file : params.dataUrl;
+      if (!inputReference) throw new Error("PUTER_VIDEO_IMAGE_READ_FAILED");
     }
     var options = buildVideoOptions(model, params.duration, params.aspect, inputReference);
-    var raw = await withTimeout(sdk.ai.txt2vid(params.prompt, options), GENERATION_TIMEOUT_MS);
-    return normalizePuterVideoResult(raw);
+    var request = sdk.ai.txt2vid(params.prompt, options);
+    return withTimeout(request, GENERATION_TIMEOUT_MS).then(normalizePuterVideoResult);
   }
 
   function videoErrorMessage(error) {
@@ -264,6 +264,7 @@
     var accountVerified = false;
     var mode = "text";
     var referenceFile = null;
+    var referenceDataUrl = "";
     var referenceUrl = "";
     var normalizedResult = null;
     var generationToken = 0;
@@ -279,7 +280,7 @@
           '<label class="nvg-field-label" for="nvgPrompt">Prompt video <span>Wajib</span></label><textarea id="nvgPrompt" minlength="3" maxlength="3000" rows="6" placeholder="Contoh: Kota futuristik pada malam hari, hujan deras, pantulan neon di jalan basah, gerakan kamera perlahan."></textarea><div class="nvg-count"><span>Jelaskan subjek, gerakan, kamera, dan suasana.</span><span id="nvgCount">0 / 3000</span></div>' +
           '<div class="nvg-control-grid"><label><span>Model</span><select id="nvgModel"></select></label><label><span>Durasi</span><select id="nvgDuration"></select></label></div>' +
           '<fieldset class="nvg-aspect"><legend>Rasio video</legend><label><input type="radio" name="nvgAspect" value="9:16" checked><span><i class="fa-solid fa-mobile-screen"></i>9:16</span></label><label><input type="radio" name="nvgAspect" value="16:9"><span><i class="fa-solid fa-display"></i>16:9</span></label></fieldset>' +
-          '<button class="nvg-primary" id="nvgGenerate" type="button" disabled><i class="fa-solid fa-clapperboard"></i><span>Generate Video</span></button><p class="nvg-message" id="nvgMessage" role="status" aria-live="polite">Hubungkan akun Puter terlebih dahulu.</p>' +
+          '<button class="nvg-primary" id="nvgGenerate" type="button" disabled><i class="fa-solid fa-clapperboard"></i><span>Generate Video</span></button><p class="nvg-message" id="nvgMessage" role="status" aria-live="polite">Hubungkan akun Puter terlebih dahulu.</p><button class="nvg-auth-retry" id="nvgAuthRetry" type="button" hidden><i class="fa-solid fa-right-to-bracket"></i><span>Hubungkan Ulang Puter</span></button>' +
         '</section>' +
         '<section class="nvg-card nvg-result" aria-label="Video hasil"><div class="nvg-result-head"><div><span class="nvg-kicker">HASIL</span><h2>Generated Video</h2></div><span id="nvgResultMeta">Session only</span></div><div class="nvg-placeholder" id="nvgPlaceholder"><i class="fa-solid fa-film"></i><strong>Video akan muncul di sini</strong><span>Proses dapat memerlukan beberapa menit.</span></div><video id="nvgVideo" controls playsinline preload="metadata" hidden></video><div class="nvg-actions" id="nvgActions" hidden><a id="nvgDownload" href="#" download="nexora-ai-video.mp4"><i class="fa-solid fa-download"></i>Download Video</a><a id="nvgOpen" href="#" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i>Open Video</a><button id="nvgAgain" type="button"><i class="fa-solid fa-rotate-right"></i>Generate Again</button></div></section>' +
         '<p class="nvg-help">Video memakai allowance akun Puter pengguna. Durasi dan ukuran yang tampil mengikuti model resmi yang dipilih.</p>' +
@@ -305,6 +306,7 @@
     var durationSelect = body.querySelector("#nvgDuration");
     var generate = body.querySelector("#nvgGenerate");
     var message = body.querySelector("#nvgMessage");
+    var authRetry = body.querySelector("#nvgAuthRetry");
     var placeholder = body.querySelector("#nvgPlaceholder");
     var video = body.querySelector("#nvgVideo");
     var actions = body.querySelector("#nvgActions");
@@ -382,6 +384,7 @@
 
     function clearReference() {
       referenceFile = null;
+      referenceDataUrl = "";
       fileInput.value = "";
       if (referenceUrl && window.URL && typeof window.URL.revokeObjectURL === "function") window.URL.revokeObjectURL(referenceUrl);
       referenceUrl = "";
@@ -413,6 +416,7 @@
         connect.disabled = false;
         connect.querySelector("span").textContent = "Hubungkan Puter";
         generate.disabled = true;
+        authRetry.hidden = false;
         return;
       }
       var user = null;
@@ -428,6 +432,7 @@
         connect.disabled = false;
         connect.querySelector("span").textContent = "Hubungkan Ulang";
         generate.disabled = true;
+        authRetry.hidden = false;
         setMessage("Sesi Puter sudah kedaluwarsa. Hubungkan ulang sebelum generate.", "error");
         return;
       }
@@ -435,6 +440,7 @@
       connect.disabled = false;
       connect.querySelector("span").textContent = "Akun Terhubung";
       generate.disabled = busy;
+      authRetry.hidden = true;
       account.textContent = runtime.safeName(user);
       try {
         var monthly = await window.puter.auth.getMonthlyUsage();
@@ -443,9 +449,10 @@
       setMessage("Puter sudah terhubung. Video siap dibuat.", "ok");
     }
 
-    connect.addEventListener("click", async function () {
+    async function connectPuter() {
       if (busy) return;
       connect.disabled = true;
+      authRetry.disabled = true;
       setMessage("Membuka login Puter…", "loading");
       try {
         var puter = window.puter;
@@ -459,11 +466,16 @@
         if (!alive) return;
         accountVerified = false;
         connect.disabled = false;
+        authRetry.disabled = false;
+        authRetry.hidden = false;
         connect.querySelector("span").textContent = "Coba Hubungkan Lagi";
         generate.disabled = true;
         setMessage(videoErrorMessage(error), "error");
       }
-    });
+    }
+
+    connect.addEventListener("click", connectPuter);
+    authRetry.addEventListener("click", connectPuter);
 
     textMode.addEventListener("click", function () { setMode("text"); });
     imageMode.addEventListener("click", function () { setMode("image"); });
@@ -477,9 +489,11 @@
       if (!selected) return;
       try {
         await validateReferenceImage(selected);
+        var preparedDataUrl = await readFileAsDataUrl(selected);
         if (!alive) return;
         clearReference();
         referenceFile = selected;
+        referenceDataUrl = preparedDataUrl;
         referenceUrl = URL.createObjectURL(selected);
         previewImage.src = referenceUrl;
         fileName.textContent = selected.name || "Gambar referensi";
@@ -523,6 +537,7 @@
       var token = ++generationToken;
       clearStatusTimers();
       setBusy(true);
+      authRetry.hidden = true;
       setMessage("Menyiapkan model video…", "loading");
       statusTimers.push(setTimeout(function () { if (alive && busy && token === generationToken) setMessage("Generating your video…", "loading"); }, 1800));
       statusTimers.push(setTimeout(function () { if (alive && busy && token === generationToken) setMessage("Video AI dapat memerlukan beberapa menit. Jangan tutup halaman ini.", "loading"); }, 30000));
@@ -535,7 +550,8 @@
           duration: Number(durationSelect.value),
           aspect: selectedAspect,
           mode: mode,
-          file: referenceFile
+          file: referenceFile,
+          dataUrl: referenceDataUrl
         });
         if (!alive || token !== generationToken) {
           disposeVideoResult(result);
@@ -565,8 +581,12 @@
             generate.disabled = true;
             connect.disabled = false;
             connect.querySelector("span").textContent = "Hubungkan Ulang";
+            authRetry.disabled = false;
+            authRetry.hidden = false;
+            setMessage("Otorisasi Puter perlu diperbarui. Tekan Hubungkan Ulang Puter.", "error");
+          } else {
+            setMessage(videoErrorMessage(error), "error");
           }
-          setMessage(videoErrorMessage(error), "error");
         }
       } finally {
         clearStatusTimers();

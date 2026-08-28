@@ -1,3 +1,10 @@
+## 6.4.0 HF45 Puter direct-tap authorization — 2026-08-28
+
+- Fix: `puter.ai.txt2vid()` sekarang dipanggil sinkron dari event tap Generate tanpa `await` SDK, validasi file, atau FileReader sebelumnya, sehingga user activation Chrome Android tetap aktif saat Puter meminta otorisasi.
+- Image mode: validasi magic-byte dan data URI Veo dipersiapkan saat gambar dipilih; Sora tetap menerima object File asli.
+- Recovery UI: tombol Hubungkan Ulang Puter tampil langsung di bawah error auth agar pengguna tidak perlu scroll kembali ke card akun.
+- Cache: modul JavaScript dan CSS AI Video dinaikkan ke HF45 untuk memutus cache HF44 di Android.
+
 ## 6.4.0 HF44 Puter Android re-auth recovery — 2026-08-28
 
 - Fix: token lokal Puter tidak lagi dianggap sebagai sesi aktif sebelum `getUser()` berhasil memvalidasinya.
