@@ -40,7 +40,7 @@ assert.doesNotMatch(stability, /refresh="\+\(force\?"force"/);
 // Aplikasi eksternal tidak lagi mengunduh bundle lokal ratusan KB/MB.
 assert.equal(manifest.tools.zxvai, undefined);
 assert.equal(manifest.tools.fotolink, undefined);
-assert.doesNotMatch(lazy, /zxvai:'openNexusAI'/);
+assert.doesNotMatch(lazy, /zxvai:'openNexoraAI'/);
 assert.doesNotMatch(lazy, /fotolink:'openPix'/);
 assert.match(registry, /\["zxvai","ZxVAI","external",null,null,"https:\/\/zxvaiapk\.netlify\.app\/"\]/);
 assert.match(registry, /\["fotolink","Foto To Link","external",null,null,"https:\/\/pixvault-bykz\.netlify\.app\/"\]/);

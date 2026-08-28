@@ -126,7 +126,7 @@ async function getUserInfo() {
     }
 
     await detectCountry();
-    window.addEventListener('online', function nexusRetryCountryOnce() {
+    window.addEventListener('online', function nexoraRetryCountryOnce() {
         detectCountry();
     }, { once: true });
 
@@ -208,8 +208,8 @@ const apiStatusChecks = [
         hosts:['api.vercel.com','api.netlify.com'], tools:['vdeploy']
     },
     {
-        id:'nexusai', name:'Nexus AI',
-        hosts:[], tools:['nexusai']
+        id:'nexoraai', name:'Nexora AI',
+        hosts:[], tools:['nexoraai']
     },
     {
         id:'groqfact', name:'Groq CariFakta',
@@ -1394,7 +1394,7 @@ async function nxCanvasWindowsQuote(text) {
     nxWrapText(ctx, text, 365, 285, 510, 46);
     ctx.fillStyle = '#7dd3fc';
     ctx.font = '700 22px Inter, Arial';
-    ctx.fillText('NEXUS TOOLS', 365, 410);
+    ctx.fillText('NEXORA TOOLS', 365, 410);
     return nxCanvasToUrl(canvas);
 }
 
@@ -1436,7 +1436,7 @@ async function nxCanvasTanyaUstadz(text) {
     return nxCanvasToUrl(canvas);
 }
 
-const DOWNLOAD_HISTORY_KEY = 'nexus_download_history_v1';
+const DOWNLOAD_HISTORY_KEY = 'nexora_download_history_v1';
 let downloadHistoryFilter = 'all';
 
 function readDownloadHistory() {
@@ -1592,7 +1592,7 @@ let toolsData = {
         { id: 'genmail', icon: 'fa-solid fa-envelope-open-text', name: 'GenMail', desc: 'Buat email sementara, periksa inbox, dan baca pesan dengan aman', badge: 'TEMP MAIL' },
         { id: 'danbooru', icon: 'fa-solid fa-images', name: 'Danbooru Search', desc: 'Cari ilustrasi anime berdasarkan tag dalam gallery ringan', badge: 'SAFE DEFAULT' },
         { id: 'animetoreal', icon: 'fa-solid fa-wand-magic-sparkles', name: 'Anime to Real', desc: 'Ubah ilustrasi anime dari URL menjadi gambar realistis', badge: 'AI TRANSFORM' },
-        { id: 'promptgenerate', icon: 'fa-solid fa-wand-magic-sparkles', name: 'Prompt Generator', desc: 'Analisis gambar dengan Gemini Vision menjadi prompt produksi profesional', badge: 'VISION AI' },
+        { id: 'promptgenerate', icon: 'fa-solid fa-wand-magic-sparkles', name: 'Nexora Prompt Generator', desc: 'Analisis gambar dengan Nexora Vision AI menjadi prompt produksi profesional', badge: 'VISION AI' },
         { id: 'fakeovo', icon: 'fa-solid fa-wallet', name: 'Fake OVO', desc: 'Generator tampilan saldo OVO', badge: 'CANVAS' },
         { id: 'quotegenerator', icon: 'fa-solid fa-quote-left', name: 'Quote Generator', desc: 'Buat gambar quote monokrom', badge: 'JPG' },
         { id: 'carifakta', icon: 'fa-solid fa-magnifying-glass-chart', name: 'CariFakta', desc: 'Analisis klaim dan berita menggunakan AI', badge: 'AI' },
@@ -1603,7 +1603,7 @@ let toolsData = {
         { id: 'bmkg', icon: 'fa-solid fa-cloud-sun-rain', name: 'BMKG Indonesia', desc: 'Gempa terkini, prakiraan cuaca 3 hari dan peringatan dini cuaca dari BMKG', badge: 'BMKG' },
         { id: 'spaceexplorer', icon: 'fa-solid fa-user-astronaut', name: 'Space Explorer', desc: 'APOD, galeri Mars, asteroid dekat Bumi dan cuaca antariksa NASA', badge: 'NASA' },
         { id: 'ocrintel', icon: 'fa-solid fa-file-lines', name: 'Nexora OCR Intelligence', desc: 'Ekstrak teks dari gambar dan PDF, analisis dokumen, lalu buat searchable PDF', badge: 'OCR' },
-        { id: 'documentai', icon: 'fa-solid fa-file-waveform', name: 'Nexora Document AI', desc: 'Ringkas, analisis, ekstrak tabel, dan tanya isi dokumen dengan Gemini', badge: 'AI' },
+        { id: 'documentai', icon: 'fa-solid fa-file-waveform', name: 'Nexora Document AI', desc: 'Ringkas, analisis, ekstrak tabel, dan tanya isi dokumen dengan Nexora AI', badge: 'AI' },
         { id: 'svgalight', icon: 'fa-solid fa-wand-magic-sparkles', name: 'SVG → Alight XML', desc: 'Konversi SVG ke XML Alight Motion dengan AM Optimized, Maximum Fidelity, audit kesamaan, dan kontrol layer', badge: 'ENGINE v1.8' },
         { id: 'alightpremium', icon: 'fa-solid fa-bolt', name: 'Alight Motion Premium 1 Tahun', desc: 'Request magic link lalu proses aktivasi Premium melalui API reseller', badge: '1 YEAR' },
         { id: 'imagevectorizer', icon: 'fa-solid fa-bezier-curve', name: 'Nexora Image Vectorizer', desc: 'Ubah PNG atau JPG menjadi SVG melalui FreeConvert Cloud', badge: 'SVG' },
@@ -1621,7 +1621,7 @@ let toolsData = {
     ],
     vault: [
 
-        { id: 'ttquote', icon: 'fa-brands fa-tiktok', name: 'Quote TikTok Nexus', desc: 'Buat fake TikTok chat versi Nexus', badge: 'NEXUS' },
+        { id: 'ttquote', icon: 'fa-brands fa-tiktok', name: 'Quote TikTok Nexora', desc: 'Buat fake TikTok chat versi Nexora', badge: 'NEXORA' },
         { id: 'qrgen', icon: 'fa-solid fa-qrcode', name: 'QR Generator', desc: 'Buat QR langsung di sini', badge: 'QR' }
     ],
     external: [
@@ -1670,7 +1670,7 @@ function toolCardMarkup(item, isExternal = false, category = '') {
     const safeIcon = escapeToolHtml(item.icon || 'fa-solid fa-cube');
     const safeLink = encodeURIComponent(String(item.link || '#')).replace(/'/g, '%27');
     const clickAttr = item.id === 'unbanwa' ?
-        `onclick="window.openNexusUnban && window.openNexusUnban()"` :
+        `onclick="window.openNexoraUnban && window.openNexoraUnban()"` :
         (item.id === 'vdeploy' ?
         `onclick="window.openDeploy && window.openDeploy()"` :
         (item.id === 'webencryption' ?
@@ -1984,12 +1984,12 @@ function showTool(toolId) {
         case 'svgalight': renderSvgAlight(body); break;
         case 'alightpremium': renderAlightPremium(body); break;
         case 'imagevectorizer': renderImageVectorizer(body); break;
-        case 'text2d': renderFlamoText2D(body); break;
-        case 'text3d': renderFlamoText3D(body); break;
-        case 'textfxanimation': renderFlamoTextFxAnimation(body); break;
-        case 'textvector': renderFlamoTextVector(body); break;
-        case 'trimpath': renderFlamoTrimpath(body); break;
-        case 'logoanimate': renderFlamoLogoAnimate(body); break;
+        case 'text2d': renderNexoraText2D(body); break;
+        case 'text3d': renderNexoraText3D(body); break;
+        case 'textfxanimation': renderNexoraTextFxAnimation(body); break;
+        case 'textvector': renderNexoraTextVector(body); break;
+        case 'trimpath': renderNexoraTrimpath(body); break;
+        case 'logoanimate': renderNexoraLogoAnimate(body); break;
         case 'promptgenerate': renderPromptGenerator(body); break;
         case 'aiimage': renderPuterImage(body); break;
         case 'genmail': renderGenMail(body); break;
@@ -1999,7 +1999,7 @@ function showTool(toolId) {
         case 'quotegenerator': renderQuoteGenerator(body); break;
         case 'carifakta': renderCariFakta(body); break;
                 case 'mltools': renderMlTools(body); break;
-        case 'saranide': closeTool(); window.openNexusReportRoom && window.openNexusReportRoom(); return;
+        case 'saranide': closeTool(); window.openNexoraReportRoom && window.openNexoraReportRoom(); return;
 case 'calc': renderCalc(body); break;
         case 'pwgen': renderPwgen(body); break;
         case 'morse': renderMorse(body); break;
@@ -2544,7 +2544,7 @@ function renderBrat(body) {
     body.innerHTML = `
         <h2><i class="fas fa-wand-magic-sparkles"></i> BRAT Generator</h2>
         <p style="color:#8b7ab8;font-size:13px;margin-bottom:12px;">Bisa static PNG atau animated GIF.</p>
-        <input type="text" id="bratText" class="v-input" placeholder="Contoh: nexus tools" maxlength="120">
+        <input type="text" id="bratText" class="v-input" placeholder="Contoh: nexora tools" maxlength="120">
         <div class="provider-buttons" style="grid-template-columns:repeat(2,1fr);">
             <button class="provider-btn active" id="bratStaticBtn"><i class="fas fa-image"></i> Static</button>
             <button class="provider-btn" id="bratGifBtn"><i class="fas fa-film"></i> Animated GIF</button>
@@ -2584,7 +2584,7 @@ function renderBrat(body) {
         lines.forEach((line, i) => ctx.fillText(line, canvas.width / 2, start + i * lh));
         ctx.font = '700 26px Arial, Helvetica, sans-serif';
         ctx.globalAlpha = 0.45;
-        ctx.fillText('NEXUS BRAT', canvas.width / 2, 842);
+        ctx.fillText('NEXORA BRAT', canvas.width / 2, 842);
         ctx.globalAlpha = 1;
         return canvas;
     }
@@ -2800,7 +2800,7 @@ function renderFakeDev(body) {
         ctx.fillText('FAKEDEV PROFILE', 155, 178);
         ctx.fillStyle = '#7dd3fc';
         ctx.font = '700 22px Poppins, Arial, sans-serif';
-        ctx.fillText('NEXUS TOOLS CARD', 155, 218);
+        ctx.fillText('NEXORA TOOLS CARD', 155, 218);
         const initials = name.split(/\s+/).slice(0, 2).map(s => s[0] || '').join('').toUpperCase();
         ctx.beginPath();
         ctx.arc(260, 365, 92, 0, Math.PI * 2);
@@ -2852,7 +2852,7 @@ function renderFakeDev(body) {
         ctx.textAlign = 'right';
         ctx.fillStyle = 'rgba(255,255,255,.36)';
         ctx.font = '700 20px Poppins, Arial, sans-serif';
-        ctx.fillText('generated by Nexus Tools', 1048, 765);
+        ctx.fillText('generated by Nexora Tools', 1048, 765);
         nxShowCanvas('fdResult', canvas, 'fakedev_' + Date.now() + '.png');
     };
 }
@@ -3067,7 +3067,7 @@ function renderQrGenerator(body) {
     body.innerHTML = `
         <h2><i class="fas fa-qrcode"></i> QR Generator</h2>
         <p style="color:#8b7ab8;font-size:13px;margin-bottom:12px;">Buat QR langsung dari teks atau link, tanpa pindah ke website lain.</p>
-        <textarea id="qrText" class="v-textarea" style="height:86px;resize:none;" placeholder="Masukkan link atau teks...">https://nexus-tools.my.id</textarea>
+        <textarea id="qrText" class="v-textarea" style="height:86px;resize:none;" placeholder="Masukkan link atau teks...">https://nexora-tools.my.id</textarea>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0;">
             <div>
                 <label>Warna QR</label>
@@ -3082,7 +3082,7 @@ function renderQrGenerator(body) {
         <div id="qrResult"></div>
     `;
     function buildQrUrl() {
-        const text = document.getElementById('qrText').value.trim() || 'NEXUS TOOLS';
+        const text = document.getElementById('qrText').value.trim() || 'NEXORA TOOLS';
         const fg = nxHexClean(document.getElementById('qrFg').value, '111111');
         const bg = nxHexClean(document.getElementById('qrBg').value, 'ffffff');
         return 'https://api.qrserver.com/v1/create-qr-code/?size=900x900&margin=24&color=' + fg + '&bgcolor=' + bg + '&data=' + encodeURIComponent(text);
@@ -3112,7 +3112,7 @@ function renderTiktokQuote(body) {
         <p style="color:#8b7ab8;font-size:13px;margin-bottom:12px;">Buat quote style TikTok langsung dari canvas, bukan pindah link.</p>
         <div class="nx-form-grid">
             <div class="nx-field"><label>Nama</label><input type="text" id="ttqName" class="v-input" value="Dika Tools" placeholder="Nama"></div>
-            <div class="nx-field"><label>Username</label><input type="text" id="ttqUser" class="v-input" value="@vyan_tools" placeholder="@username"></div>
+            <div class="nx-field"><label>Username</label><input type="text" id="ttqUser" class="v-input" value="@nexora_tools" placeholder="@username"></div>
             <div class="nx-field"><label>Likes</label><input type="text" id="ttqLikes" class="v-input" value="128.4K" placeholder="128.4K"></div>
             <div class="nx-field"><label>Komentar</label><input type="text" id="ttqComments" class="v-input" value="9.8K" placeholder="9.8K"></div>
             <div class="nx-field nx-span-2"><label>Quote</label><textarea id="ttqText" class="v-textarea" style="height:92px;resize:none;" placeholder="Tulis quote...">Jangan tunggu sempurna, yang penting jalan dulu lalu rapikan.</textarea></div>
@@ -3122,7 +3122,7 @@ function renderTiktokQuote(body) {
     `;
     document.getElementById('ttqBtn').onclick = () => {
         const name = document.getElementById('ttqName').value.trim() || 'Dika Tools';
-        const user = document.getElementById('ttqUser').value.trim() || '@vyan_tools';
+        const user = document.getElementById('ttqUser').value.trim() || '@nexora_tools';
         const likes = document.getElementById('ttqLikes').value.trim() || '0';
         const comments = document.getElementById('ttqComments').value.trim() || '0';
         const quote = document.getElementById('ttqText').value.trim() || 'Tulis quote kamu di sini.';
@@ -3196,7 +3196,7 @@ function renderTiktokQuote(body) {
         ctx.textAlign = 'center';
         ctx.fillStyle = 'rgba(255,255,255,.28)';
         ctx.font = '800 22px Poppins, Arial, sans-serif';
-        ctx.fillText('Generated by NEXUS TOOLS', 540, 1228);
+        ctx.fillText('Generated by NEXORA TOOLS', 540, 1228);
         nxShowCanvas('ttqResult', canvas, 'tiktok_quote_' + Date.now() + '.png');
     };
 }

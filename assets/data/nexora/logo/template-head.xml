@@ -4,7 +4,7 @@ Created by Alight Motion (http://alightmotion.com)
 Exported: 2026-08-15 04:31 PM
 6.2.53 (859)
 -->
-<scene title="Flamo Tools Logo Animate" width="1440" height="1080" exportWidth="1920" exportHeight="1080" bgcolor="#FF000000" totalTime="8333" fps="60" modifiedTime="1786804307288" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="freeze">
+<scene title="Nexora Tools Logo Animate" width="1440" height="1080" exportWidth="1920" exportHeight="1080" bgcolor="#FF000000" totalTime="8333" fps="60" modifiedTime="1786804307288" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="freeze">
   <media uri="am-internal:///C130CC9EC427DCDDAA4D30B5F8689903411A5C7C.png" type="image/png" size="190914" infoUpdated="1786612471157" width="1080" height="1080"/>
   <embedScene id="53" label="Background" startTime="0" endTime="8333" fillType="intrinsic" outTime="8333">
     <transform>

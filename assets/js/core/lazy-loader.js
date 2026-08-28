@@ -31,12 +31,12 @@
     'unban-whatsapp': {css:[],js:['assets/js/features/unban-whatsapp.js']},
     'deploy-center': {css:['assets/css/features/deploy-center.css'],js:['assets/js/features/deploy-center.js']},
     'web-encryption': {css:['assets/css/features/web-encryption.css'],js:['assets/js/features/web-encryption.js']},
-    'flamo-text-2d': {css:['assets/css/features/flamo-generators.css'],js:['assets/vendor/flamo/text-2d-presets.js','assets/vendor/flamo/text-style-data.js','assets/vendor/flamo/text-2d-engine.js','assets/js/features/flamo/flamo-runtime.js']},
-    'flamo-text-3d': {css:['assets/css/features/flamo-generators.css'],js:['assets/vendor/flamo/3d-engine.js','assets/js/features/flamo/flamo-runtime.js']},
-    'flamo-text-fx-animation': {css:['assets/css/features/flamo-generators.css'],js:['assets/vendor/flamo/text-fx-animation-engine.js','assets/js/features/flamo/flamo-runtime.js']},
-    'flamo-text-vector': {css:['assets/css/features/flamo-generators.css'],js:['assets/js/features/flamo/flamo-runtime.js']},
-    'flamo-trimpath': {css:['assets/css/features/flamo-generators.css'],js:['assets/vendor/flamo/trimpath-font-metrics.js','assets/vendor/flamo/trimpath-letters.js','assets/vendor/flamo/trimpath-engine.js','assets/js/features/flamo/flamo-runtime.js']},
-    'flamo-logo-animate': {css:['assets/css/features/flamo-generators.css'],js:['assets/js/features/flamo/logo-engine.js','assets/js/features/flamo/flamo-runtime.js']}
+    'nexora-text-2d': {css:['assets/css/features/nexora-generators.css'],js:['assets/vendor/nexora/text-2d-presets.js','assets/vendor/nexora/text-style-data.js','assets/vendor/nexora/text-2d-engine.js','assets/js/features/nexora/nexora-runtime.js']},
+    'nexora-text-3d': {css:['assets/css/features/nexora-generators.css'],js:['assets/vendor/nexora/3d-engine.js','assets/js/features/nexora/nexora-runtime.js']},
+    'nexora-text-fx-animation': {css:['assets/css/features/nexora-generators.css'],js:['assets/vendor/nexora/text-fx-animation-engine.js','assets/js/features/nexora/nexora-runtime.js']},
+    'nexora-text-vector': {css:['assets/css/features/nexora-generators.css'],js:['assets/js/features/nexora/nexora-runtime.js']},
+    'nexora-trimpath': {css:['assets/css/features/nexora-generators.css'],js:['assets/vendor/nexora/trimpath-font-metrics.js','assets/vendor/nexora/trimpath-letters.js','assets/vendor/nexora/trimpath-engine.js','assets/js/features/nexora/nexora-runtime.js']},
+    'nexora-logo-animate': {css:['assets/css/features/nexora-generators.css'],js:['assets/js/features/nexora/logo-engine.js','assets/js/features/nexora/nexora-runtime.js']}
   };
 
   var toolModules = {
@@ -46,11 +46,11 @@
     iqc:'generator-pack',winquotes:'generator-pack',nokiamsg:'generator-pack',
     terabox:'download-pack',fakebankjago:'download-pack',
     unbanwa:'unban-whatsapp',vdeploy:'deploy-center',webencryption:'web-encryption',
-    text2d:'flamo-text-2d',text3d:'flamo-text-3d',textfxanimation:'flamo-text-fx-animation',textvector:'flamo-text-vector',trimpath:'flamo-trimpath',logoanimate:'flamo-logo-animate'
+    text2d:'nexora-text-2d',text3d:'nexora-text-3d',textfxanimation:'nexora-text-fx-animation',textvector:'nexora-text-vector',trimpath:'nexora-trimpath',logoanimate:'nexora-logo-animate'
   };
 
   var labels = {
-    'get code html':'getcode','tiktok':'tiktok','quote tiktok nexus':'ttquote','virus scan':'virusscan','crypto market scanner':'cryptomarket','nexora web intelligence':'webintel','ip & asn intelligence':'ipintel','ip asn intelligence':'ipintel','bmkg indonesia':'bmkg','bmkg':'bmkg','space explorer':'spaceexplorer','nexora ocr intelligence':'ocrintel','ocr intelligence':'ocrintel','nexora document ai':'documentai','document ai':'documentai','svg → alight xml':'svgalight','svg alight xml':'svgalight','anime vector atelier':'svgalight','alight motion premium 1 tahun':'alightpremium','alight premium':'alightpremium','nexora image vectorizer':'imagevectorizer','image vectorizer':'imagevectorizer','baca komik full':'comicreader',
+    'get code html':'getcode','tiktok':'tiktok','quote tiktok nexora':'ttquote','virus scan':'virusscan','crypto market scanner':'cryptomarket','nexora web intelligence':'webintel','ip & asn intelligence':'ipintel','ip asn intelligence':'ipintel','bmkg indonesia':'bmkg','bmkg':'bmkg','space explorer':'spaceexplorer','nexora ocr intelligence':'ocrintel','ocr intelligence':'ocrintel','nexora document ai':'documentai','document ai':'documentai','svg → alight xml':'svgalight','svg alight xml':'svgalight','anime vector atelier':'svgalight','alight motion premium 1 tahun':'alightpremium','alight premium':'alightpremium','nexora image vectorizer':'imagevectorizer','image vectorizer':'imagevectorizer','baca komik full':'comicreader',
     'sertifikat custom':'sertifikat','fakedev':'fakedev','prompt generator':'promptgenerate','nexora ai image':'aiimage','ai image':'aiimage','genmail':'genmail','advanced temp mail':'genmail','temp mail nexora':'genmail','all in one downloader':'aiodownloader','aio downloader':'aiodownloader','universal downloader':'aiodownloader','danbooru search':'danbooru','danbooru':'danbooru','anime art search':'danbooru','anime to real':'animetoreal','anime realistic':'animetoreal','fake ovo':'fakeovo',
     'quote generator':'quotegenerator','carifakta':'carifakta','ml tools':'mltools','iqc generator':'iqc',
     'windows quotes':'winquotes','nokia message':'nokiamsg','terabox downloader':'terabox','fake bank jago':'fakebankjago',
@@ -62,16 +62,16 @@
   var modulePromises = new Map();
   var assetPromises = new Map();
   var ASSET_VERSION = '6.4.0';
-  var ASSET_PATCH = 'final-mobile';
+  var ASSET_PATCH = 'branding1';
   var ASSET_PATCHES = [
-    [/(?:assets\/(?:vendor\/flamo|js\/features\/flamo)\/|flamo-generators\.css(?:$|\?))/, 'flamo'],
-    [/prompt-generator\.(?:js|css)(?:$|\?)/, 'prompt-android'],
+    [/(?:assets\/(?:vendor\/nexora|js\/features\/nexora)\/|nexora-generators\.css(?:$|\?))/, 'nexora'],
+    [/prompt-generator\.(?:js|css)(?:$|\?)/, 'prompt-android-branding1'],
     [/puter-image\.(?:js|css)(?:$|\?)/, 'puter-image-hf28'],
     [/genmail\.(?:js|css)(?:$|\?)/, 'genmail-v1'],
     [/aio-downloader\.(?:js|css)(?:$|\?)/, 'aio-downloader-hf31'],
     [/danbooru-search\.(?:js|css)(?:$|\?)/, 'danbooru-search-hf35'],
     [/anime-to-real\.(?:js|css)(?:$|\?)/, 'anime-to-real-hf37'],
-    [/document-ai\.(?:js|css)(?:$|\?)/, 'document-android'],
+    [/document-ai\.(?:js|css)(?:$|\?)/, 'document-android-branding1'],
     [/crypto-market\.(?:js|css)(?:$|\?)/, 'crypto-mtf'],
     [/comic-reader\.(?:js|css)(?:$|\?)/, 'comic-reader'],
     [/svg-alight\.(?:js|css)(?:$|\?)/, 'svg-alight'],
@@ -174,7 +174,7 @@
 
   function invokeSpecial(toolId,event){
     var openers={
-      getcode:'openGetCodeRoom',tiktok:'openTiktokRoom',unbanwa:'openNexusUnban',vdeploy:'openDeploy'
+      getcode:'openGetCodeRoom',tiktok:'openTiktokRoom',unbanwa:'openNexoraUnban',vdeploy:'openDeploy'
     };
     var name=openers[toolId];
     if(name && typeof window[name]==='function') return window[name](event||null);

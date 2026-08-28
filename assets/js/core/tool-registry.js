@@ -26,7 +26,7 @@
     ["genmail","GenMail","api","genmail","renderGenMail","https://all-tools-nexora.vercel.app/api/genmail"],
     ["danbooru","Danbooru Search","api","danbooru-search","renderDanbooruSearch","https://all-tools-nexora.vercel.app/api/search/danbooru"],
     ["animetoreal","Anime to Real","api","anime-to-real","renderAnimeToReal","https://all-tools-nexora.vercel.app/api/ai/anime-to-real"],
-    ["promptgenerate","Prompt Generator","module","prompt-generator","renderPromptGenerator",null],
+    ["promptgenerate","Nexora Prompt Generator","module","prompt-generator","renderPromptGenerator",null],
     ["fakeovo","Fake OVO","module","imported-tools","renderFakeOvo",null],
     ["quotegenerator","Quote Generator","module","imported-tools","renderQuoteGenerator",null],
     ["carifakta","CariFakta","module","imported-tools","renderCariFakta",null],
@@ -41,18 +41,18 @@
     ["svgalight","SVG → Alight XML","api","svg-alight","renderSvgAlight","https://svgtoxml.vercel.app/"],
     ["alightpremium","Alight Motion Premium 1 Tahun","api","alight-premium","renderAlightPremium","https://api.kyzznekoo.my.id/"],
     ["imagevectorizer","Nexora Image Vectorizer","module","image-vectorizer","renderImageVectorizer",null],
-    ["text2d","2D Text Animate / Text FX","module","flamo-text-2d","renderFlamoText2D",null],
-    ["text3d","3D Text Animate","module","flamo-text-3d","renderFlamoText3D",null],
-    ["textfxanimation","Text FX Animation","module","flamo-text-fx-animation","renderFlamoTextFxAnimation",null],
-    ["textvector","Text to Vector","module","flamo-text-vector","renderFlamoTextVector",null],
-    ["trimpath","Trimpath Generator","module","flamo-trimpath","renderFlamoTrimpath",null],
-    ["logoanimate","Logo Animate","module","flamo-logo-animate","renderFlamoLogoAnimate",null],
+    ["text2d","2D Text Animate / Text FX","module","nexora-text-2d","renderNexoraText2D",null],
+    ["text3d","3D Text Animate","module","nexora-text-3d","renderNexoraText3D",null],
+    ["textfxanimation","Text FX Animation","module","nexora-text-fx-animation","renderNexoraTextFxAnimation",null],
+    ["textvector","Text to Vector","module","nexora-text-vector","renderNexoraTextVector",null],
+    ["trimpath","Trimpath Generator","module","nexora-trimpath","renderNexoraTrimpath",null],
+    ["logoanimate","Logo Animate","module","nexora-logo-animate","renderNexoraLogoAnimate",null],
     ["calc","Calculator","local",null,"renderCalc",null],
     ["pwgen","Password Gen","local",null,"renderPwgen",null],
     ["morse","Morse Code","local",null,"renderMorse",null],
     ["removebg","Remove BG","local",null,"renderRemovebg",null],
     ["enhancer","Image Enhancer","local",null,"renderEnhancer",null],
-    ["ttquote","Quote TikTok Nexus","module","tiktok-quote","renderTiktokQuote",null],
+    ["ttquote","Quote TikTok Nexora","module","tiktok-quote","renderTiktokQuote",null],
     ["qrgen","QR Generator","local",null,"renderQrGenerator",null],
     ["tiktokhd","Upload TikTok HD","external",null,"openTikTokHdUpload","https://www.tiktok.com/tiktokstudio"],
     ["getcode","Get Code HTML","module","get-code","openGetCodeRoom",null],
@@ -60,7 +60,7 @@
     ["zxvai","ZxVAI","external",null,null,"https://zxvaiapk.netlify.app/"],
     ["fotolink","Foto To Link","external",null,null,"https://pixvault-bykz.netlify.app/"],
     ["webencryption","Web Encryption","module","web-encryption","renderWebEncryption",null],
-    ["unbanwa","Unban WhatsApp","module","unban-whatsapp","openNexusUnban",null]
+    ["unbanwa","Unban WhatsApp","module","unban-whatsapp","openNexoraUnban",null]
   ];
 
   var map = Object.create(null);

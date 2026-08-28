@@ -728,7 +728,7 @@ body.nx-about-dev-open{
 }
 .nx-access-lock-close{background:#151219;color:#d8d0dd}
 .nx-access-lock-wa{background:#f4f4f5;color:#08070a}
-[data-nexus-access-locked="1"]{cursor:pointer!important}
+[data-nexora-access-locked="1"]{cursor:pointer!important}
 @keyframes nxAccessCardIn{
   from{opacity:0;transform:translateY(14px) scale(.97)}
   to{opacity:1;transform:translateY(0) scale(1)}
@@ -1191,7 +1191,7 @@ body.nx-universal-room-open{overflow:hidden!important}
   font-size:12px!important;
 }
 
-/* Nexus AI memakai tombol kembali lebar */
+/* Nexora AI memakai tombol kembali lebar */
 #aivaBack{
   left:12px!important;
   top:10px!important;

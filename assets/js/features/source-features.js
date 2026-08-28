@@ -1,6 +1,6 @@
 /* Source-backed feature overrides — extracted from index.html v3. Classic script; keep execution order. */
 
-/* ===== original script 9: nxNexusSourceFeatures ===== */
+/* ===== original script 9: nxNexoraSourceFeatures ===== */
 (function(){
   "use strict";
 
@@ -265,7 +265,7 @@
           <div class="nx-source-card nx-source-result">
             <div class="nx-source-stage">
               <div class="nx-source-empty" id="nxFdEmpty"><i class="fa-solid fa-image"></i>Hasil FakeDev asli akan muncul di sini.</div>
-              <img id="nxFdResult" alt="Hasil FakeDev API Nexus">
+              <img id="nxFdResult" alt="Hasil FakeDev API Nexora">
             </div>
             <button class="nx-source-btn secondary" id="nxFdDownload" type="button" disabled><i class="fa-solid fa-download"></i> Download PNG</button>
           </div>

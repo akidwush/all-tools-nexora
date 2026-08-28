@@ -35,7 +35,7 @@ assert.ok(app.includes("case 'webencryption': renderWebEncryption(body); break;"
 assert.ok(app.includes('window.openTikTokHdUpload && window.openTikTokHdUpload()'));
 
 const index = read('index.html');
-assert.ok(!index.includes('data-nexus-access-locked'));
+assert.ok(!index.includes('data-nexora-access-locked'));
 // Catalog cards are intentionally rendered from app.js; index.html keeps only
 // empty grid containers to avoid parsing a duplicate static catalog.
 assert.ok(app.includes("id: 'tiktokhd'"));

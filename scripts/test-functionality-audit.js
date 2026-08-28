@@ -47,7 +47,7 @@ function responseMock() {
   const coreAppSource = fs.readFileSync(require.resolve("../assets/js/core/app.js"), "utf8");
   assert.match(accountSource, /safeAccountMessage/);
   assert.equal((accountUiSource.match(/class="nx-account-primary" type="submit"/g) || []).length, 2, "account forms must expose explicit submit buttons so busy-state works");
-  assert.doesNotMatch(coreAppSource, /console\.warn\('\[Nexus Country\]/, "handled geolocation fallbacks must not pollute production console");
+  assert.doesNotMatch(coreAppSource, /console\.warn\('\[Nexora Country\]/, "handled geolocation fallbacks must not pollute production console");
   for (const sourcePath of ["../lib/public-database", "../api/admin/tools", "../api/admin/dashboard"]) {
     assert.match(fs.readFileSync(require.resolve(sourcePath), "utf8"), /RETIRED_TOOL_IDS[\s\S]*?bigimage/, `${sourcePath} must suppress retired database rows`);
   }

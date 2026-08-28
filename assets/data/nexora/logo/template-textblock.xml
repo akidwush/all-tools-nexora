@@ -30,7 +30,7 @@
           <property name="redColor" type="color" value="#FFF238A9"/>
         </effect>
         <scene title="" width="2259" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="3783" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
-          <text id="37" label="Flamo Tools" startTime="0" endTime="3783" fillType="color" size="18.000000" font="imported?name=PlusJakartaSans-SemiBold.ttf" wrapWidth="720" align="center">
+          <text id="37" label="Nexora Tools" startTime="0" endTime="3783" fillType="color" size="18.000000" font="imported?name=PlusJakartaSans-SemiBold.ttf" wrapWidth="720" align="center">
             <transform>
               <location value="1127.827026,842.425781,0.000000"/>
               <scale value="3.132853,3.132853"/>
@@ -47,7 +47,7 @@
                 <kf t="0.459183" v="1.000000" e="cubicBezier 0.0 0.0 0.58 1.0"/>
               </property>
             </effect>
-            <content>Flamo Tools</content>
+            <content>Nexora Tools</content>
 </text>
           <shape id="39" label="Rectangle 1" startTime="0" endTime="3783" fillType="color" blending="mask" s=".rect">
             <transform>
@@ -107,7 +107,7 @@
           <property name="color" type="color" value="#FFFFFFFF"/>
         </effect>
         <scene title="" width="2259" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="3783" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
-          <text id="37" label="Flamo Tools" startTime="0" endTime="3783" fillType="color" size="18.000000" font="imported?name=PlusJakartaSans-SemiBold.ttf" wrapWidth="720" align="center">
+          <text id="37" label="Nexora Tools" startTime="0" endTime="3783" fillType="color" size="18.000000" font="imported?name=PlusJakartaSans-SemiBold.ttf" wrapWidth="720" align="center">
             <transform>
               <location value="1127.827026,842.425781,0.000000"/>
               <scale value="3.132853,3.132853"/>
@@ -124,7 +124,7 @@
                 <kf t="0.459183" v="1.000000" e="cubicBezier 0.0 0.0 0.58 1.0"/>
               </property>
             </effect>
-            <content>Flamo Tools</content>
+            <content>Nexora Tools</content>
 </text>
           <shape id="39" label="Rectangle 1" startTime="0" endTime="3783" fillType="color" blending="mask" s=".rect">
             <transform>
@@ -187,7 +187,7 @@
           <property name="strength" type="float" value="0.285000"/>
         </effect>
         <scene title="" width="2259" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="3783" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
-          <text id="37" label="Flamo Tools" startTime="0" endTime="3783" fillType="color" size="18.000000" font="imported?name=PlusJakartaSans-SemiBold.ttf" wrapWidth="720" align="center">
+          <text id="37" label="Nexora Tools" startTime="0" endTime="3783" fillType="color" size="18.000000" font="imported?name=PlusJakartaSans-SemiBold.ttf" wrapWidth="720" align="center">
             <transform>
               <location value="1127.827026,842.425781,0.000000"/>
               <scale value="3.132853,3.132853"/>
@@ -204,7 +204,7 @@
                 <kf t="0.459183" v="1.000000" e="cubicBezier 0.0 0.0 0.58 1.0"/>
               </property>
             </effect>
-            <content>Flamo Tools</content>
+            <content>Nexora Tools</content>
 </text>
           <shape id="39" label="Rectangle 1" startTime="0" endTime="3783" fillType="color" blending="mask" s=".rect">
             <transform>
@@ -248,7 +248,7 @@
           <property name="strength" type="float" value="0.285000"/>
         </effect>
         <scene title="" width="2259" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="3783" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
-          <text id="37" label="Flamo Tools" startTime="0" endTime="3783" fillType="color" size="18.000000" font="imported?name=PlusJakartaSans-SemiBold.ttf" wrapWidth="720" align="center">
+          <text id="37" label="Nexora Tools" startTime="0" endTime="3783" fillType="color" size="18.000000" font="imported?name=PlusJakartaSans-SemiBold.ttf" wrapWidth="720" align="center">
             <transform>
               <location value="1127.827026,842.425781,0.000000"/>
               <scale value="3.132853,3.132853"/>
@@ -265,7 +265,7 @@
                 <kf t="0.459183" v="1.000000" e="cubicBezier 0.0 0.0 0.58 1.0"/>
               </property>
             </effect>
-            <content>Flamo Tools</content>
+            <content>Nexora Tools</content>
 </text>
           <shape id="39" label="Rectangle 1" startTime="0" endTime="3783" fillType="color" blending="mask" s=".rect">
             <transform>
@@ -309,7 +309,7 @@
           <property name="strength" type="float" value="0.285000"/>
         </effect>
         <scene title="" width="2259" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="3783" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
-          <text id="37" label="Flamo Tools" startTime="0" endTime="3783" fillType="color" size="18.000000" font="imported?name=PlusJakartaSans-SemiBold.ttf" wrapWidth="720" align="center">
+          <text id="37" label="Nexora Tools" startTime="0" endTime="3783" fillType="color" size="18.000000" font="imported?name=PlusJakartaSans-SemiBold.ttf" wrapWidth="720" align="center">
             <transform>
               <location value="1127.827026,842.425781,0.000000"/>
               <scale value="3.132853,3.132853"/>
@@ -326,7 +326,7 @@
                 <kf t="0.459183" v="1.000000" e="cubicBezier 0.0 0.0 0.58 1.0"/>
               </property>
             </effect>
-            <content>Flamo Tools</content>
+            <content>Nexora Tools</content>
 </text>
           <shape id="39" label="Rectangle 1" startTime="0" endTime="3783" fillType="color" blending="mask" s=".rect">
             <transform>
@@ -370,7 +370,7 @@
           <property name="strength" type="float" value="0.285000"/>
         </effect>
         <scene title="" width="2259" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="3783" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
-          <text id="37" label="Flamo Tools" startTime="0" endTime="3783" fillType="color" size="18.000000" font="imported?name=PlusJakartaSans-SemiBold.ttf" wrapWidth="720" align="center">
+          <text id="37" label="Nexora Tools" startTime="0" endTime="3783" fillType="color" size="18.000000" font="imported?name=PlusJakartaSans-SemiBold.ttf" wrapWidth="720" align="center">
             <transform>
               <location value="1127.827026,842.425781,0.000000"/>
               <scale value="3.132853,3.132853"/>
@@ -387,7 +387,7 @@
                 <kf t="0.459183" v="1.000000" e="cubicBezier 0.0 0.0 0.58 1.0"/>
               </property>
             </effect>
-            <content>Flamo Tools</content>
+            <content>Nexora Tools</content>
 </text>
           <shape id="39" label="Rectangle 1" startTime="0" endTime="3783" fillType="color" blending="mask" s=".rect">
             <transform>
@@ -428,7 +428,7 @@
         </transform>
         <fillColor value="#FF000000"/>
         <scene title="" width="2259" height="1084" exportWidth="1920" exportHeight="1080" bgcolor="#00000000" totalTime="3783" fps="60" modifiedTime="0" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="off">
-          <text id="37" label="Flamo Tools" startTime="0" endTime="3783" fillType="color" size="18.000000" font="imported?name=PlusJakartaSans-SemiBold.ttf" wrapWidth="720" align="center">
+          <text id="37" label="Nexora Tools" startTime="0" endTime="3783" fillType="color" size="18.000000" font="imported?name=PlusJakartaSans-SemiBold.ttf" wrapWidth="720" align="center">
             <transform>
               <location value="1127.827026,842.425781,0.000000"/>
               <scale value="3.132853,3.132853"/>
@@ -445,7 +445,7 @@
                 <kf t="0.459183" v="1.000000" e="cubicBezier 0.0 0.0 0.58 1.0"/>
               </property>
             </effect>
-            <content>Flamo Tools</content>
+            <content>Nexora Tools</content>
 </text>
           <shape id="39" label="Rectangle 1" startTime="0" endTime="3783" fillType="color" blending="mask" s=".rect">
             <transform>

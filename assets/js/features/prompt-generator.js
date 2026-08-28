@@ -1,4 +1,4 @@
-/* Nexora Prompt Studio v2 — native Gemini Vision workflow */
+/* Nexora Prompt Studio v2 — provider-backed vision workflow */
 (function(){
   'use strict';
 
@@ -9,7 +9,7 @@
     if(typeof body.__nxCleanup==='function')body.__nxCleanup();
     body.innerHTML='\
       <section class="nx-prompt" aria-label="Nexora Prompt Studio">\
-        <div class="nx-prompt-status"><div><span class="nx-prompt-status-dot"></span><strong>GEMINI VISION ENGINE</strong><small id="nxPromptHealth">Memeriksa kesiapan mesin…</small></div><span><i class="fa-solid fa-shield-halved"></i> Gambar tidak disimpan</span></div>\
+        <div class="nx-prompt-status"><div><span class="nx-prompt-status-dot"></span><strong>NEXORA VISION AI</strong><small id="nxPromptHealth">Memeriksa kesiapan mesin…</small></div><span><i class="fa-solid fa-shield-halved"></i> Gambar tidak disimpan</span></div>\
         <div class="nx-prompt-layout">\
           <form id="nxPromptForm" class="nx-prompt-builder">\
             <div class="nx-prompt-step-head"><span>01</span><div><strong>Gambar Referensi</strong><small>JPG, PNG, atau WebP · otomatis dioptimalkan</small></div></div>\
@@ -116,7 +116,7 @@
       if(!state.result)return '';var row=state.result,lines=[row.title,row.summary,'','PROMPT UTAMA',row.prompt];if(row.negativePrompt)lines.push('','NEGATIVE PROMPT',row.negativePrompt);(row.variants||[]).forEach(function(item){lines.push('',item.label.toUpperCase(),item.prompt);});return lines.filter(function(value){return value!==undefined&&value!==null;}).join('\n');
     }
     async function submit(event){
-      event.preventDefault();clearError();if(!state.file||!state.fileData){showError('Pilih gambar terlebih dahulu.');return;}if(state.controller)state.controller.abort();var controller=new AbortController();state.controller=controller;setBusy(true,'Gemini membaca gambar…');waiting.hidden=false;waiting.innerHTML='<i class="fa-solid fa-circle-notch fa-spin"></i><strong>Menganalisis visual</strong><span>Membaca subjek, komposisi, lighting, warna, kamera, dan gaya untuk membangun prompt.</span>';resultRoot.hidden=true;
+      event.preventDefault();clearError();if(!state.file||!state.fileData){showError('Pilih gambar terlebih dahulu.');return;}if(state.controller)state.controller.abort();var controller=new AbortController();state.controller=controller;setBusy(true,'Nexora AI membaca gambar…');waiting.hidden=false;waiting.innerHTML='<i class="fa-solid fa-circle-notch fa-spin"></i><strong>Menganalisis visual</strong><span>Membaca subjek, komposisi, lighting, warna, kamera, dan gaya untuk membangun prompt.</span>';resultRoot.hidden=true;
       try{
         var response=await fetcher('/api/prompt-generator',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({fileName:state.file.name,mimeType:state.mimeType,fileData:state.fileData,direction:root.querySelector('#nxPromptDirection').value,target:root.querySelector('#nxPromptTarget').value,style:root.querySelector('#nxPromptStyle').value,language:root.querySelector('#nxPromptLanguage').value,aspectRatio:root.querySelector('#nxPromptRatio').value,creativity:Number(root.querySelector('#nxPromptCreativity').value),includeNegative:root.querySelector('#nxPromptNegative').checked}),signal:controller.signal,nexoraTimeoutMs:85000,nexoraRetries:0});
         var payload=await response.json().catch(function(){return {};});if(!response.ok||!payload.ok)throw new Error(payload.message||'Prompt belum dapat dibuat.');renderResult(payload);
@@ -130,6 +130,6 @@
     root.querySelector('#nxPromptCopyMain').addEventListener('click',function(event){copyText(state.result&&state.result.prompt,event.currentTarget);});root.querySelector('#nxPromptCopyNegative').addEventListener('click',function(event){copyText(state.result&&state.result.negativePrompt,event.currentTarget);});root.querySelector('#nxPromptCopyAll').addEventListener('click',function(event){copyText(fullText(),event.currentTarget);});
     root.querySelector('#nxPromptDownload').addEventListener('click',function(){var text=fullText();if(!text)return;var url=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));var link=document.createElement('a');link.href=url;link.download='nexora-prompt-'+Date.now()+'.txt';document.body.appendChild(link);link.click();link.remove();setTimeout(function(){URL.revokeObjectURL(url);},1000);});
     body.__nxCleanup=function(){if(state.controller)state.controller.abort();if(state.previewUrl)URL.revokeObjectURL(state.previewUrl);};
-    fetcher('/api/prompt-generator',{method:'GET',cache:'no-store',credentials:'same-origin',headers:{Accept:'application/json'},nexoraTimeoutMs:8000,nexoraRetries:0}).then(function(response){return response.json();}).then(function(payload){root.querySelector('#nxPromptHealth').textContent=payload.configured?'Mesin siap · Gemini API terlindungi':'Mesin belum dikonfigurasi';}).catch(function(){root.querySelector('#nxPromptHealth').textContent='Status mesin tidak tersedia';});
+    fetcher('/api/prompt-generator',{method:'GET',cache:'no-store',credentials:'same-origin',headers:{Accept:'application/json'},nexoraTimeoutMs:8000,nexoraRetries:0}).then(function(response){return response.json();}).then(function(payload){root.querySelector('#nxPromptHealth').textContent=payload.configured?'Mesin Nexora AI siap':'Mesin belum dikonfigurasi';}).catch(function(){root.querySelector('#nxPromptHealth').textContent='Status mesin tidak tersedia';});
   };
 })();

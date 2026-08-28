@@ -55,7 +55,7 @@ async function main() {
   assert.equal(normalized.assistantName, "Reactor AI");
   assert.equal(normalized.temperature, 1.25);
   assert.equal(normalized.maxOutputTokens, 8192);
-  assert.throws(() => normalizeSettings({ ...DEFAULT_SETTINGS, model: "gemini-untrusted" }), /Model Gemini/);
+  assert.throws(() => normalizeSettings({ ...DEFAULT_SETTINGS, model: "gemini-untrusted" }), /Model Nexora AI/);
   assert.ok(ALLOWED_MODELS.includes(DEFAULT_SETTINGS.model));
 
   const safe = publicSettings(DEFAULT_SETTINGS, { published: true });

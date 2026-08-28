@@ -122,7 +122,7 @@
           <div class="nda-hero-copy">
             <span class="nda-kicker"><i class="fa-solid fa-crown"></i> VVIP DOCUMENT INTELLIGENCE</span>
             <h2>Dokumen panjang, jawaban singkat.</h2>
-            <p>Analisis PDF, scan, gambar, TXT, Markdown, atau CSV menggunakan Gemini. Ringkas, ekstrak tabel, buat catatan belajar, lalu tanyakan bagian apa pun.</p>
+            <p>Analisis PDF, scan, gambar, TXT, Markdown, atau CSV menggunakan Nexora AI. Ringkas, ekstrak tabel, buat catatan belajar, lalu tanyakan bagian apa pun.</p>
             <div class="nda-trust"><span><i class="fa-solid fa-shield-halved"></i> File tidak disimpan</span><span><i class="fa-solid fa-file-circle-check"></i> Referensi halaman</span><span><i class="fa-solid fa-language"></i> Bahasa Indonesia</span></div>
           </div>
           <div class="nda-reactor" aria-hidden="true"><i class="fa-solid fa-file-waveform"></i><span></span><span></span></div>
@@ -380,8 +380,8 @@
     };
 
     fetcher("/api/document-ai", { method: "GET", credentials: "same-origin", cache: "no-store", nexoraTimeoutMs: 8000, nexoraRetries: 0 }).then(function (response) { return response.json(); }).then(function (payload) {
-      var badge = root.querySelector("#ndaApiState"); badge.textContent = payload.configured ? "GEMINI READY" : "KEY REQUIRED"; badge.classList.toggle("is-warning", !payload.configured);
-      if (!payload.configured) notify("Gemini API belum dikonfigurasi pada server.", true);
+      var badge = root.querySelector("#ndaApiState"); badge.textContent = payload.configured ? "NEXORA AI READY" : "KEY REQUIRED"; badge.classList.toggle("is-warning", !payload.configured);
+      if (!payload.configured) notify("Nexora AI belum dikonfigurasi pada server.", true);
     }).catch(function () { var badge = root.querySelector("#ndaApiState"); badge.textContent = "API OFFLINE"; badge.classList.add("is-warning"); });
   }
 

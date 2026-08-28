@@ -26,7 +26,7 @@ const globalHeaders = vercel.headers.find((entry) => entry.source === "/(.*)")?.
 assert.ok(globalHeaders.some((header) => header.key === "Cache-Control" && header.value === "no-store, no-cache, must-revalidate, max-age=0"));
 assert.equal(vercel.headers.filter((entry) => ["/assets/(.*)", "/api/(.*)"].includes(entry.source)).length, 0, "Cache header duplikat tidak boleh kembali.");
 for (const source of [app, read("assets/js/core/social-links.js"), read("assets/js/core/tool-health.js")]) {
-  assert.doesNotMatch(source, /nexus_country_cache|nexora_social_links_v63|nexora_tool_health_v42/);
+  assert.doesNotMatch(source, /nexora_country_cache|nexora_social_links_v63|nexora_tool_health_v42/);
 }
 
 assert.match(reactor, /unifiedOriginalUi:true/);

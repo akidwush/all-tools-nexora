@@ -105,6 +105,7 @@
     if (details.status === 429 || /rate|too many|concurren/.test(raw)) return "Permintaan terlalu cepat atau masih ada proses lain. Tunggu sebentar lalu coba lagi.";
     if (/safety|moderation|policy|filtered|rai/.test(raw)) return "Prompt ditolak aturan keamanan Puter. Ubah isi prompt lalu coba lagi.";
     if (/model not found|model.*unavailable|unsupported model|no provider/.test(raw)) return "Model ini sedang tidak tersedia di Puter. Pilih model lain.";
+    if (/failed to extract image url from replicate response|unable to access non-serverless model/.test(raw)) return "Provider model ini sedang bermasalah di Puter. Pilih model lain atau coba lagi nanti.";
     if (/network|fetch|offline/.test(raw)) return "Koneksi ke Puter terputus. Periksa internet lalu coba lagi.";
     if (details.message && details.message !== "[object Object]") return "Puter menolak permintaan: " + details.message + (details.code ? " (" + details.code + ")" : "");
     return "Puter tidak memberi alasan yang dapat dibaca. Coba lagi beberapa saat.";
@@ -112,8 +113,10 @@
 
   function canFallback(error) {
     var details = errorDetails(error);
-    var raw = (details.code + " " + details.message).toLowerCase();
-    return /model not found|model.*unavailable|unsupported model|no provider/.test(raw);
+    var raw = (details.code + " " + details.status + " " + details.message).toLowerCase();
+    if (details.status === 401 || details.status === 402 || details.status === 403 || details.status === 429) return false;
+    if (/allowance|credit|quota|usage.limit|insufficient|payment|fund|safety|moderation|policy|filtered|rai|cancel|closed|denied|unauthorized|authentication|rate|too many|concurren/.test(raw)) return false;
+    return /model not found|model.*unavailable|unsupported model|no provider|failed to extract image url from replicate response|unable to access non-serverless model/.test(raw);
   }
 
   function generationOptions(modelId, ratioKey) {
@@ -303,7 +306,7 @@
           console.warn("[puter-image] generation failed", { model: modelId, code: firstDetails.code, status: firstDetails.status, message: firstDetails.message });
           if (!canFallback(firstError) || modelId === DEFAULT_MODEL) throw firstError;
           usedModel = DEFAULT_MODEL;
-          setMessage("Model pilihan tidak tersedia. Mencoba GPT Image Mini…", "loading");
+          setMessage("Provider model pilihan sedang bermasalah. Mencoba GPT Image Mini…", "loading");
           generated = await window.puter.ai.txt2img(value, generationOptions(DEFAULT_MODEL, ratioKey));
         }
         if (!alive) return;

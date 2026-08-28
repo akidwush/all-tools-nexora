@@ -12,11 +12,11 @@
   var LIVE_AUDIT_MAX_ITEMS=120;
   var SOURCE_APP_ORIGIN="https://kaze-extract.netlify.app/";
   var FORCE_HOSTED_SOURCE=false;
-  var FAST_ROUTE_KEY="nexus_get_html_fast_route";
+  var FAST_ROUTE_KEY="nexora_get_html_fast_route";
   var FAST_REQUEST_LIMIT=12000;
-  var NEXUS_NATIVE_FETCH=window.fetch.bind(window);
-  var HISTORY_KEY="nexus_get_html_v2_history";
-  var STATS_KEY="nexus_get_html_v2_stats";
+  var NEXORA_NATIVE_FETCH=window.fetch.bind(window);
+  var HISTORY_KEY="nexora_get_html_v2_history";
+  var STATS_KEY="nexora_get_html_v2_stats";
   var MAX_HISTORY=24;
   var DEFAULT_CODE="// Hasil ekstraksi HTML akan tampil di sini...";
 
@@ -47,7 +47,7 @@
   var elementCache={};
   var PROCESS_MESSAGES=[
     "Establishing secure connection...",
-    "Menghubungkan jaringan server Nexus...",
+    "Menghubungkan jaringan server Nexora...",
     "Membuka jalur ekstraksi tercepat...",
     "Menguji respons dari beberapa wilayah...",
     "Memvalidasi source HTML...",
@@ -206,7 +206,7 @@
   function setTopStatus(state,title){
     var status=byId("nxGetCodeTopStatus");
     if(!status) return;
-    status.title=title||"Nexus Extractor";
+    status.title=title||"Nexora Extractor";
     if(state==="loading"){
       status.style.color="#c084fc";
       status.innerHTML='<i class="fas fa-spinner fa-spin"></i>';
@@ -781,7 +781,7 @@
     if(signal && signal.aborted) throw new Error("Request dibatalkan.");
 
     rotateProcessText("Fast lane · "+route.label);
-    var response=await NEXUS_NATIVE_FETCH(route.url,{
+    var response=await NEXORA_NATIVE_FETCH(route.url,{
       method:"GET",
       mode:"cors",
       cache:"no-store",
@@ -797,7 +797,7 @@
     return normalizeFastPayload(rawText,route);
   }
 
-  function fetchNexusSourcePayload(apiUrl,targetUrl){
+  function fetchNexoraSourcePayload(apiUrl,targetUrl){
     var routes=getFastRoutes(apiUrl,targetUrl);
     var controller=typeof AbortController!=="undefined"
       ?new AbortController()
@@ -876,7 +876,7 @@
     currentHtml="";
     clearSourceReport();
 
-    setLoading(true,"Membuka 12 jalur ekstraksi Nexus...");
+    setLoading(true,"Membuka 12 jalur ekstraksi Nexora...");
     startProcessRotation("Establishing secure connection...");
     var requestStarted=typeof performance!=="undefined" && performance.now
       ?performance.now()
@@ -890,7 +890,7 @@
 
     try{
       var api=API_ENDPOINT+encodeURIComponent(raw);
-      var data=await fetchNexusSourcePayload(api,raw);
+      var data=await fetchNexoraSourcePayload(api,raw);
       var requestFinished=typeof performance!=="undefined" && performance.now
         ?performance.now()
         :Date.now();
@@ -1342,7 +1342,7 @@
     try{
       for(var offset=0;offset<candidates.length;offset+=LIVE_AUDIT_CHUNK_SIZE){
         var chunk=candidates.slice(offset,offset+LIVE_AUDIT_CHUNK_SIZE);
-        var response=await NEXUS_NATIVE_FETCH(LIVE_AUDIT_ENDPOINT,{
+        var response=await NEXORA_NATIVE_FETCH(LIVE_AUDIT_ENDPOINT,{
           method:"POST",
           headers:{"Content-Type":"application/json","Accept":"application/json"},
           body:JSON.stringify({target:currentUrl,items:chunk}),
@@ -1780,17 +1780,17 @@
           '<div class="nxgc-hosted-loader" id="nxgcHostedLoader">'+
             '<div class="nxgc-hosted-loader-card">'+
               '<span class="nxgc-hosted-loader-spin"></span>'+
-              '<b>NEXUS EXTRACT</b>'+
+              '<b>NEXORA EXTRACT</b>'+
               '<span>Memuat server sumber HTTPS...</span>'+
             '</div>'+
           '</div>'+
-          '<iframe id="nxgcHostedSourceFrame" title="Nexus Extract Source Workspace" src="about:blank" loading="eager" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads" allow="clipboard-read; clipboard-write; fullscreen; autoplay"></iframe>'+
+          '<iframe id="nxgcHostedSourceFrame" title="Nexora Extract Source Workspace" src="about:blank" loading="eager" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads" allow="clipboard-read; clipboard-write; fullscreen; autoplay"></iframe>'+
         '</section>'+
         '<div class="nxgc-wrap">'+
           '<section class="nxgc-panel">'+
             '<div class="nxgc-brand-block">'+
               '<span class="nxgc-brand-mark"><i class="fas fa-code"></i></span>'+
-              '<span class="nxgc-brand-copy"><b>NEXUS EXTRACT</b><span>Secure Web Intelligence · Multi-Server Extraction</span></span>'+
+              '<span class="nxgc-brand-copy"><b>NEXORA EXTRACT</b><span>Secure Web Intelligence · Multi-Server Extraction</span></span>'+
               '<span class="nxgc-brand-side">'+
                 '<span class="nxgc-server-pill" id="nxgcServerPill"><i class="fas fa-circle"></i> 12 Servers Ready</span>'+
                 '<span class="nxgc-brand-ratio" id="nxgcBrandRatio">RATIO --</span>'+
@@ -1812,7 +1812,7 @@
             '</div>'+
             '<div class="nxgc-loader" id="nxgcLoader">'+
               '<span class="nxgc-spinner"></span>'+
-              '<span class="nxgc-loader-copy"><b>Nexus Extract Processing</b><span id="nxgcLoaderText">Establishing secure connection...</span></span>'+
+              '<span class="nxgc-loader-copy"><b>Nexora Extract Processing</b><span id="nxgcLoaderText">Establishing secure connection...</span></span>'+
               '<span class="nxgc-loader-ratio" id="nxgcLoaderRatio">0%</span>'+
             '</div>'+
             '<section class="nxgc-result" id="nxgcResult">'+
@@ -1982,7 +1982,7 @@
       var heading=card.querySelector("h4,h3,.tool-name");
       if(!heading || String(heading.textContent||"").trim().toLowerCase()!=="get code html") return;
       card.removeAttribute("onclick");
-      card.removeAttribute("data-nexus-access-locked");
+      card.removeAttribute("data-nexora-access-locked");
       card.dataset.nxGetCodeV2="1";
       card.setAttribute("role","button");
       card.setAttribute("tabindex","0");

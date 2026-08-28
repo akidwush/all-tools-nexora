@@ -42,5 +42,5 @@ Regression test memeriksa konsistensi 44 tool, sintaks seluruh JavaScript, batas
 - Tool yang memakai API pihak ketiga mengikuti ketersediaan, kuota, dan kontrak provider tersebut.
 - Source HTML legacy berukuran besar masih dipertahankan untuk beberapa tool aktif. Sandbox membatasi haknya, tetapi migrasi bertahap ke komponen native akan membuat pemeliharaan lebih mudah.
 - CSP aktif masih mengizinkan inline script/style dan sejumlah origin eksternal untuk kompatibilitas payload legacy. Migrasikan handler dan payload tersebut bertahap agar `'unsafe-inline'` serta allowlist yang tidak lagi diperlukan dapat dihapus.
-- Token deployment memiliki hak tinggi. Gunakan token scoped, rotasi berkala, lindungi `NEXUS_DEPLOY_ACCESS_KEY`, dan audit aktivitas provider.
+- Token deployment memiliki hak tinggi. Gunakan token scoped, rotasi berkala, lindungi `NEXORA_DEPLOY_ACCESS_KEY`, dan audit aktivitas provider.
 - Audit ini tidak menggantikan penetration test terhadap deployment produksi beserta konfigurasi akun/provider yang sebenarnya.

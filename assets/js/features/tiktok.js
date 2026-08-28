@@ -89,10 +89,10 @@
     }
   }
   function ttReadHistory(){
-    try{ return JSON.parse(localStorage.getItem('nexus_download_history_v1')||'[]')||[]; }catch(e){ return []; }
+    try{ return JSON.parse(localStorage.getItem('nexora_download_history_v1')||'[]')||[]; }catch(e){ return []; }
   }
   function ttWriteHistory(list){
-    try{ localStorage.setItem('nexus_download_history_v1', JSON.stringify(list||[])); }catch(e){}
+    try{ localStorage.setItem('nexora_download_history_v1', JSON.stringify(list||[])); }catch(e){}
   }
   function ttRenderRoomHistory(){
     var host=document.getElementById('ttRoomHistoryList');

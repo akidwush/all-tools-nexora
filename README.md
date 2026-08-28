@@ -157,7 +157,7 @@ npm run dev
 
 ## Generator XML lokal
 
-Enam generator native berikut dimuat per route dan tidak bergantung pada WordPress atau jaringan Flamo:
+Enam generator native berikut dimuat per route dan tidak bergantung pada WordPress atau jaringan Nexora:
 
 - `#tool-text2d` — 2D Text Animate / Text FX.
 - `#tool-text3d` — 3D Text Animate.
@@ -166,7 +166,7 @@ Enam generator native berikut dimuat per route dan tidak bergantung pada WordPre
 - `#tool-trimpath` — Trimpath Generator.
 - `#tool-logoanimate` — Logo Animate.
 
-Preset, template XML, data huruf, dan 16 file font disimpan di `assets/vendor/flamo`, `assets/data/flamo`, dan `assets/fonts/flamo`. Semua akses member lokal dibuka, palet custom dibatasi 15 per perangkat, dan hasil tersimpan sebagai riwayat lokal. Logo Animate mempertahankan media placeholder bawaan template; ganti media logo di Alight Motion setelah impor XML.
+Preset, template XML, data huruf, dan 16 file font disimpan di `assets/vendor/nexora`, `assets/data/nexora`, dan `assets/fonts/nexora`. Semua akses member lokal dibuka, palet custom dibatasi 15 per perangkat, dan hasil tersimpan sebagai riwayat lokal. Logo Animate mempertahankan media placeholder bawaan template; ganti media logo di Alight Motion setelah impor XML.
 
 ## Konfigurasi
 
@@ -176,7 +176,7 @@ Salin `.env.example` dan isi hanya layanan yang digunakan. Variable utama:
 - Operasional: `HEALTH_CHECK_TOKEN` dan pengaturan timeout/cache opsional.
 - Tool eksternal: `COINGECKO_API_KEY`, `GOOGLE_PAGESPEED_API_KEY`, `GOOGLE_SAFE_BROWSING_API_KEY`, `NASA_API_KEY`, `OCR_SPACE_API_KEY`, `FREECONVERT_API_KEY`, `SVGTOXML_ENGINE_KEY`, `KURONEKO_API_KEY` untuk GenMail dan All In One Downloader, serta `GEMINI_API_KEY` untuk Personal AI, Document AI, dan Prompt Generator. Alias `GOOGLE_GENERATIVE_AI_API_KEY`, `GOOGLE_GEMINI_API_KEY`, dan `GOOGLE_API_KEY` juga didukung. Model dapat dioverride lewat `GEMINI_MODEL`, `DOCUMENT_AI_MODEL`, atau `PROMPT_GENERATOR_MODEL`. Setelah mengubah environment Vercel, lakukan redeploy agar Function menerima nilai terbaru.
 - SiteGrabber: `SITEGRABBER_API_BASE_URL` dan `SITEGRABBER_API_KEY`.
-- Deploy Center: `NEXUS_DEPLOY_ACCESS_KEY`, kemudian token `VERCEL_TOKEN` atau `NETLIFY_TOKEN`.
+- Deploy Center: `NEXORA_DEPLOY_ACCESS_KEY`, kemudian token `VERCEL_TOKEN` atau `NETLIFY_TOKEN`.
 
 Jangan memakai prefix publik untuk secret dan jangan menaruh key di HTML/JavaScript browser. Jika `FEEDBACK_HASH_SALT` kosong, server memakai salt acak per proses; konfigurasi nilai tetap tetap disarankan agar hash konsisten antar-instance.
 
@@ -188,7 +188,7 @@ Untuk instalasi baru, jalankan `database/schema.sql` melalui Supabase SQL Editor
 
 Untuk database lama, jalankan migration yang belum pernah diterapkan dari `database/migrations/` sesuai urutan nomor. Backup database terlebih dahulu.
 
-Migration `database/migrations/026_flamo_native_generators.sql` menambahkan enam generator XML lokal ke katalog database. Frontend tetap mempertahankan katalog bundle jika database belum diperbarui, tetapi migration ini perlu dijalankan sekali agar Dashboard Admin dan data Supabase ikut sinkron.
+Migration `database/migrations/026_nexora_native_generators.sql` menambahkan enam generator XML lokal ke katalog database. Frontend tetap mempertahankan katalog bundle jika database belum diperbarui, tetapi migration ini perlu dijalankan sekali agar Dashboard Admin dan data Supabase ikut sinkron.
 
 Migration `database/migrations/027_puter_ai_image.sql` menambahkan Nexora AI Image ke katalog database. Fitur berjalan langsung di browser melalui Puter, tidak memakai API key Nexora, dan tidak menambah Vercel Function.
 

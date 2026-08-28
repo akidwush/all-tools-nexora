@@ -27,7 +27,7 @@ const fakeDev = fs.readFileSync(
 assert.ok(fakeDev.includes("Mode lokal aktif. Profile"));
 assert.ok(fakeDev.includes('"success"'));
 
-assert.equal(fs.existsSync(path.join(root, "assets/js/features/nexus-ai.js")), false, "Modul Nexus AI mati harus dibuang");
+assert.equal(fs.existsSync(path.join(root, "assets/js/features/nexora-ai.js")), false, "Modul Nexora AI mati harus dibuang");
 assert.equal(fs.existsSync(path.join(root, "assets/js/features/pix-vault.js")), false, "Modul Pix Vault dengan key lama harus dibuang");
 
 console.log(

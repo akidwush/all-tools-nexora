@@ -83,8 +83,8 @@
     }
   });
 
-  window.openNexusAboutDev = openAboutDev;
-  window.closeNexusAboutDev = closeAboutDev;
+  window.openNexoraAboutDev = openAboutDev;
+  window.closeNexoraAboutDev = closeAboutDev;
 })();
 
 /* ===== original script 17: nxTopHamburgerMenuScript ===== */
@@ -141,8 +141,8 @@
     button.setAttribute(
       "aria-label",
       active
-        ? "Tutup menu Nexus"
-        : "Buka menu Nexus"
+        ? "Tutup menu Nexora"
+        : "Buka menu Nexora"
     );
   }
 
@@ -223,11 +223,11 @@
 
         if(
           typeof window
-            .openNexusAboutDev ===
+            .openNexoraAboutDev ===
           "function"
         ){
           window
-            .openNexusAboutDev();
+            .openNexoraAboutDev();
           return;
         }
 
@@ -251,11 +251,11 @@
 
         if(
           typeof window
-            .openNexusReportRoom ===
+            .openNexoraReportRoom ===
           "function"
         ){
           window
-            .openNexusReportRoom();
+            .openNexoraReportRoom();
           return;
         }
 
@@ -271,10 +271,10 @@
     );
   }
 
-  window.openNexusTopMenu =
+  window.openNexoraTopMenu =
     () => setOpen(true);
 
-  window.closeNexusTopMenu =
+  window.closeNexoraTopMenu =
     closeMenu;
 })();
 
@@ -339,7 +339,7 @@
 
   function closeUniversalRoomBelow(){
     if(
-      typeof window.closeNexusToolRoom ===
+      typeof window.closeNexoraToolRoom ===
       "function"
     ){
       const universal =
@@ -354,7 +354,7 @@
         )
       ){
         try{
-          window.closeNexusToolRoom();
+          window.closeNexoraToolRoom();
         }catch(error){}
       }
     }
@@ -420,10 +420,10 @@
     }
   );
 
-  window.openNexusReportRoom =
+  window.openNexoraReportRoom =
     openReportRoom;
 
-  window.closeNexusReportRoom =
+  window.closeNexoraReportRoom =
     closeReportRoom;
 
   /*
@@ -446,7 +446,7 @@
     return false;
   };
   window.renderTikTokHdUpload=window.openTikTokHdUpload;
-  window.isNexusLockedTool=function(){return false;};
+  window.isNexoraLockedTool=function(){return false;};
 })();
 
 
@@ -467,16 +467,16 @@
     
     
     
-    comicreader:{renderer:'renderComicReader', category:'tools', icon:'fa-solid fa-book-open-reader', title:'Komik Indonesia', desc:'Manga, manhwa, dan manhua lengkap dengan pencarian, favorit, riwayat, chapter, bahasa, serta reader vertikal.', accent:'#c084fc', accent2:'#ec4899', rgb:'192,132,252', badge:'Nexus Comic Core'},
+    comicreader:{renderer:'renderComicReader', category:'tools', icon:'fa-solid fa-book-open-reader', title:'Komik Indonesia', desc:'Manga, manhwa, dan manhua lengkap dengan pencarian, favorit, riwayat, chapter, bahasa, serta reader vertikal.', accent:'#c084fc', accent2:'#ec4899', rgb:'192,132,252', badge:'Nexora Comic Core'},
     aiimage:{renderer:'renderPuterImage', category:'tools', icon:'fa-solid fa-image', title:'Nexora AI Image', desc:'Buat gambar AI dengan akun dan allowance Puter milik pengguna. Nexora tidak menyimpan prompt, password, atau gambar hasil.', accent:'#a78bfa', accent2:'#22d3ee', rgb:'167,139,250', badge:'Puter User-Pays AI'},
     genmail:{renderer:'renderGenMail', category:'tools', icon:'fa-solid fa-envelope-open-text', title:'GenMail', desc:'Buat alamat email sementara, periksa inbox, dan baca pesan melalui proxy aman Nexora.', accent:'#a78bfa', accent2:'#22d3ee', rgb:'167,139,250', badge:'Advanced Temp Mail'},
     danbooru:{renderer:'renderDanbooruSearch', category:'tools', icon:'fa-solid fa-images', title:'Danbooru Search', desc:'Cari ilustrasi anime berdasarkan tag melalui proxy aman Nexora dengan gallery ringan dan mode Safe sebagai pilihan awal.', accent:'#c084fc', accent2:'#22d3ee', rgb:'192,132,252', badge:'Anime Art Search'},
     animetoreal:{renderer:'renderAnimeToReal', category:'tools', icon:'fa-solid fa-wand-magic-sparkles', title:'Anime to Real', desc:'Ubah URL ilustrasi anime menjadi gambar realistis melalui proxy AI aman Nexora.', accent:'#a78bfa', accent2:'#22d3ee', rgb:'167,139,250', badge:'AI Image Transform'},
-    promptgenerate:{renderer:'renderPromptGenerator', category:'tools', icon:'fa-solid fa-wand-magic-sparkles', title:'Prompt Generator', desc:'Gemini Vision membaca gambar dan menyusun prompt profesional untuk Midjourney, FLUX, SDXL, Ideogram, dan image-to-video.', accent:'#67e8f9', accent2:'#7c3aed', rgb:'103,232,249', badge:'Vision Prompt Architect'},
-    fakeovo:{renderer:'renderFakeOvo', category:'tools', icon:'fa-solid fa-wallet', title:'Fake OVO', desc:'Atur nominal dan hasilkan tampilan saldo OVO.', accent:'#a78bfa', accent2:'#6d28d9', rgb:'167,139,250', badge:'Nexus Canvas Studio'},
-    quotegenerator:{renderer:'renderQuoteGenerator', category:'tools', icon:'fa-solid fa-quote-left', title:'Quote Generator', desc:'Susun teks dan penulis lalu render gambar quote monokrom.', accent:'#cbd5e1', accent2:'#7c3aed', rgb:'203,213,225', badge:'Nexus Quote Studio'},
-    carifakta:{renderer:'renderCariFakta', category:'tools', icon:'fa-solid fa-magnifying-glass-chart', title:'CariFakta', desc:'Periksa klaim, konteks, dan tingkat keyakinan menggunakan AI.', accent:'#4ade80', accent2:'#7c3aed', rgb:'74,222,128', badge:'Nexus Fact Intelligence'},
-    mltools:{renderer:'renderMlTools', category:'tools', icon:'fa-solid fa-gamepad', title:'ML Tools Nexus', desc:'Script Skin MLBB, kalkulator Winrate, dan Stalk akun dengan mesin serta hasil asli ML Tools.', accent:'#67e8f9', accent2:'#7c3aed', rgb:'103,232,249', badge:'Nexus ML Gaming Lab'},
+    promptgenerate:{renderer:'renderPromptGenerator', category:'tools', icon:'fa-solid fa-wand-magic-sparkles', title:'Nexora Prompt Generator', desc:'Nexora Vision AI membaca gambar dan menyusun prompt profesional untuk Midjourney, FLUX, SDXL, Ideogram, dan image-to-video.', accent:'#67e8f9', accent2:'#7c3aed', rgb:'103,232,249', badge:'Vision Prompt Architect'},
+    fakeovo:{renderer:'renderFakeOvo', category:'tools', icon:'fa-solid fa-wallet', title:'Fake OVO', desc:'Atur nominal dan hasilkan tampilan saldo OVO.', accent:'#a78bfa', accent2:'#6d28d9', rgb:'167,139,250', badge:'Nexora Canvas Studio'},
+    quotegenerator:{renderer:'renderQuoteGenerator', category:'tools', icon:'fa-solid fa-quote-left', title:'Quote Generator', desc:'Susun teks dan penulis lalu render gambar quote monokrom.', accent:'#cbd5e1', accent2:'#7c3aed', rgb:'203,213,225', badge:'Nexora Quote Studio'},
+    carifakta:{renderer:'renderCariFakta', category:'tools', icon:'fa-solid fa-magnifying-glass-chart', title:'CariFakta', desc:'Periksa klaim, konteks, dan tingkat keyakinan menggunakan AI.', accent:'#4ade80', accent2:'#7c3aed', rgb:'74,222,128', badge:'Nexora Fact Intelligence'},
+    mltools:{renderer:'renderMlTools', category:'tools', icon:'fa-solid fa-gamepad', title:'ML Tools Nexora', desc:'Script Skin MLBB, kalkulator Winrate, dan Stalk akun dengan mesin serta hasil asli ML Tools.', accent:'#67e8f9', accent2:'#7c3aed', rgb:'103,232,249', badge:'Nexora ML Gaming Lab'},
 virusscan:  {renderer:'renderVirusScan', category:'tools', icon:'fa-solid fa-shield-virus', title:'Virus Scan Nexora', desc:'Analisis lokal untuk URL, file, hash, domain, dan IP dalam ruang keamanan All Tools Nexora.', accent:'#c084fc', accent2:'#7c3aed', rgb:'192,132,252', badge:'Nexora Security Core'},
     cryptomarket:{renderer:'renderCryptoMarket', category:'tools', icon:'fa-solid fa-chart-line', title:'Crypto Market Scanner', desc:'Analisis multi-timeframe 15m, 1 jam, mikro, makro, indikator teknikal, dan referensi risiko dari candle tertutup.', accent:'#22d3ee', accent2:'#34d399', rgb:'34,211,238', badge:'MTF Market Intelligence'},
     webintel:{renderer:'renderWebIntelligence', category:'tools', icon:'fa-solid fa-satellite-dish', title:'Nexora Web Intelligence', desc:'Ubah URL menjadi audit SEO, security, performa, aksesibilitas, stack, tracker, dan rekomendasi teknis berbasis bukti.', accent:'#22d3ee', accent2:'#8b5cf6', rgb:'34,211,238', badge:'Nexora Intelligence Engine'},
@@ -484,29 +484,29 @@ virusscan:  {renderer:'renderVirusScan', category:'tools', icon:'fa-solid fa-shi
     bmkg:{renderer:'renderBmkgIndonesia', category:'tools', icon:'fa-solid fa-cloud-sun-rain', title:'BMKG Indonesia', desc:'Pantau gempa terkini, prakiraan cuaca 3 hari, dan peringatan dini cuaca dari jalur Open Data resmi BMKG.', accent:'#27a9e0', accent2:'#67b84b', rgb:'39,169,224', badge:'BMKG Open Data'},
     spaceexplorer:{renderer:'renderSpaceExplorer', category:'tools', icon:'fa-solid fa-user-astronaut', title:'Space Explorer', desc:'Jelajahi APOD, arsip misi Mars, asteroid dekat Bumi, dan cuaca antariksa melalui pusat data resmi NASA.', accent:'#67e8f9', accent2:'#fb7185', rgb:'103,232,249', badge:'NASA Deep Space Link'},
     ocrintel:{renderer:'renderOcrIntelligence', category:'tools', icon:'fa-solid fa-file-lines', title:'Nexora OCR Intelligence', desc:'Ubah foto, screenshot, dan PDF menjadi teks yang dapat dicari, disalin, dianalisis, dan diunduh kembali.', accent:'#38bdf8', accent2:'#a78bfa', rgb:'56,189,248', badge:'Document Vision Engine'},
-    documentai:{renderer:'renderDocumentAi', category:'tools', icon:'fa-solid fa-file-waveform', title:'Nexora Document AI', desc:'Analisis PDF, scan, gambar, dan dokumen teks dengan ringkasan, ekstraksi tabel, ekspor, serta tanya-jawab Gemini.', accent:'#b782ff', accent2:'#69e8f2', rgb:'183,130,255', badge:'VVIP Document Intelligence'},
+    documentai:{renderer:'renderDocumentAi', category:'tools', icon:'fa-solid fa-file-waveform', title:'Nexora Document AI', desc:'Analisis PDF, scan, gambar, dan dokumen teks dengan ringkasan, ekstraksi tabel, ekspor, serta tanya-jawab Nexora AI.', accent:'#b782ff', accent2:'#69e8f2', rgb:'183,130,255', badge:'VVIP Document Intelligence'},
     svgalight:{renderer:'renderSvgAlight', category:'tools', icon:'fa-solid fa-wand-magic-sparkles', title:'SVG → Alight XML', desc:'Konversi SVG menjadi XML Alight Motion melalui API resmi v1.8 dengan AM Optimized, Maximum Fidelity, audit kesamaan, dan kontrol layer.', accent:'#67e8f9', accent2:'#f0abfc', rgb:'103,232,249', badge:'Engine v1.8'},
     alightpremium:{renderer:'renderAlightPremium', category:'tools', icon:'fa-solid fa-bolt', title:'Alight Motion Premium 1 Tahun', desc:'Request magic link dan proses aktivasi Premium lewat API reseller dengan API key server-side atau key milik pengguna.', accent:'#8b5cf6', accent2:'#22d3ee', rgb:'139,92,246', badge:'Reseller Activation'},
     imagevectorizer:{renderer:'renderImageVectorizer', category:'tools', icon:'fa-solid fa-bezier-curve', title:'Nexora Image Vectorizer', desc:'Ubah PNG atau JPG menjadi SVG melalui FreeConvert Cloud dengan signed direct upload dan preview yang tetap proporsional.', accent:'#5eead4', accent2:'#a3e635', rgb:'94,234,212', badge:'FreeConvert Cloud'},
-    text2d:{renderer:'renderFlamoText2D',category:'tools',icon:'fa-solid fa-font',title:'2D Text Animate / Text FX',desc:'Generator XML teks 2D dengan preset, keyframe, cubic Bézier, Style FX, color mapping, dan timing lokal.',accent:'#a78bfa',accent2:'#22d3ee',rgb:'167,139,250',badge:'Nexora XML Engine'},
-    text3d:{renderer:'renderFlamoText3D',category:'tools',icon:'fa-solid fa-cube',title:'3D Text Animate',desc:'Tujuh preset XML teks 3D, extrude, offset, popup, flip, dan long shadow yang berjalan sepenuhnya lokal.',accent:'#f97316',accent2:'#a855f7',rgb:'249,115,22',badge:'7 Native Presets'},
-    textfxanimation:{renderer:'renderFlamoTextFxAnimation',category:'tools',icon:'fa-solid fa-wand-magic-sparkles',title:'Text FX Animation',desc:'Lima template efek teks native dengan mode karakter/kata dan penggantian color role.',accent:'#ec4899',accent2:'#22d3ee',rgb:'236,72,153',badge:'5 Native FX'},
-    textvector:{renderer:'renderFlamoTextVector',category:'tools',icon:'fa-solid fa-draw-polygon',title:'Text to Vector',desc:'Konversi teks menjadi path vector Alight Motion memakai OpenType dan font lokal di Web Worker.',accent:'#34d399',accent2:'#38bdf8',rgb:'52,211,153',badge:'Local OpenType Worker'},
-    trimpath:{renderer:'renderFlamoTrimpath',category:'tools',icon:'fa-solid fa-route',title:'Trimpath Generator',desc:'Generator trimpath berbasis data huruf, metrics, mask, style, timing, dan color mapping asli.',accent:'#38bdf8',accent2:'#8b5cf6',rgb:'56,189,248',badge:'Native Letter Engine'},
-    logoanimate:{renderer:'renderFlamoLogoAnimate',category:'tools',icon:'fa-solid fa-shapes',title:'Logo Animate',desc:'Template XML animasi logo 8,33 detik dengan hierarki efek dan text block lokal.',accent:'#f59e0b',accent2:'#ec4899',rgb:'245,158,11',badge:'Local XML Template'},
+    text2d:{renderer:'renderNexoraText2D',category:'tools',icon:'fa-solid fa-font',title:'2D Text Animate / Text FX',desc:'Generator XML teks 2D dengan preset, keyframe, cubic Bézier, Style FX, color mapping, dan timing lokal.',accent:'#a78bfa',accent2:'#22d3ee',rgb:'167,139,250',badge:'Nexora XML Engine'},
+    text3d:{renderer:'renderNexoraText3D',category:'tools',icon:'fa-solid fa-cube',title:'3D Text Animate',desc:'Tujuh preset XML teks 3D, extrude, offset, popup, flip, dan long shadow yang berjalan sepenuhnya lokal.',accent:'#f97316',accent2:'#a855f7',rgb:'249,115,22',badge:'7 Native Presets'},
+    textfxanimation:{renderer:'renderNexoraTextFxAnimation',category:'tools',icon:'fa-solid fa-wand-magic-sparkles',title:'Text FX Animation',desc:'Lima template efek teks native dengan mode karakter/kata dan penggantian color role.',accent:'#ec4899',accent2:'#22d3ee',rgb:'236,72,153',badge:'5 Native FX'},
+    textvector:{renderer:'renderNexoraTextVector',category:'tools',icon:'fa-solid fa-draw-polygon',title:'Text to Vector',desc:'Konversi teks menjadi path vector Alight Motion memakai OpenType dan font lokal di Web Worker.',accent:'#34d399',accent2:'#38bdf8',rgb:'52,211,153',badge:'Local OpenType Worker'},
+    trimpath:{renderer:'renderNexoraTrimpath',category:'tools',icon:'fa-solid fa-route',title:'Trimpath Generator',desc:'Generator trimpath berbasis data huruf, metrics, mask, style, timing, dan color mapping asli.',accent:'#38bdf8',accent2:'#8b5cf6',rgb:'56,189,248',badge:'Native Letter Engine'},
+    logoanimate:{renderer:'renderNexoraLogoAnimate',category:'tools',icon:'fa-solid fa-shapes',title:'Logo Animate',desc:'Template XML animasi logo 8,33 detik dengan hierarki efek dan text block lokal.',accent:'#f59e0b',accent2:'#ec4899',rgb:'245,158,11',badge:'Local XML Template'},
 instagram:  {renderer:'renderInstagram',   category:'downloader', icon:'fa-brands fa-instagram', title:'Instagram Downloader', desc:'Ambil video, Reels, foto, carousel, metadata, dan caption dalam ruang download khusus.', accent:'#e879f9', accent2:'#c026d3', rgb:'232,121,249', badge:'Media Studio'},
     aiodownloader:{renderer:'renderAioDownloader',category:'downloader',icon:'fa-solid fa-cloud-arrow-down',title:'All In One Downloader',desc:'Tempel satu link media lalu buka atau salin pilihan download yang benar-benar diberikan layanan.',accent:'#8b5cf6',accent2:'#0891b2',rgb:'139,92,246',badge:'Universal Media Tool'},
     youtube:    {renderer:'renderYoutube',     category:'downloader', icon:'fa-brands fa-youtube', title:'YouTube Metadata', desc:'Lihat metadata publik dan lanjutkan melalui tautan resmi YouTube. Konversi MP4/MP3 tidak disediakan.', accent:'#fb7185', accent2:'#dc2626', rgb:'251,113,133', badge:'Official Link'},
     spotify:    {renderer:'renderSpotify',     category:'downloader', icon:'fa-brands fa-spotify', title:'Spotify Downloader', desc:'Coba unduh audio melalui provider; fallback otomatis ke metadata dan tautan Spotify resmi.', accent:'#4ade80', accent2:'#16a34a', rgb:'74,222,128', badge:'Best Effort MP3'},
-    terabox:    {renderer:'renderTerabox', category:'downloader', icon:'fa-solid fa-box-open', title:'Terabox Downloader', desc:'Ambil daftar file dari tautan share Terabox dan unduh file yang tersedia.', accent:'#60a5fa', accent2:'#2563eb', rgb:'96,165,250', badge:'Nexus Cloud Downloader'},
+    terabox:    {renderer:'renderTerabox', category:'downloader', icon:'fa-solid fa-box-open', title:'Terabox Downloader', desc:'Ambil daftar file dari tautan share Terabox dan unduh file yang tersedia.', accent:'#60a5fa', accent2:'#2563eb', rgb:'96,165,250', badge:'Nexora Cloud Downloader'},
     brat:       {renderer:'renderBrat',        category:'maker', icon:'fa-solid fa-wand-magic-sparkles', title:'BRAT Generator', desc:'Buat karya BRAT statis atau animasi GIF dengan area kerja penuh dan hasil yang mudah dipantau.', accent:'#facc15', accent2:'#f97316', rgb:'250,204,21', badge:'Creative Maker'},
     iqc:        {renderer:'renderIqc',         category:'maker', icon:'fa-solid fa-image', title:'IQC Generator', desc:'Susun gambar IQC, atur isi, lalu lihat preview dalam ruang desain khusus.', accent:'#67e8f9', accent2:'#0891b2', rgb:'103,232,249', badge:'Image Composer'},
     sertifikat: {renderer:'renderSertifikatTololSource', category:'maker', icon:'fa-solid fa-certificate', title:'Sertifikat Custom', desc:'Buat sertifikat melalui API sumber dengan renderer lokal otomatis saat layanan pihak ketiga tidak tersedia.', accent:'#facc15', accent2:'#a855f7', rgb:'250,204,21', badge:'API + Local Fallback'},
 
     ektp:       {renderer:'renderEktp',        category:'maker', icon:'fa-solid fa-id-card', title:'E-KTP Generator', desc:'Lengkapi formulir demo dan hasilkan kartu dalam ruang editor identitas terpisah.', accent:'#60a5fa', accent2:'#2563eb', rgb:'96,165,250', badge:'Identity Studio'},
     fakedana:   {renderer:'renderFakeDana',    category:'maker', icon:'fa-solid fa-money-bill-wave', title:'Fake Dana', desc:'Atur tampilan saldo simulasi dan buat hasil visual dalam ruang generator khusus.', accent:'#38bdf8', accent2:'#0284c7', rgb:'56,189,248', badge:'Balance Mockup'},
-    fakebankjago:{renderer:'renderFakeBankJago', category:'maker', icon:'fa-solid fa-building-columns', title:'Fake Bank Jago', desc:'Buat visual simulasi saldo Bank Jago menggunakan nama dan nominal.', accent:'#facc15', accent2:'#f97316', rgb:'250,204,21', badge:'Nexus Simulation Maker'},
-    fakedev:    {renderer:'renderFakeDev',     category:'maker', icon:'fa-solid fa-laptop-code', title:'FakeDev', desc:'Generator profil developer menggunakan endpoint gambar asli dari HTML Nexus Tools.', accent:'#a78bfa', accent2:'#6d28d9', rgb:'167,139,250', badge:'Nexus Source API'},
+    fakebankjago:{renderer:'renderFakeBankJago', category:'maker', icon:'fa-solid fa-building-columns', title:'Fake Bank Jago', desc:'Buat visual simulasi saldo Bank Jago menggunakan nama dan nominal.', accent:'#facc15', accent2:'#f97316', rgb:'250,204,21', badge:'Nexora Simulation Maker'},
+    fakedev:    {renderer:'renderFakeDev',     category:'maker', icon:'fa-solid fa-laptop-code', title:'FakeDev', desc:'Generator profil developer menggunakan endpoint gambar asli dari HTML Nexora Tools.', accent:'#a78bfa', accent2:'#6d28d9', rgb:'167,139,250', badge:'Nexora Source API'},
     fakelobby:  {renderer:'renderFakeLobby',   category:'maker', icon:'fa-solid fa-gamepad', title:'Fake Lobby', desc:'Buat tampilan lobby game simulasi dengan kontrol dan preview dalam satu halaman.', accent:'#fb7185', accent2:'#7c3aed', rgb:'251,113,133', badge:'Gaming Room'},
     winquotes:  {renderer:'renderWinquotes',   category:'maker', icon:'fa-brands fa-windows', title:'Windows Quotes', desc:'Tulis quote dan hasilkan meme bergaya Windows dalam 2 pilihan style.', accent:'#38bdf8', accent2:'#2563eb', rgb:'56,189,248', badge:'Quote Creator'},
     nokiamsg:   {renderer:'renderNokiaMsg',   category:'maker', icon:'fa-solid fa-mobile-retro', title:'Nokia Message', desc:'Susun pesan SMS jadul dan hasilkan gambar dalam ruang generator retro.', accent:'#a3e635', accent2:'#65a30d', rgb:'163,230,52', badge:'Retro Message'},
@@ -516,7 +516,7 @@ instagram:  {renderer:'renderInstagram',   category:'downloader', icon:'fa-brand
     morse:      {renderer:'renderMorse',       category:'tools', icon:'fa-solid fa-tower-broadcast', title:'Morse Code', desc:'Konversi teks dan kode Morse, termasuk audio, dalam ruang komunikasi tersendiri.', accent:'#c084fc', accent2:'#7c3aed', rgb:'192,132,252', badge:'Signal Utility'},
     removebg:   {renderer:'renderRemovebg',    category:'tools', icon:'fa-solid fa-eraser', title:'Remove Background', desc:'Unggah gambar dan hapus latar belakang dengan preview besar dalam ruang AI khusus.', accent:'#34d399', accent2:'#059669', rgb:'52,211,153', badge:'AI Image Tool'},
     enhancer:   {renderer:'renderEnhancer',    category:'tools', icon:'fa-solid fa-wand-magic', title:'Image Enhancer', desc:'Tingkatkan kualitas gambar dan bandingkan hasil pada halaman pemrosesan visual.', accent:'#f472b6', accent2:'#9333ea', rgb:'244,114,182', badge:'AI Enhancement'},
-    ttquote:    {renderer:'renderTiktokQuote', category:'vault', icon:'fa-brands fa-tiktok', title:'Quote TikTok Nexus', desc:'Buat fake chat TikTok dari username, pesan, dan foto profil lalu hasilkan sebagai Fake TikTok Chat.', accent:'#67e8f9', accent2:'#ec4899', rgb:'103,232,249', badge:'Nexus Quote Chat'},
+    ttquote:    {renderer:'renderTiktokQuote', category:'vault', icon:'fa-brands fa-tiktok', title:'Quote TikTok Nexora', desc:'Buat fake chat TikTok dari username, pesan, dan foto profil lalu hasilkan sebagai Fake TikTok Chat.', accent:'#67e8f9', accent2:'#ec4899', rgb:'103,232,249', badge:'Nexora Quote Chat'},
     qrgen:      {renderer:'renderQrGenerator', category:'vault', icon:'fa-solid fa-qrcode', title:'QR Generator', desc:'Masukkan teks atau tautan, atur QR, lalu simpan hasil dari halaman generator penuh.', accent:'#a3e635', accent2:'#16a34a', rgb:'163,230,53', badge:'QR Utility'}
   };
 
@@ -540,7 +540,7 @@ instagram:  {renderer:'renderInstagram',   category:'downloader', icon:'fa-brand
         '<div class="nx-room-scroll" id="nxUniversalRoomScroll">'+
           '<main class="nx-room-wrap">'+
             '<section class="nx-room-hero">'+
-              '<div><div class="nx-room-kicker"><i class="fas fa-layer-group"></i><span id="nxUniversalRoomBadge">Nexus Tool Room</span></div><h1 id="nxUniversalRoomTitle">Tool</h1><p id="nxUniversalRoomDesc"></p></div>'+
+              '<div><div class="nx-room-kicker"><i class="fas fa-layer-group"></i><span id="nxUniversalRoomBadge">Nexora Tool Room</span></div><h1 id="nxUniversalRoomTitle">Tool</h1><p id="nxUniversalRoomDesc"></p></div>'+
               '<div class="nx-room-hero-icon"><i id="nxUniversalRoomHeroIcon" class="fas fa-cube"></i></div>'+
             '</section>'+
             '<section class="nx-room-panel"><div class="nx-room-tool-body" id="nxUniversalRoomBody"></div></section>'+
@@ -570,12 +570,12 @@ instagram:  {renderer:'renderInstagram',   category:'downloader', icon:'fa-brand
     document.getElementById('nxUniversalRoomTopTitle').textContent = meta.title;
     document.getElementById('nxUniversalRoomTitle').textContent = meta.title;
     document.getElementById('nxUniversalRoomDesc').textContent = meta.desc;
-    document.getElementById('nxUniversalRoomBadge').textContent = meta.badge || 'Nexus Tool Room';
+    document.getElementById('nxUniversalRoomBadge').textContent = meta.badge || 'Nexora Tool Room';
   }
 
   function cleanupRoomBody(){
     if(!roomBody || typeof roomBody.__nxCleanup!=='function') return;
-    try{ roomBody.__nxCleanup(); }catch(error){ try{ console.warn('[Nexus Room cleanup]',error); }catch(_error){} }
+    try{ roomBody.__nxCleanup(); }catch(error){ try{ console.warn('[Nexora Room cleanup]',error); }catch(_error){} }
     try{ delete roomBody.__nxCleanup; }catch(_error){ roomBody.__nxCleanup=null; }
   }
 
@@ -604,7 +604,7 @@ instagram:  {renderer:'renderInstagram',   category:'downloader', icon:'fa-brand
       if(mountApi) mountApi(roomBody,toolId);
     }catch(err){
       roomBody.innerHTML = '<div class="dl-error"><i class="fas fa-triangle-exclamation"></i><br><br>Fitur gagal dimuat.<br><span style="font-size:11px;opacity:.72">'+String(err && err.message ? err.message : err)+'</span></div>';
-      try{ console.error('[Nexus Room]',toolId,err); }catch(e){}
+      try{ console.error('[Nexora Room]',toolId,err); }catch(e){}
     }
 
     room.classList.add('is-open');
@@ -652,8 +652,8 @@ instagram:  {renderer:'renderInstagram',   category:'downloader', icon:'fa-brand
     closeTimer = setTimeout(finishClose,280);
   }
 
-  window.openNexusToolRoom = openRoom;
-  window.closeNexusToolRoom = function(){ closeRoom(true); };
+  window.openNexoraToolRoom = openRoom;
+  window.closeNexoraToolRoom = function(){ closeRoom(true); };
 
   window.showTool = function(toolId){
     if(roomTools[toolId]){

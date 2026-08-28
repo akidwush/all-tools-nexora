@@ -94,7 +94,7 @@ for (const [name, module] of Object.entries(moduleManifest.modules || {})) {
 }
 
 for (const removed of [
-  "assets/js/features/nexus-ai.js", "assets/css/features/nexus-ai.css",
+  "assets/js/features/nexora-ai.js", "assets/css/features/nexora-ai.css",
   "assets/js/features/pix-vault.js", "assets/css/features/pix-vault.css",
   "assets/js/features/big-image.js", "assets/css/features/big-image.css",
   "lib/bigjpg-upscaler.js"

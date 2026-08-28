@@ -7,9 +7,9 @@
   const USER_ACCESS = PAGE_QUERY.get('user_access') || 'guest'; // 'guest' | 'free' | 'premium'
   function currentWpUser(){
     try {
-      return window.flamoCurrentUser || (window.parent && window.parent.flamoCurrentUser) || {};
+      return window.nexoraCurrentUser || (window.parent && window.parent.nexoraCurrentUser) || {};
     } catch (error) {
-      return window.flamoCurrentUser || {};
+      return window.nexoraCurrentUser || {};
     }
   }
   const CURRENT_WP_USER = currentWpUser();
@@ -18,7 +18,7 @@
   const isCustomFont = value => String(value || '').startsWith('custom:');
   const customFontId = value => String(value || '').replace(/^custom:/, '');
   const findCustomFont = value => customFonts.find(font => font.id === customFontId(value)) || null;
-  function customFontFamily(font){ return 'FlamoCustomFont_' + String(font && font.id || '').replace(/[^a-zA-Z0-9_-]/g, '_'); }
+  function customFontFamily(font){ return 'NexoraCustomFont_' + String(font && font.id || '').replace(/[^a-zA-Z0-9_-]/g, '_'); }
   function fontDisplayName(value){ const found = isCustomFont(value) ? findCustomFont(value) : null; return found ? (found.name || 'Custom Font') : String(value || 'Lexend'); }
   function escHtml(value){ return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch])); }
   function iconSvg(type){
@@ -34,13 +34,13 @@
   function setUploadStatus(message, mode, login){ const el = $('fontUploadStatus'); if(!el) return; el.classList.toggle('is-success', mode === 'success'); el.classList.toggle('is-error', mode === 'error'); const link = login ? ' <a href="/login" target="_top">Masuk ' + iconSvg('arrow') + '</a>' : ''; el.innerHTML = (mode === 'success' ? iconSvg('check') : mode === 'error' ? iconSvg('danger') : '') + '<span>' + escHtml(message || '') + link + '</span>'; }
   function fontApi(action, body){ if(!FONT_API.ajaxUrl || !FONT_API.nonce) return Promise.reject(new Error('Koneksi upload font belum siap.')); const data = body || new FormData(); data.set('action', action); data.set('nonce', FONT_API.nonce); return fetch(FONT_API.ajaxUrl, { method:'POST', credentials:'same-origin', body:data }).then(r => r.json().catch(() => null).then(json => { if(!json || !json.success) throw new Error((json && json.data && json.data.message) || 'Request font gagal.'); return json.data || {}; })); }
   function renderCustomFontOptions(selected){ const font = $('fontName'); if(!font) return; const current = selected || font.value; Array.from(font.querySelectorAll('optgroup[data-custom-fonts]')).forEach(g => g.remove()); if(customFonts.length){ const group = document.createElement('optgroup'); group.label = 'Font Custom · 24 jam'; group.dataset.customFonts = '1'; customFonts.forEach(item => group.append(new Option(item.name || 'Custom Font', 'custom:' + item.id))); font.append(group); } if(current && Array.from(font.options).some(o => o.value === current)) font.value = current; }
-  function renderCustomFontList(){ const list = $('customFontList'); if(!list) return; if(!customFonts.length){ list.innerHTML = '<p class="flamo3d-engine-note">Belum ada font custom.</p>'; return; } list.innerHTML = customFonts.map(font => '<div class="flamo-temp-font-item"><div><p class="flamo-temp-font-name">' + escHtml(font.name || 'Custom Font') + '</p><p class="flamo-temp-font-time">' + iconSvg('clock') + '<span>' + escHtml(String(font.extension || '').toUpperCase()) + ' · ' + escHtml(remainingLabel(font.expiresAt)) + '</span></p></div><button class="flamo-temp-font-trash" type="button" data-delete-font="' + escHtml(font.id) + '" aria-label="Hapus font">' + iconSvg('trash') + '<span>Hapus</span></button></div>').join(''); }
-  function loadCustomFonts(selectId){ if(!FONT_API.loggedIn){ setCustomStatus('Login diperlukan untuk upload font.', 'error'); renderCustomFontOptions(); return Promise.resolve([]); } return fontApi('flamo_temp_font_list', new FormData()).then(data => { customFonts = Array.isArray(data.fonts) ? data.fonts : []; renderCustomFontOptions(selectId); renderCustomFontList(); if(customFonts.length) setCustomStatus(customFonts.length + ' font custom aktif.', 'success'); else setCustomStatus('Belum ada font custom aktif.'); return customFonts; }).catch(error => { setCustomStatus(error.message, 'error'); return []; }); }
-  function openFontUpload(){ window.parent?.postMessage({ type:'FLAMO_3D_FONT_UPLOAD_OPEN' }, '*'); }
+  function renderCustomFontList(){ const list = $('customFontList'); if(!list) return; if(!customFonts.length){ list.innerHTML = '<p class="nexora3d-engine-note">Belum ada font custom.</p>'; return; } list.innerHTML = customFonts.map(font => '<div class="nexora-temp-font-item"><div><p class="nexora-temp-font-name">' + escHtml(font.name || 'Custom Font') + '</p><p class="nexora-temp-font-time">' + iconSvg('clock') + '<span>' + escHtml(String(font.extension || '').toUpperCase()) + ' · ' + escHtml(remainingLabel(font.expiresAt)) + '</span></p></div><button class="nexora-temp-font-trash" type="button" data-delete-font="' + escHtml(font.id) + '" aria-label="Hapus font">' + iconSvg('trash') + '<span>Hapus</span></button></div>').join(''); }
+  function loadCustomFonts(selectId){ if(!FONT_API.loggedIn){ setCustomStatus('Login diperlukan untuk upload font.', 'error'); renderCustomFontOptions(); return Promise.resolve([]); } return fontApi('nexora_temp_font_list', new FormData()).then(data => { customFonts = Array.isArray(data.fonts) ? data.fonts : []; renderCustomFontOptions(selectId); renderCustomFontList(); if(customFonts.length) setCustomStatus(customFonts.length + ' font custom aktif.', 'success'); else setCustomStatus('Belum ada font custom aktif.'); return customFonts; }).catch(error => { setCustomStatus(error.message, 'error'); return []; }); }
+  function openFontUpload(){ window.parent?.postMessage({ type:'NEXORA_3D_FONT_UPLOAD_OPEN' }, '*'); }
   function closeFontUpload(){ $('fontUploadBackdrop')?.classList.remove('is-open'); $('fontUploadModal')?.classList.remove('is-open'); }
   function bindFontUpload(){ $('uploadFontBtn')?.addEventListener('click', openFontUpload); $('reloadFontsBtn')?.addEventListener('click', () => loadCustomFonts($('fontName')?.value).then(() => { renderFontStyleOptions(isCustomFont($('fontName')?.value) ? '' : ($('fontStyle')?.value || '400')); updateAll(); })); $('fontUploadClose')?.addEventListener('click', closeFontUpload); $('fontUploadCancel')?.addEventListener('click', closeFontUpload); $('fontUploadBackdrop')?.addEventListener('click', closeFontUpload); $('fontUploadSubmit')?.addEventListener('click', uploadCustomFont); $('customFontList')?.addEventListener('click', e => { const btn = e.target.closest('[data-delete-font]'); if(btn) deleteCustomFont(btn.dataset.deleteFont); }); const zone = $('fontDropZone'), input = $('fontFileInput'); if(zone && input){ ['dragenter','dragover'].forEach(t => zone.addEventListener(t, e => { e.preventDefault(); zone.classList.add('is-drag'); })); ['dragleave','drop'].forEach(t => zone.addEventListener(t, e => { e.preventDefault(); zone.classList.remove('is-drag'); })); zone.addEventListener('drop', e => { const file = e.dataTransfer && e.dataTransfer.files ? e.dataTransfer.files[0] : null; if(!file) return; const dt = new DataTransfer(); dt.items.add(file); input.files = dt.files; setUploadStatus(file.name + ' · ' + (file.size / 1024 / 1024).toFixed(2) + 'MB'); }); input.addEventListener('change', () => { const file = input.files && input.files[0]; setUploadStatus(file ? file.name + ' · ' + (file.size / 1024 / 1024).toFixed(2) + 'MB' : 'Pilih file TTF atau OTF.'); }); } }
-  function uploadCustomFont(){ const input = $('fontFileInput'), button = $('fontUploadSubmit'); const file = input && input.files ? input.files[0] : null; if(!FONT_API.loggedIn){ setUploadStatus('Login diperlukan untuk upload font.', 'error', true); return; } if(!file){ setUploadStatus('Pilih file font terlebih dahulu.', 'error'); return; } const body = new FormData(); body.set('font_file', file); if(button) button.disabled = true; setUploadStatus('Mengupload dan memvalidasi font...'); fontApi('flamo_temp_font_upload', body).then(data => { if(input) input.value = ''; setUploadStatus(data.message || 'Font berhasil diupload.', 'success'); return loadCustomFonts(data.font && data.font.id ? 'custom:' + data.font.id : '').then(() => { if(data.font && data.font.id && $('fontName')) $('fontName').value = 'custom:' + data.font.id; renderFontStyleOptions(''); updateAll(); markDirty(); }); }).catch(error => setUploadStatus(error.message, 'error')).finally(() => { if(button) button.disabled = false; }); }
-  function deleteCustomFont(id){ const body = new FormData(); body.set('font_id', id || ''); setUploadStatus('Menghapus font...'); fontApi('flamo_temp_font_delete', body).then(data => { setUploadStatus(data.message || 'Font dihapus.', 'success'); return loadCustomFonts('Lexend').then(() => { renderFontStyleOptions(''); updateAll(); markDirty(); }); }).catch(error => setUploadStatus(error.message, 'error')); }
+  function uploadCustomFont(){ const input = $('fontFileInput'), button = $('fontUploadSubmit'); const file = input && input.files ? input.files[0] : null; if(!FONT_API.loggedIn){ setUploadStatus('Login diperlukan untuk upload font.', 'error', true); return; } if(!file){ setUploadStatus('Pilih file font terlebih dahulu.', 'error'); return; } const body = new FormData(); body.set('font_file', file); if(button) button.disabled = true; setUploadStatus('Mengupload dan memvalidasi font...'); fontApi('nexora_temp_font_upload', body).then(data => { if(input) input.value = ''; setUploadStatus(data.message || 'Font berhasil diupload.', 'success'); return loadCustomFonts(data.font && data.font.id ? 'custom:' + data.font.id : '').then(() => { if(data.font && data.font.id && $('fontName')) $('fontName').value = 'custom:' + data.font.id; renderFontStyleOptions(''); updateAll(); markDirty(); }); }).catch(error => setUploadStatus(error.message, 'error')).finally(() => { if(button) button.disabled = false; }); }
+  function deleteCustomFont(id){ const body = new FormData(); body.set('font_id', id || ''); setUploadStatus('Menghapus font...'); fontApi('nexora_temp_font_delete', body).then(data => { setUploadStatus(data.message || 'Font dihapus.', 'success'); return loadCustomFonts('Lexend').then(() => { renderFontStyleOptions(''); updateAll(); markDirty(); }); }).catch(error => setUploadStatus(error.message, 'error')); }
   function ensureCustomPreviewFont(value){ const font = findCustomFont(value); if(!font || !font.url || !('FontFace' in window)) return; const family = customFontFamily(font); if(document.fonts && Array.from(document.fonts).some(f => f.family === family)) return; const face = new FontFace(family, 'url("' + font.url + '")'); face.load().then(loaded => { document.fonts.add(loaded); updateAll(); }).catch(() => setCustomStatus('Font custom gagal dimuat di preview.', 'error')); }
 
   const DEFAULT_FONTS = ['Lexend','Exo','Inter','Poppins','Montserrat','Manrope','Plus Jakarta Sans','Sora','DM Sans','Space Grotesk','Outfit','Urbanist','Rubik','Raleway','Oswald','Bebas Neue','Anton','Archivo Black','League Spartan','Orbitron','Nunito Sans'];
@@ -125,10 +125,10 @@
 
   function structuredCloneSafe(obj){ return JSON.parse(JSON.stringify(obj)); }
   function esc(s){ return String(s ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&apos;','"':'&quot;'}[c])); }
-  function slug(s){ return String(s || 'flamo-text-animation').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9#_-]+/g,'-').replace(/-+/g,'-').replace(/^-+|-+$/g,'') || 'flamo-text-animation'; }
-  function post(type, payload){ const msg = { type }; if(type === 'FLAMO_3D_GENERATED') msg.payload = payload; else Object.assign(msg, payload || {}); parent.postMessage(msg, '*'); }
-  function markDirty(){ if(suppressDirty) return; generatedXml = ''; if($('xmlOut')) $('xmlOut').value = ''; post('FLAMO_3D_DIRTY'); }
-  function filename(){ return slug(($('filename') && $('filename').value) || 'flamo-text-animation').replace(/\.xml$/i,'') + '.xml'; }
+  function slug(s){ return String(s || 'nexora-text-animation').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9#_-]+/g,'-').replace(/-+/g,'-').replace(/^-+|-+$/g,'') || 'nexora-text-animation'; }
+  function post(type, payload){ const msg = { type }; if(type === 'NEXORA_3D_GENERATED') msg.payload = payload; else Object.assign(msg, payload || {}); parent.postMessage(msg, '*'); }
+  function markDirty(){ if(suppressDirty) return; generatedXml = ''; if($('xmlOut')) $('xmlOut').value = ''; post('NEXORA_3D_DIRTY'); }
+  function filename(){ return slug(($('filename') && $('filename').value) || 'nexora-text-animation').replace(/\.xml$/i,'') + '.xml'; }
   function prettyName(key){ return String(key || '').replace(/([a-z])([A-Z])/g,'$1 $2').replace(/[._-]+/g,' ').replace(/\b\w/g, m => m.toUpperCase()).trim(); }
 
   function availableFontStyles(fontName){
@@ -151,10 +151,10 @@
       style.innerHTML = '<option value="">—</option>';
       style.value = '';
       style.disabled = true;
-      style.classList.add('flamo-temp-font-style-empty');
+      style.classList.add('nexora-temp-font-style-empty');
       return;
     }
-    style.classList.remove('flamo-temp-font-style-empty');
+    style.classList.remove('nexora-temp-font-style-empty');
     const list = availableFontStyles(value);
     const keep = preferred && list.includes(String(preferred)) ? String(preferred) : defaultFontStyle(value);
     style.innerHTML = list.map(v => `<option value="${esc(v)}">${esc(FONT_LABEL[v] || v)}</option>`).join('');
@@ -170,10 +170,10 @@
     select.innerHTML=''; (window.STYLE_META||[]).forEach(s=>select.append(new Option(s.name,s.id))); select.value=selectedStyle;
     renderStyleMenu(); renderStyleCurrent();
   }
-  function renderStyleMenu(){ const menu=$('styleMenu'); if(!menu)return; menu.innerHTML=(window.STYLE_META||[]).map((s,i)=>`<button class="flamo3d-preset-option${s.id===selectedStyle?' is-active':''}" type="button" data-style-fx="${esc(s.id)}" style="--i:${i}">${s.gif?`<img src="${s.gif}" alt="">`:''}<span>${esc(s.name)}</span></button>`).join(''); }
+  function renderStyleMenu(){ const menu=$('styleMenu'); if(!menu)return; menu.innerHTML=(window.STYLE_META||[]).map((s,i)=>`<button class="nexora3d-preset-option${s.id===selectedStyle?' is-active':''}" type="button" data-style-fx="${esc(s.id)}" style="--i:${i}">${s.gif?`<img src="${s.gif}" alt="">`:''}<span>${esc(s.name)}</span></button>`).join(''); }
   function renderStyleCurrent(){ const s=currentStyle(); if($('styleName'))$('styleName').textContent=s.name||'Style FX'; if($('styleSub'))$('styleSub').textContent=s.desc||'Style group'; if($('styleThumb'))$('styleThumb').src=s.gif||''; syncStyleRoleState(true); renderStyleRoles(); renderStyleMenu(); }
-  function chooseStyle(id){ post('FLAMO_PRS_STATUS_CLOSE'); selectedStyle=id; if($('styleFx'))$('styleFx').value=id; renderStyleCurrent(); updateFileNameAuto(); markDirty(); toggleStyleMenu(false); }
-  function toggleStyleMenu(force){ const picker=document.querySelector('.flamo-fx-style-picker'), trigger=$('styleTrigger'); if(!picker)return; const open=typeof force==='boolean'?force:!picker.classList.contains('is-open'); picker.classList.toggle('is-open',open); trigger?.setAttribute('aria-expanded',open?'true':'false'); }
+  function chooseStyle(id){ post('NEXORA_PRS_STATUS_CLOSE'); selectedStyle=id; if($('styleFx'))$('styleFx').value=id; renderStyleCurrent(); updateFileNameAuto(); markDirty(); toggleStyleMenu(false); }
+  function toggleStyleMenu(force){ const picker=document.querySelector('.nexora-fx-style-picker'), trigger=$('styleTrigger'); if(!picker)return; const open=typeof force==='boolean'?force:!picker.classList.contains('is-open'); picker.classList.toggle('is-open',open); trigger?.setAttribute('aria-expanded',open?'true':'false'); }
   function initSelects(){
     const font = $('fontName'), preset = $('animPreset');
     if(font && !font.childElementCount) { const srcFonts = (window.FONTS && window.FONTS.length ? window.FONTS : DEFAULT_FONTS); const fonts = srcFonts.includes('Lexend') ? srcFonts : ['Lexend', ...srcFonts]; fonts.forEach(f => font.append(new Option(f, f))); }
@@ -201,11 +201,11 @@
   function presetFooterHtml(item){
     const cls = presetWrapClass(item);
     if(!cls) return '';
-    if(cls === 'is-member') return `<div class="flamo-prs-footer flamo-prs-footer--member">${_icoKey}<span>Member Only</span></div>`;
-    if(cls === 'is-soon') return `<div class="flamo-prs-footer flamo-prs-footer--soon"><span>Segera Hadir</span>${_icoStar}</div>`;
+    if(cls === 'is-member') return `<div class="nexora-prs-footer nexora-prs-footer--member">${_icoKey}<span>Member Only</span></div>`;
+    if(cls === 'is-soon') return `<div class="nexora-prs-footer nexora-prs-footer--soon"><span>Segera Hadir</span>${_icoStar}</div>`;
     if(cls === 'is-donate'){
       const pct = item.supportProgress || 0;
-      return `<div class="flamo-prs-footer flamo-prs-footer--donate"><span>Support Preset</span><span class="flamo-prs-donate-bar"><i style="width:${pct}%"></i></span>${_icoArrowUp}</div>`;
+      return `<div class="nexora-prs-footer nexora-prs-footer--donate"><span>Support Preset</span><span class="nexora-prs-donate-bar"><i style="width:${pct}%"></i></span>${_icoArrowUp}</div>`;
     }
     return '';
   }
@@ -226,11 +226,11 @@
   function donateOverviewHtml(images){
     const list = Array.isArray(images) ? images.filter(Boolean) : [];
     if(!list.length) return '';
-    return `<div class="flamo3d-prs-donate-overview" data-donate-slider>
-      <div class="flamo3d-prs-donate-overview-frame" data-donate-slider-frame>
-        <div class="flamo3d-prs-donate-overview-track" data-donate-slider-track>${list.map(src => `<div class="flamo3d-prs-donate-overview-slide"><img src="${esc(src)}" alt=""></div>`).join('')}</div>
+    return `<div class="nexora3d-prs-donate-overview" data-donate-slider>
+      <div class="nexora3d-prs-donate-overview-frame" data-donate-slider-frame>
+        <div class="nexora3d-prs-donate-overview-track" data-donate-slider-track>${list.map(src => `<div class="nexora3d-prs-donate-overview-slide"><img src="${esc(src)}" alt=""></div>`).join('')}</div>
       </div>
-      <div class="flamo3d-prs-donate-dots" data-donate-slider-dots>${list.map((_, i) => `<button type="button" class="flamo3d-prs-donate-dot${i === 0 ? ' is-active' : ''}" aria-label="Slide ${i + 1}"></button>`).join('')}</div>
+      <div class="nexora3d-prs-donate-dots" data-donate-slider-dots>${list.map((_, i) => `<button type="button" class="nexora3d-prs-donate-dot${i === 0 ? ' is-active' : ''}" aria-label="Slide ${i + 1}"></button>`).join('')}</div>
     </div>`;
   }
   function initDonateSliders(root){
@@ -238,7 +238,7 @@
     root.querySelectorAll('[data-donate-slider]').forEach(wrap => {
       const frame = wrap.querySelector('[data-donate-slider-frame]');
       const track = wrap.querySelector('[data-donate-slider-track]');
-      const dots = Array.from(wrap.querySelectorAll('[data-donate-slider-dots] .flamo3d-prs-donate-dot'));
+      const dots = Array.from(wrap.querySelectorAll('[data-donate-slider-dots] .nexora3d-prs-donate-dot'));
       const count = track ? track.children.length : 0;
       if(!frame || !track || count < 2) return;
       let index = 0, timer = null, startX = 0, currentX = 0, dragging = false, frameWidth = 1;
@@ -258,7 +258,7 @@
   function donateFormatRupiah(value){ const digits = String(value || '').replace(/\D/g, ''); return digits ? new Intl.NumberFormat('id-ID').format(Number(digits)) : ''; }
   function formatDonateNominal(input){ input.value = donateFormatRupiah(input.value); }
   function toggleDonateAnon(checkbox){
-    const field = checkbox.closest('.flamo3d-prs-donate-field');
+    const field = checkbox.closest('.nexora3d-prs-donate-field');
     const sender = field && field.querySelector('[data-donate-sender]');
     if(!sender) return;
     const ctx = checkbox.closest('[data-username]');
@@ -279,14 +279,14 @@
   }
   function donateConfig(){
     try {
-      if(window.parent && window.parent !== window && window.parent.flamoDonateConfig) return window.parent.flamoDonateConfig;
+      if(window.parent && window.parent !== window && window.parent.nexoraDonateConfig) return window.parent.nexoraDonateConfig;
     } catch(e) {}
-    return window.flamoDonateConfig || {};
+    return window.nexoraDonateConfig || {};
   }
   async function submitDonateForm(form, opts){
     opts = opts || {};
     const ctx = form.closest('[data-tool-name]');
-    const toolName = (ctx && ctx.dataset.toolName) || 'Flamo Tools';
+    const toolName = (ctx && ctx.dataset.toolName) || 'Nexora Tools';
     const nominalInput = form.querySelector('[data-donate-nominal]');
     const messageInput = form.querySelector('[data-donate-message]');
     const fileInput = form.querySelector('[data-donate-file]');
@@ -302,7 +302,7 @@
       return null;
     }
     const fd = new FormData();
-    fd.append('action', 'flamo_submit_donation');
+    fd.append('action', 'nexora_submit_donation');
     fd.append('nonce', config.nonce);
     fd.append('tool_id', '0');
     fd.append('subject_type', (ctx && ctx.dataset.subjectType) || 'preset');
@@ -321,7 +321,7 @@
         noteEl.textContent = 'Donasi masuk ke admin dengan status pending.';
         noteEl.classList.add('is-visible');
       }
-      post('FLAMO_DONATE_CONFIRMED', { id: json.data && json.data.id, toolName });
+      post('NEXORA_DONATE_CONFIRMED', { id: json.data && json.data.id, toolName });
       if(opts.openWa && json.data && json.data.waUrl) window.open(json.data.waUrl, '_blank');
       return json;
     } catch(error) {
@@ -334,7 +334,7 @@
   function sendDonateWaConfirm(btn){
     const ctx = btn.closest('[data-wa-number]');
     const waNumber = (ctx && ctx.dataset.waNumber) || '';
-    const toolName = (ctx && ctx.dataset.toolName) || 'Flamo Tools';
+    const toolName = (ctx && ctx.dataset.toolName) || 'Nexora Tools';
     const scope = ctx || document;
     const nominalInput = scope.querySelector('[data-donate-nominal]');
     const messageInput = scope.querySelector('[data-donate-message]');
@@ -353,44 +353,44 @@
   function memberSliderHtml(images){
     const list = Array.isArray(images) ? images.filter(Boolean) : [];
     if(!list.length) return '';
-    return `<div class="flamo3d-prs-member-slider" data-member-slider>
-      <div class="flamo3d-prs-member-slider-frame" data-member-slider-frame>
-        <div class="flamo3d-prs-member-slider-track" data-member-slider-track>${list.map(src => `<div class="flamo3d-prs-member-slide"><img src="${esc(src)}" alt=""></div>`).join('')}</div>
+    return `<div class="nexora3d-prs-member-slider" data-member-slider>
+      <div class="nexora3d-prs-member-slider-frame" data-member-slider-frame>
+        <div class="nexora3d-prs-member-slider-track" data-member-slider-track>${list.map(src => `<div class="nexora3d-prs-member-slide"><img src="${esc(src)}" alt=""></div>`).join('')}</div>
       </div>
-      <div class="flamo3d-prs-member-dots" data-member-slider-dots>${list.map((_, i) => `<button type="button" class="flamo3d-prs-member-dot${i === 0 ? ' is-active' : ''}" aria-label="Slide ${i + 1}"></button>`).join('')}</div>
+      <div class="nexora3d-prs-member-dots" data-member-slider-dots>${list.map((_, i) => `<button type="button" class="nexora3d-prs-member-dot${i === 0 ? ' is-active' : ''}" aria-label="Slide ${i + 1}"></button>`).join('')}</div>
     </div>`;
   }
   function memberAccessInfoHtml(){
-    return `<p class="flamo3d-prs-member-access-title">Yang Bisa Akses</p>
-      <p class="flamo3d-prs-member-access-desc">Akses diberikan permanen setelah pembelian sekali atau melalui course tertentu.</p>
-      <div class="flamo3d-prs-member-access-box">
-        <div class="flamo3d-prs-member-access-group"><p class="flamo3d-prs-member-access-group-title">Member Course</p><ul class="flamo3d-prs-member-list"><li>Kelas Basic</li><li>Kelas Mastering</li></ul></div>
-        <div class="flamo3d-prs-member-access-group"><p class="flamo3d-prs-member-access-group-title">Flamo Tools Lifetime</p><ul class="flamo3d-prs-member-list"><li>Sekali bayar, akses selamanya</li></ul></div>
+    return `<p class="nexora3d-prs-member-access-title">Yang Bisa Akses</p>
+      <p class="nexora3d-prs-member-access-desc">Akses diberikan permanen setelah pembelian sekali atau melalui course tertentu.</p>
+      <div class="nexora3d-prs-member-access-box">
+        <div class="nexora3d-prs-member-access-group"><p class="nexora3d-prs-member-access-group-title">Member Course</p><ul class="nexora3d-prs-member-list"><li>Kelas Basic</li><li>Kelas Mastering</li></ul></div>
+        <div class="nexora3d-prs-member-access-group"><p class="nexora3d-prs-member-access-group-title">Nexora Tools Lifetime</p><ul class="nexora3d-prs-member-list"><li>Sekali bayar, akses selamanya</li></ul></div>
       </div>`;
   }
   function memberBenefitBlockHtml(){
-    return `<section class="flamo3d-prs-member-benefit-block">
-      <h3 class="flamo3d-prs-member-benefit-title">Benefit Join</h3>
-      <ul class="flamo3d-prs-member-list"><li>Akses tools premium selamanya.</li><li>Update fitur dan preset lebih dulu.</li><li>Workflow creative tools lebih cepat.</li></ul>
+    return `<section class="nexora3d-prs-member-benefit-block">
+      <h3 class="nexora3d-prs-member-benefit-title">Benefit Join</h3>
+      <ul class="nexora3d-prs-member-list"><li>Akses tools premium selamanya.</li><li>Update fitur dan preset lebih dulu.</li><li>Workflow creative tools lebih cepat.</li></ul>
     </section>`;
   }
   function memberAccessLayerHtml(katalog){
     const pages = katalogPages(katalog);
     const katalogHtml = pages.length ? `
-      <button class="flamo3d-prs-member-katalog-toggle" type="button" data-member-katalog-toggle><span data-member-katalog-label>Lihat Katalog</span> ${_icoChevronDown}</button>
-      <div class="flamo3d-prs-member-katalog-morph" data-member-katalog-morph>
-        <div class="flamo3d-prs-member-katalog-window" data-katalog-window>
-          <div class="flamo3d-prs-member-katalog-track" data-katalog-track>${katalogTrackHtml(pages, 'flamo3d-prs-member-katalog')}</div>
+      <button class="nexora3d-prs-member-katalog-toggle" type="button" data-member-katalog-toggle><span data-member-katalog-label>Lihat Katalog</span> ${_icoChevronDown}</button>
+      <div class="nexora3d-prs-member-katalog-morph" data-member-katalog-morph>
+        <div class="nexora3d-prs-member-katalog-window" data-katalog-window>
+          <div class="nexora3d-prs-member-katalog-track" data-katalog-track>${katalogTrackHtml(pages, 'nexora3d-prs-member-katalog')}</div>
         </div>
       </div>` : '';
-    return `<div class="flamo3d-prs-member-access-layer" data-member-access-layer>
-      <div class="flamo3d-prs-member-access-column">
-        <div class="flamo3d-prs-member-access-top">${memberAccessInfoHtml()}</div>
-        <div class="flamo3d-prs-member-access-bottom">
+    return `<div class="nexora3d-prs-member-access-layer" data-member-access-layer>
+      <div class="nexora3d-prs-member-access-column">
+        <div class="nexora3d-prs-member-access-top">${memberAccessInfoHtml()}</div>
+        <div class="nexora3d-prs-member-access-bottom">
           ${katalogHtml}
-          <div class="flamo3d-prs-member-actions">
-            <button class="flamo3d-prs-member-btn" type="button" data-member-access-toggle>Balik</button>
-            <a class="flamo3d-prs-member-btn primary" href="/marketplace" target="_top">Join Sekarang</a>
+          <div class="nexora3d-prs-member-actions">
+            <button class="nexora3d-prs-member-btn" type="button" data-member-access-toggle>Balik</button>
+            <a class="nexora3d-prs-member-btn primary" href="/marketplace" target="_top">Join Sekarang</a>
           </div>
         </div>
       </div>
@@ -401,7 +401,7 @@
     root.querySelectorAll('[data-member-slider]').forEach(wrap => {
       const frame = wrap.querySelector('[data-member-slider-frame]');
       const track = wrap.querySelector('[data-member-slider-track]');
-      const dots = Array.from(wrap.querySelectorAll('[data-member-slider-dots] .flamo3d-prs-member-dot'));
+      const dots = Array.from(wrap.querySelectorAll('[data-member-slider-dots] .nexora3d-prs-member-dot'));
       const count = track ? track.children.length : 0;
       if(!frame || !track || count < 2) return;
       let index = 0, timer = null, startX = 0, currentX = 0, dragging = false, frameWidth = 1;
@@ -419,7 +419,7 @@
     });
   }
   function toggleMemberAccess(btn){
-    const scope = btn.closest('.flamo3d-prs-member-body') || btn.parentElement;
+    const scope = btn.closest('.nexora3d-prs-member-body') || btn.parentElement;
     const layer = scope && scope.querySelector('[data-member-access-layer]');
     if(!layer) return;
     layer.classList.toggle('is-open');
@@ -455,19 +455,19 @@
     return idx === -1 ? SOON_PHASES.length - 1 : idx;
   }
   function soonTaskListHtml(activeIndex){
-    return '<div class="flamo3d-prs-soon-task-list">' + SOON_PHASES.map((ph, i) => {
+    return '<div class="nexora3d-prs-soon-task-list">' + SOON_PHASES.map((ph, i) => {
       const state = i < activeIndex ? 'is-done' : i === activeIndex ? 'is-active' : 'is-disabled';
-      return `<div class="flamo3d-prs-soon-task ${state}" style="--accent:${ph.color};--accent-soft:${ph.soft};--accent-text:${ph.text}"><span class="flamo3d-prs-soon-task-icon">${ph.icon}</span><span class="flamo3d-prs-soon-task-body"><b>${esc(ph.label)}</b><small>${esc(ph.desc)}</small></span></div>`;
+      return `<div class="nexora3d-prs-soon-task ${state}" style="--accent:${ph.color};--accent-soft:${ph.soft};--accent-text:${ph.text}"><span class="nexora3d-prs-soon-task-icon">${ph.icon}</span><span class="nexora3d-prs-soon-task-body"><b>${esc(ph.label)}</b><small>${esc(ph.desc)}</small></span></div>`;
     }).join('') + '</div>';
   }
   function soonOverviewHtml(images){
     const list = Array.isArray(images) ? images.filter(Boolean) : [];
     if(!list.length) return '';
-    return `<div class="flamo3d-prs-soon-overview" data-soon-slider>
-      <div class="flamo3d-prs-soon-overview-frame" data-soon-slider-frame>
-        <div class="flamo3d-prs-soon-overview-track" data-soon-slider-track>${list.map(src => `<div class="flamo3d-prs-soon-overview-slide"><img src="${esc(src)}" alt=""></div>`).join('')}</div>
+    return `<div class="nexora3d-prs-soon-overview" data-soon-slider>
+      <div class="nexora3d-prs-soon-overview-frame" data-soon-slider-frame>
+        <div class="nexora3d-prs-soon-overview-track" data-soon-slider-track>${list.map(src => `<div class="nexora3d-prs-soon-overview-slide"><img src="${esc(src)}" alt=""></div>`).join('')}</div>
       </div>
-      <div class="flamo3d-prs-soon-dots" data-soon-slider-dots>${list.map((_, i) => `<button type="button" class="flamo3d-prs-soon-dot${i === 0 ? ' is-active' : ''}" aria-label="Slide ${i + 1}"></button>`).join('')}</div>
+      <div class="nexora3d-prs-soon-dots" data-soon-slider-dots>${list.map((_, i) => `<button type="button" class="nexora3d-prs-soon-dot${i === 0 ? ' is-active' : ''}" aria-label="Slide ${i + 1}"></button>`).join('')}</div>
     </div>`;
   }
   // Shared: sliding-window katalog carousel (Coming Soon + Member access panel)
@@ -502,8 +502,8 @@
   function soonKatalogHtml(images){
     const pages = katalogPages(images);
     if(!pages.length) return '';
-    return `<div class="flamo3d-prs-soon-katalog-window" data-katalog-window>
-      <div class="flamo3d-prs-soon-katalog-track" data-katalog-track>${katalogTrackHtml(pages, 'flamo3d-prs-soon-katalog')}</div>
+    return `<div class="nexora3d-prs-soon-katalog-window" data-katalog-window>
+      <div class="nexora3d-prs-soon-katalog-track" data-katalog-track>${katalogTrackHtml(pages, 'nexora3d-prs-soon-katalog')}</div>
     </div>`;
   }
   function initSoonSliders(root){
@@ -511,7 +511,7 @@
     root.querySelectorAll('[data-soon-slider]').forEach(wrap => {
       const frame = wrap.querySelector('[data-soon-slider-frame]');
       const track = wrap.querySelector('[data-soon-slider-track]');
-      const dots = Array.from(wrap.querySelectorAll('[data-soon-slider-dots] .flamo3d-prs-soon-dot'));
+      const dots = Array.from(wrap.querySelectorAll('[data-soon-slider-dots] .nexora3d-prs-soon-dot'));
       const count = track ? track.children.length : 0;
       if(!frame || !track || count < 2) return;
       let index = 0, timer = null, startX = 0, currentX = 0, dragging = false, frameWidth = 1;
@@ -545,52 +545,52 @@
     const status = p.status || 'active', access = p.access || 'free';
     if(access === 'premium' && status === 'active'){
       const sliderHtml = memberSliderHtml(p.memberImages);
-      const descHtml = p.memberDesc ? `<p class="flamo3d-prs-member-desc">${esc(p.memberDesc)}</p>` : '';
+      const descHtml = p.memberDesc ? `<p class="nexora3d-prs-member-desc">${esc(p.memberDesc)}</p>` : '';
       const accessLayerHtml = memberAccessLayerHtml(p.memberKatalog);
-      const mascotUrl = absUrl('../../assets/icons/flamo-login-mascot.png');
+      const mascotUrl = absUrl('../../assets/icons/nexora-login-mascot.png');
       if(!FONT_API.loggedIn){
         return { title: p.name || 'Premium Tool', titleIco: _icoKey, sub: 'Member Login · Login untuk cek akses premium.',
-          body: `<div class="flamo3d-prs-member-body flamo3d-prs-member-body-guest">
-            <div class="flamo3d-prs-member-login-col">
-              <img class="flamo3d-prs-member-mascot" src="${esc(mascotUrl)}" alt="Flamo mascot">
-              <div class="flamo3d-prs-member-form">
-                <input class="flamo3d-prs-member-input" data-inline-login-identity type="text" placeholder="Email atau username" autocomplete="username">
-                <input class="flamo3d-prs-member-input" data-inline-login-password type="password" placeholder="Password" autocomplete="current-password">
-                <button class="flamo3d-prs-member-small-link" data-inline-forgot-open type="button">Lupa password?</button>
-                <p class="flamo3d-prs-member-note" data-inline-auth-status aria-live="polite"></p>
+          body: `<div class="nexora3d-prs-member-body nexora3d-prs-member-body-guest">
+            <div class="nexora3d-prs-member-login-col">
+              <img class="nexora3d-prs-member-mascot" src="${esc(mascotUrl)}" alt="Nexora mascot">
+              <div class="nexora3d-prs-member-form">
+                <input class="nexora3d-prs-member-input" data-inline-login-identity type="text" placeholder="Email atau username" autocomplete="username">
+                <input class="nexora3d-prs-member-input" data-inline-login-password type="password" placeholder="Password" autocomplete="current-password">
+                <button class="nexora3d-prs-member-small-link" data-inline-forgot-open type="button">Lupa password?</button>
+                <p class="nexora3d-prs-member-note" data-inline-auth-status aria-live="polite"></p>
               </div>
-              <div class="flamo3d-prs-member-actions">
-                <button class="flamo3d-prs-member-btn" type="button" data-member-access-toggle>Lihat Detail</button>
-                <button class="flamo3d-prs-member-btn primary" data-inline-login-submit type="button">Login</button>
+              <div class="nexora3d-prs-member-actions">
+                <button class="nexora3d-prs-member-btn" type="button" data-member-access-toggle>Lihat Detail</button>
+                <button class="nexora3d-prs-member-btn primary" data-inline-login-submit type="button">Login</button>
               </div>
-              <a class="flamo3d-prs-member-btn" style="width:100%;height:44px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:10px" href="#nexora-local-only/?flamo_google_login=1" target="_top"><img src="/wp-content/plugins/flamo-3d-tools-clean/assets/icons/google-login.svg" alt="" style="width:20px;height:20px;display:block"><span>Continue with Google</span></a>
-              <p class="flamo3d-prs-member-note">Belum punya akun? <a href="/login" target="_top">Daftar disini</a></p>
+              <a class="nexora3d-prs-member-btn" style="width:100%;height:44px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:10px" href="#nexora-local-only/?nexora_google_login=1" target="_top"><img src="/wp-content/plugins/nexora-3d-tools-clean/assets/icons/google-login.svg" alt="" style="width:20px;height:20px;display:block"><span>Continue with Google</span></a>
+              <p class="nexora3d-prs-member-note">Belum punya akun? <a href="/login" target="_top">Daftar disini</a></p>
             </div>
-            <div class="flamo3d-prs-member-premium-col">
-              <p class="flamo3d-prs-member-title-sm">Detail Premium</p>
+            <div class="nexora3d-prs-member-premium-col">
+              <p class="nexora3d-prs-member-title-sm">Detail Premium</p>
               ${sliderHtml}
               ${descHtml}
               ${memberBenefitBlockHtml()}
-              <button class="flamo3d-prs-member-text-link" type="button" data-member-access-toggle>Siapa aja yang bisa akses?</button>
-              <div class="flamo3d-prs-member-actions">
-                <button class="flamo3d-prs-member-btn" type="button" data-member-access-toggle>Lihat Detail</button>
-                <a class="flamo3d-prs-member-btn primary" href="/marketplace" target="_top">Join Member</a>
+              <button class="nexora3d-prs-member-text-link" type="button" data-member-access-toggle>Siapa aja yang bisa akses?</button>
+              <div class="nexora3d-prs-member-actions">
+                <button class="nexora3d-prs-member-btn" type="button" data-member-access-toggle>Lihat Detail</button>
+                <a class="nexora3d-prs-member-btn primary" href="/marketplace" target="_top">Join Member</a>
               </div>
               ${accessLayerHtml}
             </div>
           </div>` };
       }
       return { title: p.name || 'Premium Tool', titleIco: _icoKey, sub: 'Member Only · Akun kamu belum punya akses premium.',
-        body: `<div class="flamo3d-prs-member-body flamo3d-prs-member-body-user">
-          <div class="flamo3d-prs-member-premium-col">
-            <p class="flamo3d-prs-member-title-sm">Detail Premium</p>
+        body: `<div class="nexora3d-prs-member-body nexora3d-prs-member-body-user">
+          <div class="nexora3d-prs-member-premium-col">
+            <p class="nexora3d-prs-member-title-sm">Detail Premium</p>
             ${sliderHtml}
             ${descHtml}
             ${memberBenefitBlockHtml()}
-            <button class="flamo3d-prs-member-text-link" type="button" data-member-access-toggle>Siapa aja yang bisa akses?</button>
-            <div class="flamo3d-prs-member-actions">
-              <button class="flamo3d-prs-member-btn" type="button" data-member-access-toggle>Lihat Detail</button>
-              <a class="flamo3d-prs-member-btn primary" href="/marketplace" target="_top">Join Member</a>
+            <button class="nexora3d-prs-member-text-link" type="button" data-member-access-toggle>Siapa aja yang bisa akses?</button>
+            <div class="nexora3d-prs-member-actions">
+              <button class="nexora3d-prs-member-btn" type="button" data-member-access-toggle>Lihat Detail</button>
+              <a class="nexora3d-prs-member-btn primary" href="/marketplace" target="_top">Join Member</a>
             </div>
             ${accessLayerHtml}
           </div>
@@ -601,22 +601,22 @@
       const activeIndex = soonPhaseIndex(pct);
       const detailUrl = p.detailUrl || '#';
       const overviewHtml = soonOverviewHtml(p.overviewImages);
-      const descHtml = p.comingSoonDesc ? `<p class="flamo3d-prs-soon-desc">${esc(p.comingSoonDesc)}</p>` : '';
+      const descHtml = p.comingSoonDesc ? `<p class="nexora3d-prs-soon-desc">${esc(p.comingSoonDesc)}</p>` : '';
       const katalogHtml = soonKatalogHtml(p.katalogImages);
       const actionsHtml = !FONT_API.loggedIn
-        ? `<div class="flamo3d-prs-soon-actions"><a class="flamo3d-prs-soon-btn" href="/login" target="_top">Login</a><a class="flamo3d-prs-soon-btn primary" href="/marketplace" target="_top">Market</a></div><a class="flamo3d-prs-soon-btn" style="width:100%;height:44px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:10px" href="#nexora-local-only/?flamo_google_login=1" target="_top"><img src="/wp-content/plugins/flamo-3d-tools-clean/assets/icons/google-login.svg" alt="" style="width:20px;height:20px;display:block"><span>Continue with Google</span></a>`
-        : `<div class="flamo3d-prs-soon-actions"><a class="flamo3d-prs-soon-btn" href="${esc(detailUrl)}" target="_top">Lihat Detail</a><a class="flamo3d-prs-soon-btn primary" href="/marketplace" target="_top">Market</a></div>`;
-      return { title: p.name || 'Coming Soon', titleIco: _icoStar, sub: 'Coming Soon · by Flamo Creative',
-        body: `<div class="flamo3d-prs-soon-popup">
-          <div class="flamo3d-prs-soon-scroll">
-            <div class="flamo3d-prs-soon-left" data-soon-left>
+        ? `<div class="nexora3d-prs-soon-actions"><a class="nexora3d-prs-soon-btn" href="/login" target="_top">Login</a><a class="nexora3d-prs-soon-btn primary" href="/marketplace" target="_top">Market</a></div><a class="nexora3d-prs-soon-btn" style="width:100%;height:44px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:10px" href="#nexora-local-only/?nexora_google_login=1" target="_top"><img src="/wp-content/plugins/nexora-3d-tools-clean/assets/icons/google-login.svg" alt="" style="width:20px;height:20px;display:block"><span>Continue with Google</span></a>`
+        : `<div class="nexora3d-prs-soon-actions"><a class="nexora3d-prs-soon-btn" href="${esc(detailUrl)}" target="_top">Lihat Detail</a><a class="nexora3d-prs-soon-btn primary" href="/marketplace" target="_top">Market</a></div>`;
+      return { title: p.name || 'Coming Soon', titleIco: _icoStar, sub: 'Coming Soon · by Nexora Creative',
+        body: `<div class="nexora3d-prs-soon-popup">
+          <div class="nexora3d-prs-soon-scroll">
+            <div class="nexora3d-prs-soon-left" data-soon-left>
               ${overviewHtml}
               ${descHtml}
-              <button class="flamo3d-prs-soon-katalog-toggle" type="button" data-soon-catalog-toggle><span data-soon-catalog-label>Lihat Katalog</span> ${_icoChevronDown}</button>
-              <div class="flamo3d-prs-soon-katalog-morph" data-soon-catalog-morph>${katalogHtml}</div>
+              <button class="nexora3d-prs-soon-katalog-toggle" type="button" data-soon-catalog-toggle><span data-soon-catalog-label>Lihat Katalog</span> ${_icoChevronDown}</button>
+              <div class="nexora3d-prs-soon-katalog-morph" data-soon-catalog-morph>${katalogHtml}</div>
             </div>
-            <aside class="flamo3d-prs-soon-right">
-              <p class="flamo3d-prs-soon-right-title">Update pengerjaan</p>
+            <aside class="nexora3d-prs-soon-right">
+              <p class="nexora3d-prs-soon-right-title">Update pengerjaan</p>
               ${soonTaskListHtml(activeIndex)}
             </aside>
           </div>
@@ -628,73 +628,73 @@
       const raised = Number(p.supportCollected || p.donateCollected || 0);
       const pct = goal > 0 ? Math.max(0, Math.min(100, Math.round((raised / goal) * 100))) : Math.max(0, Math.min(100, Number(p.supportProgress || 0)));
       const overviewHtml = donateOverviewHtml(p.overviewImages);
-      const descHtml = p.toolDescShort ? `<p class="flamo3d-prs-donate-desc">${esc(p.toolDescShort)}</p>` : '';
+      const descHtml = p.toolDescShort ? `<p class="nexora3d-prs-donate-desc">${esc(p.toolDescShort)}</p>` : '';
       const detailUrl = p.detailUrl || '#';
       if(!FONT_API.loggedIn){
-        return { title: p.name || p.toolName || 'Support Tool', titleIco: '', sub: 'Support preset · by Flamo Creative',
-          body: `<div class="flamo3d-prs-donate-body flamo3d-prs-donate-body-guest">
-            <div class="flamo3d-prs-donate-preview">${overviewHtml}${descHtml}</div>
-            <div class="flamo3d-prs-donate-detail-card">
-              <h3 class="flamo3d-prs-donate-detail-title">Support detail</h3>
-              <div class="flamo3d-prs-donate-actions">
-                <a class="flamo3d-prs-donate-btn" href="${esc(detailUrl)}" target="_top">Lihat Tools</a>
-                <a class="flamo3d-prs-donate-btn primary" href="/login" target="_top">Login</a>
+        return { title: p.name || p.toolName || 'Support Tool', titleIco: '', sub: 'Support preset · by Nexora Creative',
+          body: `<div class="nexora3d-prs-donate-body nexora3d-prs-donate-body-guest">
+            <div class="nexora3d-prs-donate-preview">${overviewHtml}${descHtml}</div>
+            <div class="nexora3d-prs-donate-detail-card">
+              <h3 class="nexora3d-prs-donate-detail-title">Support detail</h3>
+              <div class="nexora3d-prs-donate-actions">
+                <a class="nexora3d-prs-donate-btn" href="${esc(detailUrl)}" target="_top">Lihat Tools</a>
+                <a class="nexora3d-prs-donate-btn primary" href="/login" target="_top">Login</a>
               </div>
-              <a class="flamo3d-prs-donate-btn" style="width:100%;height:44px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:10px" href="#nexora-local-only/?flamo_google_login=1" target="_top"><img src="/wp-content/plugins/flamo-3d-tools-clean/assets/icons/google-login.svg" alt="" style="width:20px;height:20px;display:block"><span>Continue with Google</span></a>
-              <p class="flamo3d-prs-donate-signup-note">Belum punya akun? <a href="/login" target="_top">Daftar disini</a></p>
+              <a class="nexora3d-prs-donate-btn" style="width:100%;height:44px;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:10px" href="#nexora-local-only/?nexora_google_login=1" target="_top"><img src="/wp-content/plugins/nexora-3d-tools-clean/assets/icons/google-login.svg" alt="" style="width:20px;height:20px;display:block"><span>Continue with Google</span></a>
+              <p class="nexora3d-prs-donate-signup-note">Belum punya akun? <a href="/login" target="_top">Daftar disini</a></p>
             </div>
           </div>` };
       }
       const username = USERNAME;
-      return { title: p.name || p.toolName || 'Support Tool', titleIco: '', sub: 'Support preset · by Flamo Creative',
-        body: `<div class="flamo3d-prs-donate-body flamo3d-prs-donate-body-user" data-tool-name="${esc(p.toolName || 'Flamo Tools')}" data-subject-type="${esc(p.subjectType || 'preset')}" data-subject-id="${esc(p.subjectId || '')}" data-wa-number="${esc(p.waNumber || '')}" data-username="${esc(username)}" data-detail-url="${esc(detailUrl)}">
-          <div class="flamo3d-prs-donate-scroll">
-            <div class="flamo3d-prs-donate-left">
-              <div class="flamo3d-prs-donate-preview">${overviewHtml}${descHtml}</div>
-              <div class="flamo3d-prs-donate-progress-large" aria-label="Donation progress">
-                <div class="flamo3d-prs-donate-large-track">
-                  <div class="flamo3d-prs-donate-large-fill" style="width:${pct}%">
-                    <div class="flamo3d-prs-donate-large-pixels" aria-hidden="true">${donateProgressPixels()}</div>
-                    <span class="flamo3d-prs-donate-large-badge">${pct}</span>
+      return { title: p.name || p.toolName || 'Support Tool', titleIco: '', sub: 'Support preset · by Nexora Creative',
+        body: `<div class="nexora3d-prs-donate-body nexora3d-prs-donate-body-user" data-tool-name="${esc(p.toolName || 'Nexora Tools')}" data-subject-type="${esc(p.subjectType || 'preset')}" data-subject-id="${esc(p.subjectId || '')}" data-wa-number="${esc(p.waNumber || '')}" data-username="${esc(username)}" data-detail-url="${esc(detailUrl)}">
+          <div class="nexora3d-prs-donate-scroll">
+            <div class="nexora3d-prs-donate-left">
+              <div class="nexora3d-prs-donate-preview">${overviewHtml}${descHtml}</div>
+              <div class="nexora3d-prs-donate-progress-large" aria-label="Donation progress">
+                <div class="nexora3d-prs-donate-large-track">
+                  <div class="nexora3d-prs-donate-large-fill" style="width:${pct}%">
+                    <div class="nexora3d-prs-donate-large-pixels" aria-hidden="true">${donateProgressPixels()}</div>
+                    <span class="nexora3d-prs-donate-large-badge">${pct}</span>
                   </div>
                 </div>
-                <div class="flamo3d-prs-donate-large-status"><span>Terkumpul :</span><b>${donateFmtRp(raised)} / ${donateFmtRp(goal)}</b></div>
+                <div class="nexora3d-prs-donate-large-status"><span>Terkumpul :</span><b>${donateFmtRp(raised)} / ${donateFmtRp(goal)}</b></div>
               </div>
             </div>
-            <aside class="flamo3d-prs-donate-right">
-              <h3 class="flamo3d-prs-donate-right-title">Panel Donasi</h3>
-              <figure class="flamo3d-prs-donate-qris-frame"><img src="${esc(p.qrisImage || '')}" alt="QRIS ${esc(p.merchantName || '')}"></figure>
-              <div class="flamo3d-prs-donate-qris-meta"><p class="flamo3d-prs-donate-qris-name">${esc(p.merchantName || '')}</p><p class="flamo3d-prs-donate-qris-nmid">NMID: ${esc(p.merchantNmid || '')}</p></div>
-              <form id="flamoDonateDesktopForm" class="flamo3d-prs-donate-form" data-donate-form>
-                <label class="flamo3d-prs-donate-field">
-                  <span class="flamo3d-prs-donate-label">Nominal</span>
-                  <input class="flamo3d-prs-donate-input" type="text" inputmode="numeric" placeholder="Contoh: 50000" data-donate-nominal required>
+            <aside class="nexora3d-prs-donate-right">
+              <h3 class="nexora3d-prs-donate-right-title">Panel Donasi</h3>
+              <figure class="nexora3d-prs-donate-qris-frame"><img src="${esc(p.qrisImage || '')}" alt="QRIS ${esc(p.merchantName || '')}"></figure>
+              <div class="nexora3d-prs-donate-qris-meta"><p class="nexora3d-prs-donate-qris-name">${esc(p.merchantName || '')}</p><p class="nexora3d-prs-donate-qris-nmid">NMID: ${esc(p.merchantNmid || '')}</p></div>
+              <form id="nexoraDonateDesktopForm" class="nexora3d-prs-donate-form" data-donate-form>
+                <label class="nexora3d-prs-donate-field">
+                  <span class="nexora3d-prs-donate-label">Nominal</span>
+                  <input class="nexora3d-prs-donate-input" type="text" inputmode="numeric" placeholder="Contoh: 50000" data-donate-nominal required>
                 </label>
-                <div class="flamo3d-prs-donate-field">
-                  <div class="flamo3d-prs-donate-field-row">
-                    <span class="flamo3d-prs-donate-label">Nama pengirim</span>
-                    <label class="flamo3d-prs-donate-anon"><input type="checkbox" data-donate-anon><span>Kirim sebagai anonim</span></label>
+                <div class="nexora3d-prs-donate-field">
+                  <div class="nexora3d-prs-donate-field-row">
+                    <span class="nexora3d-prs-donate-label">Nama pengirim</span>
+                    <label class="nexora3d-prs-donate-anon"><input type="checkbox" data-donate-anon><span>Kirim sebagai anonim</span></label>
                   </div>
-                  <input class="flamo3d-prs-donate-input" type="text" value="${esc(username)}" placeholder="Tulis nama bebas" data-donate-sender readonly>
+                  <input class="nexora3d-prs-donate-input" type="text" value="${esc(username)}" placeholder="Tulis nama bebas" data-donate-sender readonly>
                 </div>
-                <label class="flamo3d-prs-donate-field">
-                  <span class="flamo3d-prs-donate-label">Pesan untuk dev</span>
-                  <textarea class="flamo3d-prs-donate-textarea" placeholder="Tulis pesan singkat untuk dev" data-donate-message></textarea>
+                <label class="nexora3d-prs-donate-field">
+                  <span class="nexora3d-prs-donate-label">Pesan untuk dev</span>
+                  <textarea class="nexora3d-prs-donate-textarea" placeholder="Tulis pesan singkat untuk dev" data-donate-message></textarea>
                 </label>
-                <label class="flamo3d-prs-donate-file">
-                  <span class="flamo3d-prs-donate-file-name" data-donate-file-name>Upload bukti transfer</span>
-                  <span class="flamo3d-prs-donate-file-chip">Pilih file</span>
+                <label class="nexora3d-prs-donate-file">
+                  <span class="nexora3d-prs-donate-file-name" data-donate-file-name>Upload bukti transfer</span>
+                  <span class="nexora3d-prs-donate-file-chip">Pilih file</span>
                   <input type="file" accept="image/*,.pdf" data-donate-file>
                 </label>
               </form>
             </aside>
           </div>
-          <div class="flamo3d-prs-donate-actionbar">
-            <div class="flamo3d-prs-donate-actions">
-              <a class="flamo3d-prs-donate-btn" href="${esc(detailUrl)}" target="_top">Lihat Tools</a>
-              <button class="flamo3d-prs-donate-btn primary" type="button" data-donate-wa>Konfirmasi WA</button>
+          <div class="nexora3d-prs-donate-actionbar">
+            <div class="nexora3d-prs-donate-actions">
+              <a class="nexora3d-prs-donate-btn" href="${esc(detailUrl)}" target="_top">Lihat Tools</a>
+              <button class="nexora3d-prs-donate-btn primary" type="button" data-donate-wa>Konfirmasi WA</button>
             </div>
-            <button class="flamo3d-prs-donate-confirm" type="submit" form="flamoDonateDesktopForm">Konfirmasi</button>
+            <button class="nexora3d-prs-donate-confirm" type="submit" form="nexoraDonateDesktopForm">Konfirmasi</button>
           </div>
         </div>` };
     }
@@ -708,7 +708,7 @@
     if(!content) return;
     const prsType = p.status === 'soon' ? 'soon' : p.status === 'donate' ? 'donate' : 'member';
     // Always hand off to the shared parent-shell status panel (matches every
-    // other Flamo tool) instead of the old desktop-only local panel, which
+    // other Nexora tool) instead of the old desktop-only local panel, which
     // used to render different markup and could silently no-op if its
     // #prsPanelEl/#prsPanelBd elements weren't present.
     const payload = { key, prsType, title: content.title, sub: content.sub, loggedIn: !!FONT_API.loggedIn };
@@ -733,7 +733,7 @@
       payload.subjectType = p.subjectType || 'preset';
       payload.subjectId = p.subjectId || '';
       payload.detailUrl = p.detailUrl || '#';
-      payload.toolName = p.toolName || 'Flamo Tools';
+      payload.toolName = p.toolName || 'Nexora Tools';
       payload.toolDescShort = p.toolDescShort || '';
       payload.overviewImages = (Array.isArray(p.overviewImages) ? p.overviewImages : []).map(absUrl);
       payload.supporters = FONT_API.loggedIn ? (Array.isArray(p.supporters) ? p.supporters : []) : [];
@@ -743,9 +743,9 @@
       payload.waNumber = p.waNumber || '';
       payload.username = FONT_API.loggedIn ? USERNAME : '';
     }
-    post('FLAMO_PRS_STATUS_OPEN', payload);
+    post('NEXORA_PRS_STATUS_OPEN', payload);
   }
-  window.flamoOpenDbStatusPanel = function(item){
+  window.nexoraOpenDbStatusPanel = function(item){
     item = item || {};
     const key = String(item.engineKey || item.slug || ('db-' + item.id));
     const status = item.prsType === 'soon' ? 'soon' : item.prsType === 'donate' ? 'donate' : 'active';
@@ -764,35 +764,35 @@
       detailUrl: item.detailUrl || '#',
       comingSoonDesc: item.description || item.shortDescription || '',
       toolDescShort: item.description || item.shortDescription || '',
-      toolName: item.toolName || item.name || 'Flamo Tools',
+      toolName: item.toolName || item.name || 'Nexora Tools',
       overviewImages: Array.isArray(item.overviewImages) ? item.overviewImages : [],
       katalogImages: Array.isArray(item.katalogImages) ? item.katalogImages : []
     });
     showPresetStatusPanel(key);
   };
-  document.addEventListener('flamo:db-status-open', function(event){
-    window.flamoOpenDbStatusPanel(event.detail || {});
+  document.addEventListener('nexora:db-status-open', function(event){
+    window.nexoraOpenDbStatusPanel(event.detail || {});
   });
   function closePresetStatusPanel(){
     $('prsPanelEl')?.classList.remove('is-open');
     $('prsPanelBd')?.classList.remove('is-open');
     _prsPanelKey = null;
-    post('FLAMO_DONATE_PANEL_TOGGLE', { open: false });
-    post('FLAMO_SOON_PANEL_TOGGLE', { open: false });
+    post('NEXORA_DONATE_PANEL_TOGGLE', { open: false });
+    post('NEXORA_SOON_PANEL_TOGGLE', { open: false });
   }
 
   function initPresetCardWrap(){
-    const picker = document.querySelector('.flamo3d-preset-picker');
-    const card = picker && picker.querySelector('.flamo3d-preset-card');
+    const picker = document.querySelector('.nexora3d-preset-picker');
+    const card = picker && picker.querySelector('.nexora3d-preset-card');
     if(!picker || !card || $('presetCardWrap')) return;
     const wrap = document.createElement('div');
     wrap.id = 'presetCardWrap';
-    wrap.className = 'flamo-prs-wrap';
+    wrap.className = 'nexora-prs-wrap';
     picker.insertBefore(wrap, card);
     wrap.appendChild(card);
     const footer = document.createElement('div');
     footer.id = 'presetCardFooter';
-    footer.className = 'flamo-prs-footer';
+    footer.className = 'nexora-prs-footer';
     footer.style.display = 'none';
     wrap.appendChild(footer);
   }
@@ -801,9 +801,9 @@
     if(!wrap || !footer) return;
     const p = currentPreset();
     const cls = presetWrapClass(p);
-    wrap.className = 'flamo-prs-wrap' + (cls ? ' ' + cls : '');
+    wrap.className = 'nexora-prs-wrap' + (cls ? ' ' + cls : '');
     if(cls){
-      footer.className = 'flamo-prs-footer flamo-prs-footer--' + cls.replace('is-','');
+      footer.className = 'nexora-prs-footer nexora-prs-footer--' + cls.replace('is-','');
       footer.innerHTML = presetFooterHtml(p).replace(/^<div[^>]*>|<\/div>$/g,'');
       footer.style.display = '';
     } else {
@@ -851,9 +851,9 @@
 
   function inlineAuthConfig(){
     try {
-      return (window.parent && window.parent.flamoInlineAuth) || window.flamoInlineAuth || {};
+      return (window.parent && window.parent.nexoraInlineAuth) || window.nexoraInlineAuth || {};
     } catch(e) {
-      return window.flamoInlineAuth || {};
+      return window.nexoraInlineAuth || {};
     }
   }
   function inlineAuthPost(action, identity, password){
@@ -878,12 +878,12 @@
     status.style.color = success ? '#21b878' : (message ? '#ff607c' : '');
   }
   function submitInlineLogin(button){
-    const panel = button.closest('.flamo3d-prs-panel');
+    const panel = button.closest('.nexora3d-prs-panel');
     const identity = panel && panel.querySelector('[data-inline-login-identity]');
     const password = panel && panel.querySelector('[data-inline-login-password]');
     button.disabled = true;
     setInlineAuthStatus(panel,'Memeriksa akun…');
-    inlineAuthPost('flamo_inline_login',identity && identity.value,password && password.value)
+    inlineAuthPost('nexora_inline_login',identity && identity.value,password && password.value)
       .then(data => {
         setInlineAuthStatus(panel,data.message || 'Login berhasil.',true);
         setTimeout(() => window.top.location.reload(),450);
@@ -894,25 +894,25 @@
       });
   }
   function showInlineForgot(button){
-    const col = button.closest('.flamo3d-prs-member-login-col');
+    const col = button.closest('.nexora3d-prs-member-login-col');
     if(!col) return;
-    col.innerHTML = `<div class="flamo3d-prs-member-form">
-      <p class="flamo3d-prs-member-title-sm">Lupa Password</p>
-      <p class="flamo3d-prs-member-note">Masukkan email atau username. Link reset dikirim oleh WordPress ke email akunmu.</p>
-      <input class="flamo3d-prs-member-input" data-inline-forgot-identity type="text" placeholder="Email atau username" autocomplete="username">
-      <p class="flamo3d-prs-member-note" data-inline-auth-status aria-live="polite"></p>
+    col.innerHTML = `<div class="nexora3d-prs-member-form">
+      <p class="nexora3d-prs-member-title-sm">Lupa Password</p>
+      <p class="nexora3d-prs-member-note">Masukkan email atau username. Link reset dikirim oleh WordPress ke email akunmu.</p>
+      <input class="nexora3d-prs-member-input" data-inline-forgot-identity type="text" placeholder="Email atau username" autocomplete="username">
+      <p class="nexora3d-prs-member-note" data-inline-auth-status aria-live="polite"></p>
     </div>
-    <div class="flamo3d-prs-member-actions">
-      <button class="flamo3d-prs-member-btn" data-inline-forgot-back type="button">Kembali</button>
-      <button class="flamo3d-prs-member-btn primary" data-inline-forgot-submit type="button">Kirim Link</button>
+    <div class="nexora3d-prs-member-actions">
+      <button class="nexora3d-prs-member-btn" data-inline-forgot-back type="button">Kembali</button>
+      <button class="nexora3d-prs-member-btn primary" data-inline-forgot-submit type="button">Kirim Link</button>
     </div>`;
   }
   function submitInlineForgot(button){
-    const panel = button.closest('.flamo3d-prs-panel');
+    const panel = button.closest('.nexora3d-prs-panel');
     const identity = panel && panel.querySelector('[data-inline-forgot-identity]');
     button.disabled = true;
     setInlineAuthStatus(panel,'Mengirim link reset…');
-    inlineAuthPost('flamo_inline_forgot',identity && identity.value)
+    inlineAuthPost('nexora_inline_forgot',identity && identity.value)
       .then(data => {
         setInlineAuthStatus(panel,data.message || 'Link reset sudah dikirim.',true);
         button.disabled = false;
@@ -929,17 +929,17 @@
     menu.innerHTML = Object.entries(window.PRESETS || {}).map(([key, item], index) => {
       const img = (window.GIFS || {})[item.gif] || '';
       const cls = presetWrapClass(item);
-      const imgEl = img ? `<img src="${img}" alt="">` : `<div class="flamo-prs-thumb-ph"></div>`;
+      const imgEl = img ? `<img src="${img}" alt="">` : `<div class="nexora-prs-thumb-ph"></div>`;
       const inner = `${imgEl}<span>${esc(item.name || prettyName(key))}</span>`;
-      const btn = `<button class="flamo3d-preset-option${key === selectedPreset ? ' is-active' : ''}" type="button" data-preset="${esc(key)}">${inner}</button>`;
-      if(cls) return `<div class="flamo-prs-wrap ${cls}" style="--i:${index}" data-status-preset="${esc(key)}">${btn}${presetFooterHtml(item)}</div>`;
-      return `<button class="flamo3d-preset-option${key === selectedPreset ? ' is-active' : ''}" type="button" data-preset="${esc(key)}" style="--i:${index}">${inner}</button>`;
+      const btn = `<button class="nexora3d-preset-option${key === selectedPreset ? ' is-active' : ''}" type="button" data-preset="${esc(key)}">${inner}</button>`;
+      if(cls) return `<div class="nexora-prs-wrap ${cls}" style="--i:${index}" data-status-preset="${esc(key)}">${btn}${presetFooterHtml(item)}</div>`;
+      return `<button class="nexora3d-preset-option${key === selectedPreset ? ' is-active' : ''}" type="button" data-preset="${esc(key)}" style="--i:${index}">${inner}</button>`;
     }).join('');
     menu.classList.toggle('is-open', !!open);
   }
 
   function togglePresetMenu(force){
-    const picker = document.querySelector('.flamo3d-preset-picker');
+    const picker = document.querySelector('.nexora3d-preset-picker');
     const menu = $('presetMenu');
     const trigger = $('presetTrigger');
     const open = force == null ? !(menu && menu.classList.contains('is-open')) : !!force;
@@ -956,7 +956,7 @@
     // sebelumnya, dan user malah milih preset normal, panel itu ga pernah
     // dikasih tau buat nutup — akibatnya tombol Generate ketutup widget
     // pixel-grid selamanya sampe user nemu tombol close kecilnya sendiri.
-    post('FLAMO_PRS_STATUS_CLOSE');
+    post('NEXORA_PRS_STATUS_CLOSE');
     selectedPreset = key;
     const p = currentPreset();
     if($('animPreset')) $('animPreset').value = selectedPreset;
@@ -1045,12 +1045,12 @@
   function hexToRgb(hex){ const h=String(hex||'#ffffff').replace('#','').padEnd(6,'f').slice(0,6); return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]; }
   function rgbToHex(rgb){ return '#'+rgb.map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('').toUpperCase(); }
   function interpolatePalette(colors,t){ if(!colors.length)return $('textColor')?.value||'#ffffff'; if(colors.length===1)return colors[0]; const x=Math.max(0,Math.min(1,t))*(colors.length-1),i=Math.min(colors.length-2,Math.floor(x)),f=x-i,a=hexToRgb(colors[i]),b=hexToRgb(colors[i+1]); return rgbToHex(a.map((v,k)=>v+(b[k]-v)*f)); }
-  function activePalette(){ if(Array.isArray(colorRoleState.runtimeColors)&&colorRoleState.runtimeColors.length) return { colors:colorRoleState.runtimeColors }; if(colorRoleState.customPaletteId){ const cp=(window.FlamoCustomPalette?window.FlamoCustomPalette.list():[]).find(p=>p.id===colorRoleState.customPaletteId); if(cp) return { colors:cp.colors }; } return COLOR_PALETTES[colorRoleState.paletteIndex]||COLOR_PALETTES[0]; }
+  function activePalette(){ if(Array.isArray(colorRoleState.runtimeColors)&&colorRoleState.runtimeColors.length) return { colors:colorRoleState.runtimeColors }; if(colorRoleState.customPaletteId){ const cp=(window.NexoraCustomPalette?window.NexoraCustomPalette.list():[]).find(p=>p.id===colorRoleState.customPaletteId); if(cp) return { colors:cp.colors }; } return COLOR_PALETTES[colorRoleState.paletteIndex]||COLOR_PALETTES[0]; }
   function roleColor(index,count){ const mode=colorRoleState.mode,colors=activePalette().colors;if(mode==='single')return $('textColor')?.value||'#ffffff';if(mode==='repeat')return colors[Math.floor(index/Math.max(1,colorRoleState.repeatEvery))%colors.length];const t=count<=1?0:index/(count-1);return interpolatePalette(colors,mode==='mirror'?(t<=.5?t*2:(1-t)*2):t); }
   function styleRoles(){ return Array.isArray(currentStyle().roles) ? currentStyle().roles : []; }
   function normalizeHex(value){ const v=String(value||'').trim(); const m=v.match(/^#(?:FF)?([0-9a-f]{6})$/i); return m ? '#'+m[1].toUpperCase() : '#FFFFFF'; }
   function syncStyleRoleState(reset=false){ const roles=styleRoles(); if(reset || styleRoleState.colors.length!==roles.length) styleRoleState.colors=roles.map(r=>normalizeHex(r.default)); }
-  function renderStyleRoles(){ const holder=$('styleColorRoles'); if(!holder)return; syncStyleRoleState(); const roles=styleRoles(); holder.innerHTML=roles.map((role,i)=>{ const value=normalizeHex(styleRoleState.colors[i]); return `<div class="flamo3d-color-item"><span class="flamo3d-color-dot" style="--c:${value}"></span><span><b>${esc(role.name||('Role '+(i+1)))}</b><small>${value}</small></span><input type="color" data-style-role-index="${i}" value="${value}" aria-label="${esc(role.name||'Style color')}"></div>`; }).join('') || '<p class="flamo3d-engine-note">Style ini tidak memiliki color role yang aman.</p>'; }
+  function renderStyleRoles(){ const holder=$('styleColorRoles'); if(!holder)return; syncStyleRoleState(); const roles=styleRoles(); holder.innerHTML=roles.map((role,i)=>{ const value=normalizeHex(styleRoleState.colors[i]); return `<div class="nexora3d-color-item"><span class="nexora3d-color-dot" style="--c:${value}"></span><span><b>${esc(role.name||('Role '+(i+1)))}</b><small>${value}</small></span><input type="color" data-style-role-index="${i}" value="${value}" aria-label="${esc(role.name||'Style color')}"></div>`; }).join('') || '<p class="nexora3d-engine-note">Style ini tidak memiliki color role yang aman.</p>'; }
   function styleArgb(hex){ return '#FF'+normalizeHex(hex).slice(1).toUpperCase(); }
   function applyStyleColorsToDocument(doc){ const roles=styleRoles(); syncStyleRoleState(); roles.forEach((role,i)=>{ const replacement=styleArgb(styleRoleState.colors[i]); const oldValues=(role.old||[]).map(v=>String(v).toUpperCase()); Array.from(doc.querySelectorAll('*')).forEach(el=>{ if(el.closest('text')) return; Array.from(el.attributes||[]).forEach(attr=>{ if(oldValues.includes(String(attr.value).toUpperCase())) el.setAttribute(attr.name,replacement); }); }); }); }
 
@@ -1065,13 +1065,13 @@
     const family=isCustomFont(fontValue) ? `"${customFontFamily(findCustomFont(fontValue))}", "${font}", Lexend, "Plus Jakarta Sans", Inter, Arial, sans-serif` : `"${font}", Lexend, "Plus Jakarta Sans", Inter, Arial, sans-serif`;
     const count=[...raw].filter(ch=>!/[\n\r ]/.test(ch)).length;let ci=0;
     ensurePreviewFont(fontValue,weight);
-    preview.innerHTML=[...raw].map(ch=>ch==='\n'?'<br>':ch===' '?' ':`<span class="flamo2d-preview-char" style="--char-color:${roleColor(ci++,count)}">${esc(ch)}</span>`).join('')||'Text preview';
+    preview.innerHTML=[...raw].map(ch=>ch==='\n'?'<br>':ch===' '?' ':`<span class="nexora2d-preview-char" style="--char-color:${roleColor(ci++,count)}">${esc(ch)}</span>`).join('')||'Text preview';
     const rs=preview.style;
-    rs.setProperty('--flamo2d-preview-font',family);
-    rs.setProperty('--flamo2d-preview-weight',weight);
-    rs.setProperty('--flamo2d-preview-size',`clamp(26px, ${Math.max(2.8,(+($('fontSize')?.value||10))*.42)}vw, 54px)`);
-    rs.setProperty('--flamo2d-preview-spacing',Math.max(0,(+($('spacing')?.value||40)-40)/12)+'px');
-    rs.setProperty('--flamo2d-preview-line-height',Math.max(.85,(+($('lineHeight')?.value||80))/80).toFixed(2));
+    rs.setProperty('--nexora2d-preview-font',family);
+    rs.setProperty('--nexora2d-preview-weight',weight);
+    rs.setProperty('--nexora2d-preview-size',`clamp(26px, ${Math.max(2.8,(+($('fontSize')?.value||10))*.42)}vw, 54px)`);
+    rs.setProperty('--nexora2d-preview-spacing',Math.max(0,(+($('spacing')?.value||40)-40)/12)+'px');
+    rs.setProperty('--nexora2d-preview-line-height',Math.max(.85,(+($('lineHeight')?.value||80))/80).toFixed(2));
     preview.style.fontFamily=family;
     preview.style.fontWeight=weight;
     renderRoleStrip();
@@ -1079,7 +1079,7 @@
   function renderTimeline(){
     const units=getUnits(),plan=timingPlan(units),total=plan.total,ruler=$('timeRuler'),inner=$('timelineInner'),info=$('timelineInfo');if(!ruler||!inner)return;
     const seconds=Math.max(1,Math.ceil(total/1000));ruler.innerHTML=Array.from({length:seconds+1},(_,i)=>{const left=i/seconds*100;return `<span style="left:${left}%"></span><b style="left:${left}%">${i}s</b>`}).join('');
-    inner.innerHTML=units.slice(0,80).map((u,i)=>{const start=plan.starts[i],end=plan.ends[i],left=start/total*100,width=Math.max(2,(end-start)/total*100),color=roleColor(i,units.length);return `<div class="flamo3d-tl-row"><span class="flamo3d-tl-label"><i class="flamo2d-layer-swatch" style="--layer-color:${color}" aria-hidden="true"></i><b>${esc(u.ch)}</b></span><span class="flamo3d-tl-track"><i style="left:${left}%;width:${Math.min(100-left,width)}%"></i><em style="left:${left}%"></em></span><span class="flamo3d-tl-time">${start}ms</span></div>`}).join('');if(info)info.textContent=`${units.length} layer`;
+    inner.innerHTML=units.slice(0,80).map((u,i)=>{const start=plan.starts[i],end=plan.ends[i],left=start/total*100,width=Math.max(2,(end-start)/total*100),color=roleColor(i,units.length);return `<div class="nexora3d-tl-row"><span class="nexora3d-tl-label"><i class="nexora2d-layer-swatch" style="--layer-color:${color}" aria-hidden="true"></i><b>${esc(u.ch)}</b></span><span class="nexora3d-tl-track"><i style="left:${left}%;width:${Math.min(100-left,width)}%"></i><em style="left:${left}%"></em></span><span class="nexora3d-tl-time">${start}ms</span></div>`}).join('');if(info)info.textContent=`${units.length} layer`;
   }
 
   function curveToSvgPoint(p){ return { x: 20 + p.x * 260, y: 130 - p.y * 110 }; }
@@ -1097,7 +1097,7 @@
   }
 
   function updateAll(){ syncLabels(); renderPreview(); renderTimeline(); drawCurve(); }
-  function updateFileNameAuto(){ if(!$('filename') || $('filename').dataset.touched) return; const first = (($('inputText')?.value || 'flamo-text').split('\n').find(x => x.trim()) || 'flamo-text'); const styleTag = styleFxOn() ? ('#' + (currentStyle().name || 'style')) : ''; $('filename').value = slug(first + '#' + (currentPreset().name || 'preset') + styleTag); }
+  function updateFileNameAuto(){ if(!$('filename') || $('filename').dataset.touched) return; const first = (($('inputText')?.value || 'nexora-text').split('\n').find(x => x.trim()) || 'nexora-text'); const styleTag = styleFxOn() ? ('#' + (currentStyle().name || 'style')) : ''; $('filename').value = slug(first + '#' + (currentPreset().name || 'preset') + styleTag); }
   function colorArgb(hex){ const h = String(hex || '#ffffff').replace('#',''); return '#FF' + (h.length === 6 ? h : 'FFFFFF').toUpperCase(); }
   function fontFileName(){ const value=$('fontName')?.value || 'Lexend'; if(isCustomFont(value)) return `${fontDisplayName(value)}.ttf`.replace(/\s+/g,''); return `${fontDisplayName(value)}-${FONT_LABEL[$('fontStyle')?.value || '700'] || 'Bold'}.ttf`.replace(/\s+/g,''); }
   const RANDOM_INOUT_OFFSETS = [
@@ -1194,7 +1194,7 @@
       layers = units.map((u,i) => textLayer(u, id++, parent, plan.starts[i], plan.ends[i], p, roleColor(i, units.length), i));
     }
     layers.push(`  <nullobj id="${parent}" label="Null 1" startTime="0" endTime="${total}" fillType="none">\n    <transform>\n      <location value="540.000000,540.000000,0.000000"/>\n    </transform>\n  </nullobj>`);
-    return `<?xml version='1.0' encoding='UTF-8' ?>\n<!-- Generated by Flamo 2D Text Animate Clean -->\n<scene title="${esc(slug($('filename')?.value))}" width="1080" height="1080" exportWidth="1920" exportHeight="1080" bgcolor="#FF000000" totalTime="${total}" fps="60" modifiedTime="${Date.now()}" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="freeze">\n  <bookmark t="0"/>\n${layers.join('\n')}\n</scene>\n`;
+    return `<?xml version='1.0' encoding='UTF-8' ?>\n<!-- Generated by Nexora 2D Text Animate Clean -->\n<scene title="${esc(slug($('filename')?.value))}" width="1080" height="1080" exportWidth="1920" exportHeight="1080" bgcolor="#FF000000" totalTime="${total}" fps="60" modifiedTime="${Date.now()}" amver="859" ffver="107" am="com.alightcreative.motion/6.2.53" amplatform="ios" precompose="dynamicResolution" retime="freeze">\n  <bookmark t="0"/>\n${layers.join('\n')}\n</scene>\n`;
   }
   function parseXmlFragment(xml){ return new DOMParser().parseFromString(xml,'application/xml'); }
   function styleFxOn(){ return !!$('styleFxSwitch')?.classList.contains('is-on'); }
@@ -1223,7 +1223,7 @@
       const n=nullSample?nullSample.cloneNode(true):doc.createElement('nullobj'); n.setAttribute('id',String(nullId)); n.setAttribute('label','Null 1'); n.setAttribute('startTime','0'); n.setAttribute('endTime',String(plan.total)); n.setAttribute('hidden','true'); n.setAttribute('fillType','none'); if(!n.querySelector('transform')){const tr=doc.createElement('transform'),loc=doc.createElement('location');loc.setAttribute('value','540.000000,540.000000,0.000000');tr.appendChild(loc);n.appendChild(tr);} sc.appendChild(n); sc.setAttribute('totalTime',String(plan.total));
     });
     const root=doc.documentElement; root.setAttribute('totalTime',String(plan.total)); root.setAttribute('title',slug($('filename')?.value||'text-fx')); root.setAttribute('modifiedTime',String(Date.now()));
-    return `<?xml version='1.0' encoding='UTF-8' ?>\n<!-- Generated by Flamo 2D Text Animate Clean -->\n`+new XMLSerializer().serializeToString(root);
+    return `<?xml version='1.0' encoding='UTF-8' ?>\n<!-- Generated by Nexora 2D Text Animate Clean -->\n`+new XMLSerializer().serializeToString(root);
   }
 
   function doGenerate(){
@@ -1232,38 +1232,38 @@
       generatedXml = generateXml();
       if($('xmlOut')) $('xmlOut').value = generatedXml;
       if($('status')) $('status').textContent = 'XML siap. Tombol utama berubah jadi Download File.';
-      post('FLAMO_3D_GENERATED', { filename: filename(), content: generatedXml, createdAt: Date.now(), tool: '2D Text Animate' });
-    }catch(err){ post('FLAMO_3D_GENERATE_ERROR', { message: err.message || 'XML gagal dibuat.' }); }
+      post('NEXORA_3D_GENERATED', { filename: filename(), content: generatedXml, createdAt: Date.now(), tool: '2D Text Animate' });
+    }catch(err){ post('NEXORA_3D_GENERATE_ERROR', { message: err.message || 'XML gagal dibuat.' }); }
   }
-  function setTheme(theme){ const root = document.querySelector('.flamo3d-tool'); const clean = theme === 'dark' ? 'dark' : 'light'; if(root) root.dataset.theme = clean; document.querySelector('.flamo2d-other-menu')?.setAttribute('data-theme', clean); }
-  function openHelp(){ $('modalBackdrop')?.classList.add('is-open'); $('helpModal')?.classList.add('is-open'); post('FLAMO_3D_CHILD_PANEL_OPEN'); if(innerWidth <= 760) window.parent?.postMessage({ type: 'FLAMO_3D_HELP_OPEN', helpTitle: '2D Text Animate', helpLabel: 'Tutorial & FAQ 2D Text Animate' }, '*'); }
+  function setTheme(theme){ const root = document.querySelector('.nexora3d-tool'); const clean = theme === 'dark' ? 'dark' : 'light'; if(root) root.dataset.theme = clean; document.querySelector('.nexora2d-other-menu')?.setAttribute('data-theme', clean); }
+  function openHelp(){ $('modalBackdrop')?.classList.add('is-open'); $('helpModal')?.classList.add('is-open'); post('NEXORA_3D_CHILD_PANEL_OPEN'); if(innerWidth <= 760) window.parent?.postMessage({ type: 'NEXORA_3D_HELP_OPEN', helpTitle: '2D Text Animate', helpLabel: 'Tutorial & FAQ 2D Text Animate' }, '*'); }
   function closeHelp(){ $('modalBackdrop')?.classList.remove('is-open'); $('helpModal')?.classList.remove('is-open'); }
 
   function targetPaletteIndex(){ return paletteTarget==='style' ? styleRoleState.paletteIndex : colorRoleState.paletteIndex; }
   function targetPaletteColors(){ return paletteTarget==='style' ? styleRoleState.colors : activePalette().colors; }
-  function renderPaletteGrid(){ const grid=$('paletteGrid');if(!grid)return;grid.innerHTML=COLOR_PALETTES.map((p,i)=>`<button type="button" class="flamo2d-palette-card${i===targetPaletteIndex()&&!targetRoleState().customPaletteId?' is-active':''}" data-palette-index="${i}"><span>${esc(p.name)}</span><span class="flamo2d-palette-swatches">${p.colors.map(c=>`<i style="background:${c}"></i>`).join('')}</span></button>`).join(''); }
-  function applyPalette(index){ index=Math.max(0,Math.min(COLOR_PALETTES.length-1,+index||0)); const palette=COLOR_PALETTES[index]; if(paletteTarget==='style'){ styleRoleState.paletteIndex=index; styleRoleState.customPaletteId=null; syncStyleRoleState(); styleRoleState.colors=styleRoles().map((r,i)=>palette.colors[i%palette.colors.length]); renderStyleRoles(); }else{ colorRoleState.paletteIndex=index; colorRoleState.customPaletteId=null; } renderPaletteGrid(); renderCustomPaletteStrip(); updateAll(); markDirty(); post('FLAMO_3D_ACTIVE_ROLE_COLORS',{colors:targetPaletteColors(),target:paletteTarget}); }
-  function openPalette(target='character'){ paletteTarget=target; if($('paletteTitle'))$('paletteTitle').textContent=target==='style'?'Style FX Color Palette':'Character Color Palette'; if($('paletteSubtitle'))$('paletteSubtitle').textContent=target==='style'?'Terapkan palette ke Color Roles Style FX.':'Terapkan palette ke warna tiap huruf.'; if(matchMedia('(max-width:760px)').matches){post('FLAMO_3D_PALETTE_OPEN',{palettes:COLOR_PALETTES,activeColors:targetPaletteColors(),target:paletteTarget,title:target==='style'?'Style FX Color Palette':'Character Color Palette',customPalettes:(window.FlamoCustomPalette?window.FlamoCustomPalette.list():[]),customPaletteLimit:(window.FlamoCustomPalette?window.FlamoCustomPalette.limitFor(isMemberUser()):2),activeCustomPaletteId:targetRoleState().customPaletteId});return;}renderPaletteGrid();renderCustomPaletteStrip();toggleCustomPaletteForm(false);$('paletteBackdrop')?.classList.add('is-open');$('paletteModal')?.classList.add('is-open'); }
+  function renderPaletteGrid(){ const grid=$('paletteGrid');if(!grid)return;grid.innerHTML=COLOR_PALETTES.map((p,i)=>`<button type="button" class="nexora2d-palette-card${i===targetPaletteIndex()&&!targetRoleState().customPaletteId?' is-active':''}" data-palette-index="${i}"><span>${esc(p.name)}</span><span class="nexora2d-palette-swatches">${p.colors.map(c=>`<i style="background:${c}"></i>`).join('')}</span></button>`).join(''); }
+  function applyPalette(index){ index=Math.max(0,Math.min(COLOR_PALETTES.length-1,+index||0)); const palette=COLOR_PALETTES[index]; if(paletteTarget==='style'){ styleRoleState.paletteIndex=index; styleRoleState.customPaletteId=null; syncStyleRoleState(); styleRoleState.colors=styleRoles().map((r,i)=>palette.colors[i%palette.colors.length]); renderStyleRoles(); }else{ colorRoleState.paletteIndex=index; colorRoleState.customPaletteId=null; } renderPaletteGrid(); renderCustomPaletteStrip(); updateAll(); markDirty(); post('NEXORA_3D_ACTIVE_ROLE_COLORS',{colors:targetPaletteColors(),target:paletteTarget}); }
+  function openPalette(target='character'){ paletteTarget=target; if($('paletteTitle'))$('paletteTitle').textContent=target==='style'?'Style FX Color Palette':'Character Color Palette'; if($('paletteSubtitle'))$('paletteSubtitle').textContent=target==='style'?'Terapkan palette ke Color Roles Style FX.':'Terapkan palette ke warna tiap huruf.'; if(matchMedia('(max-width:760px)').matches){post('NEXORA_3D_PALETTE_OPEN',{palettes:COLOR_PALETTES,activeColors:targetPaletteColors(),target:paletteTarget,title:target==='style'?'Style FX Color Palette':'Character Color Palette',customPalettes:(window.NexoraCustomPalette?window.NexoraCustomPalette.list():[]),customPaletteLimit:(window.NexoraCustomPalette?window.NexoraCustomPalette.limitFor(isMemberUser()):2),activeCustomPaletteId:targetRoleState().customPaletteId});return;}renderPaletteGrid();renderCustomPaletteStrip();toggleCustomPaletteForm(false);$('paletteBackdrop')?.classList.add('is-open');$('paletteModal')?.classList.add('is-open'); }
   function closePalette(){ $('paletteBackdrop')?.classList.remove('is-open');$('paletteModal')?.classList.remove('is-open'); }
 
   function renderCustomPaletteStrip(){
     const strip=$('customPaletteStrip'); if(!strip) return;
     const member=isMemberUser();
-    const list=window.FlamoCustomPalette ? window.FlamoCustomPalette.list() : [];
-    const limit=window.FlamoCustomPalette ? window.FlamoCustomPalette.limitFor(member) : (member?15:2);
+    const list=window.NexoraCustomPalette ? window.NexoraCustomPalette.list() : [];
+    const limit=window.NexoraCustomPalette ? window.NexoraCustomPalette.limitFor(member) : (member?15:2);
     const quota=$('customPaletteQuota'); if(quota) quota.textContent=list.length+'/'+limit;
     const activeId=targetRoleState().customPaletteId;
-    const cards=list.map(p=>`<div class="flamo2d-custom-palette-card${p.id===activeId?' is-active':''}" data-custom-palette-id="${esc(p.id)}"><button type="button" class="flamo2d-custom-palette-remove" data-remove-custom="${esc(p.id)}" aria-label="Hapus palet">&times;</button><span>${esc(p.name)}</span><span class="flamo2d-palette-swatches">${p.colors.map(c=>`<i style="background:${c}"></i>`).join('')}</span></div>`).join('');
-    const addCard=list.length<limit ? `<button type="button" class="flamo2d-custom-palette-add" id="customPaletteAddBtn">+ Import</button>` : `<div class="flamo2d-custom-palette-locked">Penuh (${limit})</div>`;
+    const cards=list.map(p=>`<div class="nexora2d-custom-palette-card${p.id===activeId?' is-active':''}" data-custom-palette-id="${esc(p.id)}"><button type="button" class="nexora2d-custom-palette-remove" data-remove-custom="${esc(p.id)}" aria-label="Hapus palet">&times;</button><span>${esc(p.name)}</span><span class="nexora2d-palette-swatches">${p.colors.map(c=>`<i style="background:${c}"></i>`).join('')}</span></div>`).join('');
+    const addCard=list.length<limit ? `<button type="button" class="nexora2d-custom-palette-add" id="customPaletteAddBtn">+ Import</button>` : `<div class="nexora2d-custom-palette-locked">Penuh (${limit})</div>`;
     strip.innerHTML=cards+addCard;
   }
   function toggleCustomPaletteForm(show){ const form=$('customPaletteForm'); if(!form) return; form.hidden = show===undefined ? !form.hidden : !show; const err=$('customPaletteError'); if(err){ err.hidden=true; err.textContent=''; } if(!form.hidden) $('customPaletteInput')?.focus(); }
   function submitCustomPalette(){
-    if(!window.FlamoCustomPalette) return;
+    if(!window.NexoraCustomPalette) return;
     const input=$('customPaletteInput'); const err=$('customPaletteError'); if(!input) return;
-    const parsed=window.FlamoCustomPalette.parse(input.value);
+    const parsed=window.NexoraCustomPalette.parse(input.value);
     if(!parsed.ok){ if(err){ err.hidden=false; err.textContent=parsed.message; } return; }
-    const added=window.FlamoCustomPalette.add('', parsed.colors, isMemberUser());
+    const added=window.NexoraCustomPalette.add('', parsed.colors, isMemberUser());
     if(!added.ok){ if(err){ err.hidden=false; err.textContent=added.message; } return; }
     input.value='';
     toggleCustomPaletteForm(false);
@@ -1271,17 +1271,17 @@
     applyCustomPalette(added.palette.id);
   }
   function applyCustomPalette(id){
-    const list=window.FlamoCustomPalette ? window.FlamoCustomPalette.list() : [];
+    const list=window.NexoraCustomPalette ? window.NexoraCustomPalette.list() : [];
     const cp=list.find(p=>p.id===id); if(!cp) return;
     const roleState=targetRoleState(); roleState.customPaletteId=id;
     if(paletteTarget==='style'){ syncStyleRoleState(); styleRoleState.colors=styleRoles().map((r,i)=>cp.colors[i%cp.colors.length]); renderStyleRoles(); }
     renderPaletteGrid(); renderCustomPaletteStrip(); updateAll(); markDirty();
-    post('FLAMO_3D_ACTIVE_ROLE_COLORS',{colors:targetPaletteColors(),target:paletteTarget});
+    post('NEXORA_3D_ACTIVE_ROLE_COLORS',{colors:targetPaletteColors(),target:paletteTarget});
     closePalette();
   }
-  function removeCustomPalette(id){ window.FlamoCustomPalette?.remove(id); if(colorRoleState.customPaletteId===id) colorRoleState.customPaletteId=null; if(styleRoleState.customPaletteId===id) styleRoleState.customPaletteId=null; renderCustomPaletteStrip(); }
+  function removeCustomPalette(id){ window.NexoraCustomPalette?.remove(id); if(colorRoleState.customPaletteId===id) colorRoleState.customPaletteId=null; if(styleRoleState.customPaletteId===id) styleRoleState.customPaletteId=null; renderCustomPaletteStrip(); }
 
-  window.addEventListener('message', e => { const d = e.data || {}; if(d.type === 'FLAMO_3D_THEME') setTheme(d.theme); if(d.type === 'FLAMO_3D_GENERATE') doGenerate(); if(d.type === 'FLAMO_PRS_STATUS_REQUEST' && d.key) showPresetStatusPanel(d.key); if(d.type === 'FLAMO_3D_CLOSE_MODALS') { closeHelp(); closePalette(); closeFontUpload(); closePresetStatusPanel(); togglePresetMenu(false); closeGraphOtherPortal(); } if(d.type === 'FLAMO_3D_APPLY_PALETTE') applyPalette(d.index); if(d.type === 'FLAMO_3D_APPLY_CUSTOM_PALETTE') applyCustomPalette(d.id); if(d.type === 'FLAMO_VECTOR_CUSTOM_FONTS_UPDATED') loadCustomFonts(d.selectId || $('fontName')?.value).then(() => { renderFontStyleOptions(isCustomFont($('fontName')?.value) ? '' : ($('fontStyle')?.value || '400')); updateAll(); }); });
+  window.addEventListener('message', e => { const d = e.data || {}; if(d.type === 'NEXORA_3D_THEME') setTheme(d.theme); if(d.type === 'NEXORA_3D_GENERATE') doGenerate(); if(d.type === 'NEXORA_PRS_STATUS_REQUEST' && d.key) showPresetStatusPanel(d.key); if(d.type === 'NEXORA_3D_CLOSE_MODALS') { closeHelp(); closePalette(); closeFontUpload(); closePresetStatusPanel(); togglePresetMenu(false); closeGraphOtherPortal(); } if(d.type === 'NEXORA_3D_APPLY_PALETTE') applyPalette(d.index); if(d.type === 'NEXORA_3D_APPLY_CUSTOM_PALETTE') applyCustomPalette(d.id); if(d.type === 'NEXORA_VECTOR_CUSTOM_FONTS_UPDATED') loadCustomFonts(d.selectId || $('fontName')?.value).then(() => { renderFontStyleOptions(isCustomFont($('fontName')?.value) ? '' : ($('fontStyle')?.value || '400')); updateAll(); }); });
   function standaloneSet(id, value, checked){
     const el=$(id);
     if(!el) throw new Error('Kontrol engine 2D tidak lengkap: '+id);
@@ -1306,7 +1306,7 @@
     styleRoleState={paletteIndex:colorRoleState.paletteIndex,colors:[],customPaletteId:null};
     graphMode=['smooth','linear','fastStart','slowStart','random','custom'].includes(opts.graphMode)?opts.graphMode:'smooth';
     curveHandles=structuredCloneSafe(GRAPH_CURVES[graphMode]||GRAPH_CURVES.smooth);
-    standaloneSet('inputText',opts.text||'Flamo\nCreative');
+    standaloneSet('inputText',opts.text||'Nexora\nCreative');
     standaloneSet('timingTarget',opts.timingTarget==='word'?'word':'char');
     standaloneSet('spacing',Number(opts.spacing)||40);
     standaloneSet('lineHeight',Number(opts.lineHeight)||80);
@@ -1320,7 +1320,7 @@
     standaloneSet('fontName',opts.fontName||'Lexend');
     standaloneSet('fontStyle',opts.fontStyle||'400');
     standaloneSet('textColor',opts.textColor||'#ffffff');
-    standaloneSet('filename',opts.filename||'flamo#blur');
+    standaloneSet('filename',opts.filename||'nexora#blur');
     const styleSwitch=$('styleFxSwitch');
     if(styleSwitch) styleSwitch.classList.toggle('is-on',opts.styleEnabled===true);
     syncStyleRoleState(true);
@@ -1329,7 +1329,7 @@
     if(!xml||!/<scene\b/.test(xml)) throw new Error('XML 2D Text Animate gagal dibuat.');
     return xml;
   }
-  window.Flamo2DTextEngine=Object.freeze({
+  window.Nexora2DTextEngine=Object.freeze({
     ready:true,
     generate:standaloneGenerate,
     presets:Object.keys(window.PRESETS||{}).filter(key=>window.PRESETS[key]&&window.PRESETS[key].status==='active'),
@@ -1373,7 +1373,7 @@
     $('styleTrigger')?.addEventListener('click',()=>toggleStyleMenu());
     $('styleFx')?.addEventListener('change',e=>chooseStyle(e.target.value));
     $('styleMenu')?.addEventListener('click',e=>{const b=e.target.closest('[data-style-fx]');if(b)chooseStyle(b.dataset.styleFx);});
-    document.addEventListener('click', e => { if(!e.target.closest('.flamo3d-preset-picker')) togglePresetMenu(false); if(!e.target.closest('.flamo-fx-style-picker')) toggleStyleMenu(false); });
+    document.addEventListener('click', e => { if(!e.target.closest('.nexora3d-preset-picker')) togglePresetMenu(false); if(!e.target.closest('.nexora-fx-style-picker')) toggleStyleMenu(false); });
 
     $('textColor')?.addEventListener('input', () => {
       $('textColorText').value = $('textColor').value;
@@ -1388,7 +1388,7 @@
     $('filename')?.addEventListener('input', () => { $('filename').dataset.touched = '1'; markDirty(); });
     $('colorRolesOpen')?.addEventListener('click', () => openPalette('character'));
     $('stylePaletteOpen')?.addEventListener('click', () => openPalette('style'));
-    $('styleColorRoles')?.addEventListener('input', e => { const input=e.target.closest('[data-style-role-index]'); if(!input)return; syncStyleRoleState(); const i=+input.dataset.styleRoleIndex; styleRoleState.colors[i]=normalizeHex(input.value); const item=input.closest('.flamo3d-color-item'); if(item){ item.querySelector('.flamo3d-color-dot')?.style.setProperty('--c',styleRoleState.colors[i]); const small=item.querySelector('small'); if(small)small.textContent=styleRoleState.colors[i]; } markDirty(); });
+    $('styleColorRoles')?.addEventListener('input', e => { const input=e.target.closest('[data-style-role-index]'); if(!input)return; syncStyleRoleState(); const i=+input.dataset.styleRoleIndex; styleRoleState.colors[i]=normalizeHex(input.value); const item=input.closest('.nexora3d-color-item'); if(item){ item.querySelector('.nexora3d-color-dot')?.style.setProperty('--c',styleRoleState.colors[i]); const small=item.querySelector('small'); if(small)small.textContent=styleRoleState.colors[i]; } markDirty(); });
     $('paletteClose')?.addEventListener('click', closePalette);
     $('paletteBackdrop')?.addEventListener('click', closePalette);
     $('paletteGrid')?.addEventListener('click', e => { const b=e.target.closest('[data-palette-index]'); if(b) applyPalette(b.dataset.paletteIndex); });
@@ -1428,12 +1428,12 @@
     Object.keys(rangeSuffix).forEach(id => syncRange(id, rangeSuffix[id]));
     syncColorRoleControls();
 
-    const otherWrap = document.querySelector('.flamo3d-graph-other');
+    const otherWrap = document.querySelector('.nexora3d-graph-other');
     const otherToggle = document.querySelector('[data-graph-other-toggle]');
-    const toolRoot = document.querySelector('.flamo3d-tool');
-    const presetPanel = document.querySelector('.flamo3d-graph-preset-panel');
+    const toolRoot = document.querySelector('.nexora3d-tool');
+    const presetPanel = document.querySelector('.nexora3d-graph-preset-panel');
     const otherMenu = document.createElement('div');
-    otherMenu.className = 'flamo2d-other-menu';
+    otherMenu.className = 'nexora2d-other-menu';
     otherMenu.setAttribute('data-theme', toolRoot?.dataset.theme || 'light');
     otherMenu.innerHTML = ['smooth','linear','custom'].map(key => `<button type="button" data-graph-choice="${key}">${key.charAt(0).toUpperCase()+key.slice(1)}</button>`).join('');
     document.body.appendChild(otherMenu);
@@ -1490,7 +1490,7 @@
       if(open) requestAnimationFrame(positionGraphOtherMenu);
     });
     document.addEventListener('click', e => {
-      if(!e.target.closest('.flamo3d-graph-other') && !e.target.closest('.flamo2d-other-menu')) closeGraphOther();
+      if(!e.target.closest('.nexora3d-graph-other') && !e.target.closest('.nexora2d-other-menu')) closeGraphOther();
     });
     window.addEventListener('resize', positionGraphOtherMenu);
     window.addEventListener('scroll', positionGraphOtherMenu, true);
@@ -1506,8 +1506,8 @@
     $('modalClose')?.addEventListener('click', closeHelp);
     $('modalBackdrop')?.addEventListener('click', closeHelp);
     $$('[data-tab]').forEach(b => b.addEventListener('click', () => { $$('[data-tab]').forEach(x => x.classList.remove('is-active')); $$('[data-panel]').forEach(x => x.classList.remove('is-active')); b.classList.add('is-active'); document.querySelector(`[data-panel="${b.dataset.tab}"]`)?.classList.add('is-active'); }));
-    $$('.flamo3d-faq button').forEach(b => b.addEventListener('click', () => b.parentElement.classList.toggle('is-open')));
+    $$('.nexora3d-faq button').forEach(b => b.addEventListener('click', () => b.parentElement.classList.toggle('is-open')));
     renderPaletteGrid(); renderRoleStrip();
-    post('FLAMO_3D_ACTIVE_ROLE_COLORS', { colors: activePalette().colors });
+    post('NEXORA_3D_ACTIVE_ROLE_COLORS', { colors: activePalette().colors });
   });
 })();

@@ -1,7 +1,7 @@
 /* Generator pack — extracted from index.html v3. Classic script; keep execution order. */
 
 /* ===== original script 15: nxGenPack ===== */
-// Nexus generator pack: Windows Quotes (2 style), IQC (3 style), Nokia Message
+// Nexora generator pack: Windows Quotes (2 style), IQC (3 style), Nokia Message
 function nxGenShow(prefix, url) {
     var resDiv = document.getElementById(prefix + 'ResultDiv');
     var preview = document.getElementById(prefix + 'PreviewBox');

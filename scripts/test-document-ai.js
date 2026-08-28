@@ -106,7 +106,7 @@ const response = {
     assert.equal(generated, "Ringkasan dokumen berhasil.");
     assert.deepEqual(attemptedModels, ["gemini-missing-test-model", DEFAULT_MODEL]);
     assert.deepEqual(generatedPayload.config.thinkingConfig, { thinkingLevel: "low" });
-    assert.match(lazySource, /'document-android'/);
+    assert.match(lazySource, /'document-android-branding1'/);
     assert.match(fs.readFileSync(path.join(root, "index.html"), "utf8"), /document-ai-v1/);
 
     process.env.DOCUMENT_AI_MODEL = DEFAULT_MODEL;

@@ -22,7 +22,7 @@ const windows = new Map();
 for (let index = 0; index < 20; index += 1) takeFixedWindow(windows, `ip-${index}`, { limit: 2, maxEntries: 4 });
 assert.equal(windows.size, 4);
 
-for (const removed of ["nexus-ai.js", "pix-vault.js"]) {
+for (const removed of ["nexora-ai.js", "pix-vault.js"]) {
   assert.equal(fs.existsSync(path.join(root, "assets/js/features", removed)), false, `${removed} masih tersimpan`);
 }
 for (const relative of [

@@ -1,3 +1,12 @@
+## 6.4.0 Branding consistency audit — 2026-08-28
+
+- Branding: seluruh identitas aplikasi, card, loader, metadata, route label, iframe payload, template XML, dan generator lokal diseragamkan menjadi Nexora.
+- Paths: aset generator, worker, runtime, vendor, font, data, migration, dan regression test lama dipindahkan ke namespace `nexora` dengan seluruh referensi diperbarui.
+- AI copy: label fitur, status, loading, error publik, Document AI, Prompt Generator, dan Personal AI kini menggunakan nama Nexora AI; kontrak provider Google tetap dipertahankan hanya pada model ID, environment variable, helper, metadata, dan error code internal.
+- Embedded tools: payload Base64 untuk Comic Reader, Deploy Center, ML Tools, TikTok Quote, Unban WhatsApp, Virus Scan, dan preset Text FX ikut diaudit dan diperbarui.
+- Performance: branding observer yang sebelumnya memindai seluruh perubahan DOM dihapus karena sumber dan payload kini sudah bersih; cache-bust asset dinaikkan ke `branding1`.
+- QA: menambahkan regression audit khusus untuk path, source, embedded payload, metadata, dan UI copy agar identitas lama tidak kembali.
+
 ## 6.4.0 HF37 Anime to Real gallery upload — 2026-08-28
 
 - UX: mempertahankan input Image URL dan menambahkan pilihan gambar langsung dari galeri Android sebagai sumber kedua.
@@ -226,7 +235,7 @@
 
 ### Keamanan
 
-- Menghapus modul Nexus AI dan Pix Vault yang tidak lagi terdaftar; salah satunya menyimpan kredensial API lama di payload browser.
+- Menghapus modul Nexora AI dan Pix Vault yang tidak lagi terdaftar; salah satunya menyimpan kredensial API lama di payload browser.
 - Mengisolasi seluruh tool `srcdoc` dalam iframe sandbox tanpa `allow-same-origin` dan memvalidasi sumber `postMessage`.
 - Mengubah server lokal ke whitelist public asset, melengkapi seluruh rewrite Vercel, query parsing, response helper, dan batas body per endpoint.
 - Membatasi Map cache/rate-limit agar tidak tumbuh tanpa batas.

@@ -7,7 +7,7 @@ values
   (
     'documentai',
     'Nexora Document AI',
-    'Ringkas, analisis, ekstrak tabel, dan tanya isi dokumen dengan Gemini',
+    'Ringkas, analisis, ekstrak tabel, dan tanya isi dokumen dengan Nexora AI',
     'tools',
     'AI',
     'fa-solid fa-file-waveform',
