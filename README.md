@@ -132,7 +132,6 @@ Node.js 20 atau lebih baru diperlukan.
 ```bash
 cp .env.example .env
 npm ci
-sh scripts/fetch-ai-vendor.sh
 npm test
 npm run dev
 ```
@@ -148,7 +147,6 @@ git clone https://github.com/akidwush/all-tools-nexora.git
 cd all-tools-nexora
 cp .env.example .env
 npm ci
-sh scripts/fetch-ai-vendor.sh
 npm test
 npm run dev
 ```

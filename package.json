@@ -8,8 +8,7 @@
     "start": "node serve-local.js",
     "check": "node scripts/check-project.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/run-tests.js",
-    "prebuild": "node scripts/prepare-ai-vendor.js"
+    "test": "node scripts/run-tests.js"
   },
   "engines": {
     "node": ">=20"

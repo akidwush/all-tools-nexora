@@ -52,7 +52,7 @@
     ["pwgen","Password Gen","local",null,"renderPwgen",null],
     ["morse","Morse Code","local",null,"renderMorse",null],
     ["removebg","Remove BG","local",null,"renderRemovebg",null],
-    ["enhancer","Image Enhancer","local",null,"renderEnhancer",null],
+    ["enhancer","Nexora Image HD Enhancer V4","api","hd4-enhancer","renderHd4Enhancer","https://all-tools-nexora.vercel.app/api/tools/hd4"],
     ["ttquote","Quote TikTok Nexora","module","tiktok-quote","renderTiktokQuote",null],
     ["qrgen","QR Generator","local",null,"renderQrGenerator",null],
     ["tiktokhd","Upload TikTok HD","external",null,"openTikTokHdUpload","https://www.tiktok.com/tiktokstudio"],

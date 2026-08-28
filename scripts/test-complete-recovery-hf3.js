@@ -56,9 +56,10 @@ assert.match(deploy, /https:\/\/app\.netlify\.com\/drop/);
 assert.match(deploy, /Salin perintah Termux/);
 assert.match(deployCss, /#deployFallback\.show\{display:grid\}/);
 
-// Batas gambar mencegah buffer berukuran ekstrem pada perangkat Android.
-assert.match(app, /const patchSize = profile\.lowPower \? 32 : \(profile\.mobileLike \? 48 : 64\)/);
-assert.match(app, /const padding = 4/);
+// Enhancer lokal berat sudah diganti modul HD4 server-side; batas gambar tool
+// lokal lain tetap mencegah buffer ekstrem pada perangkat Android.
+assert.doesNotMatch(app, /NX_LOCAL_ESRGAN_ASSETS|NexoraLocalEnhance|function renderEnhancer/);
+assert.equal(manifest.tools.enhancer, "hd4-enhancer");
 assert.match(app, /const maxSide = profile\.lowPower \? 1280 : \(profile\.mobileLike \? 1440 : 1800\)/);
 assert.match(app, /const max = profile\.lowPower \? 1100 : \(profile\.mobileLike \? 1280 : 1500\)/);
 assert.match(app, /if \(!profile\.lowPower\)/);

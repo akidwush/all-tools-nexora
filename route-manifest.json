@@ -28,6 +28,7 @@
     "/api/search/danbooru",
     "/api/ai/anime-to-real",
     "/api/ai/song",
+    "/api/tools/hd4",
     "/api/space-explorer",
     "/api/ocr-intelligence",
     "/api/vdeploy",

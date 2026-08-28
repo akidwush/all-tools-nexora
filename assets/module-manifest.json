@@ -137,6 +137,14 @@
         "assets/js/features/ai-song.js"
       ]
     },
+    "hd4-enhancer": {
+      "css": [
+        "assets/css/features/hd4-enhancer.css"
+      ],
+      "js": [
+        "assets/js/features/hd4-enhancer.js"
+      ]
+    },
     "image-vectorizer": {
       "css": [
         "assets/css/features/image-vectorizer.css"
@@ -277,6 +285,7 @@
     "danbooru": "danbooru-search",
     "animetoreal": "anime-to-real",
     "aisong": "ai-song",
+    "enhancer": "hd4-enhancer",
     "fakeovo": "imported-tools",
     "quotegenerator": "imported-tools",
     "carifakta": "imported-tools",

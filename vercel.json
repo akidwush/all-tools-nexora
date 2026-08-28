@@ -133,6 +133,10 @@
       "destination": "/api/tool-health?_service=ai-song"
     },
     {
+      "source": "/api/tools/hd4",
+      "destination": "/api/tool-health?_service=hd4-enhancer"
+    },
+    {
       "source": "/api/space-explorer",
       "destination": "/api/tool-health?mode=space-explorer"
     },

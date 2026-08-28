@@ -1,3 +1,14 @@
+## 6.4.0 Nexora Image HD Enhancer V4 — 2026-08-28
+
+- Replacement: menghapus renderer, slider kekuatan, runtime ESRGAN, TensorFlow.js, dan UpscalerJS milik Image Enhancer lokal; ID enhancer dipertahankan agar bookmark/rute lama tetap kompatibel.
+- Fitur: card dan room kini bernama **Nexora Image HD Enhancer V4** dengan input URL, Paste, preview Original → Enhanced, Download, Open Image, dan Copy Link.
+- API: route same-origin /api/tools/hd4 dimultipleks melalui api/tool-health.js ke endpoint HD4 tetap; KURONEKO_API_KEY hanya ditambahkan server-side dengan URLSearchParams.
+- Response: handler menerima redirect URL, JSON/direct text URL, image/*, dan binary image application/octet-stream yang lolos magic-byte; normalizer internal selalu menghasilkan imageUrl.
+- Security: backend tidak pernah mengambil user URL, private/local host ditolak, query di-whitelist, secret reflection diblokir, error disanitasi, timeout 55 detik, rate limit, deduplikasi, batas respons, dan no-store aktif.
+- Mobile: layout tunggal ringan untuk lebar 360, 375, 390, dan 412 px memakai gambar lazy/async, object-fit contain, action vertikal, dan tanpa dependency UI baru.
+- Data: tidak ada perubahan Supabase, schema, seed, migration, tabel, Auth, Storage, Edge Function, dependency, atau environment variable baru.
+- Response nyata: probe tanpa secret mengonfirmasi HTTP 401 JSON dengan field creator, message, dan status; schema sukses tidak diklaim tanpa key production.
+
 ## 6.4.0 Nexora AI Song Generator — 2026-08-28
 
 - HF39: provider HTTP 400 generik tidak lagi dituduh sebagai prompt invalid; error generation dipetakan ke service unavailable dan Runtime Logs hanya memuat status, kategori, durasi, serta bentuk field aman.

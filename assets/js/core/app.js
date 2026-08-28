@@ -897,270 +897,6 @@ function nxCanvasToUrl(canvas) {
     });
 }
 
-const NX_LOCAL_ESRGAN_ASSETS = Object.freeze({
-    tensorflow: '/assets/vendor/tfjs/tf.min.js',
-    tensorflowFallback: 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js',
-    upscaler: '/assets/vendor/upscaler/upscaler.min.js',
-    upscalerFallback: 'https://cdn.jsdelivr.net/npm/upscaler@1.0.0/dist/browser/umd/upscaler.min.js',
-    model: '/assets/vendor/esrgan-slim/x2/model.json',
-    modelFallback: 'https://cdn.jsdelivr.net/npm/@upscalerjs/esrgan-slim@1.0.0-beta.10/models/x2/model.json',
-    revision: '6318-hf20-image-enhancer1'
-});
-
-let nxEsrganReadyPromise = null;
-let nxEsrganInstance = null;
-let nxEsrganVendorSource = 'pending';
-let nxEsrganModelSource = 'pending';
-let nxEsrganLastEngine = 'pending';
-let nxEsrganLastError = '';
-
-function nxVendorRequestUrl(src) {
-    if (!src || !src.startsWith('/')) return src;
-    const join = src.includes('?') ? '&' : '?';
-    return `${src}${join}nxv=${NX_LOCAL_ESRGAN_ASSETS.revision}`;
-}
-
-function nxForgetVendorScript(src) {
-    const script = document.querySelector(`script[data-nexora-vendor="${src}"]`);
-    if (script && script.parentNode) script.parentNode.removeChild(script);
-}
-
-function nxLoadVendorScript(src, ready) {
-    if (typeof ready === 'function' && ready()) return Promise.resolve(src);
-    const existing = document.querySelector(`script[data-nexora-vendor="${src}"]`);
-    if (existing && existing.__nxPromise) return existing.__nxPromise;
-    const script = existing || document.createElement('script');
-    const requestUrl = nxVendorRequestUrl(src);
-    script.src = requestUrl;
-    script.async = true;
-    script.dataset.nexoraVendor = src;
-    if (/^https?:\/\//i.test(requestUrl)) script.crossOrigin = 'anonymous';
-    script.__nxPromise = new Promise((resolve, reject) => {
-        script.addEventListener('load', () => {
-            if (typeof ready !== 'function' || ready()) resolve(src);
-            else reject(Object.assign(new Error(`Vendor AI tidak mengekspos API yang diharapkan: ${src}`), { code: 'LOCAL_VENDOR_API_MISSING', vendor: src }));
-        }, { once: true });
-        script.addEventListener('error', () => reject(Object.assign(new Error(`Aset vendor AI gagal dimuat: ${src}`), { code: 'LOCAL_VENDOR_LOAD_FAILED', vendor: src })), { once: true });
-    });
-    if (!existing) document.head.appendChild(script);
-    return script.__nxPromise;
-}
-
-async function nxLoadVendorWithFallback(primary, fallback, ready, label) {
-    let primaryError = null;
-    try {
-        await nxLoadVendorScript(primary, ready);
-        return { source: 'local', url: primary };
-    } catch (error) {
-        primaryError = error;
-        nxForgetVendorScript(primary);
-    }
-    try {
-        await nxLoadVendorScript(fallback, ready);
-        return { source: 'cdn', url: fallback, primaryError };
-    } catch (fallbackError) {
-        nxForgetVendorScript(fallback);
-        const error = new Error(`${label || 'Vendor AI'} gagal dimuat dari aset lokal dan CDN cadangan.`);
-        error.code = 'LOCAL_VENDOR_ALL_SOURCES_FAILED';
-        error.primaryError = primaryError;
-        error.fallbackError = fallbackError;
-        throw error;
-    }
-}
-
-async function nxProbeEsrganModel(url) {
-    const response = await fetch(nxVendorRequestUrl(url), { cache: 'no-store', credentials: 'omit' });
-    if (!response.ok) throw new Error(`Model ESRGAN HTTP ${response.status}`);
-    const type = String(response.headers.get('content-type') || '').toLowerCase();
-    if (type && !type.includes('json') && !type.includes('octet-stream') && !type.includes('text/plain')) {
-        throw new Error(`Model ESRGAN memiliki Content-Type tidak valid: ${type}`);
-    }
-    const model = await response.json();
-    if (!model || !model.modelTopology || !Array.isArray(model.weightsManifest)) throw new Error('model.json ESRGAN tidak valid.');
-    const paths = model.weightsManifest.flatMap(row => Array.isArray(row.paths) ? row.paths : []);
-    if (!paths.length) throw new Error('weightsManifest ESRGAN kosong.');
-    return nxVendorRequestUrl(url);
-}
-
-async function nxResolveEsrganModelPath() {
-    try {
-        const path = await nxProbeEsrganModel(NX_LOCAL_ESRGAN_ASSETS.model);
-        nxEsrganModelSource = 'local';
-        return path;
-    } catch (localError) {
-        try {
-            const path = await nxProbeEsrganModel(NX_LOCAL_ESRGAN_ASSETS.modelFallback);
-            nxEsrganModelSource = 'cdn';
-            return path;
-        } catch (fallbackError) {
-            const error = new Error('Model ESRGAN lokal dan CDN cadangan sama-sama tidak tersedia.');
-            error.code = 'LOCAL_ESRGAN_MODEL_UNAVAILABLE';
-            error.localError = localError;
-            error.fallbackError = fallbackError;
-            throw error;
-        }
-    }
-}
-
-async function nxEnsureLocalEsrgan() {
-    if (nxEsrganInstance) return nxEsrganInstance;
-    if (nxEsrganReadyPromise) return nxEsrganReadyPromise;
-    nxEsrganReadyPromise = (async () => {
-        const tfVendor = await nxLoadVendorWithFallback(
-            NX_LOCAL_ESRGAN_ASSETS.tensorflow,
-            NX_LOCAL_ESRGAN_ASSETS.tensorflowFallback,
-            () => Boolean(window.tf && typeof window.tf.ready === 'function' && typeof window.tf.setBackend === 'function'),
-            'TensorFlow.js'
-        );
-        nxEsrganVendorSource = tfVendor.source;
-        await window.tf.setBackend('webgl');
-        await window.tf.ready();
-        if (window.tf.getBackend() !== 'webgl') {
-            throw Object.assign(new Error('WebGL tidak tersedia untuk ESRGAN lokal.'), { code: 'LOCAL_ESRGAN_WEBGL_UNAVAILABLE' });
-        }
-        const upscalerVendor = await nxLoadVendorWithFallback(
-            NX_LOCAL_ESRGAN_ASSETS.upscaler,
-            NX_LOCAL_ESRGAN_ASSETS.upscalerFallback,
-            () => typeof window.Upscaler === 'function',
-            'UpscalerJS'
-        );
-        if (upscalerVendor.source === 'cdn') nxEsrganVendorSource = 'cdn';
-        const modelPath = await nxResolveEsrganModelPath();
-        nxEsrganInstance = new window.Upscaler({
-            model: {
-                scale: 2,
-                modelType: 'layers',
-                path: modelPath,
-                inputRange: [0, 255],
-                outputRange: [0, 255]
-            }
-        });
-        return nxEsrganInstance;
-    })().catch(error => {
-        nxEsrganReadyPromise = null;
-        nxEsrganInstance = null;
-        throw error;
-    });
-    return nxEsrganReadyPromise;
-}
-
-async function nxObjectUrlFromDataUrl(dataUrl) {
-    const match = /^data:([^;,]+)?(;base64)?,([\s\S]*)$/.exec(String(dataUrl || ''));
-    if (!match) throw new Error('Hasil ESRGAN tidak dapat dibaca.');
-    const mime = match[1] || 'image/png';
-    const raw = match[2] ? atob(match[3]) : decodeURIComponent(match[3]);
-    const bytes = new Uint8Array(raw.length);
-    for (let index = 0; index < raw.length; index++) bytes[index] = raw.charCodeAt(index);
-    const blob = new Blob([bytes], { type: mime });
-    if (!blob || blob.size < 32) throw new Error('Hasil ESRGAN kosong.');
-    return URL.createObjectURL(blob);
-}
-
-function nxLoadImageFromUrl(url) {
-    return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => resolve(img);
-        img.onerror = () => reject(new Error('Hasil ESRGAN tidak dapat dibuka.'));
-        img.src = url;
-    });
-}
-
-async function nxNormalizeExact2x(resultUrl, sourceWidth, sourceHeight) {
-    const expectedWidth = Math.max(1, sourceWidth * 2);
-    const expectedHeight = Math.max(1, sourceHeight * 2);
-    const resultImage = await nxLoadImageFromUrl(resultUrl);
-    const resultWidth = resultImage.naturalWidth || resultImage.width;
-    const resultHeight = resultImage.naturalHeight || resultImage.height;
-    if (resultWidth === expectedWidth && resultHeight === expectedHeight) {
-        return resultUrl;
-    }
-    const canvas = document.createElement('canvas');
-    canvas.width = expectedWidth;
-    canvas.height = expectedHeight;
-    const ctx = canvas.getContext('2d');
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(resultImage, 0, 0, expectedWidth, expectedHeight);
-    URL.revokeObjectURL(resultUrl);
-    return nxCanvasToUrl(canvas);
-}
-
-function nxCanvasUpscaleExact2x(img, sourceWidth, sourceHeight) {
-    const canvas = document.createElement('canvas');
-    canvas.width = Math.max(1, sourceWidth * 2);
-    canvas.height = Math.max(1, sourceHeight * 2);
-    const ctx = canvas.getContext('2d');
-    if (!ctx) throw Object.assign(new Error('Canvas 2D tidak tersedia untuk fallback resize.'), { code: 'LOCAL_CANVAS_UNAVAILABLE' });
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    return nxCanvasToUrl(canvas);
-}
-
-async function nxLocalEnhance(file, imageUrl, strength = 55, onProgress, signal) {
-    void strength;
-    const loaded = await nxLoadCanvasImage(file, imageUrl);
-    const img = loaded.img;
-    const sw = img.naturalWidth || img.width;
-    const sh = img.naturalHeight || img.height;
-    if (!sw || !sh) {
-        URL.revokeObjectURL(loaded.url);
-        throw Object.assign(new Error('Dimensi sumber tidak valid.'), { code: 'LOCAL_ESRGAN_INVALID_INPUT' });
-    }
-    const profile = window.__NEXORA_PERFORMANCE__ || {};
-    const patchSize = profile.lowPower ? 32 : (profile.mobileLike ? 48 : 64);
-    const padding = 4;
-    try {
-        try {
-            const upscaler = await nxEnsureLocalEsrgan();
-            const dataUrl = await upscaler.upscale(img, {
-                output: 'base64',
-                patchSize,
-                padding,
-                awaitNextFrame: true,
-                signal,
-                progress: value => {
-                    if (typeof onProgress !== 'function') return;
-                    const raw = Number(value) || 0;
-                    const percent = raw <= 1 ? raw * 100 : raw;
-                    onProgress(Math.max(0, Math.min(100, percent)));
-                }
-            });
-            if (typeof dataUrl !== 'string' || !dataUrl.startsWith('data:image/')) {
-                throw Object.assign(new Error('ESRGAN mengembalikan hasil yang tidak valid.'), { code: 'LOCAL_ESRGAN_EMPTY_RESULT' });
-            }
-            const objectUrl = await nxObjectUrlFromDataUrl(dataUrl);
-            const normalizedUrl = await nxNormalizeExact2x(objectUrl, sw, sh);
-            nxEsrganLastEngine = 'esrgan';
-            nxEsrganLastError = '';
-            return normalizedUrl;
-        } catch (error) {
-            if ((signal && signal.aborted) || (error && error.name === 'AbortError')) throw error;
-            nxEsrganLastEngine = 'canvas';
-            nxEsrganLastError = String(error && (error.code || error.message) || 'LOCAL_ESRGAN_FAILED');
-            console.warn('[Image Enhancer] ESRGAN tidak tersedia, memakai resize 2x:', nxEsrganLastError);
-            if (typeof onProgress === 'function') onProgress(100);
-            return await nxCanvasUpscaleExact2x(img, sw, sh);
-        }
-    } finally {
-        URL.revokeObjectURL(loaded.url);
-    }
-}
-
-window.NexoraLocalEnhance = nxLocalEnhance;
-window.NexoraLocalEnhanceInfo = () => ({
-    engine: 'LOCAL ESRGAN',
-    model: 'ESRGAN Slim 2x',
-    backend: window.tf && typeof window.tf.getBackend === 'function' ? window.tf.getBackend() : 'pending',
-    scale: 2,
-    tiled: true,
-    vendorSource: nxEsrganVendorSource,
-    modelSource: nxEsrganModelSource,
-    lastEngine: nxEsrganLastEngine,
-    lastError: nxEsrganLastError,
-    runtimeRevision: NX_LOCAL_ESRGAN_ASSETS.revision
-});
-
 let nxBgRemovalModulePromise = null;
 async function nxLoadBgRemovalModule() {
     if (nxBgRemovalModulePromise) return nxBgRemovalModulePromise;
@@ -1618,7 +1354,7 @@ let toolsData = {
         { id: 'pwgen', icon: 'fa-solid fa-key', name: 'Password Gen', desc: 'Password aman', badge: 'Secure' },
         { id: 'morse', icon: 'fa-solid fa-tower-broadcast', name: 'Morse Code', desc: 'Konversi morse', badge: 'Audio' },
         { id: 'removebg', icon: 'fa-solid fa-eraser', name: 'Remove BG', desc: 'Hapus background', badge: 'AI' },
-        { id: 'enhancer', icon: 'fa-solid fa-magic', name: 'Image Enhancer', desc: 'Tingkatkan kualitas', badge: 'HD' }
+        { id: 'enhancer', icon: 'fa-solid fa-wand-magic-sparkles', name: 'Nexora Image HD Enhancer V4', desc: 'Tingkatkan detail dan kualitas gambar dari URL', badge: 'HD V4' }
     ],
     vault: [
 
@@ -1851,6 +1587,11 @@ async function applyDatabaseToolConfiguration() {
                 name: 'Sertifikat Custom',
                 description: 'Buat sertifikat custom dari nama melalui API atau renderer lokal',
                 badge: 'PNG'
+            },
+            enhancer: {
+                name: 'Nexora Image HD Enhancer V4',
+                description: 'Tingkatkan detail dan kualitas gambar dari URL melalui gateway aman Nexora',
+                badge: 'HD V4'
             }
         };
         // The source catalogue is authoritative for bundled tools. Replacing it
@@ -2006,7 +1747,7 @@ case 'calc': renderCalc(body); break;
         case 'pwgen': renderPwgen(body); break;
         case 'morse': renderMorse(body); break;
         case 'removebg': renderRemovebg(body); break;
-        case 'enhancer': renderEnhancer(body); break;
+        case 'enhancer': renderHd4Enhancer(body); break;
         case 'ttquote': renderTiktokQuote(body); break;
         case 'qrgen': renderQrGenerator(body); break;
         case 'webencryption': renderWebEncryption(body); break;
@@ -3624,50 +3365,6 @@ function renderRemovebg(body) {
         } finally {
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-wand-magic-sparkles"></i> Hapus Background';
-        }
-    };
-}
-
-function renderEnhancer(body) {
-    body.innerHTML = `
-        <h2><i class="fas fa-magic"></i> Image Enhancer</h2>
-        <p style="color:#8b7ab8;font-size:13px;margin-bottom:12px;">Perbesar, tajamkan detail, dan tingkatkan warna gambar langsung di browser.</p>
-        <input type="url" id="enhancerUrl" class="v-input" placeholder="URL gambar (opsional)">
-        <input type="file" id="enhancerFile" accept="image/png,image/jpeg,image/webp" style="display:none">
-        <label for="enhancerFile" style="display:flex;justify-content:center;align-items:center;gap:8px;width:100%;padding:13px;margin:10px 0;background:rgba(168,85,247,.06);border:1px dashed rgba(168,85,247,.28);border-radius:14px;cursor:pointer;font-size:13px;color:#b9a0e9;">
-            <i class="fas fa-cloud-arrow-up"></i> <span id="enhancerUploadText">Pilih Gambar</span>
-        </label>
-        <div id="enhancerFileName" style="text-align:center;color:#6a5a8a;font-size:12px;margin-bottom:10px;">Belum ada file</div>
-        <label style="font-size:12px;color:#8b7ab8;">Kekuatan: <b id="enhancerStrengthLabel">55%</b></label>
-        <input type="range" id="enhancerStrength" min="10" max="100" value="55" style="width:100%;margin:8px 0 16px;accent-color:#a855f7;">
-        <button class="v-btn" id="enhancerBtn"><i class="fas fa-wand-magic-sparkles"></i> Tingkatkan Gambar</button>
-        <div id="enhancerResult"></div>`;
-    const fileInput = document.getElementById('enhancerFile');
-    const strength = document.getElementById('enhancerStrength');
-    strength.oninput = () => document.getElementById('enhancerStrengthLabel').textContent = strength.value + '%';
-    fileInput.onchange = () => {
-        const file = fileInput.files[0];
-        if (file && file.size > 16 * 1024 * 1024) { alert('Ukuran gambar maksimal 16 MB.'); fileInput.value=''; }
-        document.getElementById('enhancerUploadText').textContent = fileInput.files[0] ? 'Ganti Gambar' : 'Pilih Gambar';
-        document.getElementById('enhancerFileName').textContent = fileInput.files[0] ? fileInput.files[0].name : 'Belum ada file';
-    };
-    document.getElementById('enhancerBtn').onclick = async () => {
-        const url = document.getElementById('enhancerUrl').value.trim();
-        const file = fileInput.files[0];
-        const btn = document.getElementById('enhancerBtn');
-        const result = document.getElementById('enhancerResult');
-        if (!url && !file) return alert('Masukkan URL atau pilih gambar!');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Meningkatkan...';
-        result.innerHTML = '<div class="result-box"><i class="fas fa-spinner spin"></i><br>Upscale dan mempertajam gambar...</div>';
-        try {
-            const img = await nxLocalEnhance(file, url, Number(strength.value));
-            nxRenderImageResult(result, img, `enhanced_${Date.now()}.png`, 'Diproses lokal: upscale hingga 2×, koreksi warna, dan sharpening.');
-        } catch (e) {
-            result.innerHTML = `<div class="result-box" style="color:#ef4444;">Gagal meningkatkan gambar: ${nxEscape(e.message)}</div>`;
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-wand-magic-sparkles"></i> Tingkatkan Gambar';
         }
     };
 }

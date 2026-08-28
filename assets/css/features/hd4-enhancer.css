@@ -1,0 +1,45 @@
+.nxhd4{--nxhd4-a:#a855f7;--nxhd4-b:#22d3ee;display:grid;gap:13px;width:100%;max-width:680px;margin:0 auto;color:#f2f4ff;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow-x:clip}
+.nxhd4 *{box-sizing:border-box;min-width:0}
+.nxhd4-hero,.nxhd4-card{border:1px solid rgba(168,85,247,.2);background:linear-gradient(180deg,rgba(24,16,42,.72),rgba(7,6,17,.88));box-shadow:0 16px 42px rgba(2,6,23,.2)}
+.nxhd4-hero{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:center;padding:16px;border-radius:22px}
+.nxhd4-hero-icon{width:50px;height:50px;display:grid;place-items:center;border-radius:16px;color:#e9d5ff;background:linear-gradient(145deg,rgba(168,85,247,.22),rgba(34,211,238,.1));border:1px solid rgba(192,132,252,.28);font-size:23px}
+.nxhd4-kicker,.nxhd4-stage-head span{display:block;color:#a996c2;font-size:10px;font-weight:900;letter-spacing:.15em}
+.nxhd4-hero h2{margin:4px 0 0;font-size:clamp(21px,6.2vw,34px);line-height:1.1;letter-spacing:-.035em;overflow-wrap:anywhere}
+.nxhd4-hero p{margin:8px 0 0;color:#a89bb9;font-size:13px;line-height:1.55}
+.nxhd4-card{padding:15px;border-radius:22px}
+.nxhd4-form-card form{display:grid;gap:9px}
+.nxhd4-form-card label{color:#c1b5ce;font-size:12px;font-weight:850}
+.nxhd4-input-row{display:grid;grid-template-columns:minmax(0,1fr) 72px;gap:9px}
+.nxhd4 input{width:100%;height:52px;padding:0 14px;border:1px solid rgba(192,132,252,.2);border-radius:15px;outline:0;background:rgba(3,3,12,.58);color:#f4efff;font:inherit}
+.nxhd4 input:focus{border-color:rgba(168,85,247,.66);box-shadow:0 0 0 3px rgba(168,85,247,.1)}
+.nxhd4-paste,.nxhd4-primary,.nxhd4-action{min-height:48px;border-radius:14px;border:1px solid transparent;color:#fff;font:inherit;font-weight:850;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;text-decoration:none}
+.nxhd4-paste{min-width:0;padding:0 8px;color:#e9d5ff;border-color:rgba(192,132,252,.27);background:rgba(126,34,206,.13)}
+.nxhd4-primary{width:100%;margin-top:8px;background:linear-gradient(135deg,#a855f7,#7c3aed);box-shadow:0 11px 25px rgba(126,34,206,.2)}
+.nxhd4 button:disabled,.nxhd4 input:disabled{opacity:.58;cursor:wait}
+.nxhd4-hint,.nxhd4-feedback,.nxhd4-note{font-size:11px;line-height:1.55}
+.nxhd4-hint{margin:0 2px;color:#8e819e}
+.nxhd4-feedback{min-height:18px;margin:10px 1px 0;color:#9c8daf}
+.nxhd4-feedback.is-loading{color:#c4b5fd}
+.nxhd4-feedback.is-error{color:#fda4af}
+.nxhd4-workspace{display:grid;gap:12px}
+.nxhd4-stage{display:grid;gap:11px}
+.nxhd4-stage-head strong{display:block;margin-top:3px;color:#eee8f6;font-size:14px}
+.nxhd4-image-frame{position:relative;display:grid;width:100%;min-height:190px;max-height:58vh;aspect-ratio:4/5;place-items:center;overflow:hidden;border:1px dashed rgba(192,132,252,.23);border-radius:18px;background:#04030b}
+.nxhd4-image-frame.has-image{border-style:solid}
+.nxhd4-image-frame img{display:block;width:100%;height:100%;max-width:100%;max-height:58vh;object-fit:contain}
+.nxhd4-empty{display:grid;place-items:center;gap:10px;padding:22px;color:#988aa9;text-align:center}
+.nxhd4-empty i{color:#c084fc;font-size:30px}
+.nxhd4-empty span{font-size:12px;line-height:1.5}
+.nxhd4-image-frame.is-broken .nxhd4-empty i{color:#fda4af}
+.nxhd4-arrow{height:36px;display:grid;place-items:center;color:#c084fc}
+.nxhd4-arrow i{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:rgba(168,85,247,.1);border:1px solid rgba(192,132,252,.2)}
+.nxhd4-actions{display:grid;grid-template-columns:1fr;gap:9px}
+.nxhd4-action{padding:9px 10px;color:#e9d5ff;border-color:rgba(192,132,252,.27);background:rgba(126,34,206,.13);font-size:11px;overflow-wrap:anywhere}
+.nxhd4-action:first-child{color:#fff;border-color:transparent;background:linear-gradient(135deg,#a855f7,#7c3aed)}
+.nxhd4-action:disabled{cursor:not-allowed;opacity:.48}
+.nxhd4-note{margin:0;padding:0 8px;color:#8e819e;text-align:center}
+.nxhd4-note i{margin-right:5px;color:#86efac}
+.nxhd4-toast{position:sticky;bottom:16px;z-index:3;justify-self:center;max-width:calc(100% - 24px);padding:10px 14px;border:1px solid rgba(52,211,153,.26);border-radius:999px;background:#0b2019;color:#dcfce7;font-size:12px;font-weight:850;box-shadow:0 10px 28px rgba(2,6,23,.3)}
+.nxhd4-toast.is-error{color:#ffe4e6;background:#261016;border-color:rgba(251,113,133,.28)}
+.nxhd4 [hidden]{display:none!important}
+@media(prefers-reduced-motion:reduce){.nxhd4 *{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}

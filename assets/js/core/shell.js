@@ -516,7 +516,7 @@ instagram:  {renderer:'renderInstagram',   category:'downloader', icon:'fa-brand
     pwgen:      {renderer:'renderPwgen',       category:'tools', icon:'fa-solid fa-key', title:'Password Generator', desc:'Buat password kuat dengan kontrol keamanan dalam halaman utilitas khusus.', accent:'#fbbf24', accent2:'#ea580c', rgb:'251,191,36', badge:'Security Tool'},
     morse:      {renderer:'renderMorse',       category:'tools', icon:'fa-solid fa-tower-broadcast', title:'Morse Code', desc:'Konversi teks dan kode Morse, termasuk audio, dalam ruang komunikasi tersendiri.', accent:'#c084fc', accent2:'#7c3aed', rgb:'192,132,252', badge:'Signal Utility'},
     removebg:   {renderer:'renderRemovebg',    category:'tools', icon:'fa-solid fa-eraser', title:'Remove Background', desc:'Unggah gambar dan hapus latar belakang dengan preview besar dalam ruang AI khusus.', accent:'#34d399', accent2:'#059669', rgb:'52,211,153', badge:'AI Image Tool'},
-    enhancer:   {renderer:'renderEnhancer',    category:'tools', icon:'fa-solid fa-wand-magic', title:'Image Enhancer', desc:'Tingkatkan kualitas gambar dan bandingkan hasil pada halaman pemrosesan visual.', accent:'#f472b6', accent2:'#9333ea', rgb:'244,114,182', badge:'AI Enhancement'},
+    enhancer:   {renderer:'renderHd4Enhancer', category:'tools', icon:'fa-solid fa-wand-magic-sparkles', title:'Nexora Image HD Enhancer V4', desc:'Tingkatkan detail dan kualitas gambar dari URL melalui gateway server-side aman Nexora.', accent:'#a855f7', accent2:'#22d3ee', rgb:'168,85,247', badge:'Nexora HD V4'},
     ttquote:    {renderer:'renderTiktokQuote', category:'vault', icon:'fa-brands fa-tiktok', title:'Quote TikTok Nexora', desc:'Buat fake chat TikTok dari username, pesan, dan foto profil lalu hasilkan sebagai Fake TikTok Chat.', accent:'#67e8f9', accent2:'#ec4899', rgb:'103,232,249', badge:'Nexora Quote Chat'},
     qrgen:      {renderer:'renderQrGenerator', category:'vault', icon:'fa-solid fa-qrcode', title:'QR Generator', desc:'Masukkan teks atau tautan, atur QR, lalu simpan hasil dari halaman generator penuh.', accent:'#a3e635', accent2:'#16a34a', rgb:'163,230,53', badge:'QR Utility'}
   };
@@ -704,7 +704,7 @@ instagram:  {renderer:'renderInstagram',   category:'downloader', icon:'fa-brand
         if(id === 'pwgen') aliases.push('password gen','password generator');
         if(id === 'morse') aliases.push('morse code');
         if(id === 'removebg') aliases.push('remove bg','remove background');
-        if(id === 'enhancer') aliases.push('image enhancer');
+        if(id === 'enhancer') aliases.push('image enhancer','image hd enhancer','image upscaler','hd4','nexora image hd enhancer v4');
         if(id === 'ttquote') aliases.push('tiktok quote');
         if(id === 'qrgen') aliases.push('qr generator');
         if(aliases.indexOf(name) === -1) return false;
