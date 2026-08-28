@@ -1,5 +1,6 @@
 ## 6.4.0 Nexora AI Song Generator — 2026-08-28
 
+- HF39: provider HTTP 400 generik tidak lagi dituduh sebagai prompt invalid; error generation dipetakan ke service unavailable dan Runtime Logs hanya memuat status, kategori, durasi, serta bentuk field aman.
 - Fitur: menambahkan generator lagu mobile-first dengan prompt wajib, judul/style opsional, preset genre, native audio player, lyrics, Download, Open Audio, dan Copy Link.
 - API: route `/api/ai/song` dimultipleks melalui `api/tool-health.js`; upstream tetap dan `KURONEKO_API_KEY` hanya ditambahkan server-side memakai `URLSearchParams`.
 - Runtime: request sinkron satu kali, timeout 110 detik, `no-store`, rate limit, deduplikasi request identik, batas respons, AbortController, dan sanitasi error aktif.
