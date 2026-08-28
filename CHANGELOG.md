@@ -1,3 +1,10 @@
+## 6.4.0 HF43 Puter video result recovery — 2026-08-28
+
+- Fix: normalizer AI Video kini menerima data URI video dengan MIME generik `application/octet-stream` yang dapat dihasilkan Blob Puter pada Chrome Android.
+- Compatibility: hasil resmi Puter didukung sebagai elemen video, child `<source>`, Blob, ArrayBuffer/typed array, Response-like, direct URL, serta wrapper object bertingkat.
+- Diagnostics: bentuk hasil yang belum dikenali hanya mencatat tipe root, nama field, tag, protokol, dan MIME; prompt serta URL video tidak pernah dicatat.
+- Cache: versi modul AI Video dinaikkan ke HF43 agar browser Android tidak mempertahankan normalizer HF42.
+
 ## 6.4.0 HF42 Nexora AI Video Generator — 2026-08-28
 
 - Fitur: menambahkan Text to Video dan Image to Video melalui `puter.ai.txt2vid()` dengan player native, Download, Open Video, dan Generate Again.

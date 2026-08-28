@@ -49,43 +49,119 @@
   }
 
   function isAllowedVideoUrl(value) {
-    return /^(?:https:\/\/|blob:|data:video\/)/i.test(String(value || ""));
+    return /^(?:https:\/\/|blob:|data:(?:video\/|application\/(?:octet-stream|mp4|x-mp4)|binary\/octet-stream))/i.test(String(value || ""));
   }
 
-  function sourceFromObject(value) {
+  function safeValue(value, key) {
+    try { return value && value[key]; } catch (_) { return null; }
+  }
+
+  function sourceFromElement(value) {
     if (!value || typeof value !== "object") return "";
-    var direct = [value.videoUrl, value.video_url, value.asset_url, value.url, value.href, value.src];
+    var sourceNode = null;
+    try { sourceNode = typeof value.querySelector === "function" ? value.querySelector("source[src]") : null; } catch (_) { sourceNode = null; }
+    var direct = [
+      safeValue(value, "currentSrc"),
+      safeValue(value, "src"),
+      typeof value.getAttribute === "function" ? value.getAttribute("data-source") : "",
+      typeof value.getAttribute === "function" ? value.getAttribute("src") : "",
+      sourceNode && (safeValue(sourceNode, "src") || (typeof sourceNode.getAttribute === "function" ? sourceNode.getAttribute("src") : ""))
+    ];
     for (var index = 0; index < direct.length; index += 1) {
       if (isAllowedVideoUrl(direct[index])) return String(direct[index]);
-      if (direct[index] && typeof direct[index] === "object" && isAllowedVideoUrl(direct[index].url)) return String(direct[index].url);
     }
     return "";
   }
 
-  function normalizePuterVideoResult(raw) {
+  function sourceFromObject(value, depth, seen) {
+    if (isAllowedVideoUrl(value)) return String(value);
+    if (!value || typeof value !== "object" || depth > 3) return "";
+    if (Array.isArray(value)) {
+      for (var arrayIndex = 0; arrayIndex < value.length; arrayIndex += 1) {
+        var itemSource = sourceFromObject(value[arrayIndex], depth + 1, seen);
+        if (itemSource) return itemSource;
+      }
+      return "";
+    }
+    if (seen.indexOf(value) !== -1) return "";
+    seen.push(value);
+    var directKeys = ["videoUrl", "video_url", "asset_url", "output_url", "download_url", "file_url", "url", "href", "src"];
+    for (var index = 0; index < directKeys.length; index += 1) {
+      var direct = safeValue(value, directKeys[index]);
+      if (isAllowedVideoUrl(direct)) return String(direct);
+      if (direct && typeof direct === "object" && isAllowedVideoUrl(safeValue(direct, "url"))) return String(safeValue(direct, "url"));
+    }
+    var nestedKeys = ["result", "data", "output", "video", "media", "response", "asset", "file"];
+    for (var nestedIndex = 0; nestedIndex < nestedKeys.length; nestedIndex += 1) {
+      var nested = safeValue(value, nestedKeys[nestedIndex]);
+      if (Array.isArray(nested)) {
+        for (var itemIndex = 0; itemIndex < nested.length; itemIndex += 1) {
+          var arraySource = sourceFromObject(nested[itemIndex], depth + 1, seen);
+          if (arraySource) return arraySource;
+        }
+      } else {
+        var nestedSource = sourceFromObject(nested, depth + 1, seen);
+        if (nestedSource) return nestedSource;
+      }
+    }
+    return "";
+  }
+
+  function ownedBlobResult(blob, sourceType) {
+    if (!blob || !blob.size) throw new Error("PUTER_VIDEO_EMPTY_RESULT");
+    var objectUrl = URL.createObjectURL(blob);
+    return { videoUrl: objectUrl, blob: blob, element: null, metadata: { sourceType: sourceType, mimeType: blob.type || "video/mp4", ownsObjectUrl: true } };
+  }
+
+  function describeVideoResult(raw) {
+    var source = sourceFromElement(raw) || sourceFromObject(raw, 0, []);
+    var dataMime = /^data:([^;,]+)/i.exec(source || "");
+    var protocol = /^([a-z][a-z0-9+.-]*):/i.exec(source || "");
+    var keys = [];
+    try { keys = raw && typeof raw === "object" ? Object.keys(raw).slice(0, 20) : []; } catch (_) { keys = []; }
+    return {
+      rootType: raw === null ? "null" : Array.isArray(raw) ? "array" : typeof raw,
+      tagName: String(safeValue(raw, "tagName") || "").slice(0, 20),
+      keys: keys,
+      sourceProtocol: protocol ? protocol[1].toLowerCase() : "none",
+      dataMime: dataMime ? dataMime[1].toLowerCase().slice(0, 80) : "none",
+      mimeHint: String(safeValue(raw, "type") || (typeof safeValue(raw, "getAttribute") === "function" ? raw.getAttribute("data-mime-type") : "") || "").slice(0, 80)
+    };
+  }
+
+  async function normalizePuterVideoResult(raw) {
     if (!raw) throw new Error("PUTER_VIDEO_EMPTY_RESULT");
     if (typeof HTMLVideoElement !== "undefined" && raw instanceof HTMLVideoElement) {
-      var elementUrl = String(raw.currentSrc || raw.src || raw.getAttribute("data-source") || "");
+      var elementUrl = sourceFromElement(raw);
       if (!isAllowedVideoUrl(elementUrl)) throw new Error("PUTER_VIDEO_INVALID_RESULT");
       return { videoUrl: elementUrl, blob: null, element: raw, metadata: { sourceType: "HTMLVideoElement", ownsObjectUrl: false } };
     }
     if (raw && String(raw.tagName || "").toUpperCase() === "VIDEO") {
-      var duckUrl = String(raw.currentSrc || raw.src || (typeof raw.getAttribute === "function" ? raw.getAttribute("data-source") : "") || "");
+      var duckUrl = sourceFromElement(raw);
       if (!isAllowedVideoUrl(duckUrl)) throw new Error("PUTER_VIDEO_INVALID_RESULT");
       return { videoUrl: duckUrl, blob: null, element: raw, metadata: { sourceType: "HTMLVideoElement", ownsObjectUrl: false } };
     }
     if (typeof Blob !== "undefined" && raw instanceof Blob) {
-      if (!raw.size) throw new Error("PUTER_VIDEO_EMPTY_RESULT");
-      var objectUrl = URL.createObjectURL(raw);
-      return { videoUrl: objectUrl, blob: raw, element: null, metadata: { sourceType: "Blob", mimeType: raw.type || "video/mp4", ownsObjectUrl: true } };
+      return ownedBlobResult(raw, "Blob");
+    }
+    if (typeof ArrayBuffer !== "undefined" && (raw instanceof ArrayBuffer || (typeof ArrayBuffer.isView === "function" && ArrayBuffer.isView(raw)))) {
+      var bytes = raw instanceof ArrayBuffer ? raw : raw.buffer.slice(raw.byteOffset, raw.byteOffset + raw.byteLength);
+      return ownedBlobResult(new Blob([bytes], { type: "video/mp4" }), "ArrayBuffer");
+    }
+    if (raw && typeof raw === "object" && typeof raw.arrayBuffer === "function") {
+      var responseBytes = await raw.arrayBuffer();
+      var headerType = "";
+      try { headerType = raw.headers && typeof raw.headers.get === "function" ? raw.headers.get("content-type") : ""; } catch (_) { headerType = ""; }
+      return ownedBlobResult(new Blob([responseBytes], { type: headerType || raw.type || "video/mp4" }), "Response");
     }
     if (typeof raw === "string" && isAllowedVideoUrl(raw)) {
       return { videoUrl: raw, blob: null, element: null, metadata: { sourceType: "URL", ownsObjectUrl: false } };
     }
-    var objectUrlValue = sourceFromObject(raw);
+    var objectUrlValue = sourceFromObject(raw, 0, []);
     if (objectUrlValue) {
       return { videoUrl: objectUrlValue, blob: null, element: null, metadata: { sourceType: "Object", ownsObjectUrl: false } };
     }
+    console.warn("[puter-video] unsupported result shape", describeVideoResult(raw));
     throw new Error("PUTER_VIDEO_INVALID_RESULT");
   }
 

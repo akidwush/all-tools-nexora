@@ -31,9 +31,9 @@ assert.match(shell, /aivideo:\{renderer:'renderPuterVideo'/);
 assert.match(registry, /\["aivideo","Nexora AI Video Generator","module","puter-video","renderPuterVideo",null\]/);
 assert.match(health, /id: "aivideo", name: "Nexora AI Video Generator"/);
 assert.match(lazy, /aivideo:'puter-video'/);
-assert.match(lazy, /puter-video-hf42/);
+assert.match(lazy, /puter-video-hf43/);
 assert.match(lazy, /'puter-video':'Nexora AI Video Generator'/);
-assert.match(index, /hf42-puter-video1/);
+assert.match(index, /hf43-puter-video1/);
 assert.match(readme, /#tool-aivideo/);
 assert.match(readme, /60 tool/);
 
@@ -89,6 +89,7 @@ const sandbox = {
   },
   URL: { createObjectURL() { return "blob:nexora-video-test"; } },
   Blob,
+  ArrayBuffer,
   HTMLVideoElement: undefined,
   FileReader: function FileReader() {},
   Uint8Array,
@@ -117,19 +118,6 @@ assert.equal(helpers.buildOptions(sora, 99, "invalid", reference).input_referenc
 assert.equal(helpers.buildOptions(sora, 99, "invalid", reference).seconds, 4);
 assert.equal(helpers.buildOptions(sora, 99, "invalid", reference).size, "720x1280");
 
-const elementResult = helpers.normalize({
-  tagName: "VIDEO",
-  src: "https://assets.puter.site/video.mp4",
-  getAttribute() { return ""; }
-});
-assert.equal(elementResult.videoUrl, "https://assets.puter.site/video.mp4");
-assert.equal(elementResult.metadata.sourceType, "HTMLVideoElement");
-const blobResult = helpers.normalize(new Blob(["video"], { type: "video/mp4" }));
-assert.equal(blobResult.videoUrl, "blob:nexora-video-test");
-assert.equal(blobResult.metadata.ownsObjectUrl, true);
-assert.equal(helpers.normalize({ asset_url: "https://assets.puter.site/result.mp4" }).videoUrl, "https://assets.puter.site/result.mp4");
-assert.throws(() => helpers.normalize({ result: "missing" }), /PUTER_VIDEO_INVALID_RESULT/);
-
 assert.match(helpers.errorMessage({ status: 401, message: "Unauthorized" }), /Login Puter/);
 assert.match(helpers.errorMessage({ status: 402, message: "Allowance exhausted" }), /Allowance/);
 assert.match(helpers.errorMessage({ status: 429, message: "Too many requests" }), /terlalu banyak/);
@@ -144,8 +132,59 @@ async function verifyImageValidation() {
   await assert.rejects(() => helpers.validateImage(fake), /PUTER_VIDEO_IMAGE_INVALID/);
 }
 
-verifyImageValidation().then(() => {
-  console.log("Nexora AI Video HF42 lulus: model resmi Puter, text/image-to-video, normalizer, auth, player, download, cleanup, mobile, dan zero-backend tervalidasi.");
+async function verifyMediaNormalization() {
+  const elementResult = await helpers.normalize({
+    tagName: "VIDEO",
+    src: "https://assets.puter.site/video.mp4",
+    getAttribute() { return ""; },
+    querySelector() { return null; }
+  });
+  assert.equal(elementResult.videoUrl, "https://assets.puter.site/video.mp4");
+  assert.equal(elementResult.metadata.sourceType, "HTMLVideoElement");
+
+  const genericMimeElement = await helpers.normalize({
+    tagName: "VIDEO",
+    src: "data:application/octet-stream;base64,AAAA",
+    getAttribute(name) { return name === "data-mime-type" ? "video/mp4" : ""; },
+    querySelector() { return null; }
+  });
+  assert.match(genericMimeElement.videoUrl, /^data:application\/octet-stream/);
+
+  const sourceChild = await helpers.normalize({
+    tagName: "VIDEO",
+    src: "",
+    getAttribute() { return ""; },
+    querySelector() { return { src: "https://assets.puter.site/source-child.mp4" }; }
+  });
+  assert.match(sourceChild.videoUrl, /source-child\.mp4$/);
+
+  const blobResult = await helpers.normalize(new Blob(["video"], { type: "video/mp4" }));
+  assert.equal(blobResult.videoUrl, "blob:nexora-video-test");
+  assert.equal(blobResult.metadata.ownsObjectUrl, true);
+
+  const arrayBufferResult = await helpers.normalize(Uint8Array.from([0, 1, 2]).buffer);
+  assert.equal(arrayBufferResult.metadata.sourceType, "ArrayBuffer");
+  assert.equal(arrayBufferResult.metadata.ownsObjectUrl, true);
+
+  const responseResult = await helpers.normalize({
+    type: "application/octet-stream",
+    headers: { get() { return "video/mp4"; } },
+    async arrayBuffer() { return Uint8Array.from([0, 1, 2]).buffer; }
+  });
+  assert.equal(responseResult.metadata.sourceType, "Response");
+  assert.equal(responseResult.blob.type, "video/mp4");
+
+  const nestedResult = await helpers.normalize({ result: { output: { video_url: "https://assets.puter.site/nested.mp4" } } });
+  assert.match(nestedResult.videoUrl, /nested\.mp4$/);
+  const scalarEnvelope = await helpers.normalize({ result: "https://assets.puter.site/scalar.mp4" });
+  assert.match(scalarEnvelope.videoUrl, /scalar\.mp4$/);
+  const arrayEnvelope = await helpers.normalize([{ href: "https://assets.puter.site/array.mp4" }]);
+  assert.match(arrayEnvelope.videoUrl, /array\.mp4$/);
+  await assert.rejects(() => helpers.normalize({ result: "missing" }), /PUTER_VIDEO_INVALID_RESULT/);
+}
+
+Promise.all([verifyImageValidation(), verifyMediaNormalization()]).then(() => {
+  console.log("Nexora AI Video HF43 lulus: hasil Puter DOM/Blob/ArrayBuffer/Response/nested, MIME generik Android, model resmi, auth, player, download, cleanup, mobile, dan zero-backend tervalidasi.");
 }).catch((error) => {
   console.error(error);
   process.exit(1);
