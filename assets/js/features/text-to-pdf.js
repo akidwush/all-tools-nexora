@@ -39,7 +39,7 @@
     var sections = [{ id: "nap-section-1", title: "BAB 1", content: "" }];
     var settings = {
       paperSize: "A5",
-      fontFamily: "Comic Neue",
+      fontFamily: "Helvetica",
       fontSize: 11,
       lineHeight: 1.5,
       margin: 42,
@@ -75,7 +75,7 @@
               <summary><span><i class="fa-solid fa-sliders"></i> Pengaturan format</span><i class="fa-solid fa-chevron-down"></i></summary>
               <div class="nap-format-grid">
                 <label>Ukuran kertas<select id="napPaper"><option value="A5">A5</option><option value="A4">A4</option></select></label>
-                <label>Font PDF<select id="napFont"><option value="Comic Neue">Comic Neue</option><option value="Helvetica">Helvetica</option><option value="Times-Roman">Times Roman</option></select></label>
+                <label>Font PDF<select id="napFont"><option value="Helvetica">Helvetica</option><option value="Times-Roman">Times Roman</option></select></label>
                 <label>Ukuran font<input id="napFontSize" type="number" min="8" max="18" value="11"></label>
                 <label>Jarak baris<input id="napLineHeight" type="number" min="1.1" max="2.2" step="0.1" value="1.5"></label>
                 <label>Margin (pt)<input id="napMargin" type="number" min="20" max="90" value="42"></label>
@@ -287,7 +287,7 @@
       requestSequence++;
       releasePdf();
       sections = [{ id: "nap-section-" + Date.now(), title: "BAB 1", content: "" }];
-      settings = { paperSize: "A5", fontFamily: "Comic Neue", fontSize: 11, lineHeight: 1.5, margin: 42, startEachSectionOnNewPage: true };
+      settings = { paperSize: "A5", fontFamily: "Helvetica", fontSize: 11, lineHeight: 1.5, margin: 42, startEachSectionOnNewPage: true };
       root.querySelector("#napPaper").value = settings.paperSize;
       root.querySelector("#napFont").value = settings.fontFamily;
       root.querySelector("#napFontSize").value = settings.fontSize;
