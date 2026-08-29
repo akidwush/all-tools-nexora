@@ -80,7 +80,7 @@
     [/ai-song\.(?:js|css)(?:$|\?)/, 'ai-song-v1'],
     [/hd4-enhancer\.(?:js|css)(?:$|\?)/, 'hd4-enhancer-v2'],
     [/document-ai\.(?:js|css)(?:$|\?)/, 'document-android-branding1'],
-    [/text-to-pdf\.(?:js|css)(?:$|\?)/, 'auto-pdf-v1'],
+    [/text-to-pdf\.(?:js|css)(?:$|\?)/, 'auto-pdf-v2'],
     [/crypto-market\.(?:js|css)(?:$|\?)/, 'crypto-mtf'],
     [/comic-reader\.(?:js|css)(?:$|\?)/, 'comic-reader'],
     [/svg-alight\.(?:js|css)(?:$|\?)/, 'svg-alight'],

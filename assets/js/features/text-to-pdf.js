@@ -74,8 +74,46 @@
             <details class="nap-format">
               <summary><span><i class="fa-solid fa-sliders"></i> Pengaturan format</span><i class="fa-solid fa-chevron-down"></i></summary>
               <div class="nap-format-grid">
-                <label>Ukuran kertas<select id="napPaper"><option value="A5">A5</option><option value="A4">A4</option></select></label>
-                <label>Font PDF<select id="napFont"><option value="Helvetica">Helvetica</option><option value="Times-Roman">Times Roman</option></select></label>
+                <div class="nap-field nap-choice-field">
+                  <span class="nap-field-label">Ukuran kertas</span>
+                  <div class="nap-select" data-nap-select="napPaper">
+                    <select id="napPaper" class="nap-native-select" aria-hidden="true" tabindex="-1">
+                      <option value="A5">A5</option>
+                      <option value="A4">A4</option>
+                    </select>
+                    <button id="napPaperTrigger" class="nap-select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="napPaperMenu">
+                      <span data-nap-selected>A5</span><i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                    </button>
+                    <div id="napPaperMenu" class="nap-select-menu" role="listbox" aria-label="Ukuran kertas" hidden>
+                      <button class="nap-select-option" type="button" role="option" aria-selected="true" data-value="A5" data-label="A5" data-description="Ringkas · cocok untuk novel">
+                        <span class="nap-select-dot" aria-hidden="true"></span><span><strong>A5</strong><small>Ringkas · cocok untuk novel</small></span>
+                      </button>
+                      <button class="nap-select-option" type="button" role="option" aria-selected="false" data-value="A4" data-label="A4" data-description="Standar · ruang lebih luas">
+                        <span class="nap-select-dot" aria-hidden="true"></span><span><strong>A4</strong><small>Standar · ruang lebih luas</small></span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="nap-field nap-choice-field">
+                  <span class="nap-field-label">Font PDF</span>
+                  <div class="nap-select nap-select--font" data-nap-select="napFont">
+                    <select id="napFont" class="nap-native-select" aria-hidden="true" tabindex="-1">
+                      <option value="Helvetica">Helvetica</option>
+                      <option value="Times-Roman">Times Roman</option>
+                    </select>
+                    <button id="napFontTrigger" class="nap-select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false" aria-controls="napFontMenu">
+                      <span data-nap-selected>Helvetica</span><i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                    </button>
+                    <div id="napFontMenu" class="nap-select-menu" role="listbox" aria-label="Font PDF" hidden>
+                      <button class="nap-select-option" type="button" role="option" aria-selected="true" data-value="Helvetica" data-label="Helvetica" data-description="Bersih dan modern">
+                        <span class="nap-select-dot" aria-hidden="true"></span><span><strong>Helvetica</strong><small>Bersih dan modern</small></span>
+                      </button>
+                      <button class="nap-select-option" type="button" role="option" aria-selected="false" data-value="Times-Roman" data-label="Times Roman" data-description="Klasik dan formal">
+                        <span class="nap-select-dot" aria-hidden="true"></span><span><strong>Times Roman</strong><small>Klasik dan formal</small></span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
                 <label>Ukuran font<input id="napFontSize" type="number" min="8" max="18" value="11"></label>
                 <label>Jarak baris<input id="napLineHeight" type="number" min="1.1" max="2.2" step="0.1" value="1.5"></label>
                 <label>Margin (pt)<input id="napMargin" type="number" min="20" max="90" value="42"></label>
@@ -117,6 +155,131 @@
     var generateButton = root.querySelector("#napGenerate");
     var downloadButton = root.querySelector("#napDownload");
     var filenameInput = root.querySelector("#napFilename");
+    var customSelectCleanups = [];
+    var customSelectSync = {};
+
+    function closeCustomSelect(wrapper, restoreFocus) {
+      if (!wrapper) return;
+      var trigger = wrapper.querySelector(".nap-select-trigger");
+      var menu = wrapper.querySelector(".nap-select-menu");
+      wrapper.classList.remove("is-open");
+      if (trigger) trigger.setAttribute("aria-expanded", "false");
+      if (menu) menu.hidden = true;
+      if (restoreFocus && trigger) trigger.focus({ preventScroll: true });
+    }
+
+    function closeAllCustomSelects(except) {
+      root.querySelectorAll(".nap-select.is-open").forEach(function (wrapper) {
+        if (wrapper !== except) closeCustomSelect(wrapper, false);
+      });
+    }
+
+    function setupCustomSelect(selectId) {
+      var select = root.querySelector("#" + selectId);
+      var wrapper = root.querySelector('[data-nap-select="' + selectId + '"]');
+      if (!select || !wrapper) return function () {};
+      var trigger = wrapper.querySelector(".nap-select-trigger");
+      var selectedLabel = wrapper.querySelector("[data-nap-selected]");
+      var menu = wrapper.querySelector(".nap-select-menu");
+      var options = Array.from(wrapper.querySelectorAll(".nap-select-option"));
+
+      function sync() {
+        var option = options.find(function (item) { return item.dataset.value === select.value; }) || options[0];
+        if (!option) return;
+        if (selectedLabel) selectedLabel.textContent = option.dataset.label || option.textContent.trim();
+        options.forEach(function (item) {
+          var active = item === option;
+          item.setAttribute("aria-selected", active ? "true" : "false");
+          item.classList.toggle("is-selected", active);
+        });
+      }
+
+      function openMenu(focusTarget) {
+        closeAllCustomSelects(wrapper);
+        wrapper.classList.add("is-open");
+        trigger.setAttribute("aria-expanded", "true");
+        menu.hidden = false;
+        if (focusTarget) {
+          var selected = options.find(function (item) { return item.getAttribute("aria-selected") === "true"; });
+          var target = focusTarget === "last" ? options[options.length - 1] : selected || options[0];
+          requestAnimationFrame(function () { target?.focus({ preventScroll: true }); });
+        }
+      }
+
+      function choose(option) {
+        if (!option || !option.dataset.value) return;
+        select.value = option.dataset.value;
+        sync();
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+        closeCustomSelect(wrapper, true);
+      }
+
+      function onTriggerClick() {
+        if (wrapper.classList.contains("is-open")) closeCustomSelect(wrapper, false);
+        else openMenu(false);
+      }
+
+      function onTriggerKeydown(event) {
+        if (event.key === "ArrowDown" || event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openMenu("selected");
+        } else if (event.key === "ArrowUp") {
+          event.preventDefault();
+          openMenu("last");
+        } else if (event.key === "Escape") {
+          closeCustomSelect(wrapper, false);
+        }
+      }
+
+      function onMenuClick(event) {
+        var option = event.target.closest(".nap-select-option");
+        if (option) choose(option);
+      }
+
+      function onMenuKeydown(event) {
+        var current = event.target.closest(".nap-select-option");
+        if (!current) return;
+        var index = options.indexOf(current);
+        if (event.key === "Escape") {
+          event.preventDefault();
+          closeCustomSelect(wrapper, true);
+          return;
+        }
+        if (event.key === "Home" || event.key === "End" || event.key === "ArrowDown" || event.key === "ArrowUp") {
+          event.preventDefault();
+          var nextIndex = index;
+          if (event.key === "Home") nextIndex = 0;
+          if (event.key === "End") nextIndex = options.length - 1;
+          if (event.key === "ArrowDown") nextIndex = (index + 1) % options.length;
+          if (event.key === "ArrowUp") nextIndex = (index - 1 + options.length) % options.length;
+          options[nextIndex]?.focus({ preventScroll: true });
+        }
+      }
+
+      trigger.addEventListener("click", onTriggerClick);
+      trigger.addEventListener("keydown", onTriggerKeydown);
+      menu.addEventListener("click", onMenuClick);
+      menu.addEventListener("keydown", onMenuKeydown);
+      select.addEventListener("change", sync);
+      customSelectSync[selectId] = sync;
+      sync();
+
+      return function () {
+        trigger.removeEventListener("click", onTriggerClick);
+        trigger.removeEventListener("keydown", onTriggerKeydown);
+        menu.removeEventListener("click", onMenuClick);
+        menu.removeEventListener("keydown", onMenuKeydown);
+        select.removeEventListener("change", sync);
+      };
+    }
+
+    customSelectCleanups.push(setupCustomSelect("napPaper"));
+    customSelectCleanups.push(setupCustomSelect("napFont"));
+
+    function handleCustomSelectOutside(event) {
+      if (!root.contains(event.target) || !event.target.closest(".nap-select")) closeAllCustomSelects(null);
+    }
+    document.addEventListener("pointerdown", handleCustomSelectOutside);
 
     function signature() {
       return JSON.stringify({ sections: sections.map(function (section) { return { title: section.title.trim(), content: section.content.trim() }; }), settings: settings });
@@ -290,6 +453,8 @@
       settings = { paperSize: "A5", fontFamily: "Helvetica", fontSize: 11, lineHeight: 1.5, margin: 42, startEachSectionOnNewPage: true };
       root.querySelector("#napPaper").value = settings.paperSize;
       root.querySelector("#napFont").value = settings.fontFamily;
+      customSelectSync.napPaper?.();
+      customSelectSync.napFont?.();
       root.querySelector("#napFontSize").value = settings.fontSize;
       root.querySelector("#napLineHeight").value = settings.lineHeight;
       root.querySelector("#napMargin").value = settings.margin;
@@ -316,6 +481,8 @@
 
     root.__napCleanup = function () {
       requestSequence++;
+      document.removeEventListener("pointerdown", handleCustomSelectOutside);
+      customSelectCleanups.forEach(function (cleanup) { cleanup(); });
       releasePdf();
     };
     renderSections();

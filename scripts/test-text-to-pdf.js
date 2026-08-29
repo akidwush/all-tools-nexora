@@ -83,8 +83,11 @@ async function main() {
   }
 
   const frontend = read("assets/js/features/text-to-pdf.js");
-  for (const token of ["renderTextToPdf", "/api/tools/text-to-pdf", "Buat Preview", "Unduh PDF", "MAX_SECTIONS = 5"]) assert.ok(frontend.includes(token));
+  for (const token of ["renderTextToPdf", "/api/tools/text-to-pdf", "Buat Preview", "Unduh PDF", "MAX_SECTIONS = 5", "nap-select-trigger", "napFontMenu", "napPaperMenu", "setupCustomSelect"]) assert.ok(frontend.includes(token));
   assert.doesNotMatch(frontend, /NEXORA_PDF_API_KEY|X-API-Key/);
+  const pdfCss = read("assets/css/features/text-to-pdf.css");
+  for (const token of [".nap-select-menu", ".nap-select-option.is-selected", ".nap-native-select", ".nap-select--font"]) assert.ok(pdfCss.includes(token));
+  assert.match(read("assets/js/core/lazy-loader.js"), /text-to-pdf[^\n]*auto-pdf-v2/);
 
   const manifest = JSON.parse(read("assets/module-manifest.json"));
   assert.equal(manifest.tools.autopdf, "text-to-pdf");
