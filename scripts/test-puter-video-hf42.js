@@ -31,9 +31,9 @@ assert.match(shell, /aivideo:\{renderer:'renderPuterVideo'/);
 assert.match(registry, /\["aivideo","Nexora AI Video Generator","module","puter-video","renderPuterVideo",null\]/);
 assert.match(health, /id: "aivideo", name: "Nexora AI Video Generator"/);
 assert.match(lazy, /aivideo:'puter-video'/);
-assert.match(lazy, /puter-video-hf46/);
+assert.match(lazy, /puter-video-hf47/);
 assert.match(lazy, /'puter-video':'Nexora AI Video Generator'/);
-assert.match(index, /hf46-puter-video1/);
+assert.match(index, /hf47-puter-video1/);
 assert.match(readme, /#tool-aivideo/);
 assert.match(readme, /60 tool/);
 
@@ -62,6 +62,13 @@ assert.match(generationHelper, /var request = sdk\.ai\.txt2vid\(params\.prompt, 
 assert.match(generationHelper, /options\.puter_output_path = outputPath/);
 assert.match(feature, /sdk\.fs\.read\(outputPath\)/);
 assert.match(feature, /sdk\.fs\.delete\(outputPath\)/);
+assert.match(feature, /id="nvgCost"/);
+assert.match(feature, /Perkiraan biaya/);
+assert.match(feature, /video\.onloadedmetadata = reportActualDuration/);
+assert.match(feature, /diminta " \+ requestedSeconds \+ "s · hasil " \+ actualSeconds/);
+assert.match(feature, /penyesuaian allowance/);
+assert.match(css, /\.nvg-cost/);
+assert.match(css, /\.nvg-message\.is-warning/);
 assert.match(css, /\.nvg-auth-retry/);
 assert.match(feature, /body\.__nxCleanup/);
 assert.match(feature, /URL\.revokeObjectURL/);
@@ -87,7 +94,7 @@ for (const token of [
 
 const instrumented = feature.replace(
   /window\.normalizePuterVideoResult = normalizePuterVideoResult;[\s\S]*?\}\)\(\);\s*$/,
-  "window.__puterVideoTest={models:videoModels,normalize:normalizePuterVideoResult,generate:generateVideoWithPuter,buildOptions:buildVideoOptions,errorMessage:videoErrorMessage,validateImage:validateReferenceImage};})();"
+  "window.__puterVideoTest={models:videoModels,normalize:normalizePuterVideoResult,generate:generateVideoWithPuter,buildOptions:buildVideoOptions,errorMessage:videoErrorMessage,validateImage:validateReferenceImage,cost:estimatedVideoCost};})();"
 );
 const revoked = [];
 const sandbox = {
@@ -123,6 +130,10 @@ const helpers = sandbox.window.__puterVideoTest;
 assert.ok(helpers, "Helper AI Video gagal diekspos untuk regresi");
 assert.equal(helpers.models.length, 4);
 assert.equal(helpers.models.every((model) => model.supportsImageInput), true);
+assert.equal(helpers.cost(helpers.models[0], 8), 0.8);
+assert.equal(helpers.cost(helpers.models[1], 8), 2.4);
+assert.equal(helpers.cost(helpers.models[2], 8), 1.2);
+assert.equal(helpers.cost(helpers.models[3], 8), 3.2);
 
 const sora = helpers.models[0];
 assert.deepEqual(
@@ -245,7 +256,7 @@ async function verifyMediaNormalization() {
 }
 
 Promise.all([verifyImageValidation(), verifyMediaNormalization()]).then(() => {
-  console.log("Nexora AI Video HF46 lulus: fallback Blob Puter FS, cleanup file sementara, txt2vid direct-tap Android, auth, player, mobile, dan zero-backend tervalidasi.");
+  console.log("Nexora AI Video HF47 lulus: biaya sebelum generate, durasi diminta vs aktual, allowance warning, Blob recovery, mobile, dan zero-backend tervalidasi.");
 }).catch((error) => {
   console.error(error);
   process.exit(1);

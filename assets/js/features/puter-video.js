@@ -12,6 +12,7 @@
       detail: "Seimbang",
       supportsImageInput: true,
       imageInput: "file",
+      costPerSecondUsd: 0.10,
       durations: Object.freeze([4, 8, 12]),
       sizes: Object.freeze({ "9:16": "720x1280", "16:9": "1280x720" })
     }),
@@ -21,6 +22,7 @@
       detail: "Kualitas tinggi",
       supportsImageInput: true,
       imageInput: "file",
+      costPerSecondUsd: 0.30,
       durations: Object.freeze([4, 8, 12]),
       sizes: Object.freeze({ "9:16": "720x1280", "16:9": "1280x720" })
     }),
@@ -30,6 +32,7 @@
       detail: "Lebih cepat",
       supportsImageInput: true,
       imageInput: "data-uri",
+      costPerSecondUsd: 0.15,
       durations: Object.freeze([4, 6, 8]),
       sizes: Object.freeze({ "9:16": "720x1280", "16:9": "1280x720" })
     }),
@@ -39,6 +42,7 @@
       detail: "Kualitas tinggi",
       supportsImageInput: true,
       imageInput: "data-uri",
+      costPerSecondUsd: 0.40,
       durations: Object.freeze([4, 6, 8]),
       sizes: Object.freeze({ "9:16": "720x1280", "16:9": "1280x720" })
     })
@@ -46,6 +50,16 @@
 
   function modelById(id) {
     return videoModels.find(function (model) { return model.id === id; }) || videoModels[0];
+  }
+
+  function estimatedVideoCost(model, seconds) {
+    var duration = Number(seconds);
+    if (!model || !Number.isFinite(duration) || duration <= 0 || !Number.isFinite(model.costPerSecondUsd)) return null;
+    return model.costPerSecondUsd * duration;
+  }
+
+  function formatUsd(value) {
+    return "$" + Number(value || 0).toFixed(2);
   }
 
   function isAllowedVideoUrl(value) {
@@ -301,12 +315,13 @@
           '<div class="nvg-tabs" role="tablist" aria-label="Mode video"><button class="is-active" id="nvgTextMode" type="button" role="tab" aria-selected="true"><i class="fa-solid fa-font"></i>Text to Video</button><button id="nvgImageMode" type="button" role="tab" aria-selected="false"><i class="fa-regular fa-image"></i>Image to Video</button></div>' +
           '<div class="nvg-reference" id="nvgReference" hidden><label class="nvg-field-label">Gambar referensi</label><input id="nvgFile" type="file" accept="image/jpeg,image/png,image/webp" hidden><button class="nvg-file-button" id="nvgChoose" type="button"><i class="fa-solid fa-image"></i><span>Pilih Gambar</span></button><div class="nvg-preview" id="nvgPreview" hidden><img id="nvgPreviewImage" alt="Preview gambar referensi" loading="lazy" decoding="async"><div><strong id="nvgFileName"></strong><small id="nvgFileSize"></small></div><button id="nvgRemoveImage" type="button" aria-label="Hapus gambar referensi"><i class="fa-solid fa-xmark"></i></button></div><p>JPG, PNG, atau WebP · maksimal 10 MB · langsung ke Puter.</p></div>' +
           '<label class="nvg-field-label" for="nvgPrompt">Prompt video <span>Wajib</span></label><textarea id="nvgPrompt" minlength="3" maxlength="3000" rows="6" placeholder="Contoh: Kota futuristik pada malam hari, hujan deras, pantulan neon di jalan basah, gerakan kamera perlahan."></textarea><div class="nvg-count"><span>Jelaskan subjek, gerakan, kamera, dan suasana.</span><span id="nvgCount">0 / 3000</span></div>' +
-          '<div class="nvg-control-grid"><label><span>Model</span><select id="nvgModel"></select></label><label><span>Durasi</span><select id="nvgDuration"></select></label></div>' +
+          '<div class="nvg-control-grid"><label><span>Model</span><select id="nvgModel"></select></label><label><span>Durasi yang diminta</span><select id="nvgDuration"></select></label></div>' +
+          '<div class="nvg-cost" id="nvgCost" aria-live="polite"><strong>Perkiraan biaya sedang dihitung…</strong><span>Durasi ini adalah permintaan. Puter dapat memendekkannya jika allowance tidak mencukupi.</span></div>' +
           '<fieldset class="nvg-aspect"><legend>Rasio video</legend><label><input type="radio" name="nvgAspect" value="9:16" checked><span><i class="fa-solid fa-mobile-screen"></i>9:16</span></label><label><input type="radio" name="nvgAspect" value="16:9"><span><i class="fa-solid fa-display"></i>16:9</span></label></fieldset>' +
           '<button class="nvg-primary" id="nvgGenerate" type="button" disabled><i class="fa-solid fa-clapperboard"></i><span>Generate Video</span></button><p class="nvg-message" id="nvgMessage" role="status" aria-live="polite">Hubungkan akun Puter terlebih dahulu.</p><button class="nvg-auth-retry" id="nvgAuthRetry" type="button" hidden><i class="fa-solid fa-right-to-bracket"></i><span>Hubungkan Ulang Puter</span></button>' +
         '</section>' +
         '<section class="nvg-card nvg-result" aria-label="Video hasil"><div class="nvg-result-head"><div><span class="nvg-kicker">HASIL</span><h2>Generated Video</h2></div><span id="nvgResultMeta">Session only</span></div><div class="nvg-placeholder" id="nvgPlaceholder"><i class="fa-solid fa-film"></i><strong>Video akan muncul di sini</strong><span>Proses dapat memerlukan beberapa menit.</span></div><video id="nvgVideo" controls playsinline preload="metadata" hidden></video><div class="nvg-actions" id="nvgActions" hidden><a id="nvgDownload" href="#" download="nexora-ai-video.mp4"><i class="fa-solid fa-download"></i>Download Video</a><a id="nvgOpen" href="#" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i>Open Video</a><button id="nvgAgain" type="button"><i class="fa-solid fa-rotate-right"></i>Generate Again</button></div></section>' +
-        '<p class="nvg-help">Video memakai allowance akun Puter pengguna. Durasi dan ukuran yang tampil mengikuti model resmi yang dipilih.</p>' +
+        '<p class="nvg-help">Video memakai allowance akun Puter pengguna. Pilihan durasi adalah permintaan, sedangkan durasi final mengikuti hasil nyata provider.</p>' +
       '</main>';
 
     var runtime = window.NexoraPuterRuntime;
@@ -327,6 +342,7 @@
     var count = body.querySelector("#nvgCount");
     var modelSelect = body.querySelector("#nvgModel");
     var durationSelect = body.querySelector("#nvgDuration");
+    var cost = body.querySelector("#nvgCost");
     var generate = body.querySelector("#nvgGenerate");
     var message = body.querySelector("#nvgMessage");
     var authRetry = body.querySelector("#nvgAuthRetry");
@@ -373,6 +389,16 @@
       generate.querySelector("span").textContent = next ? "Generating your video…" : "Generate Video";
     }
 
+    function updateCostEstimate() {
+      var selected = modelById(modelSelect.value);
+      var requested = Number(durationSelect.value || selected.durations[0]);
+      var estimate = estimatedVideoCost(selected, requested);
+      cost.querySelector("strong").textContent = estimate === null
+        ? "Perkiraan biaya tidak tersedia"
+        : "Perkiraan biaya " + formatUsd(estimate) + " untuk " + requested + " detik";
+      cost.querySelector("span").textContent = "Durasi yang dipilih bukan jaminan. Puter dapat menurunkannya sesuai allowance akun.";
+    }
+
     function updateDurations() {
       var selected = modelById(modelSelect.value);
       var previous = Number(durationSelect.value);
@@ -384,6 +410,7 @@
         if (seconds === previous || (!previous && seconds === selected.durations[0])) option.selected = true;
         durationSelect.appendChild(option);
       });
+      updateCostEstimate();
       if (mode === "image" && !selected.supportsImageInput) {
         setMessage("Gambar referensi tidak didukung oleh model ini.", "error");
         generate.disabled = true;
@@ -417,6 +444,8 @@
     }
 
     function clearResult() {
+      video.onloadedmetadata = null;
+      video.ondurationchange = null;
       video.pause();
       video.removeAttribute("src");
       video.load();
@@ -503,6 +532,7 @@
     textMode.addEventListener("click", function () { setMode("text"); });
     imageMode.addEventListener("click", function () { setMode("image"); });
     modelSelect.addEventListener("change", updateDurations);
+    durationSelect.addEventListener("change", updateCostEstimate);
     prompt.addEventListener("input", function () { count.textContent = prompt.value.length + " / " + MAX_PROMPT_LENGTH; });
     choose.addEventListener("click", function () { if (!busy) fileInput.click(); });
     removeImage.addEventListener("click", clearReference);
@@ -567,10 +597,11 @@
 
       try {
         var selectedAspect = (body.querySelector('input[name="nvgAspect"]:checked') || {}).value || "9:16";
+        var requestedSeconds = Number(durationSelect.value);
         var result = await generateVideoWithPuter({
           prompt: promptValue,
           modelId: selectedModel.id,
-          duration: Number(durationSelect.value),
+          duration: requestedSeconds,
           aspect: selectedAspect,
           mode: mode,
           file: referenceFile,
@@ -583,6 +614,23 @@
         clearResult();
         normalizedResult = result;
         video.style.aspectRatio = selectedAspect === "16:9" ? "16 / 9" : "9 / 16";
+        var durationReported = false;
+        var reportActualDuration = function () {
+          if (durationReported || !alive || token !== generationToken) return;
+          var actualSeconds = Number.isFinite(video.duration) && video.duration > 0 ? Math.round(video.duration) : 0;
+          if (!actualSeconds) return;
+          durationReported = true;
+          resultMeta.textContent = selectedModel.label + " · diminta " + requestedSeconds + "s · hasil " + actualSeconds + "s · " + selectedAspect;
+          if (actualSeconds < requestedSeconds) {
+            setMessage("Puter menghasilkan " + actualSeconds + " detik dari permintaan " + requestedSeconds + " detik karena penyesuaian allowance.", "warning");
+          } else if (actualSeconds !== requestedSeconds) {
+            setMessage("Durasi final provider adalah " + actualSeconds + " detik; permintaan awal " + requestedSeconds + " detik.", "warning");
+          } else {
+            setMessage("Video selesai dengan durasi " + actualSeconds + " detik sesuai permintaan.", "ok");
+          }
+        };
+        video.onloadedmetadata = reportActualDuration;
+        video.ondurationchange = reportActualDuration;
         video.src = result.videoUrl;
         video.controls = true;
         video.playsInline = true;
@@ -593,8 +641,8 @@
         download.download = "nexora-ai-video-" + Date.now() + ".mp4";
         open.href = result.videoUrl;
         actions.hidden = false;
-        resultMeta.textContent = selectedModel.label + " · " + durationSelect.value + "s · " + selectedAspect;
-        setMessage("Video selesai. Tekan play untuk melihat hasilnya.", "ok");
+        resultMeta.textContent = selectedModel.label + " · diminta " + requestedSeconds + "s · membaca hasil…";
+        setMessage("Video selesai. Nexora sedang membaca durasi hasil sebenarnya.", "ok");
       } catch (error) {
         if (alive && token === generationToken) {
           var details = runtime.errorDetails(error);
@@ -648,4 +696,5 @@
 
   window.normalizePuterVideoResult = normalizePuterVideoResult;
   window.generateVideoWithPuter = generateVideoWithPuter;
+  window.estimatedPuterVideoCost = estimatedVideoCost;
 })();

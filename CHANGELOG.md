@@ -321,3 +321,8 @@
 - AI Video sekarang meminta Puter menyimpan hasil ke file aplikasi sementara, lalu memakai `puter.fs.read()` sebagai fallback resmi ketika payload langsung SDK tidak dapat dinormalisasi.
 - File sementara dihapus segera setelah hasil menjadi Blob/browser URL; Nexora tetap tidak memakai Supabase, backend proxy, atau penyimpanan video permanen.
 - Jalur `txt2vid()` tetap dipanggil langsung dari gesture tap Android agar otorisasi browser tidak kembali terblokir.
+# 6.4.0 HF47 truthful AI Video duration — 2026-08-29
+
+- AI Video menampilkan estimasi biaya resmi untuk model dan durasi yang dipilih sebelum request berbayar dilakukan.
+- Label durasi sekarang menegaskan bahwa nilainya adalah permintaan; Puter dapat memendekkan hasil sesuai allowance akun.
+- Setelah metadata video dimuat, Nexora membaca durasi file sebenarnya dan menampilkan `diminta` serta `hasil`, termasuk peringatan khusus jika 8 detik dipangkas menjadi 4 detik.
