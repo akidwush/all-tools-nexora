@@ -1375,6 +1375,73 @@ let toolsData = {
     ]
 };
 
+// Ikon katalog publik harus mudah dibedakan dalam sekali lihat. Nilai ini
+// sengaja menjadi sumber utama untuk tool bawaan agar konfigurasi database
+// lama tidak dapat menyamakan banyak kartu dengan ikon tautan eksternal.
+const PUBLIC_TOOL_ICONS = Object.freeze({
+    "aiodownloader": "fa-solid fa-cloud-arrow-down",
+    "terabox": "fa-solid fa-box-open",
+    "instagram": "fa-brands fa-instagram",
+    "tiktok": "fa-brands fa-tiktok",
+    "youtube": "fa-brands fa-youtube",
+    "spotify": "fa-brands fa-spotify",
+    "fakebankjago": "fa-solid fa-building-columns",
+    "brat": "fa-solid fa-wand-magic-sparkles",
+    "iqc": "fa-solid fa-images",
+    "sertifikat": "fa-solid fa-certificate",
+    "ektp": "fa-solid fa-id-card",
+    "fakedana": "fa-solid fa-money-bill-wave",
+    "fakedev": "fa-solid fa-laptop-code",
+    "fakelobby": "fa-solid fa-gamepad",
+    "winquotes": "fa-brands fa-windows",
+    "nokiamsg": "fa-solid fa-mobile-retro",
+    "tanyaustadz": "fa-solid fa-user-tie",
+    "mltools": "fa-solid fa-crosshairs",
+    "comicreader": "fa-solid fa-book-open-reader",
+    "aiimage": "fa-solid fa-paintbrush",
+    "aivideo": "fa-solid fa-clapperboard",
+    "genmail": "fa-solid fa-envelope-open-text",
+    "danbooru": "fa-solid fa-photo-film",
+    "animetoreal": "fa-solid fa-person-rays",
+    "aisong": "fa-solid fa-music",
+    "promptgenerate": "fa-solid fa-pen-ruler",
+    "fakeovo": "fa-solid fa-wallet",
+    "quotegenerator": "fa-solid fa-quote-left",
+    "carifakta": "fa-solid fa-magnifying-glass-chart",
+    "virusscan": "fa-solid fa-shield-virus",
+    "cryptomarket": "fa-solid fa-chart-line",
+    "webintel": "fa-solid fa-satellite-dish",
+    "ipintel": "fa-solid fa-network-wired",
+    "bmkg": "fa-solid fa-cloud-sun-rain",
+    "spaceexplorer": "fa-solid fa-user-astronaut",
+    "ocrintel": "fa-solid fa-file-lines",
+    "documentai": "fa-solid fa-file-waveform",
+    "autopdf": "fa-solid fa-file-pdf",
+    "svgalight": "fa-solid fa-vector-square",
+    "alightpremium": "fa-solid fa-bolt",
+    "imagevectorizer": "fa-solid fa-bezier-curve",
+    "text2d": "fa-solid fa-font",
+    "text3d": "fa-solid fa-cube",
+    "textfxanimation": "fa-solid fa-text-height",
+    "textvector": "fa-solid fa-draw-polygon",
+    "trimpath": "fa-solid fa-route",
+    "logoanimate": "fa-solid fa-shapes",
+    "calc": "fa-solid fa-calculator",
+    "pwgen": "fa-solid fa-key",
+    "morse": "fa-solid fa-tower-broadcast",
+    "removebg": "fa-solid fa-eraser",
+    "enhancer": "fa-solid fa-sliders",
+    "ttquote": "fa-solid fa-comment-dots",
+    "qrgen": "fa-solid fa-qrcode",
+    "tiktokhd": "fa-solid fa-upload",
+    "getcode": "fa-solid fa-code",
+    "vdeploy": "fa-solid fa-rocket",
+    "zxvai": "fa-solid fa-robot",
+    "fotolink": "fa-solid fa-link",
+    "webencryption": "fa-solid fa-lock",
+    "unbanwa": "fa-brands fa-whatsapp"
+});
+
 function collectAllTools() {
     return [
         toolsData.tools.find(item => item.id === 'comicreader'),
@@ -1406,7 +1473,7 @@ function toolCardMarkup(item, isExternal = false, category = '') {
     const escapeToolHtml = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
     const safeId = escapeToolHtml(item.id);
     const accessLevel = item.id === 'documentai' ? 'free' : (item.accessLevel === 'vvip' ? 'vvip' : 'free');
-    const safeIcon = escapeToolHtml(item.icon || 'fa-solid fa-cube');
+    const safeIcon = escapeToolHtml(PUBLIC_TOOL_ICONS[item.id] || item.icon || 'fa-solid fa-cube');
     const safeLink = encodeURIComponent(String(item.link || '#')).replace(/'/g, '%27');
     const clickAttr = item.id === 'unbanwa' ?
         `onclick="window.openNexoraUnban && window.openNexoraUnban()"` :
@@ -1614,7 +1681,7 @@ async function applyDatabaseToolConfiguration() {
                 name: publicOverride?.name || row?.name || base.name,
                 desc: publicOverride?.description || row?.description || base.desc || '',
                 badge: publicOverride?.badge || row?.badge || base.badge || '',
-                icon: row?.icon || base.icon || 'fa-solid fa-arrow-up-right-from-square',
+                icon: PUBLIC_TOOL_ICONS[base.id] || row?.icon || base.icon || 'fa-solid fa-arrow-up-right-from-square',
                 link: row?.external_url || base.link,
                 sortOrder: Number.isFinite(Number(row?.sort_order)) ? Number(row.sort_order) : bundledOrder,
                 custom: false,
@@ -1688,6 +1755,8 @@ function showTool(toolId) {
     const viewer = document.getElementById('toolViewer');
     const body = document.getElementById('toolViewerBody');
     viewer.classList.add('active');
+    document.body.classList.add('nx-tool-room-open');
+    document.dispatchEvent(new CustomEvent('nexora:tool-room-open', { detail: { toolId } }));
     document.body.style.overflow = 'hidden';
 
     let tool = null;
@@ -1769,6 +1838,8 @@ function closeTool() {
     if(viewer){
       viewer.classList.remove('active');
     }
+
+    document.body.classList.remove('nx-tool-room-open');
 
     const body =
       document.getElementById(
