@@ -13,9 +13,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
   <link href="../assets/css/admin.css?v=6.4.0-hf12-no-login-loader" rel="stylesheet">
-  <link href="../assets/css/admin-redesign.css?v=6.4.0-admin-redesign1" rel="stylesheet">
   <link href="../assets/css/admin-ai.css?v=6.4.0-ai1" rel="stylesheet">
   <link href="../assets/css/visual-qa.css?v=6.4.0" rel="stylesheet">
+  <link href="../assets/css/admin-redesign.css?v=6.4.0-admin-mobile-first2" rel="stylesheet">
 </head>
 <body class="admin-dashboard-page">
   <div class="admin-app" id="adminApp" hidden>
@@ -28,8 +28,10 @@
       <nav class="admin-nav" aria-label="Navigasi admin">
         <div class="admin-nav-group"><span class="admin-nav-label">Overview</span><button class="admin-nav-item is-active" data-section="overview" type="button"><i class="fa-solid fa-house"></i><span>Dashboard</span></button></div>
         <div class="admin-nav-group"><span class="admin-nav-label">Users</span><button class="admin-nav-item" data-section="members" type="button"><i class="fa-solid fa-users"></i><span>Users &amp; VVIP</span></button></div>
-        <div class="admin-nav-group"><span class="admin-nav-label">Content</span><button class="admin-nav-item" data-section="tools" type="button"><i class="fa-solid fa-toolbox"></i><span>Tools</span></button><button class="admin-nav-item" data-section="socials" type="button"><i class="fa-solid fa-link"></i><span>Links &amp; WhatsApp</span></button><button class="admin-nav-item" data-section="developer" type="button"><i class="fa-solid fa-user-pen"></i><span>About Developer</span></button></div>
-        <div class="admin-nav-group"><span class="admin-nav-label">System</span><button class="admin-nav-item" data-section="ai" type="button"><i class="fa-solid fa-microchip"></i><span>AI Settings</span></button><button class="admin-nav-item" data-section="analytics" type="button"><i class="fa-solid fa-chart-simple"></i><span>Analytics</span></button><button class="admin-nav-item" data-section="feedback" type="button"><i class="fa-solid fa-inbox"></i><span>Reports</span></button><button class="admin-nav-item" data-section="health" type="button"><i class="fa-solid fa-heart-pulse"></i><span>System Health</span></button><button class="admin-nav-item" data-section="functional" type="button"><i class="fa-solid fa-list-check"></i><span>Functional Audit</span></button><button class="admin-nav-item" data-section="visual" type="button"><i class="fa-solid fa-display"></i><span>Visual QA</span></button><button class="admin-nav-item" data-section="audit" type="button"><i class="fa-solid fa-clock-rotate-left"></i><span>Audit Log</span></button></div>
+        <div class="admin-nav-group"><span class="admin-nav-label">Content</span><button class="admin-nav-item" data-section="tools" type="button"><i class="fa-solid fa-toolbox"></i><span>Tools</span></button><button class="admin-nav-item" data-section="socials" type="button"><i class="fa-solid fa-link"></i><span>Social Media</span></button><button class="admin-nav-item" data-section="developer" type="button"><i class="fa-solid fa-user-pen"></i><span>About Developer</span></button></div>
+        <div class="admin-nav-group"><span class="admin-nav-label">AI</span><button class="admin-nav-item" data-section="ai" type="button"><i class="fa-solid fa-microchip"></i><span>Personal AI</span></button></div>
+        <div class="admin-nav-group"><span class="admin-nav-label">Insight</span><button class="admin-nav-item" data-section="analytics" type="button"><i class="fa-solid fa-chart-simple"></i><span>Usage Insight</span></button><button class="admin-nav-item" data-section="feedback" type="button"><i class="fa-solid fa-inbox"></i><span>Feedback</span></button></div>
+        <div class="admin-nav-group"><span class="admin-nav-label">System</span><button class="admin-nav-item" data-section="health" type="button"><i class="fa-solid fa-heart-pulse"></i><span>Tool Health</span></button><button class="admin-nav-item" data-section="functional" type="button"><i class="fa-solid fa-list-check"></i><span>Functional Audit</span></button><button class="admin-nav-item" data-section="visual" type="button"><i class="fa-solid fa-display"></i><span>Visual QA</span></button><button class="admin-nav-item" data-section="audit" type="button"><i class="fa-solid fa-clock-rotate-left"></i><span>Audit Log</span></button></div>
       </nav>
       <div class="sidebar-bottom">
         <a href="/" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Lihat website</a>
@@ -82,11 +84,14 @@
         </section>
 
         <section class="admin-section" data-panel="tools">
-          <div class="section-toolbar">
+          <div class="section-toolbar tool-toolbar" id="toolToolbar">
             <label class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input id="toolSearch" type="search" aria-label="Cari tools" placeholder="Cari nama atau ID tools"></label>
-            <select id="toolStatusFilter" class="select-box" aria-label="Filter status tool"><option value="all">Semua status</option><option value="active">Aktif</option><option value="inactive">Nonaktif</option></select>
-            <select id="toolCategoryFilter" class="select-box" aria-label="Filter kategori tool"><option value="all">Semua kategori</option><option value="downloader">Downloader</option><option value="maker">Maker</option><option value="tools">Tools</option><option value="vault">Vault</option><option value="external">External</option></select>
-            <button id="addToolButton" data-add-tool="true" class="primary-button" type="button"><i class="fa-solid fa-plus"></i> Tambah Tool</button>
+            <button class="tool-filter-toggle secondary-button" id="toolFilterToggle" type="button" aria-expanded="false" aria-controls="toolFilterControls"><i class="fa-solid fa-filter"></i><span>Filter</span></button>
+            <div class="tool-filter-controls" id="toolFilterControls">
+              <select id="toolStatusFilter" class="select-box" aria-label="Filter status tool"><option value="all">Semua status</option><option value="active">Aktif</option><option value="inactive">Nonaktif</option></select>
+              <select id="toolCategoryFilter" class="select-box" aria-label="Filter kategori tool"><option value="all">Semua kategori</option><option value="downloader">Downloader</option><option value="maker">Maker</option><option value="tools">Tools</option><option value="vault">Vault</option><option value="external">External</option></select>
+            </div>
+            <button id="addToolButton" data-add-tool="true" class="primary-button" type="button"><i class="fa-solid fa-plus"></i><span>Tambah Tool</span></button>
           </div>
           <div class="tool-admin-grid" id="toolAdminGrid"></div>
           <div class="empty-state" id="toolEmpty" hidden><i class="fa-solid fa-box-open"></i><b>Tools tidak ditemukan</b><span>Coba ubah pencarian atau filter.</span></div>
@@ -342,7 +347,7 @@
 
   <div class="toast-stack" id="toastStack" aria-live="polite"></div>
   <script src="../assets/js/admin/admin-shell.js?v=6.4.0-admin-redesign1" defer></script>
-  <script src="../assets/js/admin/dashboard.js?v=6.4.0-hf3-admin-redesign1" defer></script>
+  <script src="../assets/js/admin/dashboard.js?v=6.4.0-hf3-admin-mobile-first2" defer></script>
   <script src="../assets/js/admin/members.js?v=6.4.0-membership1" defer></script>
   <script src="../assets/js/admin/developer-profile.js?v=6.4.0-step3" defer></script>
   <script src="../assets/js/admin/visual-qa.js?v=6.4.0" defer></script>
