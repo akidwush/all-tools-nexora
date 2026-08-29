@@ -36,6 +36,7 @@
     $$('[data-section]').forEach(button=>button.classList.toggle("is-active",button.dataset.section===section));
     const moreButton=$("[data-admin-more]");if(moreButton)moreButton.classList.toggle("is-active",["members","ai","socials","health","functional","visual","audit"].includes(section));
     $("#pageHeading").textContent=headings[section]||"Dashboard";
+    window.dispatchEvent(new CustomEvent("nexora:admin-section-changed",{detail:{section}}));
     if(updateRoute){try{history.replaceState({nxAdminSection:section},"",section==="overview"?"/admin":"/admin#section-"+encodeURIComponent(section));}catch(_){}}
     if(section==="tools")renderTools();
     if(section==="socials")renderSocials();
