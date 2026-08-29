@@ -35,6 +35,7 @@
     "/api/ai/chat",
     "/api/document-ai",
     "/api/prompt-generator",
+    "/api/tools/text-to-pdf",
     "/api/comics",
     "/api/admin/auth",
     "/api/admin/dashboard",

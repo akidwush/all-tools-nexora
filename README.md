@@ -1,6 +1,6 @@
 # All Tools Nexora
 
-All Tools Nexora v6.4.0 adalah website toolkit statis dengan 60 tool, lazy-loaded feature modules, dashboard admin, Supabase opsional untuk fitur lama, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency `@google/genai`.
+All Tools Nexora v6.4.0 adalah website toolkit statis dengan 61 tool, lazy-loaded feature modules, dashboard admin, Supabase opsional untuk fitur lama, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency `@google/genai`.
 
 ## Cara memakai Nexora AI Image
 

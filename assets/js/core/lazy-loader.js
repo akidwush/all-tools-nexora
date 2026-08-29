@@ -14,6 +14,7 @@
     'space-explorer': {css:['assets/css/features/space-explorer.css'],js:['assets/js/features/space-explorer.js']},
     'ocr-intelligence': {css:['assets/css/features/ocr-intelligence.css'],js:['assets/js/features/ocr-intelligence.js']},
     'document-ai': {css:['assets/css/features/document-ai.css'],js:['assets/js/features/document-ai.js']},
+    'text-to-pdf': {css:['assets/css/features/text-to-pdf.css'],js:['assets/js/features/text-to-pdf.js']},
     'prompt-generator': {css:['assets/css/features/prompt-generator.css'],js:['assets/js/features/prompt-generator.js']},
     'puter-image': {css:['assets/css/features/puter-image.css'],js:['assets/js/features/puter-image.js']},
     'puter-video': {css:['assets/css/features/puter-video.css'],js:['assets/js/features/puter-runtime.js','assets/js/features/puter-video.js']},
@@ -43,7 +44,7 @@
   };
 
   var toolModules = {
-    getcode:'get-code',tiktok:'tiktok',ttquote:'tiktok-quote',virusscan:'virus-scan',cryptomarket:'crypto-market',webintel:'web-intelligence',ipintel:'ip-intelligence',bmkg:'bmkg-open-data',spaceexplorer:'space-explorer',ocrintel:'ocr-intelligence',documentai:'document-ai',svgalight:'svg-alight',alightpremium:'alight-premium',imagevectorizer:'image-vectorizer',comicreader:'comic-reader',
+    getcode:'get-code',tiktok:'tiktok',ttquote:'tiktok-quote',virusscan:'virus-scan',cryptomarket:'crypto-market',webintel:'web-intelligence',ipintel:'ip-intelligence',bmkg:'bmkg-open-data',spaceexplorer:'space-explorer',ocrintel:'ocr-intelligence',documentai:'document-ai',autopdf:'text-to-pdf',svgalight:'svg-alight',alightpremium:'alight-premium',imagevectorizer:'image-vectorizer',comicreader:'comic-reader',
     sertifikat:'source-features',fakedev:'source-features',
     promptgenerate:'prompt-generator',aiimage:'puter-image',aivideo:'puter-video',genmail:'genmail',aiodownloader:'aio-downloader',danbooru:'danbooru-search',animetoreal:'anime-to-real',aisong:'ai-song',enhancer:'hd4-enhancer',fakeovo:'imported-tools',quotegenerator:'imported-tools',carifakta:'imported-tools',mltools:'imported-tools',
     iqc:'generator-pack',winquotes:'generator-pack',nokiamsg:'generator-pack',
@@ -53,7 +54,7 @@
   };
 
   var labels = {
-    'get code html':'getcode','tiktok':'tiktok','quote tiktok nexora':'ttquote','virus scan':'virusscan','crypto market scanner':'cryptomarket','nexora web intelligence':'webintel','ip & asn intelligence':'ipintel','ip asn intelligence':'ipintel','bmkg indonesia':'bmkg','bmkg':'bmkg','space explorer':'spaceexplorer','nexora ocr intelligence':'ocrintel','ocr intelligence':'ocrintel','nexora document ai':'documentai','document ai':'documentai','svg → alight xml':'svgalight','svg alight xml':'svgalight','anime vector atelier':'svgalight','alight motion premium 1 tahun':'alightpremium','alight premium':'alightpremium','nexora image vectorizer':'imagevectorizer','image vectorizer':'imagevectorizer','baca komik full':'comicreader',
+    'get code html':'getcode','tiktok':'tiktok','quote tiktok nexora':'ttquote','virus scan':'virusscan','crypto market scanner':'cryptomarket','nexora web intelligence':'webintel','ip & asn intelligence':'ipintel','ip asn intelligence':'ipintel','bmkg indonesia':'bmkg','bmkg':'bmkg','space explorer':'spaceexplorer','nexora ocr intelligence':'ocrintel','ocr intelligence':'ocrintel','nexora document ai':'documentai','document ai':'documentai','nexora auto pdf':'autopdf','auto pdf':'autopdf','text to pdf':'autopdf','teks ke pdf':'autopdf','svg → alight xml':'svgalight','svg alight xml':'svgalight','anime vector atelier':'svgalight','alight motion premium 1 tahun':'alightpremium','alight premium':'alightpremium','nexora image vectorizer':'imagevectorizer','image vectorizer':'imagevectorizer','baca komik full':'comicreader',
     'sertifikat custom':'sertifikat','fakedev':'fakedev','prompt generator':'promptgenerate','nexora ai image':'aiimage','ai image':'aiimage','nexora ai video generator':'aivideo','ai video generator':'aivideo','text to video':'aivideo','image to video':'aivideo','genmail':'genmail','advanced temp mail':'genmail','temp mail nexora':'genmail','all in one downloader':'aiodownloader','aio downloader':'aiodownloader','universal downloader':'aiodownloader','danbooru search':'danbooru','danbooru':'danbooru','anime art search':'danbooru','anime to real':'animetoreal','anime realistic':'animetoreal','nexora ai song generator':'aisong','ai song generator':'aisong','song generator':'aisong','nexora image hd enhancer v4':'enhancer','image hd enhancer v4':'enhancer','image enhancer':'enhancer','image upscaler':'enhancer','fake ovo':'fakeovo',
     'quote generator':'quotegenerator','carifakta':'carifakta','ml tools':'mltools','iqc generator':'iqc',
     'windows quotes':'winquotes','nokia message':'nokiamsg','terabox downloader':'terabox','fake bank jago':'fakebankjago',
@@ -79,6 +80,7 @@
     [/ai-song\.(?:js|css)(?:$|\?)/, 'ai-song-v1'],
     [/hd4-enhancer\.(?:js|css)(?:$|\?)/, 'hd4-enhancer-v2'],
     [/document-ai\.(?:js|css)(?:$|\?)/, 'document-android-branding1'],
+    [/text-to-pdf\.(?:js|css)(?:$|\?)/, 'auto-pdf-v1'],
     [/crypto-market\.(?:js|css)(?:$|\?)/, 'crypto-mtf'],
     [/comic-reader\.(?:js|css)(?:$|\?)/, 'comic-reader'],
     [/svg-alight\.(?:js|css)(?:$|\?)/, 'svg-alight'],

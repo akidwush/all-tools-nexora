@@ -81,6 +81,14 @@
         "assets/js/features/document-ai.js"
       ]
     },
+    "text-to-pdf": {
+      "css": [
+        "assets/css/features/text-to-pdf.css"
+      ],
+      "js": [
+        "assets/js/features/text-to-pdf.js"
+      ]
+    },
     "prompt-generator": {
       "css": [
         "assets/css/features/prompt-generator.css"
@@ -283,6 +291,7 @@
     "spaceexplorer": "space-explorer",
     "ocrintel": "ocr-intelligence",
     "documentai": "document-ai",
+    "autopdf": "text-to-pdf",
     "imagevectorizer": "image-vectorizer",
     "comicreader": "comic-reader",
     "sertifikat": "source-features",

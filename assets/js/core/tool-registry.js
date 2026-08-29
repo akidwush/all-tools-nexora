@@ -40,6 +40,7 @@
     ["spaceexplorer","Space Explorer","api","space-explorer","renderSpaceExplorer","https://api.nasa.gov/"],
     ["ocrintel","Nexora OCR Intelligence","api","ocr-intelligence","renderOcrIntelligence","https://api.ocr.space/"],
     ["documentai","Nexora Document AI","api","document-ai","renderDocumentAi","https://generativelanguage.googleapis.com/"],
+    ["autopdf","Nexora Auto PDF","api","text-to-pdf","renderTextToPdf","https://all-tools-nexora.vercel.app/api/tools/text-to-pdf"],
     ["svgalight","SVG → Alight XML","api","svg-alight","renderSvgAlight","https://svgtoxml.vercel.app/"],
     ["alightpremium","Alight Motion Premium 1 Tahun","api","alight-premium","renderAlightPremium","https://api.kyzznekoo.my.id/"],
     ["imagevectorizer","Nexora Image Vectorizer","module","image-vectorizer","renderImageVectorizer",null],

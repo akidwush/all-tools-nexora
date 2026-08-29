@@ -27,6 +27,7 @@ const required = [
   "api/health.js", "api/feedback.js", "api/audit.js", "api/tool-health.js",
   "lib/database.js", "lib/memory-store.js", "lib/tool-health.js", "lib/vdeploy.js",
   "lib/gemini-config.js",
+  "lib/text-to-pdf.js",
   "lib/freeconvert-vectorizer.js", "lib/sitegrabber-proxy.js",
   "lib/downloader-service.js", "database/schema.sql"
 ];

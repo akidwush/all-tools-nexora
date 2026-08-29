@@ -35,7 +35,7 @@ assert.match(lazy, /puter-video-hf47/);
 assert.match(lazy, /'puter-video':'Nexora AI Video Generator'/);
 assert.match(index, /hf47-puter-video1/);
 assert.match(readme, /#tool-aivideo/);
-assert.match(readme, /60 tool/);
+assert.match(readme, /61 tool/);
 
 assert.equal(routeManifest.apiRoutes.some((route) => /ai-video|aivideo/.test(route)), false, "AI Video tidak boleh menambah backend route");
 assert.doesNotMatch([feature, runtime, css].join("\n"), /supabase|api[_-]?key|openai[_-]?api|google[_-]?api/i);
