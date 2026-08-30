@@ -4,8 +4,8 @@
 
   var LIBRARY_URL='https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.0';
   var MODEL_ID='Xenova/slimsam-77-uniform';
-  var runtime=null,model=null,processor=null,imageInput=null,imageProcessed=null,imageEmbeddings=null;
-  var backend='';
+  var runtime=null,runtimeVariant='',model=null,processor=null,imageInput=null,imageProcessed=null,imageEmbeddings=null;
+  var backend='',stage='idle';
 
   function post(type,data,transfer){self.postMessage(Object.assign({type:type},data||{}),transfer||[]);}
   function dispose(value,seen){
@@ -19,10 +19,11 @@
     dispose(imageEmbeddings);dispose(imageProcessed);dispose(imageInput);
     imageEmbeddings=null;imageProcessed=null;imageInput=null;
   }
-  async function releaseAll(){
+  async function releaseAll(resetRuntime){
     releaseImage();
     try{if(model&&typeof model.dispose==='function')await model.dispose();}catch(_error){}
     model=null;processor=null;backend='';
+    if(resetRuntime){runtime=null;runtimeVariant='';}
   }
   function progressCallback(event){
     if(!event)return;
@@ -32,41 +33,72 @@
     if(Number.isFinite(event.progress))payload.progress=event.progress;
     post('progress',payload);
   }
-  async function loadRuntime(){
-    if(runtime)return runtime;
-    runtime=await import(LIBRARY_URL);
+  async function cacheAllowed(){
+    if(typeof self.caches==='undefined'||!self.navigator||!navigator.storage||typeof navigator.storage.estimate!=='function')return false;
+    try{var estimate=await navigator.storage.estimate();var quota=Number(estimate.quota)||0;var usage=Number(estimate.usage)||0;return quota-usage>=96*1024*1024;}catch(_error){return false;}
+  }
+  async function loadRuntime(variant,allowCache){
+    variant=variant||'primary';
+    if(runtime&&runtimeVariant===variant)return runtime;
+    stage='runtime-import';
+    var source=LIBRARY_URL+(variant==='primary'?'':'?nexora-runtime='+encodeURIComponent(variant));
+    runtime=await import(source);runtimeVariant=variant;
     runtime.env.allowLocalModels=false;
     runtime.env.allowRemoteModels=true;
-    runtime.env.useBrowserCache=true;
-    runtime.env.useWasmCache=true;
-    runtime.env.cacheKey='nexora-smart-cutout-v1';
+    runtime.env.useBrowserCache=allowCache!==false&&await cacheAllowed();
     if(runtime.env.backends&&runtime.env.backends.onnx&&runtime.env.backends.onnx.wasm){
       runtime.env.backends.onnx.wasm.numThreads=1;
       runtime.env.backends.onnx.wasm.proxy=false;
     }
     return runtime;
   }
-  async function tryModel(device,dtype){
-    var api=await loadRuntime();
+  async function tryModel(device,dtype,variant,allowCache,adapter){
+    var api=await loadRuntime(variant,allowCache);
     var options={dtype:dtype,progress_callback:progressCallback};
-    if(device==='webgpu')options.device='webgpu';
+    if(device==='webgpu'){
+      options.device='webgpu';
+      if(adapter&&api.env.backends&&api.env.backends.onnx&&api.env.backends.onnx.webgpu)api.env.backends.onnx.webgpu.adapter=adapter;
+    }
+    stage=device==='webgpu'?'webgpu-model':'wasm-model';
     var candidate=await api.SamModel.from_pretrained(MODEL_ID,options);
     model=candidate;
+    stage='processor';
     var candidateProcessor=await api.AutoProcessor.from_pretrained(MODEL_ID,{progress_callback:progressCallback});
     processor=candidateProcessor;backend=device==='webgpu'?'webgpu':'wasm';
+  }
+  async function getWebGpuAdapter(preferWebGpu){
+    if(!preferWebGpu||!self.navigator||!navigator.gpu)return null;
+    try{
+      var adapter=await navigator.gpu.requestAdapter({powerPreference:'high-performance'});
+      if(!adapter||!adapter.features||!adapter.features.has('shader-f16'))return null;
+      return adapter;
+    }catch(_error){return null;}
+  }
+  async function loadWasmModel(useFreshRuntime){
+    var variant=useFreshRuntime?'wasm-fallback':'primary';
+    try{await tryModel(null,'q8',variant,true,null);}
+    catch(error){
+      var usedCache=Boolean(runtime&&runtime.env&&runtime.env.useBrowserCache);
+      if(!usedCache)throw error;
+      await releaseAll(true);
+      post('status',{message:'Cache model tidak tersedia, mencoba unduhan langsung...'});
+      await tryModel(null,'q8','wasm-no-cache',false,null);
+    }
   }
   async function init(preferWebGpu){
     if(model){post('ready',{backend:backend,modelId:MODEL_ID,cached:true});return;}
     post('status',{message:'Loading AI model...'});
     var webGpuError=null;
-    if(preferWebGpu&&self.navigator&&navigator.gpu){
-      try{await tryModel('webgpu','fp16');}
-      catch(error){webGpuError=error;await releaseAll();}
+    var adapter=await getWebGpuAdapter(preferWebGpu);
+    if(adapter){
+      try{await tryModel('webgpu','fp16','primary',true,adapter);}
+      catch(error){webGpuError=error;await releaseAll(true);}
     }
     if(!model){
       post('status',{message:webGpuError?'WebGPU tidak cocok, menyiapkan fallback WASM...':'Menyiapkan fallback WASM...'});
-      await tryModel(null,'q8');
+      await loadWasmModel(Boolean(webGpuError));
     }
+    stage='ready';
     post('ready',{backend:backend,modelId:MODEL_ID,cached:false});
   }
   async function encode(url,requestId){
@@ -111,7 +143,10 @@
     var message=String(error&&error.message||error||'');
     if(/out of memory|memory|allocation|bad_alloc/i.test(message))return'OUT_OF_MEMORY';
     if(/EMPTY_MASK/.test(message))return'EMPTY_MASK';
-    if(/webgpu|wasm|onnx|model|fetch|network/i.test(message))return'MODEL_FAILED';
+    if(/quota|cache storage|cache.*failed/i.test(message))return'CACHE_FAILED';
+    if(/webassembly|wasm|simd|no available backend|backend not found/i.test(message))return'WASM_FAILED';
+    if(/fetch|network|failed to load|could not locate|status code|http/i.test(message))return'MODEL_DOWNLOAD_FAILED';
+    if(/webgpu|onnx|model/i.test(message))return'MODEL_FAILED';
     return'INFERENCE_FAILED';
   }
 
@@ -122,7 +157,7 @@
       else if(message.type==='encode')await encode(message.url,message.requestId);
       else if(message.type==='decode')await decode(message.points,message.requestId);
       else if(message.type==='reset-image'){releaseImage();post('reset-complete');}
-      else if(message.type==='dispose'){await releaseAll();close();}
-    }catch(error){post('error',{requestId:message.requestId||0,code:friendlyCode(error)});}
+      else if(message.type==='dispose'){await releaseAll(true);close();}
+    }catch(error){var code=friendlyCode(error);if(message.type==='init'&&code==='INFERENCE_FAILED')code='MODEL_FAILED';post('error',{requestId:message.requestId||0,code:code,stage:stage});}
   };
 })();

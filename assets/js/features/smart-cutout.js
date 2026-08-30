@@ -4,7 +4,7 @@
 
   var MAX_FILE_BYTES=20*1024*1024;
   var ACCEPTED=new Set(['image/jpeg','image/png','image/webp']);
-  var WORKER_URL='assets/js/workers/smart-cutout.worker.js?v=6.4.0-smart-cutout2';
+  var WORKER_URL='assets/js/workers/smart-cutout.worker.js?v=6.4.0-smart-cutout3';
   var Core=window.NexoraSmartCutoutCore;
 
   function formatBytes(value){var bytes=Number(value)||0;if(bytes<1024)return bytes+' B';if(bytes<1048576)return(bytes/1024).toFixed(1)+' KB';return(bytes/1048576).toFixed(bytes<10485760?1:0)+' MB';}
@@ -17,6 +17,9 @@
     if(code==='OUT_OF_MEMORY')return'Perangkat ini kehabisan memori saat memproses gambar.';
     if(code==='EMPTY_MASK')return'Objek tidak berhasil terdeteksi. Coba pilih titik lain.';
     if(code==='MODEL_FAILED')return'Model AI gagal dimuat. Periksa koneksi pertama kali lalu coba lagi.';
+    if(code==='MODEL_DOWNLOAD_FAILED')return'File model AI gagal diunduh. Periksa koneksi lalu coba lagi.';
+    if(code==='WASM_FAILED')return'Runtime AI lokal gagal dimulai. Update Chrome atau coba perangkat lain.';
+    if(code==='CACHE_FAILED')return'Cache model tidak tersedia. Kosongkan ruang browser lalu coba lagi.';
     if(code==='IMAGE_DECODE')return'Gambar tidak dapat dibaca.';
     if(code==='UNSUPPORTED')return'Browser ini belum mendukung fitur AI yang diperlukan.';
     if(code==='CANVAS_FAILED')return'Gambar hasil tidak dapat dibuat pada perangkat ini.';

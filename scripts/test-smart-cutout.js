@@ -31,14 +31,18 @@ for (const token of [
 
 for (const token of [
   "Xenova/slimsam-77-uniform", "@huggingface/transformers@3.5.0", "get_image_embeddings", "input_points",
-  "input_labels", "post_process_masks", "webgpu", "fp16", "wasm", "q8", "useBrowserCache", "useWasmCache",
+  "input_labels", "post_process_masks", "webgpu", "fp16", "wasm", "q8", "useBrowserCache", "cacheAllowed",
   "dispose", "reset-image"
 ]) assert.ok(worker.includes(token), `Worker Smart Cutout belum memuat ${token}`);
 
 assert.doesNotMatch(worker, /device\s*:\s*['"]wasm['"]/, "Transformers.js 3.5 memilih WASM saat opsi device tidak diberikan");
-assert.match(worker, /if\(device==='webgpu'\)options\.device='webgpu'/, "Hanya backend WebGPU yang boleh dikirim sebagai opsi device");
+assert.match(worker, /if\(device==='webgpu'\)\{\s*options\.device='webgpu'/, "Hanya backend WebGPU yang boleh dikirim sebagai opsi device");
 assert.match(worker, /wasm\.numThreads=1/, "Fallback mobile harus membatasi WASM ke satu thread");
-assert.ok(main.includes("smart-cutout2"), "Versi worker harus berubah agar browser tidak memakai runtime lama dari cache");
+assert.doesNotMatch(worker, /useBrowserCache=true/, "Cache API tidak boleh dipaksa aktif pada browser yang tidak mendukung atau kekurangan kuota");
+assert.ok(worker.includes("navigator.storage.estimate"), "Cache model harus memeriksa kuota browser terlebih dahulu");
+assert.ok(worker.includes("shader-f16"), "WebGPU FP16 harus melewati capability preflight");
+assert.ok(worker.includes("wasm-no-cache"), "WASM harus punya retry tanpa Cache API");
+assert.ok(main.includes("smart-cutout3"), "Versi worker harus berubah agar browser tidak memakai runtime lama dari cache");
 
 for (const forbidden of ["supabase", "api external", "base64 image", "pixel log"]) {
   assert.equal((main + worker).toLowerCase().includes(forbidden), false, `Inference lokal tidak boleh memuat ${forbidden}`);
