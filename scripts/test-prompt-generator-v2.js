@@ -104,6 +104,32 @@ async function main() {
     assert.ok(!JSON.stringify(generated.captured.payload).includes("gemini_test_server_secret"));
 
     process.env.PROMPT_GENERATOR_MODEL = DEFAULT_MODEL;
+    let neutralRetryCalls = 0;
+    const neutralRetry = captureResponse();
+    await handlePromptGenerator(request("POST", {
+      fileName: "portrait.png", mimeType: "image/png", fileData: `data:image/png;base64,${pngBase64}`,
+      target: "universal", style: "3d", language: "id", aspectRatio: "4:5", creativity: 3, includeNegative: true
+    }, "203.0.113.93"), neutralRetry.response, {
+      clientFactory: async () => ({ models: { generateContent: async (payload) => {
+        neutralRetryCalls += 1;
+        assert.equal(payload.model, DEFAULT_MODEL);
+        assert.equal(payload.config.safetySettings, undefined);
+        if (neutralRetryCalls === 1) return { candidates: [], promptFeedback: { blockReason: "SAFETY" } };
+        assert.match(payload.contents[0].parts[1].text, /nonseksual|netral/i);
+        return { text: JSON.stringify({
+          title: "Potret 3D", summary: "Potret karakter 3D dengan rendering bersih.",
+          prompt: "Potret karakter 3D bergaya elegan dengan rambut pirang, framing close-up, pencahayaan lembut, latar hitam sederhana, material render bersih, komposisi seimbang, dan detail wajah natural.",
+          negativePrompt: "blur, noisy texture, distorted anatomy, random text",
+          details: { subject: "karakter 3D", environment: "latar hitam", composition: "close-up", lighting: "lembut", palette: ["blonde", "black"], camera: "portrait framing", style: "3D render" },
+          keywords: ["3D portrait", "clean render"], warnings: [], variants: []
+        }) };
+      } } })
+    });
+    assert.equal(neutralRetry.captured.status, 200);
+    assert.equal(neutralRetry.captured.payload.ok, true);
+    assert.equal(neutralRetryCalls, 2);
+
+    process.env.PROMPT_GENERATOR_MODEL = DEFAULT_MODEL;
     const defaultFailureModels = [];
     const fallbackGenerated = captureResponse();
     await handlePromptGenerator(request("POST", {

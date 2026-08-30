@@ -52,17 +52,18 @@ const documentJson = JSON.stringify({
     assert.match(promptResult.prompt, /stable fallback/i);
     assert.deepEqual(promptModels.slice(0, 2), [DEFAULT_MODEL, "gemini-2.5-flash"]);
 
-    let blockedAttempts = 0;
+    const blockedModels = [];
     await assert.rejects(() => generatePrompt({
       image: { fileName: "blocked.png", mimeType: "image/png", base64: "AA==" },
       options: { target: "universal", style: "auto", language: "en", aspectRatio: "auto", creativity: 3, direction: "", includeNegative: true },
       timeoutMs: 3000,
-      clientFactory: async () => ({ models: { generateContent: async () => {
-        blockedAttempts += 1;
+      clientFactory: async () => ({ models: { generateContent: async ({ model, config }) => {
+        blockedModels.push(model);
+        assert.equal(config.safetySettings, undefined, "Patch tidak boleh menurunkan safety threshold provider.");
         return { candidates: [], promptFeedback: { blockReason: "SAFETY" } };
       } } })
     }), (error) => error.code === "PROMPT_AI_BLOCKED" && error.status === 422);
-    assert.equal(blockedAttempts, 1, "Safety block tidak boleh dicoba ulang ke model lain.");
+    assert.deepEqual(blockedModels, [DEFAULT_MODEL, DEFAULT_MODEL], "Safety block hanya boleh satu neutral retry pada model yang sama, tanpa pindah model.");
 
     const documentModels = [];
     const rawDocument = await generateDocument({
