@@ -1,9 +1,11 @@
-/* Nexora v6.4.0 — adaptive, database-configurable hero video. */
+/* Nexora v6.4.0 — mobile-first performance policy. */
 (function(){
   "use strict";
   if(window.__NEXORA_PERFORMANCE__) return;
 
-  var DEFAULT_HERO_VIDEO_URL="https://files.catbox.moe/4ijdle.mp4";
+  var UI_CONFIG=window.NexoraConfig&&window.NexoraConfig.ui||{};
+  var HERO_POLICY=UI_CONFIG.heroVideo||{};
+  var DEFAULT_HERO_VIDEO_URL=String(HERO_POLICY.url||"https://files.catbox.moe/4ijdle.mp4");
   var LEGACY_HERO_SETTINGS_CACHE_KEY="nexora_hero_settings_v1";
   var HERO_SETTINGS_TIMEOUT_MS=1800;
 
@@ -61,9 +63,11 @@
   var effectiveType=String(connection&&connection.effectiveType||"").toLowerCase();
   var verySlowNetwork=/^(slow-2g|2g)$/.test(effectiveType);
   var mobileLike=false;
+  var mobileBreakpoint=Math.max(320,Number(UI_CONFIG.mobileBreakpoint)||900);
   try{
-    mobileLike=Boolean(window.matchMedia&&window.matchMedia("(max-width: 900px), (pointer: coarse)").matches);
-  }catch(_){mobileLike=window.innerWidth<=900;}
+    mobileLike=Boolean(window.matchMedia&&window.matchMedia("(max-width: "+mobileBreakpoint+"px), (pointer: coarse)").matches);
+  }catch(_){mobileLike=window.innerWidth<=mobileBreakpoint;}
+  if(!mobileLike&&UI_CONFIG.desktopMotion!==true)document.documentElement.classList.add("nx-desktop-static");
 
   var lowPower=Boolean(
     (connection&&connection.saveData) ||
@@ -73,10 +77,10 @@
     reduced
   );
 
-  // The hero is muted and inline, so it may autoplay on both desktop and
-  // mobile. Off-screen playback is still suspended to avoid wasting decoder
-  // work; it resumes automatically when the hero returns to the viewport.
+  var heroPlaybackAllowed=mobileLike?HERO_POLICY.playOnMobile!==false:HERO_POLICY.playOnDesktop===true;
+  var heroStaticAllowed=mobileLike||HERO_POLICY.showStaticOnDesktop!==false;
   var heroMode="auto";
+  if(!heroPlaybackAllowed||lowPower||reduced)heroMode=heroStaticAllowed?"static":"disabled";
   document.documentElement.classList.add("nx-hero-video-"+heroMode);
   if(lowPower) document.documentElement.classList.add("nx-low-power");
 
@@ -96,6 +100,13 @@
     var hero=heroElement||document.querySelector("[data-nx-hero]");
     var video=heroVideo||(hero&&hero.querySelector("video[data-src]"));
     if(!hero||!video)return;
+    if(heroMode==="disabled"){
+      video.pause();
+      video.preload="none";
+      video.removeAttribute("src");
+      hero.classList.add("is-video-disabled");
+      return;
+    }
     var loaded=false;
     var ready=false;
     var autoplayBlocked=false;
@@ -105,8 +116,10 @@
     var interactionRetryUsed=false;
     var recoveryTimer=0;
 
-    video.autoplay=true;
-    video.setAttribute("autoplay","");
+    var autoplayEnabled=heroMode==="auto";
+    video.autoplay=autoplayEnabled;
+    if(autoplayEnabled)video.setAttribute("autoplay","");
+    else video.removeAttribute("autoplay");
     video.muted=true;
     video.defaultMuted=true;
     video.loop=true;
@@ -119,8 +132,7 @@
       try{return new URL(video.currentSrc||video.src,location.href).href===new URL(candidate,location.href).href;}catch(_){return false;}
     }
 
-    // The static source starts decoding immediately, before optional settings
-    // return. This keeps the primary desktop visual independent of API timing.
+    // Source attachment is delayed until this mobile-only initializer runs.
     var source=String(video.dataset.src||video.getAttribute("src")||DEFAULT_HERO_VIDEO_URL);
 
     function ensureLoaded(){
@@ -157,7 +169,7 @@
     }
 
     function ensurePlayback(){
-      if(!heroEnabled||!ready||document.hidden||autoplayBlocked||!heroVisible)return;
+      if(!autoplayEnabled||!heroEnabled||!ready||document.hidden||autoplayBlocked||!heroVisible)return;
       Promise.resolve(video.play()).then(function(){autoplayBlocked=false;}).catch(function(){
         autoplayBlocked=true;
         armInteractionRetry();
@@ -165,7 +177,7 @@
     }
 
     function schedulePlaybackRecovery(){
-      if(recoveryTimer||!heroEnabled||!heroVisible||document.hidden||autoplayBlocked)return;
+      if(!autoplayEnabled||recoveryTimer||!heroEnabled||!heroVisible||document.hidden||autoplayBlocked)return;
       recoveryTimer=setTimeout(function(){
         recoveryTimer=0;
         if(video.ended){try{video.currentTime=0;}catch(_){ }}
@@ -180,7 +192,8 @@
     function markReady(){
       ready=true;
       hero.classList.add("is-video-ready");
-      ensurePlayback();
+      if(autoplayEnabled)ensurePlayback();
+      else video.pause();
     }
     video.addEventListener("loadeddata",markReady,{once:true});
     video.addEventListener("canplay",markReady,{once:true});
@@ -196,11 +209,11 @@
 
     function onVisibility(entry){
       heroVisible=Boolean(entry&&entry.isIntersecting);
-      if(heroVisible){ensureLoaded();ensurePlayback();}
+      if(heroVisible){ensureLoaded();if(autoplayEnabled)ensurePlayback();}
       else suspendPlayback();
     }
 
-    // Start immediately so desktop playback never waits for remote settings.
+    // Phones may autoplay; desktop keeps the same header at a static frame.
     ensureLoaded();
     if(video.readyState>=2)markReady();
 
@@ -224,8 +237,7 @@
       ensurePlayback();
     }
 
-    // Load once so the identity frame remains available. Phones keep that
-    // decoded frame paused; desktop retains normal visibility-based playback.
+    // Load once so the identity frame remains visible in static mode too.
     if("IntersectionObserver" in window){
       var observer=new IntersectionObserver(function(entries){onVisibility(entries[0]);},{threshold:[0,0.01,0.35]});
       observer.observe(hero);
@@ -235,7 +247,7 @@
 
     document.addEventListener("visibilitychange",function(){
       if(document.hidden)suspendPlayback();
-      else if(!autoplayBlocked)schedulePlaybackRecovery();
+      else if(autoplayEnabled&&!autoplayBlocked)schedulePlaybackRecovery();
     });
 
   }

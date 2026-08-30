@@ -32,7 +32,7 @@ const manifest = JSON.parse(fs.readFileSync(path.join(root, "assets/module-manif
 const expected = [
   "public/index.html", "public/about.html", "public/feedback.html", "public/favicon.svg",
   "public/admin/index.html", "public/admin/login.html", "public/assets/js/core/app.js",
-  "public/assets/js/core/tool-registry.js", "public/assets/module-manifest.json",
+  "public/assets/config.js", "public/assets/js/core/tool-registry.js", "public/assets/module-manifest.json",
   ...Object.values(manifest.modules || {}).flatMap((module) => [...(module.css || []), ...(module.js || [])].map((file) => `public/${file}`))
 ];
 const missing = [...new Set(expected)].filter((relative) => !fs.existsSync(path.join(root, relative)));

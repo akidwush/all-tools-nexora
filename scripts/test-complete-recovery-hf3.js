@@ -4,6 +4,7 @@ const path = require("node:path");
 
 const root = path.join(__dirname, "..");
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
+const { getTool } = require("./config-test-helpers.js");
 const app = read("assets/js/core/app.js");
 const stability = read("assets/js/core/stability.js");
 const lazy = read("assets/js/core/lazy-loader.js");
@@ -42,8 +43,8 @@ assert.equal(manifest.tools.zxvai, undefined);
 assert.equal(manifest.tools.fotolink, undefined);
 assert.doesNotMatch(lazy, /zxvai:'openNexoraAI'/);
 assert.doesNotMatch(lazy, /fotolink:'openPix'/);
-assert.match(registry, /\["zxvai","ZxVAI","external",null,null,"https:\/\/zxvaiapk\.netlify\.app\/"\]/);
-assert.match(registry, /\["fotolink","Foto To Link","external",null,null,"https:\/\/pixvault-bykz\.netlify\.app\/"\]/);
+assert.deepEqual(getTool("zxvai").runtime, {mode:"external", dependency:"https://zxvaiapk.netlify.app/"});
+assert.deepEqual(getTool("fotolink").runtime, {mode:"external", dependency:"https://pixvault-bykz.netlify.app/"});
 
 // Fitur yang bergantung API memiliki jalur pemulihan nyata.
 assert.match(source, /async function nxBuildCertificateFallback\(nama\)/);

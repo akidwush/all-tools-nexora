@@ -2,71 +2,39 @@
 (function(){
   'use strict';
 
-  var modules = {
-    'get-code': {css:['assets/css/features/get-code.css'],js:['assets/js/features/get-code.js']},
-    'tiktok': {css:['assets/css/features/tiktok.css'],js:['assets/js/features/tiktok.js']},
-    'tiktok-quote': {css:['assets/css/features/tiktok-quote.css'],js:['assets/js/features/tiktok-quote.js']},
-    'virus-scan': {css:['assets/css/features/virus-scan.css'],js:['assets/js/features/virus-scan.js']},
-    'crypto-market': {css:['assets/css/features/crypto-market.css'],js:['assets/js/features/crypto-market.js']},
-    'web-intelligence': {css:['assets/css/features/web-intelligence.css'],js:['assets/js/features/web-intelligence.js']},
-    'ip-intelligence': {css:['assets/css/features/ip-intelligence.css'],js:['assets/js/features/ip-intelligence.js']},
-    'bmkg-open-data': {css:['assets/css/features/bmkg-open-data.css'],js:['assets/js/features/bmkg-open-data.js']},
-    'space-explorer': {css:['assets/css/features/space-explorer.css'],js:['assets/js/features/space-explorer.js']},
-    'ocr-intelligence': {css:['assets/css/features/ocr-intelligence.css'],js:['assets/js/features/ocr-intelligence.js']},
-    'document-ai': {css:['assets/css/features/document-ai.css'],js:['assets/js/features/document-ai.js']},
-    'text-to-pdf': {css:['assets/css/features/text-to-pdf.css'],js:['assets/js/features/text-to-pdf.js']},
-    'prompt-generator': {css:['assets/css/features/prompt-generator.css'],js:['assets/js/features/prompt-generator.js']},
-    'puter-image': {css:['assets/css/features/puter-image.css'],js:['assets/js/features/puter-image.js']},
-    'puter-video': {css:['assets/css/features/puter-video.css'],js:['assets/js/features/puter-runtime.js','assets/js/features/puter-video.js']},
-    'genmail': {css:['assets/css/features/genmail.css'],js:['assets/js/features/genmail.js']},
-    'aio-downloader': {css:['assets/css/features/aio-downloader.css'],js:['assets/js/features/aio-downloader.js']},
-    'danbooru-search': {css:['assets/css/features/danbooru-search.css'],js:['assets/js/features/danbooru-search.js']},
-    'anime-to-real': {css:['assets/css/features/anime-to-real.css'],js:['assets/js/features/anime-to-real.js']},
-    'ai-song': {css:['assets/css/features/ai-song.css'],js:['assets/js/features/ai-song.js']},
-    'hd4-enhancer': {css:['assets/css/features/hd4-enhancer.css'],js:['assets/js/features/hd4-enhancer.js']},
-    'image-vectorizer': {css:['assets/css/features/image-vectorizer.css'],js:['assets/js/features/image-vectorizer.js']},
-    'svg-alight': {css:['assets/css/features/svg-alight.css'],js:['assets/js/features/svg-alight.js']},
-    'alight-premium': {css:['assets/css/features/alight-premium.css'],js:['assets/js/features/alight-premium.js']},
-    'comic-reader': {css:['assets/css/features/comic-reader.css'],js:['assets/js/features/comic-reader.js']},
-    'source-features': {css:['assets/css/features/source-tools.css'],js:['assets/js/features/source-features.js']},
-    'imported-tools': {css:['assets/css/features/imported-tools.css'],js:['assets/js/features/imported-tools.js']},
-    'generator-pack': {css:[],js:['assets/js/features/generator-pack.js']},
-    'download-pack': {css:['assets/css/features/source-tools.css'],js:['assets/js/features/source-features.js','assets/js/features/download-pack.js']},
-    'unban-whatsapp': {css:[],js:['assets/js/features/unban-whatsapp.js']},
-    'deploy-center': {css:['assets/css/features/deploy-center.css'],js:['assets/js/features/deploy-center.js']},
-    'web-encryption': {css:['assets/css/features/web-encryption.css'],js:['assets/js/features/web-encryption.js']},
-    'nexora-text-2d': {css:['assets/css/features/nexora-generators.css'],js:['assets/vendor/nexora/text-2d-presets.js','assets/vendor/nexora/text-style-data.js','assets/vendor/nexora/text-2d-engine.js','assets/js/features/nexora/nexora-runtime.js']},
-    'nexora-text-3d': {css:['assets/css/features/nexora-generators.css'],js:['assets/vendor/nexora/3d-engine.js','assets/js/features/nexora/nexora-runtime.js']},
-    'nexora-text-fx-animation': {css:['assets/css/features/nexora-generators.css'],js:['assets/vendor/nexora/text-fx-animation-engine.js','assets/js/features/nexora/nexora-runtime.js']},
-    'nexora-text-vector': {css:['assets/css/features/nexora-generators.css'],js:['assets/js/features/nexora/nexora-runtime.js']},
-    'nexora-trimpath': {css:['assets/css/features/nexora-generators.css'],js:['assets/vendor/nexora/trimpath-font-metrics.js','assets/vendor/nexora/trimpath-letters.js','assets/vendor/nexora/trimpath-engine.js','assets/js/features/nexora/nexora-runtime.js']},
-    'nexora-logo-animate': {css:['assets/css/features/nexora-generators.css'],js:['assets/js/features/nexora/logo-engine.js','assets/js/features/nexora/nexora-runtime.js']}
-  };
+  var config=window.NexoraConfig;
+  if(!config||!config.tools||!config.modules)throw new Error("NexoraConfig harus dimuat sebelum lazy-loader.js.");
 
-  var toolModules = {
-    getcode:'get-code',tiktok:'tiktok',ttquote:'tiktok-quote',virusscan:'virus-scan',cryptomarket:'crypto-market',webintel:'web-intelligence',ipintel:'ip-intelligence',bmkg:'bmkg-open-data',spaceexplorer:'space-explorer',ocrintel:'ocr-intelligence',documentai:'document-ai',autopdf:'text-to-pdf',svgalight:'svg-alight',alightpremium:'alight-premium',imagevectorizer:'image-vectorizer',comicreader:'comic-reader',
-    sertifikat:'source-features',fakedev:'source-features',
-    promptgenerate:'prompt-generator',aiimage:'puter-image',aivideo:'puter-video',genmail:'genmail',aiodownloader:'aio-downloader',danbooru:'danbooru-search',animetoreal:'anime-to-real',aisong:'ai-song',enhancer:'hd4-enhancer',fakeovo:'imported-tools',quotegenerator:'imported-tools',carifakta:'imported-tools',mltools:'imported-tools',
-    iqc:'generator-pack',winquotes:'generator-pack',nokiamsg:'generator-pack',
-    terabox:'download-pack',fakebankjago:'download-pack',
-    unbanwa:'unban-whatsapp',vdeploy:'deploy-center',webencryption:'web-encryption',
-    text2d:'nexora-text-2d',text3d:'nexora-text-3d',textfxanimation:'nexora-text-fx-animation',textvector:'nexora-text-vector',trimpath:'nexora-trimpath',logoanimate:'nexora-logo-animate'
-  };
+  var modules=config.modules;
+  var toolModules=Object.create(null);
+  var labels=Object.create(null);
+  var moduleDisplayNames=Object.create(null);
+  var categories=["downloader","maker","tools","vault","external"];
 
-  var labels = {
-    'get code html':'getcode','tiktok':'tiktok','quote tiktok nexora':'ttquote','virus scan':'virusscan','crypto market scanner':'cryptomarket','nexora web intelligence':'webintel','ip & asn intelligence':'ipintel','ip asn intelligence':'ipintel','bmkg indonesia':'bmkg','bmkg':'bmkg','space explorer':'spaceexplorer','nexora ocr intelligence':'ocrintel','ocr intelligence':'ocrintel','nexora document ai':'documentai','document ai':'documentai','nexora auto pdf':'autopdf','auto pdf':'autopdf','text to pdf':'autopdf','teks ke pdf':'autopdf','svg → alight xml':'svgalight','svg alight xml':'svgalight','anime vector atelier':'svgalight','alight motion premium 1 tahun':'alightpremium','alight premium':'alightpremium','nexora image vectorizer':'imagevectorizer','image vectorizer':'imagevectorizer','baca komik full':'comicreader',
-    'sertifikat custom':'sertifikat','fakedev':'fakedev','prompt generator':'promptgenerate','nexora ai image':'aiimage','ai image':'aiimage','nexora ai video generator':'aivideo','ai video generator':'aivideo','text to video':'aivideo','image to video':'aivideo','genmail':'genmail','advanced temp mail':'genmail','temp mail nexora':'genmail','all in one downloader':'aiodownloader','aio downloader':'aiodownloader','universal downloader':'aiodownloader','danbooru search':'danbooru','danbooru':'danbooru','anime art search':'danbooru','anime to real':'animetoreal','anime realistic':'animetoreal','nexora ai song generator':'aisong','ai song generator':'aisong','song generator':'aisong','nexora image hd enhancer v4':'enhancer','image hd enhancer v4':'enhancer','image enhancer':'enhancer','image upscaler':'enhancer','fake ovo':'fakeovo',
-    'quote generator':'quotegenerator','carifakta':'carifakta','ml tools':'mltools','iqc generator':'iqc',
-    'windows quotes':'winquotes','nokia message':'nokiamsg','terabox downloader':'terabox','fake bank jago':'fakebankjago',
-    'spotify downloader':'spotify','unban whatsapp':'unbanwa',
-    'deploy & update web':'vdeploy','deploy website':'vdeploy','web encryption':'webencryption',
-    '2d text animate / text fx':'text2d','2d text animate':'text2d','3d text animate':'text3d','text fx animation':'textfxanimation','text to vector':'textvector','trimpath generator':'trimpath','logo animate':'logoanimate'
-  };
+  function addLabel(label,toolId){
+    var normalized=String(label||"").trim().toLowerCase();
+    if(normalized)labels[normalized]=toolId;
+  }
+
+  categories.forEach(function(category){
+    var items=Array.isArray(config.tools[category])?config.tools[category]:[];
+    items.forEach(function(item){
+      var toolId=String(item.id||"").trim().toLowerCase();
+      var runtime=item.runtime||{};
+      if(!toolId)return;
+      addLabel(toolId,toolId);
+      addLabel(item.name,toolId);
+      (Array.isArray(item.aliases)?item.aliases:[]).forEach(function(alias){addLabel(alias,toolId);});
+      if(runtime.module){
+        toolModules[toolId]=runtime.module;
+        if(!moduleDisplayNames[runtime.module])moduleDisplayNames[runtime.module]=item.name||toolId;
+      }
+    });
+  });
 
   var modulePromises = new Map();
   var assetPromises = new Map();
-  var moduleDisplayNames = {'puter-video':'Nexora AI Video Generator'};
-  var ASSET_VERSION = '6.4.0';
+  var ASSET_VERSION = config.version;
   var ASSET_PATCH = 'branding1';
   var ASSET_PATCHES = [
     [/(?:assets\/(?:vendor\/nexora|js\/features\/nexora)\/|nexora-generators\.css(?:$|\?))/, 'nexora'],

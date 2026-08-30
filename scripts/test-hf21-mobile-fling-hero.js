@@ -23,12 +23,12 @@ assert.match(html, /core\.css\?v=6\.4\.0-hf17-desktop-nav2-hf21-fling1-hf22-orig
 assert.match(html, /performance\.js\?v=6\.4\.0-hf18-desktop-hero3-hf21-mobile-loop1/);
 assert.match(html, /<video[^>]*autoplay[^>]*loop[^>]*muted[^>]*playsinline/i);
 assert.match(performance, /var heroMode="auto"/);
-assert.match(performance, /video\.autoplay=true/);
+assert.match(performance, /video\.autoplay=autoplayEnabled/);
 assert.match(performance, /video\.addEventListener\("ended",schedulePlaybackRecovery\)/);
 assert.match(performance, /video\.addEventListener\("pause",schedulePlaybackRecovery\)/);
 assert.match(performance, /if\(video\.ended\)\{try\{video\.currentTime=0;/);
-assert.match(performance, /if\(heroVisible\)\{ensureLoaded\(\);ensurePlayback\(\);\}/);
+assert.match(performance, /if\(heroVisible\)\{ensureLoaded\(\);if\(autoplayEnabled\)ensurePlayback\(\);\}/);
 assert.doesNotMatch(performance, /heroMode=mobileLike\?"static":"auto"/);
 assert.doesNotMatch(performance, /if\(mobileLike\)\{if\(!video\.paused\)video\.pause\(\);return;\}/);
 
-console.log("HF21 lulus: hero autoplay loop mobile dan layer penyebab blank saat fast scroll dinonaktifkan.");
+console.log("HF21 lulus: hero autoplay loop mobile, statis desktop, dan layer penyebab blank saat fast scroll dinonaktifkan.");

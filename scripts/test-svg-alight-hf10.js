@@ -2,6 +2,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const assert=require('node:assert');
 const root=path.resolve(__dirname,'..');
+const { getTool }=require('./config-test-helpers.js');
 
 const ui=fs.readFileSync(path.join(root,'assets/js/features/svg-alight.js'),'utf8');
 const css=fs.readFileSync(path.join(root,'assets/css/features/svg-alight.css'),'utf8');
@@ -44,8 +45,9 @@ assert.ok(css.includes('@media all'),'unified original CSS missing');
 assert.ok(css.includes('min-height:44px'),'44px touch target CSS missing');
 assert.ok(local.includes('mode === "svg-alight") return 4_250_000'),'local 2 MB SVG JSON body limit missing');
 assert.ok(!ui.includes('SVGTOXML_API_KEY'),'secret leaked to UI');
-assert.ok(lazy.includes("svgalight:'svg-alight'"),'lazy-loader svgalight mapping missing');
-assert.ok(lazy.includes("'svg-alight':"),'lazy-loader svg-alight module missing');
+assert.equal(getTool('svgalight').runtime.module,'svg-alight');
+assert.equal(getTool('svgalight').runtime.handler,'renderSvgAlight');
+assert.equal(getTool('svgalight').runtime.mode,'api');
 
 async function testProxyContract(){
   const previousEngineKey=process.env.SVGTOXML_ENGINE_KEY;

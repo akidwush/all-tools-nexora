@@ -216,3 +216,16 @@
   #nxUniversalRoom .nx-room-panel{padding:10px!important}
   .tool-viewer-content{padding:12px!important}
 }
+
+/* Decorative layers stay static; interaction feedback and loaders remain intact on phones. */
+.nx-membrane{animation:none!important;transform:none!important}
+html.nx-hero-video-disabled .video-banner video{display:none!important}
+
+/* The public surface intentionally uses the mobile layout everywhere.
+   The runtime adds this class on desktop so CSS needs no second visual layout. */
+html.nx-desktop-static{scroll-behavior:auto!important}
+html.nx-desktop-static *,html.nx-desktop-static *::before,html.nx-desktop-static *::after{
+  animation:none!important;
+  transition:none!important;
+}
+html.nx-desktop-static .video-banner video{display:block!important;animation:none!important;transform:none!important}

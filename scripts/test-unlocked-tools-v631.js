@@ -5,12 +5,14 @@ const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
+const { getTool } = require('./config-test-helpers.js');
 
 const sandbox = {
   window: { dispatchEvent() {} },
   CustomEvent: function CustomEvent(name) { this.type = name; },
   console
 };
+vm.runInNewContext(read('assets/config.js'), sandbox, { filename: 'config.js' });
 vm.runInNewContext(read('assets/js/core/tool-registry.js'), sandbox, { filename: 'tool-registry.js' });
 const registry = sandbox.window.NexoraToolRegistry;
 
@@ -38,8 +40,8 @@ const index = read('index.html');
 assert.ok(!index.includes('data-nexora-access-locked'));
 // Catalog cards are intentionally rendered from app.js; index.html keeps only
 // empty grid containers to avoid parsing a duplicate static catalog.
-assert.ok(app.includes("id: 'tiktokhd'"));
-assert.ok(app.includes("id: 'webencryption'"));
+assert.ok(registry.get('tiktokhd'));
+assert.ok(registry.get('webencryption'));
 
 const manifest = JSON.parse(read('assets/module-manifest.json'));
 assert.equal(manifest.tools.webencryption, 'web-encryption');
@@ -52,7 +54,7 @@ for (const token of ['AES-GCM', 'PBKDF2', '180000', 'renderWebEncryption', 'cryp
 }
 
 const health = read('lib/tool-health.js');
-assert.ok(health.includes('module-web-encryption'));
+assert.equal(getTool('webencryption').health.key, 'module-web-encryption');
 assert.ok(!health.includes('name: "Web Encryption", category: "external", target: { key: "core-shell", type: "restricted"'));
 
 console.log('Nexora compatibility tests lulus: Upload TikTok HD dan Web Encryption sudah terbuka tanpa access lock.');

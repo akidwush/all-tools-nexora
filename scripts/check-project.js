@@ -5,6 +5,7 @@ const path = require("node:path");
 const vm = require("node:vm");
 
 const root = path.resolve(__dirname, "..");
+require("./sync-config.js").syncConfig({ silent: true });
 const failures = [];
 const fail = (message) => failures.push(message);
 const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
@@ -19,11 +20,25 @@ const version = String(packageJson.version || "");
 const vercel = json("vercel.json");
 const routeManifest = json("route-manifest.json");
 const moduleManifest = json("assets/module-manifest.json");
+let projectConfig = null;
+try { projectConfig = require(path.join(root, "assets/config.js")); }
+catch (error) { fail(`assets/config.js gagal dimuat (${error.message})`); }
+
+const configTools = ["downloader", "maker", "tools", "vault", "external"].flatMap((category) =>
+  (Array.isArray(projectConfig?.tools?.[category]) ? projectConfig.tools[category] : []).map((tool) => ({ ...tool, category }))
+);
+const configIds = configTools.map((tool) => tool.id);
+if (projectConfig?.version !== version) fail(`Versi config ${projectConfig?.version || "kosong"} tidak sama dengan package ${version}.`);
+if (!configIds.length || new Set(configIds).size !== configIds.length) fail("ID tool pada assets/config.js kosong atau duplikat.");
+for (const tool of configTools) {
+  if (!tool.id || !tool.name || !tool.description || !tool.runtime || !tool.health) fail(`Konfigurasi tool tidak lengkap: ${tool.id || "(tanpa id)"}.`);
+  if (tool.runtime?.module && !projectConfig.modules?.[tool.runtime.module]) fail(`Modul ${tool.runtime.module} untuk ${tool.id} belum didefinisikan.`);
+}
 
 const required = [
   "index.html", "about.html", "feedback.html", "favicon.svg", "README.md", "CHANGELOG.md",
   "docs/SECURITY_AUDIT.md", "serve-local.js", "vercel.json", "route-manifest.json",
-  "assets/module-manifest.json", "assets/js/core/tool-registry.js", "assets/js/core/app.js",
+  "assets/config.js", "assets/module-manifest.json", "assets/js/core/tool-registry.js", "assets/js/core/app.js",
   "api/health.js", "api/feedback.js", "api/audit.js", "api/tool-health.js",
   "lib/database.js", "lib/memory-store.js", "lib/tool-health.js", "lib/vdeploy.js",
   "lib/gemini-config.js",
@@ -66,6 +81,7 @@ for (const relative of ["index.html", "admin/index.html", "admin/login.html"]) {
 let registry = null;
 try {
   const sandbox = { window: { dispatchEvent() {} }, CustomEvent: function CustomEvent() {} };
+  vm.runInNewContext(read("assets/config.js"), sandbox, { filename: "config.js" });
   vm.runInNewContext(read("assets/js/core/tool-registry.js"), sandbox, { filename: "tool-registry.js" });
   registry = sandbox.window.NexoraToolRegistry;
 } catch (error) { fail(`Tool registry tidak dapat dievaluasi: ${error.message}`); }
@@ -74,6 +90,7 @@ const registryRows = registry?.list?.() || [];
 const registryIds = registryRows.map((tool) => tool.id);
 if (registry?.version !== version) fail(`Versi registry ${registry?.version || "kosong"} tidak sama dengan package ${version}.`);
 if (!registryIds.length || new Set(registryIds).size !== registryIds.length) fail("ID tool registry kosong atau duplikat.");
+if (!sameSet(configIds, registryIds)) fail(`Katalog config tidak sama dengan registry (${configIds.length}/${registryIds.length}).`);
 
 try {
   const healthIds = require(path.join(root, "lib/tool-health.js")).TOOL_CATALOG.map((tool) => tool.id);
@@ -85,7 +102,8 @@ const seedBlock = schema.match(/insert into public\.tools[\s\S]*?on conflict \(i
 const seedIds = [...seedBlock.matchAll(/^\s*\('([a-z0-9_-]+)'/gm)].map((match) => match[1]);
 const databaseOptionalIds = new Set(["aisong", "aivideo"]);
 const databaseBackedRegistryIds = registryIds.filter((id) => !databaseOptionalIds.has(id));
-if (!sameSet(databaseBackedRegistryIds, seedIds)) fail(`Seed database tidak sama dengan registry database-backed (${seedIds.length}/${databaseBackedRegistryIds.length}).`);
+const unknownSeedIds = seedIds.filter((id) => !databaseBackedRegistryIds.includes(id));
+if (unknownSeedIds.length) fail(`Seed database memiliki tool yang tidak dikenal: ${unknownSeedIds.join(", ")}.`);
 
 const moduleTools = Object.keys(moduleManifest.tools || {});
 const expectedModuleTools = registryRows.filter((tool) => tool.module).map((tool) => tool.id);
@@ -97,6 +115,7 @@ for (const [name, module] of Object.entries(moduleManifest.modules || {})) {
 }
 
 for (const removed of [
+  "assets/js/core/cursor-red.js", "assets/css/cursor-red.css",
   "assets/js/features/nexora-ai.js", "assets/css/features/nexora-ai.css",
   "assets/js/features/pix-vault.js", "assets/css/features/pix-vault.css",
   "assets/js/features/big-image.js", "assets/css/features/big-image.css",
@@ -113,6 +132,8 @@ for (const relative of embeddedFrames) {
   if (/allow-same-origin/i.test(source)) fail(`${relative}: sandbox srcdoc masih memiliki allow-same-origin.`);
 }
 const index = read("index.html");
+if (index.indexOf("assets/config.js") < 0 || index.indexOf("assets/config.js") > index.indexOf("assets/js/core/app.js")) fail("assets/config.js harus dimuat sebelum app.js.");
+if (/cursor-red\.(?:js|css)/.test(index)) fail("Efek cursor lama masih dimuat pada halaman publik.");
 if (/id=["']nxUnbanFrame["'][^>]*allow-same-origin/i.test(index)) fail("Iframe Unban masih memiliki allow-same-origin.");
 const app = read("assets/js/core/app.js");
 if (!/event\.source\s*!==\s*sourceFrame\.contentWindow/.test(app)) fail("Handler postMessage iframe belum memvalidasi event.source.");

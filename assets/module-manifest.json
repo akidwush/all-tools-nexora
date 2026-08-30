@@ -256,75 +256,108 @@
       ]
     },
     "nexora-text-2d": {
-      "css": ["assets/css/features/nexora-generators.css"],
-      "js": ["assets/vendor/nexora/text-2d-presets.js", "assets/vendor/nexora/text-style-data.js", "assets/vendor/nexora/text-2d-engine.js", "assets/js/features/nexora/nexora-runtime.js"]
+      "css": [
+        "assets/css/features/nexora-generators.css"
+      ],
+      "js": [
+        "assets/vendor/nexora/text-2d-presets.js",
+        "assets/vendor/nexora/text-style-data.js",
+        "assets/vendor/nexora/text-2d-engine.js",
+        "assets/js/features/nexora/nexora-runtime.js"
+      ]
     },
     "nexora-text-3d": {
-      "css": ["assets/css/features/nexora-generators.css"],
-      "js": ["assets/vendor/nexora/3d-engine.js", "assets/js/features/nexora/nexora-runtime.js"]
+      "css": [
+        "assets/css/features/nexora-generators.css"
+      ],
+      "js": [
+        "assets/vendor/nexora/3d-engine.js",
+        "assets/js/features/nexora/nexora-runtime.js"
+      ]
     },
     "nexora-text-fx-animation": {
-      "css": ["assets/css/features/nexora-generators.css"],
-      "js": ["assets/vendor/nexora/text-fx-animation-engine.js", "assets/js/features/nexora/nexora-runtime.js"]
+      "css": [
+        "assets/css/features/nexora-generators.css"
+      ],
+      "js": [
+        "assets/vendor/nexora/text-fx-animation-engine.js",
+        "assets/js/features/nexora/nexora-runtime.js"
+      ]
     },
     "nexora-text-vector": {
-      "css": ["assets/css/features/nexora-generators.css"],
-      "js": ["assets/js/features/nexora/nexora-runtime.js"]
+      "css": [
+        "assets/css/features/nexora-generators.css"
+      ],
+      "js": [
+        "assets/js/features/nexora/nexora-runtime.js"
+      ]
     },
     "nexora-trimpath": {
-      "css": ["assets/css/features/nexora-generators.css"],
-      "js": ["assets/vendor/nexora/trimpath-font-metrics.js", "assets/vendor/nexora/trimpath-letters.js", "assets/vendor/nexora/trimpath-engine.js", "assets/js/features/nexora/nexora-runtime.js"]
+      "css": [
+        "assets/css/features/nexora-generators.css"
+      ],
+      "js": [
+        "assets/vendor/nexora/trimpath-font-metrics.js",
+        "assets/vendor/nexora/trimpath-letters.js",
+        "assets/vendor/nexora/trimpath-engine.js",
+        "assets/js/features/nexora/nexora-runtime.js"
+      ]
     },
     "nexora-logo-animate": {
-      "css": ["assets/css/features/nexora-generators.css"],
-      "js": ["assets/js/features/nexora/logo-engine.js", "assets/js/features/nexora/nexora-runtime.js"]
+      "css": [
+        "assets/css/features/nexora-generators.css"
+      ],
+      "js": [
+        "assets/js/features/nexora/logo-engine.js",
+        "assets/js/features/nexora/nexora-runtime.js"
+      ]
     }
   },
   "tools": {
-    "getcode": "get-code",
+    "aiodownloader": "aio-downloader",
+    "terabox": "download-pack",
     "tiktok": "tiktok",
-    "ttquote": "tiktok-quote",
+    "fakebankjago": "download-pack",
+    "iqc": "generator-pack",
+    "sertifikat": "source-features",
+    "fakedev": "source-features",
+    "winquotes": "generator-pack",
+    "nokiamsg": "generator-pack",
+    "mltools": "imported-tools",
+    "comicreader": "comic-reader",
+    "aiimage": "puter-image",
+    "aivideo": "puter-video",
+    "genmail": "genmail",
+    "danbooru": "danbooru-search",
+    "animetoreal": "anime-to-real",
+    "aisong": "ai-song",
+    "promptgenerate": "prompt-generator",
+    "fakeovo": "imported-tools",
+    "quotegenerator": "imported-tools",
+    "carifakta": "imported-tools",
     "virusscan": "virus-scan",
     "cryptomarket": "crypto-market",
     "webintel": "web-intelligence",
     "ipintel": "ip-intelligence",
+    "bmkg": "bmkg-open-data",
     "spaceexplorer": "space-explorer",
     "ocrintel": "ocr-intelligence",
     "documentai": "document-ai",
     "autopdf": "text-to-pdf",
-    "imagevectorizer": "image-vectorizer",
-    "comicreader": "comic-reader",
-    "sertifikat": "source-features",
-    "fakedev": "source-features",
-    "promptgenerate": "prompt-generator",
-    "aiimage": "puter-image",
-    "aivideo": "puter-video",
-    "genmail": "genmail",
-    "aiodownloader": "aio-downloader",
-    "danbooru": "danbooru-search",
-    "animetoreal": "anime-to-real",
-    "aisong": "ai-song",
-    "enhancer": "hd4-enhancer",
-    "fakeovo": "imported-tools",
-    "quotegenerator": "imported-tools",
-    "carifakta": "imported-tools",
-    "mltools": "imported-tools",
-    "iqc": "generator-pack",
-    "winquotes": "generator-pack",
-    "nokiamsg": "generator-pack",
-    "terabox": "download-pack",
-    "fakebankjago": "download-pack",
-    "unbanwa": "unban-whatsapp",
-    "vdeploy": "deploy-center",
-    "webencryption": "web-encryption",
     "svgalight": "svg-alight",
-    "bmkg": "bmkg-open-data",
     "alightpremium": "alight-premium",
+    "imagevectorizer": "image-vectorizer",
     "text2d": "nexora-text-2d",
     "text3d": "nexora-text-3d",
     "textfxanimation": "nexora-text-fx-animation",
     "textvector": "nexora-text-vector",
     "trimpath": "nexora-trimpath",
-    "logoanimate": "nexora-logo-animate"
+    "logoanimate": "nexora-logo-animate",
+    "enhancer": "hd4-enhancer",
+    "ttquote": "tiktok-quote",
+    "getcode": "get-code",
+    "vdeploy": "deploy-center",
+    "webencryption": "web-encryption",
+    "unbanwa": "unban-whatsapp"
   }
 }

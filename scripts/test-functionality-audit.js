@@ -65,8 +65,10 @@ function responseMock() {
   assert.equal(toolHealth.publicHealthOnly("alight-premium", { method: "GET" }, new URL("https://nexora.test/api/alight-premium?health=1&action=magic-link&email=a%40b.test")), false, "premium actions must never bypass membership through a health flag");
   assert.equal(toolHealth.publicHealthOnly("alight-premium", { method: "GET" }, new URL("https://nexora.test/api/alight-premium")), true);
   assert.equal(toolHealth.publicHealthOnly("crypto-market", { method: "GET" }, new URL("https://nexora.test/api/crypto-market?health=1")), false, "data endpoints must not inherit generic health bypasses");
+  const toolHealthCatalog = require("../lib/tool-health").TOOL_CATALOG;
+  const alightHealth = toolHealthCatalog.find((item) => item.id === "alightpremium");
+  assert.equal(alightHealth.target.method, "HEAD");
   const healthSource = fs.readFileSync(require.resolve("../lib/tool-health"), "utf8");
-  assert.match(healthSource, /id: "alightpremium"[\s\S]*?method: "HEAD"/);
   assert.match(healthSource, /rows\.filter\(\(row\) => catalogIds\.has\(row\.tool_id\)\)/);
 
   const originalGetDatabaseConfig = database.getDatabaseConfig;

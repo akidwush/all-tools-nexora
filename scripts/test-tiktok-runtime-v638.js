@@ -5,12 +5,14 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 const pkg = JSON.parse(read('package.json'));
+const config = require('../assets/config.js');
 const loader = read('assets/js/core/lazy-loader.js');
 const tiktok = read('assets/js/features/tiktok.js');
 
 assert.equal(pkg.version, '6.4.0');
 assert.match(loader, /getcode:'openGetCodeRoom',tiktok:'openTiktokRoom'/);
-assert.match(loader, /ASSET_VERSION\s*=\s*['"]6\.4\.0['"]/);
+assert.equal(config.version, pkg.version);
+assert.match(loader, /ASSET_VERSION\s*=\s*config\.version/);
 assert.match(tiktok, /var lightVideoUrl=stdUrl\|\|wmUrl\|\|hdUrl;/);
 assert.match(tiktok, /previewUrl:lightVideoUrl,title:'TikTok MP4 HD'/);
 assert.match(tiktok, /choices\.some\(function\(choice\)\{ return choice\.id==='std'; \}\) \? 'std'/);

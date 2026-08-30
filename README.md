@@ -2,6 +2,8 @@
 
 All Tools Nexora v6.4.0 adalah website toolkit statis dengan 61 tool, lazy-loaded feature modules, dashboard admin, Supabase opsional untuk fitur lama, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency `@google/genai`.
 
+Konfigurasi branding, katalog tool, modul lazy-load, dan target health check sekarang dipusatkan di `assets/config.js`. Panduan edit manual tersedia di [docs/MAINTENANCE.md](docs/MAINTENANCE.md).
+
 ## Cara memakai Nexora AI Image
 
 Fitur ini dipakai untuk membuat gambar dari tulisan. Contohnya, kamu bisa menulis “kucing memakai baju astronot”, lalu AI akan membuat gambarnya.
@@ -176,9 +178,10 @@ npm run dev
 | `lib/` | Handler, proxy, database, rate limit, dan validasi keamanan |
 | `database/` | Skema lengkap, migrations, dan setup admin pertama |
 | `scripts/` | Audit proyek, regression test, build, dan server lokal |
+| `assets/config.js` | Sumber utama branding, katalog, modul, dan health target |
 | `public/` | Output build sementara; tidak disimpan di Git |
 
-`assets/js/core/tool-registry.js` adalah sumber daftar tool. `assets/module-manifest.json`, `lib/tool-health.js`, dan seed `database/schema.sql` wajib tetap sinkron; `npm run check` memverifikasi semuanya.
+`assets/config.js` adalah satu-satunya sumber daftar tool dan branding. Registry browser serta health catalog membacanya langsung; `assets/module-manifest.json` dibuat ulang oleh `npm run sync`. `npm run check` memverifikasi konfigurasi, aset, route, dan seed database.
 
 ## Generator XML lokal
 
@@ -241,7 +244,7 @@ npm run build
 
 Deploy ke Vercel menggunakan konfigurasi `vercel.json`. Seluruh secret harus diatur sebagai environment variable server-side.
 
-Video header mempertahankan mode hemat: desktop memutar video muted saat terlihat, sedangkan HP menampilkan frame video statis agar scrolling tetap ringan dan stabil.
+Video header tetap dipertahankan: HP yang cukup kuat memutar video muted saat terlihat, sedangkan desktop, perangkat lemah, mode hemat data, dan reduced-motion menampilkan frame video statis.
 
 ### Push dari Termux
 

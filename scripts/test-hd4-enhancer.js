@@ -7,6 +7,7 @@ const path = require("node:path");
 const root = path.resolve(__dirname, "..");
 const read = (name) => fs.readFileSync(path.join(root, name), "utf8");
 const hd4 = require(path.join(root, "lib/kuroneko-hd4.js"));
+const { getTool } = require("./config-test-helpers.js");
 
 function upstreamResponse(payload, status = 200, headers = {}) {
   const normalized = Object.fromEntries(Object.entries(headers).map(([key, value]) => [String(key).toLowerCase(), value]));
@@ -50,7 +51,6 @@ const backend = read("lib/kuroneko-hd4.js");
 const app = read("assets/js/core/app.js");
 const shell = read("assets/js/core/shell.js");
 const lazy = read("assets/js/core/lazy-loader.js");
-const registry = read("assets/js/core/tool-registry.js");
 const dispatcher = read("api/tool-health.js");
 const localServer = read("serve-local.js");
 const manifest = JSON.parse(read("assets/module-manifest.json"));
@@ -69,10 +69,11 @@ assert.match(localServer, /"\/api\/tools\/hd4".+service: "hd4-enhancer"/);
 assert.match(app, /case 'enhancer': renderHd4Enhancer\(body\); break;/);
 assert.doesNotMatch(app, /function renderEnhancer\s*\(/);
 assert.match(shell, /enhancer:\s+\{renderer:'renderHd4Enhancer'/);
-assert.match(lazy, /enhancer:'hd4-enhancer'/);
 assert.match(lazy, /hd4-enhancer-v2/);
-assert.match(registry, /\["enhancer","Nexora Image HD Enhancer V4","api","hd4-enhancer","renderHd4Enhancer"/);
-assert.match(read("lib/tool-health.js"), /id: "enhancer", name: "Nexora Image HD Enhancer V4"/);
+assert.equal(getTool("enhancer").runtime.module, "hd4-enhancer");
+assert.equal(getTool("enhancer").runtime.handler, "renderHd4Enhancer");
+assert.equal(getTool("enhancer").runtime.mode, "api");
+assert.equal(getTool("enhancer").name, "Nexora Image HD Enhancer V4");
 assert.equal((read(".env.example").match(/^KURONEKO_API_KEY=$/gm) || []).length, 1);
 assert.equal(fs.existsSync(path.join(root, "database/migrations/033_hd4.sql")), false);
 

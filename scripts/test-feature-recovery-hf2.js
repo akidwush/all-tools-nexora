@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
+const { getTool } = require('./config-test-helpers.js');
 
 const index = read('index.html');
 assert.doesNotMatch(index, /id="nxToolHealth"/);
@@ -15,8 +16,8 @@ assert.match(app, /device:\s*'cpu'/);
 assert.match(app, /Model AI terlalu lama merespons/);
 assert.match(app, /new Uint32Array\(w \* h\)/);
 
-const registry = read('assets/js/core/tool-registry.js');
-assert.match(registry, /\["removebg","Remove BG","local",null,"renderRemovebg",null\]/);
+assert.equal(getTool('removebg').name, 'Remove BG');
+assert.deepEqual(getTool('removebg').runtime, { mode: 'local', handler: 'renderRemovebg' });
 
 const vercel = JSON.parse(read('vercel.json'));
 assert.ok(vercel.rewrites.some(item => item.source === '/api/vdeploy' && /mode=vdeploy/.test(item.destination)));

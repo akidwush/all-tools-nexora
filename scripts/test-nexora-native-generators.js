@@ -8,17 +8,16 @@ const vm = require("node:vm");
 const root = path.resolve(__dirname, "..");
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 const exists = (file) => fs.existsSync(path.join(root, file));
+const { getTool } = require("./config-test-helpers.js");
 
 const toolIds = ["text2d", "text3d", "textfxanimation", "textvector", "trimpath", "logoanimate"];
-const registry = read("assets/js/core/tool-registry.js");
 const manifest = JSON.parse(read("assets/module-manifest.json"));
 const app = read("assets/js/core/app.js");
 const shell = read("assets/js/core/shell.js");
 const migration = read("database/migrations/026_nexora_native_generators.sql");
 for (const id of toolIds) {
-  assert.ok(registry.includes(`["${id}"`), `Registry harus memuat ${id}`);
+  assert.ok(getTool(id), `Konfigurasi harus memuat ${id}`);
   assert.ok(manifest.tools[id], `Manifest harus memetakan ${id}`);
-  assert.ok(app.includes(`id: '${id}'`), `Katalog harus memuat ${id}`);
   assert.ok(shell.includes(`${id}:{renderer:`), `Universal room harus memuat ${id}`);
 }
 assert.match(migration, /external_url, is_active/);

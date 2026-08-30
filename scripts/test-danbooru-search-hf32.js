@@ -7,6 +7,7 @@ const path = require("node:path");
 const root = path.resolve(__dirname, "..");
 const read = (name) => fs.readFileSync(path.join(root, name), "utf8");
 const danbooru = require(path.join(root, "lib/kuroneko-danbooru.js"));
+const { getTool } = require("./config-test-helpers.js");
 
 function responsePayload(payload, status = 200, headers = {}) {
   return {
@@ -48,7 +49,6 @@ const css = read("assets/css/features/danbooru-search.css");
 const app = read("assets/js/core/app.js");
 const shell = read("assets/js/core/shell.js");
 const lazy = read("assets/js/core/lazy-loader.js");
-const registry = read("assets/js/core/tool-registry.js");
 const dispatcher = read("api/tool-health.js");
 const localServer = read("serve-local.js");
 const envExample = read(".env.example");
@@ -72,10 +72,11 @@ assert.match(localServer, /"\/api\/search\/danbooru"[^\n]+service: "danbooru-sea
 assert.match(localServer, /route\.service[^\n]+_service/);
 assert.match(app, /case 'danbooru': renderDanbooruSearch\(body\); break;/);
 assert.match(shell, /danbooru:\{renderer:'renderDanbooruSearch'/);
-assert.match(lazy, /danbooru:'danbooru-search'/);
 assert.match(lazy, /danbooru-search-hf35/);
-assert.match(registry, /\["danbooru","Danbooru Search","api","danbooru-search","renderDanbooruSearch"/);
-assert.match(read("lib/tool-health.js"), /id: "danbooru"/);
+assert.equal(getTool("danbooru").runtime.module, "danbooru-search");
+assert.equal(getTool("danbooru").runtime.handler, "renderDanbooruSearch");
+assert.equal(getTool("danbooru").runtime.mode, "api");
+assert.equal(getTool("danbooru").health.path, "/assets/js/features/danbooru-search.js");
 assert.match(schema, /'danbooru'/);
 assert.match(migration, /'danbooru'/);
 assert.match(migration, /add column if not exists access_level/);

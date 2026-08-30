@@ -5,6 +5,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const root = path.resolve(__dirname, "..");
+const { getTool } = require("./config-test-helpers.js");
 const legacyTerms = [
   ["fla", "mo"].join(""),
   ["nex", "us"].join(""),
@@ -65,7 +66,7 @@ for (const file of uiFiles) {
 
 assert.equal(failures.length, 0, failures.join("\n"));
 assert.match(fs.readFileSync(path.join(root, "index.html"), "utf8"), /All Tools Nexora/);
-assert.match(fs.readFileSync(path.join(root, "assets/js/core/tool-registry.js"), "utf8"), /Nexora Document AI/);
+assert.equal(getTool("documentai").name, "Nexora Document AI");
 assert.doesNotMatch(fs.readFileSync(path.join(root, "assets/js/features/nexora/nexora-runtime.js"), "utf8"), /NexoraNexora|nexora:nexora/i);
 
 console.log("Branding audit lulus: source, path, embedded payload, metadata, dan UI copy konsisten Nexora.");

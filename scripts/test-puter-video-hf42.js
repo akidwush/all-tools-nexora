@@ -7,14 +7,13 @@ const vm = require("node:vm");
 
 const root = path.join(__dirname, "..");
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
+const { getTool } = require("./config-test-helpers.js");
 const feature = read("assets/js/features/puter-video.js");
 const runtime = read("assets/js/features/puter-runtime.js");
 const css = read("assets/css/features/puter-video.css");
 const app = read("assets/js/core/app.js");
 const shell = read("assets/js/core/shell.js");
 const lazy = read("assets/js/core/lazy-loader.js");
-const registry = read("assets/js/core/tool-registry.js");
-const health = read("lib/tool-health.js");
 const index = read("index.html");
 const readme = read("README.md");
 const routeManifest = JSON.parse(read("route-manifest.json"));
@@ -25,14 +24,14 @@ assert.deepEqual(moduleManifest.modules["puter-video"], {
   js: ["assets/js/features/puter-runtime.js", "assets/js/features/puter-video.js"]
 });
 assert.equal(moduleManifest.tools.aivideo, "puter-video");
-assert.match(app, /id: 'aivideo'.+Nexora AI Video Generator/);
+assert.equal(getTool("aivideo").name, "Nexora AI Video Generator");
+assert.equal(getTool("aivideo").runtime.mode, "module");
+assert.equal(getTool("aivideo").runtime.module, "puter-video");
+assert.equal(getTool("aivideo").runtime.handler, "renderPuterVideo");
 assert.match(app, /case 'aivideo': renderPuterVideo\(body\); break;/);
 assert.match(shell, /aivideo:\{renderer:'renderPuterVideo'/);
-assert.match(registry, /\["aivideo","Nexora AI Video Generator","module","puter-video","renderPuterVideo",null\]/);
-assert.match(health, /id: "aivideo", name: "Nexora AI Video Generator"/);
-assert.match(lazy, /aivideo:'puter-video'/);
+assert.equal(getTool("aivideo").health.path, "/assets/js/features/puter-video.js");
 assert.match(lazy, /puter-video-hf47/);
-assert.match(lazy, /'puter-video':'Nexora AI Video Generator'/);
 assert.match(index, /hf47-puter-video1/);
 assert.match(readme, /#tool-aivideo/);
 assert.match(readme, /61 tool/);

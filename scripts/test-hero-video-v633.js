@@ -5,6 +5,7 @@ const pkg = require('../package.json');
 const performanceJs = fs.readFileSync('assets/js/core/performance.js', 'utf8');
 const coreCss = fs.readFileSync('assets/css/core.css', 'utf8');
 const index = fs.readFileSync('index.html', 'utf8');
+const config = require('../assets/config.js');
 
 assert.equal(pkg.version, '6.4.0');
 assert(performanceJs.includes('heroMode="auto"'));
@@ -14,7 +15,8 @@ assert(performanceJs.includes('interactionRetryUsed=true'));
 assert(performanceJs.includes('video.controls=false'));
 assert(performanceJs.includes('function suspendPlayback()'));
 assert(!performanceJs.includes('if(mobileLike){if(!video.paused)video.pause();return;}'));
-assert(performanceJs.includes('video.autoplay=true'));
+assert(performanceJs.includes('video.autoplay=autoplayEnabled'));
+assert(performanceJs.includes('heroMode=heroStaticAllowed?"static":"disabled"'));
 assert(performanceJs.includes('schedulePlaybackRecovery'));
 assert(performanceJs.includes('video.addEventListener("ended",schedulePlaybackRecovery)'));
 assert(!performanceJs.includes('autoplayRejected'));
@@ -29,5 +31,8 @@ assert(index.includes('autoplay=""'));
 assert(index.includes('muted=""'));
 assert(index.includes('loop=""'));
 assert(index.includes('playsinline=""'));
+assert.equal(config.ui.heroVideo.playOnMobile, true);
+assert.equal(config.ui.heroVideo.playOnDesktop, false);
+assert.equal(config.ui.heroVideo.showStaticOnDesktop, true);
 
-console.log('Nexora hero video tests lulus: autoplay loop desktop/mobile, visibility resume, dan retry interaksi aman.');
+console.log('Nexora hero video tests lulus: autoplay loop mobile, frame statis desktop, visibility resume, dan retry interaksi aman.');

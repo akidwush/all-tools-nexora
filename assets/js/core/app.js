@@ -1303,144 +1303,38 @@ document.addEventListener('click', function(e) {
 });
 
 
-let toolsData = {
-    downloader: [
-        { id: 'aiodownloader', icon: 'fa-solid fa-cloud-arrow-down', name: 'All In One Downloader', desc: 'Ambil pilihan media yang tersedia dari satu link', badge: 'AIO' },
-        { id: 'terabox', icon: 'fa-solid fa-box-open', name: 'Terabox Downloader', desc: 'Ambil file dari link share Terabox', badge: 'FILE' },{ id: 'instagram', icon: 'fa-brands fa-instagram', name: 'Instagram', desc: 'Download video & foto', badge: 'HD' },
-        { id: 'tiktok', icon: 'fa-brands fa-tiktok', name: 'TikTok', desc: 'Video, foto & audio', badge: 'MP4/MP3/JPG' },
-        { id: 'youtube', icon: 'fa-brands fa-youtube', name: 'YouTube Metadata', desc: 'Metadata dan tautan resmi YouTube', badge: 'RESMI' },
-        { id: 'spotify', icon: 'fa-brands fa-spotify', name: 'Spotify Downloader', desc: 'Audio provider dengan fallback resmi', badge: 'MP3' }
-    ],
-    maker: [{ id: 'fakebankjago', icon: 'fa-solid fa-building-columns', name: 'Fake Bank Jago', desc: 'Generator visual saldo Bank Jago', badge: 'SIMULASI' },{ id: 'brat', icon: 'fa-solid fa-wand-magic-sparkles', name: 'BRAT Generator', desc: 'Static + animated GIF', badge: 'GIF' },
-        { id: 'iqc', icon: 'fa-solid fa-image', name: 'IQC Generator', desc: 'Buat gambar IQC — Operator, Image & Dark', badge: '3 STYLE' },
-        { id: 'sertifikat', icon: 'fa-solid fa-certificate', name: 'Sertifikat Custom', desc: 'Buat sertifikat custom dari nama melalui API atau renderer lokal', badge: 'PNG' },
+function nxCloneToolCatalog(source) {
+    const categories = ['downloader', 'maker', 'tools', 'vault', 'external'];
+    const catalog = {};
 
-        { id: 'ektp', icon: 'fa-solid fa-id-card', name: 'E-KTP Generator', desc: 'Full form demo', badge: 'Full' },
-        { id: 'fakedana', icon: 'fa-solid fa-money-bill-wave', name: 'Fake Dana', desc: 'Generate saldo Dana palsu', badge: 'Custom' },
-        { id: 'fakedev', icon: 'fa-solid fa-laptop-code', name: 'FakeDev', desc: 'Buat profil developer dari nama, bio, dan foto', badge: 'API' },
-        { id: 'fakelobby', icon: 'fa-solid fa-gamepad', name: 'Fake Lobby', desc: 'FF & ML lobby palsu', badge: 'Game' },
-        { id: 'winquotes', icon: 'fa-brands fa-windows', name: 'Windows Quotes', desc: 'Quote ala Windows — 2 style', badge: '2 STYLE' },
-        { id: 'nokiamsg', icon: 'fa-solid fa-mobile-retro', name: 'Nokia Message', desc: 'Buat gambar SMS jadul Nokia', badge: 'RETRO' },
-        { id: 'tanyaustadz', icon: 'fa-solid fa-user-tie', name: 'Tanya Ustadz', desc: 'Meme generator', badge: 'Lucu' }
-    ],
-    tools: [{ id: 'mltools', icon: 'fa-solid fa-gamepad', name: 'ML Tools', desc: 'Script ML, Winrate dan Stalk MLBB', badge: 'MLBB' },{ id: 'comicreader', icon: 'fa-solid fa-book-open-reader', name: 'Baca Komik Full', desc: 'Manga, manhwa, manhua + reader', badge: 'FULL' },
-        { id: 'aiimage', icon: 'fa-solid fa-image', name: 'Nexora AI Image', desc: 'Buat gambar AI memakai akun dan allowance Puter milikmu', badge: 'PUTER AI' },
-        { id: 'aivideo', icon: 'fa-solid fa-clapperboard', name: 'Nexora AI Video Generator', desc: 'Buat video dari prompt atau gambar melalui akun Puter milikmu', badge: 'AI VIDEO' },
-        { id: 'genmail', icon: 'fa-solid fa-envelope-open-text', name: 'GenMail', desc: 'Buat email sementara, periksa inbox, dan baca pesan dengan aman', badge: 'TEMP MAIL' },
-        { id: 'danbooru', icon: 'fa-solid fa-images', name: 'Danbooru Search', desc: 'Cari ilustrasi anime berdasarkan tag dalam gallery ringan', badge: 'SAFE DEFAULT' },
-        { id: 'animetoreal', icon: 'fa-solid fa-wand-magic-sparkles', name: 'Anime to Real', desc: 'Ubah ilustrasi anime dari URL menjadi gambar realistis', badge: 'AI TRANSFORM' },
-        { id: 'aisong', icon: 'fa-solid fa-music', name: 'Nexora AI Song Generator', desc: 'Ubah ide, cerita, dan suasana menjadi lagu yang siap diputar', badge: 'AI MUSIC' },
-        { id: 'promptgenerate', icon: 'fa-solid fa-wand-magic-sparkles', name: 'Nexora Prompt Generator', desc: 'Analisis gambar dengan Nexora Vision AI menjadi prompt produksi profesional', badge: 'VISION AI' },
-        { id: 'fakeovo', icon: 'fa-solid fa-wallet', name: 'Fake OVO', desc: 'Generator tampilan saldo OVO', badge: 'CANVAS' },
-        { id: 'quotegenerator', icon: 'fa-solid fa-quote-left', name: 'Quote Generator', desc: 'Buat gambar quote monokrom', badge: 'JPG' },
-        { id: 'carifakta', icon: 'fa-solid fa-magnifying-glass-chart', name: 'CariFakta', desc: 'Analisis klaim dan berita menggunakan AI', badge: 'AI' },
-{ id: 'virusscan', icon: 'fa-solid fa-shield-virus', name: 'Virus Scan', desc: 'Scan URL, file, hash, domain & IP', badge: 'SECURITY' },
-        { id: 'cryptomarket', icon: 'fa-solid fa-chart-line', name: 'Crypto Market Scanner', desc: 'Analisis candle 15m, 1 jam, mikro, makro, indikator dan risiko crypto', badge: 'MTF LIVE' },
-        { id: 'webintel', icon: 'fa-solid fa-satellite-dish', name: 'Nexora Web Intelligence', desc: 'Audit SEO, security, performa, aksesibilitas dan teknologi website', badge: 'INTEL' },
-        { id: 'ipintel', icon: 'fa-solid fa-network-wired', name: 'IP & ASN Intelligence', desc: 'Lookup IPv4/IPv6, ASN, organisasi, negara dan benua via IPinfo Lite', badge: 'IPINFO' },
-        { id: 'bmkg', icon: 'fa-solid fa-cloud-sun-rain', name: 'BMKG Indonesia', desc: 'Gempa terkini, prakiraan cuaca 3 hari dan peringatan dini cuaca dari BMKG', badge: 'BMKG' },
-        { id: 'spaceexplorer', icon: 'fa-solid fa-user-astronaut', name: 'Space Explorer', desc: 'APOD, galeri Mars, asteroid dekat Bumi dan cuaca antariksa NASA', badge: 'NASA' },
-        { id: 'ocrintel', icon: 'fa-solid fa-file-lines', name: 'Nexora OCR Intelligence', desc: 'Ekstrak teks dari gambar dan PDF, analisis dokumen, lalu buat searchable PDF', badge: 'OCR' },
-        { id: 'documentai', icon: 'fa-solid fa-file-waveform', name: 'Nexora Document AI', desc: 'Ringkas, analisis, ekstrak tabel, dan tanya isi dokumen dengan Nexora AI', badge: 'AI' },
-        { id: 'autopdf', icon: 'fa-solid fa-file-pdf', name: 'Nexora Auto PDF', desc: 'Ubah teks panjang menjadi PDF A5 rapi dengan pagination otomatis', badge: 'PDF' },
-        { id: 'svgalight', icon: 'fa-solid fa-wand-magic-sparkles', name: 'SVG → Alight XML', desc: 'Konversi SVG ke XML Alight Motion dengan AM Optimized, Maximum Fidelity, audit kesamaan, dan kontrol layer', badge: 'ENGINE v1.8' },
-        { id: 'alightpremium', icon: 'fa-solid fa-bolt', name: 'Alight Motion Premium 1 Tahun', desc: 'Request magic link lalu proses aktivasi Premium melalui API reseller', badge: '1 YEAR' },
-        { id: 'imagevectorizer', icon: 'fa-solid fa-bezier-curve', name: 'Nexora Image Vectorizer', desc: 'Ubah PNG atau JPG menjadi SVG melalui FreeConvert Cloud', badge: 'SVG' },
-        { id: 'text2d', icon: 'fa-solid fa-font', name: '2D Text Animate / Text FX', desc: 'Buat XML animasi teks 2D dengan preset dan Style FX lokal', badge: 'XML' },
-        { id: 'text3d', icon: 'fa-solid fa-cube', name: '3D Text Animate', desc: 'Buat XML teks 3D, extrude, offset, dan long shadow', badge: '7 PRESET' },
-        { id: 'textfxanimation', icon: 'fa-solid fa-wand-magic-sparkles', name: 'Text FX Animation', desc: 'Preset efek teks native untuk Alight Motion', badge: '5 PRESET' },
-        { id: 'textvector', icon: 'fa-solid fa-draw-polygon', name: 'Text to Vector', desc: 'Ubah font lokal menjadi path vector Alight Motion', badge: 'OPENTYPE' },
-        { id: 'trimpath', icon: 'fa-solid fa-route', name: 'Trimpath Generator', desc: 'Generator trimpath huruf dengan style, timing, dan color mapping', badge: 'LOCAL XML' },
-        { id: 'logoanimate', icon: 'fa-solid fa-shapes', name: 'Logo Animate', desc: 'Template animasi logo dan text block Alight Motion', badge: '8.33S' },
-        { id: 'calc', icon: 'fa-solid fa-calculator', name: 'Calculator', desc: 'Hitung cepat', badge: 'Math' },
-        { id: 'pwgen', icon: 'fa-solid fa-key', name: 'Password Gen', desc: 'Password aman', badge: 'Secure' },
-        { id: 'morse', icon: 'fa-solid fa-tower-broadcast', name: 'Morse Code', desc: 'Konversi morse', badge: 'Audio' },
-        { id: 'removebg', icon: 'fa-solid fa-eraser', name: 'Remove BG', desc: 'Hapus background', badge: 'AI' },
-        { id: 'enhancer', icon: 'fa-solid fa-wand-magic-sparkles', name: 'Nexora Image HD Enhancer V4', desc: 'Tingkatkan kualitas gambar dari link atau galeri', badge: 'HD V4' }
-    ],
-    vault: [
+    for (const category of categories) {
+        const items = Array.isArray(source && source[category]) ? source[category] : [];
+        catalog[category] = items.map(item => ({
+            id: String(item.id || '').trim().toLowerCase(),
+            icon: item.icon || 'fa-solid fa-cube',
+            name: item.name || item.id || 'Tool',
+            desc: item.description || item.desc || '',
+            badge: item.badge || '',
+            link: item.link || '',
+            accessLevel: item.accessLevel || 'free',
+            runtime: item.runtime || {},
+            health: item.health || null,
+            aliases: Array.isArray(item.aliases) ? item.aliases.slice() : []
+        })).filter(item => item.id);
+    }
 
-        { id: 'ttquote', icon: 'fa-brands fa-tiktok', name: 'Quote TikTok Nexora', desc: 'Buat fake TikTok chat versi Nexora', badge: 'NEXORA' },
-        { id: 'qrgen', icon: 'fa-solid fa-qrcode', name: 'QR Generator', desc: 'Buat QR langsung di sini', badge: 'QR' }
-    ],
-    external: [
-        
-        { id: 'tiktokhd', icon: 'fa-brands fa-tiktok', name: 'Upload TikTok HD', desc: 'Proses MP4 HD + TikTok Studio', badge: 'HD' },
-{ id: 'getcode', icon: 'fa-solid fa-code', name: 'Get Code HTML', desc: 'Extract, preview, copy & download source', badge: 'PRO' },
-        { id: 'vdeploy', icon: 'fa-solid fa-rocket', name: 'Deploy & Update Web', desc: 'Deploy Vercel atau Netlify + update project', badge: 'UPDATE' },
-        { id: 'zxvai', icon: 'fa-solid fa-robot', name: 'ZxVAI', desc: 'AI tools & APK', link: 'https://zxvaiapk.netlify.app/' },
-        { id: 'fotolink', icon: 'fa-solid fa-image', name: 'Foto To Link', desc: 'Upload & share', link: 'https://pixvault-bykz.netlify.app/' },
-        { id: 'webencryption', icon: 'fa-solid fa-shield-halved', name: 'Web Encryption', desc: 'Encrypt & protect HTML', badge: 'SECURE' },
-        { id: 'unbanwa', icon: 'fa-brands fa-whatsapp', name: 'Unban WhatsApp', desc: 'Tools & panduan unban WhatsApp', badge: 'WA' }
-    ]
-};
+    return catalog;
+}
 
-// Ikon katalog publik harus mudah dibedakan dalam sekali lihat. Nilai ini
-// sengaja menjadi sumber utama untuk tool bawaan agar konfigurasi database
-// lama tidak dapat menyamakan banyak kartu dengan ikon tautan eksternal.
-const PUBLIC_TOOL_ICONS = Object.freeze({
-    "aiodownloader": "fa-solid fa-cloud-arrow-down",
-    "terabox": "fa-solid fa-box-open",
-    "instagram": "fa-brands fa-instagram",
-    "tiktok": "fa-brands fa-tiktok",
-    "youtube": "fa-brands fa-youtube",
-    "spotify": "fa-brands fa-spotify",
-    "fakebankjago": "fa-solid fa-building-columns",
-    "brat": "fa-solid fa-wand-magic-sparkles",
-    "iqc": "fa-solid fa-images",
-    "sertifikat": "fa-solid fa-certificate",
-    "ektp": "fa-solid fa-id-card",
-    "fakedana": "fa-solid fa-money-bill-wave",
-    "fakedev": "fa-solid fa-laptop-code",
-    "fakelobby": "fa-solid fa-gamepad",
-    "winquotes": "fa-brands fa-windows",
-    "nokiamsg": "fa-solid fa-mobile-retro",
-    "tanyaustadz": "fa-solid fa-user-tie",
-    "mltools": "fa-solid fa-crosshairs",
-    "comicreader": "fa-solid fa-book-open-reader",
-    "aiimage": "fa-solid fa-paintbrush",
-    "aivideo": "fa-solid fa-clapperboard",
-    "genmail": "fa-solid fa-envelope-open-text",
-    "danbooru": "fa-solid fa-photo-film",
-    "animetoreal": "fa-solid fa-person-rays",
-    "aisong": "fa-solid fa-music",
-    "promptgenerate": "fa-solid fa-pen-ruler",
-    "fakeovo": "fa-solid fa-wallet",
-    "quotegenerator": "fa-solid fa-quote-left",
-    "carifakta": "fa-solid fa-magnifying-glass-chart",
-    "virusscan": "fa-solid fa-shield-virus",
-    "cryptomarket": "fa-solid fa-chart-line",
-    "webintel": "fa-solid fa-satellite-dish",
-    "ipintel": "fa-solid fa-network-wired",
-    "bmkg": "fa-solid fa-cloud-sun-rain",
-    "spaceexplorer": "fa-solid fa-user-astronaut",
-    "ocrintel": "fa-solid fa-file-lines",
-    "documentai": "fa-solid fa-file-waveform",
-    "autopdf": "fa-solid fa-file-pdf",
-    "svgalight": "fa-solid fa-vector-square",
-    "alightpremium": "fa-solid fa-bolt",
-    "imagevectorizer": "fa-solid fa-bezier-curve",
-    "text2d": "fa-solid fa-font",
-    "text3d": "fa-solid fa-cube",
-    "textfxanimation": "fa-solid fa-text-height",
-    "textvector": "fa-solid fa-draw-polygon",
-    "trimpath": "fa-solid fa-route",
-    "logoanimate": "fa-solid fa-shapes",
-    "calc": "fa-solid fa-calculator",
-    "pwgen": "fa-solid fa-key",
-    "morse": "fa-solid fa-tower-broadcast",
-    "removebg": "fa-solid fa-eraser",
-    "enhancer": "fa-solid fa-sliders",
-    "ttquote": "fa-solid fa-comment-dots",
-    "qrgen": "fa-solid fa-qrcode",
-    "tiktokhd": "fa-solid fa-upload",
-    "getcode": "fa-solid fa-code",
-    "vdeploy": "fa-solid fa-rocket",
-    "zxvai": "fa-solid fa-robot",
-    "fotolink": "fa-solid fa-link",
-    "webencryption": "fa-solid fa-lock",
-    "unbanwa": "fa-brands fa-whatsapp"
-});
+if (!window.NexoraConfig || !window.NexoraConfig.tools) {
+    throw new Error('Konfigurasi Nexora tidak tersedia. Pastikan assets/config.js dimuat sebelum app.js.');
+}
+
+let toolsData = nxCloneToolCatalog(window.NexoraConfig.tools);
+
+const PUBLIC_TOOL_ICONS = Object.freeze(Object.fromEntries(
+    Object.values(toolsData).flat().map(item => [item.id, item.icon])
+));
 
 function collectAllTools() {
     return [
@@ -1455,7 +1349,7 @@ function collectAllTools() {
 
 let allTools = collectAllTools();
 
-const ALL_PAGE_SIZE = 12;
+const ALL_PAGE_SIZE = Math.max(6, Number(window.NexoraConfig.ui.catalogPageSize) || 12);
 const catalogGrids = {
     all: 'allGrid',
     downloader: 'downloaderGrid',
@@ -1539,7 +1433,7 @@ function catalogListTools() {
 }
 
 window.NexoraToolCatalog = Object.freeze({
-    version: '6.4.0',
+    version: window.NexoraConfig.version,
     has: catalogHasTool,
     list: catalogListTools
 });

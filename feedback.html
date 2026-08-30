@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<script src="assets/config.js?v=6.4.0-config1"></script>
 <script src="assets/js/core/runtime-observer.js"></script>
   <meta name="theme-color" content="#080312">
   <title>Feedback — All Tools Nexora</title>
@@ -18,7 +19,7 @@
 <body>
   <main>
     <section class="hero">
-      <p class="eyebrow">Developer Dika</p>
+      <p class="eyebrow" data-nx-brand="owner">Developer Dika</p>
       <h1>Report Bug, Saran &amp; Ide</h1>
       <p>Kirim detail yang jelas supaya masalah lebih mudah dilacak. Status dan balasan admin untuk laporan yang dikirim dari perangkat ini akan muncul di bawah.</p>
     </section>
@@ -31,7 +32,7 @@
         <label>Detail laporan<textarea id="message" name="message" minlength="5" maxlength="1000" required placeholder="Jelaskan fitur, langkah sebelum error, dan hasil yang muncul..."></textarea></label>
         <label class="trap" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
         <div id="result" class="message" role="status" aria-live="polite"></div>
-        <button id="submit" type="submit">Kirim ke Developer Dika</button>
+        <button id="submit" data-nx-brand-template="feedback-submit" type="submit">Kirim ke Developer Dika</button>
       </form>
       <div id="queue" class="queue"></div>
     </section>
@@ -105,5 +106,5 @@
       renderQueue(); renderReports(); if (navigator.onLine) flushQueue();
     })();
   </script>
-<script src="assets/js/core/custom-select.js?v=6.4.0-global-select-final1" defer></script></body>
+<script src="assets/js/core/custom-select.js?v=6.4.0-global-select-final1" defer></script><script src="assets/branding.js?v=6.4.0-config1"></script></body>
 </html>

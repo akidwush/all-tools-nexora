@@ -4,6 +4,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const root = path.resolve(__dirname, "..");
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
+const { getTool } = require("./config-test-helpers.js");
 
 const manifest = JSON.parse(read("assets/module-manifest.json"));
 const routes = JSON.parse(read("route-manifest.json"));
@@ -11,7 +12,6 @@ const vercel = JSON.parse(read("vercel.json"));
 const ui = read("assets/js/features/alight-premium.js");
 const css = read("assets/css/features/alight-premium.css");
 const local = read("serve-local.js");
-const registry = read("assets/js/core/tool-registry.js");
 const shell = read("assets/js/core/shell.js");
 const app = read("assets/js/core/app.js");
 const proxy = read("lib/alight-premium-proxy.js");
@@ -60,9 +60,10 @@ assert.match(read("assets/js/core/lazy-loader.js"), /alight-premium-hf30/);
 assert.ok(ui.includes("renderAlightPremium"));
 assert.ok(ui.includes("Apply Premium 1 Tahun"));
 assert.ok(css.includes(".nap"));
-assert.ok(registry.includes('["alightpremium","Alight Motion Premium 1 Tahun"'));
+assert.equal(getTool("alightpremium").name, "Alight Motion Premium 1 Tahun");
+assert.equal(getTool("alightpremium").runtime.module, "alight-premium");
+assert.equal(getTool("alightpremium").runtime.handler, "renderAlightPremium");
 assert.ok(shell.includes("alightpremium:{renderer:'renderAlightPremium'"));
-assert.ok(app.includes("id: 'alightpremium'"));
 assert.ok(app.includes("case 'alightpremium': renderAlightPremium(body); break;"));
 
 assert.ok(proxy.includes('productionTransport: "protected-server-route"'));

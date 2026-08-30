@@ -7,6 +7,7 @@ const path = require("node:path");
 const root = path.resolve(__dirname, "..");
 const read = (name) => fs.readFileSync(path.join(root, name), "utf8");
 const animeToReal = require(path.join(root, "lib/kuroneko-anime-to-real.js"));
+const { getTool } = require("./config-test-helpers.js");
 
 function responsePayload(payload, status = 200, headers = {}) {
   return {
@@ -49,7 +50,6 @@ const backend = read("lib/kuroneko-anime-to-real.js");
 const app = read("assets/js/core/app.js");
 const shell = read("assets/js/core/shell.js");
 const lazy = read("assets/js/core/lazy-loader.js");
-const registry = read("assets/js/core/tool-registry.js");
 const dispatcher = read("api/tool-health.js");
 const localServer = read("serve-local.js");
 const schema = read("database/schema.sql");
@@ -69,10 +69,11 @@ assert.match(dispatcher, /_service[^\n]+anime-to-real/);
 assert.match(localServer, /"\/api\/ai\/anime-to-real"[^\n]+service: "anime-to-real"/);
 assert.match(app, /case 'animetoreal': renderAnimeToReal\(body\); break;/);
 assert.match(shell, /animetoreal:\{renderer:'renderAnimeToReal'/);
-assert.match(lazy, /animetoreal:'anime-to-real'/);
 assert.match(lazy, /anime-to-real-hf3[67]/);
-assert.match(registry, /\["animetoreal","Anime to Real","api","anime-to-real","renderAnimeToReal"/);
-assert.match(read("lib/tool-health.js"), /id: "animetoreal"/);
+assert.equal(getTool("animetoreal").runtime.module, "anime-to-real");
+assert.equal(getTool("animetoreal").runtime.handler, "renderAnimeToReal");
+assert.equal(getTool("animetoreal").runtime.mode, "api");
+assert.equal(getTool("animetoreal").health.path, "/assets/js/features/anime-to-real.js");
 assert.match(schema, /'animetoreal'/);
 assert.match(readme, /#tool-animetoreal/);
 assert.equal((read(".env.example").match(/^KURONEKO_API_KEY=$/gm) || []).length, 1);

@@ -4,6 +4,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const root = path.resolve(__dirname, "..");
+const { getTool } = require("./config-test-helpers.js");
 
 function text(relative) { return fs.readFileSync(path.join(root, relative), "utf8"); }
 
@@ -11,8 +12,6 @@ const feature = text("assets/js/features/ip-intelligence.js");
 const css = text("assets/css/features/ip-intelligence.css");
 const app = text("assets/js/core/app.js");
 const shell = text("assets/js/core/shell.js");
-const registry = text("assets/js/core/tool-registry.js");
-const lazy = text("assets/js/core/lazy-loader.js");
 const vercel = JSON.parse(text("vercel.json"));
 const modules = JSON.parse(text("assets/module-manifest.json"));
 const routes = JSON.parse(text("route-manifest.json"));
@@ -21,18 +20,17 @@ assert.match(feature, /window\.renderIpIntelligence\s*=/);
 assert.match(feature, /\/api\/ip-intelligence\?/);
 assert.match(feature, /IPINFO LITE/);
 assert.ok(css.includes(".nip-hero"));
-assert.ok(app.includes("id: 'ipintel'"));
 assert.ok(app.includes("case 'ipintel': renderIpIntelligence(body); break;"));
 assert.ok(shell.includes("ipintel:{renderer:'renderIpIntelligence'"));
-assert.ok(registry.includes('["ipintel","IP & ASN Intelligence"'));
-assert.ok(lazy.includes("'ip-intelligence':"));
+assert.equal(getTool("ipintel").name, "IP & ASN Intelligence");
+assert.equal(getTool("ipintel").runtime.module, "ip-intelligence");
 assert.equal(modules.tools.ipintel, "ip-intelligence");
 assert.deepEqual(modules.modules["ip-intelligence"].js, ["assets/js/features/ip-intelligence.js"]);
 assert.ok(routes.apiRoutes.includes("/api/ip-intelligence"));
 assert.ok(vercel.rewrites.some((row) => row.source === "/api/ip-intelligence" && /mode=ip-intelligence/.test(row.destination)));
 assert.match(text(".env.example"), /^IPINFO_TOKEN=/m);
 assert.match(text("api/tool-health.js"), /handleIpIntelligence/);
-assert.match(text("lib/tool-health.js"), /id: "ipintel"/);
+assert.equal(getTool("ipintel").health.path, "/api/ip-intelligence?health=1");
 assert.match(text("lib/public-database.js"), /BUILTIN_TOOL_SEEDS/);
 assert.match(text("lib/public-database.js"), /resolution=ignore-duplicates/);
 assert.match(text("database/migrations/019_ipinfo_intelligence.sql"), /'ipintel'/);

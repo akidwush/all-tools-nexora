@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <script src="../assets/config.js?v=6.4.0-config1"></script>
   <script src="../assets/js/core/runtime-observer.js?v=6.4.0"></script>
   <meta name="robots" content="noindex,nofollow">
   <meta name="theme-color" content="#090312">
@@ -24,7 +25,7 @@
     <aside class="admin-sidebar" id="adminSidebar" aria-label="Navigasi utama admin">
       <div class="admin-brand-row"><a class="admin-logo" href="/admin">
         <span><i class="fa-solid fa-bolt"></i></span>
-        <div><b>NEXORA</b><small>ADMIN WORKSPACE</small></div>
+        <div><b data-nx-brand="shortName">NEXORA</b><small>ADMIN WORKSPACE</small></div>
       </a><button class="sidebar-collapse" id="sidebarCollapse" type="button" aria-label="Ciutkan sidebar" title="Ciutkan sidebar"><i class="fa-solid fa-angles-left"></i></button><button class="drawer-close" id="adminDrawerClose" type="button" aria-label="Tutup menu"><i class="fa-solid fa-xmark"></i></button></div>
       <nav class="admin-nav" aria-label="Navigasi admin">
         <div class="admin-nav-group"><span class="admin-nav-label">Overview</span><button class="admin-nav-item is-active" data-section="overview" type="button"><i class="fa-solid fa-house"></i><span>Dashboard</span></button></div>
@@ -73,7 +74,7 @@
               <div class="panel-head"><div><p class="eyebrow">TAMPILAN PUBLIK</p><h2>Video Header</h2></div><span class="read-only-badge" id="heroVideoPermissionBadge">Memuat...</span></div>
               <form class="hero-video-settings" id="heroVideoSettingsForm">
                 <label><span>URL video langsung (HTTPS)</span><input id="heroVideoUrl" maxlength="1000" type="url" inputmode="url" autocomplete="url" placeholder="https://cdn.example.com/banner.mp4" required></label>
-                <label class="switch-row"><span><b>Aktifkan video header</b><small>Desktop diputar otomatis tanpa suara; HP memakai tombol putar dan perangkat lemah menampilkan background ringan.</small></span><input id="heroVideoEnabled" type="checkbox" checked></label>
+                <label class="switch-row"><span><b>Aktifkan video header</b><small>Video hanya diputar otomatis di HP yang cukup kuat; desktop dan perangkat lemah memakai background statis.</small></span><input id="heroVideoEnabled" type="checkbox" checked></label>
                 <p class="hero-video-hint"><i class="fa-solid fa-gauge-high"></i> Gunakan MP4/WebM terkompresi, durasi pendek, dan ukuran ideal di bawah 5 MB agar tetap ringan.</p>
                 <button class="primary-button" id="saveHeroVideoButton" type="submit"><i class="fa-solid fa-floppy-disk"></i> Simpan Video Header</button>
                 <p class="modal-message" id="heroVideoMessage" role="status"></p>
@@ -347,6 +348,7 @@
   </div>
 
   <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+  <script src="../assets/branding.js?v=6.4.0-config1"></script>
   <script src="../assets/js/core/custom-select.js?v=6.4.0-global-select-final1" defer></script>
   <script src="../assets/js/admin/admin-shell.js?v=6.4.0-admin-redesign1" defer></script>
   <script src="../assets/js/admin/dashboard.js?v=6.4.0-hf3-admin-member-hf1" defer></script>

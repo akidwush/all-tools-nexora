@@ -5,10 +5,12 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 const pkg = JSON.parse(read('package.json'));
+const config = require('../assets/config.js');
 assert.equal(pkg.version, '6.4.0');
+assert.equal(config.version, pkg.version);
 
 const loader = read('assets/js/core/lazy-loader.js');
-assert.match(loader, /ASSET_VERSION\s*=\s*['"]6\.4\.0['"]/);
+assert.match(loader, /ASSET_VERSION\s*=\s*config\.version/);
 assert.match(loader, /var requestUrl = versioned\(url\)/);
 assert.match(loader, /link\.href=requestUrl/);
 assert.match(loader, /script\.src=requestUrl/);

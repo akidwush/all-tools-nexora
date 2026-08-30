@@ -72,7 +72,9 @@ for (const file of [
 
 const index = read("index.html");
 const loader = read("assets/js/core/lazy-loader.js");
+const config = require("../assets/config.js");
 assert.ok(index.includes("assets/css/components.css?v=6.4.0-hf14-mobile-dedup1"));
-assert.match(loader, /ASSET_VERSION = '6\.4\.0'/);
+assert.equal(config.version, "6.4.0");
+assert.match(loader, /ASSET_VERSION = config\.version/);
 
 console.log("Mobile Layout HF7 tests lulus: room containment global, Admin Login, Crypto Market, Web Intelligence, Space modal portal, CSS balance, dan cache bust aktif.");

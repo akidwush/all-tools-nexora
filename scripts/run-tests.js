@@ -5,6 +5,7 @@ const path = require("node:path");
 const { spawnSync } = require("node:child_process");
 
 const root = path.resolve(__dirname, "..");
+require("./sync-config.js").syncConfig({ silent: true });
 const scripts = fs.readdirSync(__dirname)
   .filter((name) => /^test-.*\.js$/i.test(name))
   .sort((left, right) => left.localeCompare(right));

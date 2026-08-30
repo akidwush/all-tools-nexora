@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "node serve-local.js",
     "start": "node serve-local.js",
+    "sync": "node scripts/sync-config.js",
     "check": "node scripts/check-project.js",
     "build": "node scripts/build.js",
     "test": "node scripts/run-tests.js"

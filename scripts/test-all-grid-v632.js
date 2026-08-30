@@ -7,9 +7,11 @@ const app = read("assets/js/core/app.js");
 const css = read("assets/css/core.css");
 const perf = read("assets/js/core/performance.js");
 const html = read("index.html");
+const config = require("../assets/config.js");
 
 assert.equal(pkg.version, "6.4.0");
-assert.match(app, /const ALL_PAGE_SIZE = 12/);
+assert.equal(config.ui.catalogPageSize, 12);
+assert.match(app, /NexoraConfig\.ui\.catalogPageSize/);
 assert.doesNotMatch(app, /allLoadObserver|rootMargin:\s*['"]320px/);
 assert.match(app, /allLoadPending/);
 assert.match(app, /options\.append/);

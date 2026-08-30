@@ -7,6 +7,7 @@ const path = require("node:path");
 const root = path.resolve(__dirname, "..");
 const read = (name) => fs.readFileSync(path.join(root, name), "utf8");
 const aio = require(path.join(root, "lib/kuroneko-aio.js"));
+const { getTool } = require("./config-test-helpers.js");
 
 function responsePayload(payload, status = 200, headers = {}) {
   return {
@@ -43,7 +44,6 @@ const css = read("assets/css/features/aio-downloader.css");
 const app = read("assets/js/core/app.js");
 const shell = read("assets/js/core/shell.js");
 const lazy = read("assets/js/core/lazy-loader.js");
-const registry = read("assets/js/core/tool-registry.js");
 const dispatcher = read("api/tool-health.js");
 const envExample = read(".env.example");
 const readme = read("README.md");
@@ -62,10 +62,11 @@ assert.ok(vercel.rewrites.some((entry) => entry.source === "/api/download/aio" &
 assert.match(dispatcher, /handleAioDownload/);
 assert.match(app, /case 'aiodownloader': renderAioDownloader\(body\); break;/);
 assert.match(shell, /aiodownloader:\{renderer:'renderAioDownloader'/);
-assert.match(lazy, /aiodownloader:'aio-downloader'/);
 assert.match(lazy, /aio-downloader-hf31/);
-assert.match(registry, /\["aiodownloader","All In One Downloader","api","aio-downloader","renderAioDownloader"/);
-assert.match(read("lib/tool-health.js"), /id: "aiodownloader"/);
+assert.equal(getTool("aiodownloader").runtime.module, "aio-downloader");
+assert.equal(getTool("aiodownloader").runtime.handler, "renderAioDownloader");
+assert.equal(getTool("aiodownloader").runtime.mode, "api");
+assert.equal(getTool("aiodownloader").health.path, "/assets/js/features/aio-downloader.js");
 assert.match(schema, /'aiodownloader'/);
 assert.match(migration, /'aiodownloader'/);
 assert.match(migration, /add column if not exists access_level/);

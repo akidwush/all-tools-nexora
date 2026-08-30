@@ -7,6 +7,7 @@ const path = require("node:path");
 const root = path.resolve(__dirname, "..");
 const read = (name) => fs.readFileSync(path.join(root, name), "utf8");
 const genmail = require(path.join(root, "lib/genmail.js"));
+const { getTool } = require("./config-test-helpers.js");
 
 function responsePayload(payload, status = 200, headers = {}) {
   return {
@@ -39,7 +40,6 @@ const css = read("assets/css/features/genmail.css");
 const app = read("assets/js/core/app.js");
 const shell = read("assets/js/core/shell.js");
 const lazy = read("assets/js/core/lazy-loader.js");
-const registry = read("assets/js/core/tool-registry.js");
 const proxyEntry = read("api/tool-health.js");
 const envExample = read(".env.example");
 const readme = read("README.md");
@@ -56,9 +56,10 @@ assert.ok(vercel.rewrites.some((row) => row.source === "/api/genmail" && row.des
 assert.match(proxyEntry, /handleGenMail/);
 assert.match(app, /case 'genmail': renderGenMail\(body\); break;/);
 assert.match(shell, /genmail:\{renderer:'renderGenMail'/);
-assert.match(lazy, /genmail:'genmail'/);
-assert.match(registry, /\["genmail","GenMail","api","genmail","renderGenMail"/);
-assert.match(read("lib/tool-health.js"), /id: "genmail"/);
+assert.equal(getTool("genmail").runtime.module, "genmail");
+assert.equal(getTool("genmail").runtime.handler, "renderGenMail");
+assert.equal(getTool("genmail").runtime.mode, "api");
+assert.equal(getTool("genmail").health.path, "/assets/js/features/genmail.js");
 assert.match(read("database/schema.sql"), /'genmail'/);
 const migration = read("database/migrations/028_genmail.sql");
 assert.match(migration, /'genmail'/);

@@ -6,13 +6,13 @@ const path = require("node:path");
 
 const root = path.resolve(__dirname, "..");
 const read = (name) => fs.readFileSync(path.join(root, name), "utf8");
+const { getTool } = require("./config-test-helpers.js");
 
 const feature = read("assets/js/features/puter-image.js");
 const css = read("assets/css/features/puter-image.css");
 const app = read("assets/js/core/app.js");
 const shell = read("assets/js/core/shell.js");
 const loader = read("assets/js/core/lazy-loader.js");
-const registry = read("assets/js/core/tool-registry.js");
 const schema = read("database/schema.sql");
 const migration = read("database/migrations/027_puter_ai_image.sql");
 const readme = read("README.md");
@@ -26,12 +26,14 @@ assert.deepEqual(manifest.modules["puter-image"], {
 });
 assert.equal(manifest.tools.aiimage, "puter-image");
 
-for (const source of [app, shell, loader, registry, schema, migration]) {
+for (const source of [shell, schema, migration]) {
   assert.match(source, /aiimage|Nexora AI Image/, "Katalog atau route Puter belum sinkron");
 }
+assert.equal(getTool("aiimage").name, "Nexora AI Image");
+assert.equal(getTool("aiimage").runtime.module, "puter-image");
+assert.equal(getTool("aiimage").runtime.handler, "renderPuterImage");
 assert.match(app, /case 'aiimage': renderPuterImage\(body\)/);
 assert.match(shell, /aiimage:\{renderer:'renderPuterImage'/);
-assert.match(loader, /aiimage:'puter-image'/);
 assert.match(index, /hf25-puter-image1/);
 
 for (const token of [

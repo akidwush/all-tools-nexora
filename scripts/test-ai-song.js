@@ -7,6 +7,7 @@ const path = require("node:path");
 const root = path.resolve(__dirname, "..");
 const read = (name) => fs.readFileSync(path.join(root, name), "utf8");
 const aiSong = require(path.join(root, "lib/kuroneko-ai-song.js"));
+const { getTool } = require("./config-test-helpers.js");
 
 function responsePayload(payload, status = 200, headers = {}) {
   return {
@@ -50,7 +51,6 @@ const backend = read("lib/kuroneko-ai-song.js");
 const app = read("assets/js/core/app.js");
 const shell = read("assets/js/core/shell.js");
 const lazy = read("assets/js/core/lazy-loader.js");
-const registry = read("assets/js/core/tool-registry.js");
 const dispatcher = read("api/tool-health.js");
 const localServer = read("serve-local.js");
 const schema = read("database/schema.sql");
@@ -69,10 +69,13 @@ assert.match(dispatcher, /_service[^\n]+ai-song/);
 assert.match(localServer, /"\/api\/ai\/song"[^\n]+service: "ai-song"/);
 assert.match(app, /case 'aisong': renderAiSong\(body\); break;/);
 assert.match(shell, /aisong:\{renderer:'renderAiSong'/);
-assert.match(lazy, /aisong:'ai-song'/);
 assert.match(lazy, /ai-song-v1/);
-assert.match(registry, /\["aisong","Nexora AI Song Generator","api","ai-song","renderAiSong"/);
-assert.match(read("lib/tool-health.js"), /id: "aisong"/);
+assert.deepEqual(getTool("aisong").runtime, {
+  mode: "api", module: "ai-song", handler: "renderAiSong",
+  dependency: "https://all-tools-nexora.vercel.app/api/ai/song"
+});
+assert.equal(getTool("aisong").name, "Nexora AI Song Generator");
+assert.equal(getTool("aisong").health.path, "/assets/js/features/ai-song.js");
 assert.doesNotMatch(schema, /'aisong', 'Nexora AI Song Generator'/);
 assert.equal((read(".env.example").match(/^KURONEKO_API_KEY=$/gm) || []).length, 1);
 assert.equal(fs.existsSync(path.join(root, "database/migrations/032_ai_song.sql")), false, "AI Song tidak boleh menambah migration database");

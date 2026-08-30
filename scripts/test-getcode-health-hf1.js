@@ -3,16 +3,19 @@ const fs = require("node:fs");
 const path = require("node:path");
 const root = path.resolve(__dirname, "..");
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
+const { config, getTool } = require("./config-test-helpers.js");
 
 const health = read("lib/tool-health.js");
 const stability = read("assets/js/core/stability.js");
 const lazy = read("assets/js/core/lazy-loader.js");
 const index = read("index.html");
 
-assert.match(health, /id: "getcode"[\s\S]*?path: "\/assets\/js\/features\/get-code\.js"[\s\S]*?method: "HEAD"/);
-assert.doesNotMatch(health, /id: "getcode"[\s\S]{0,280}?path: "\/api\/audit"[\s\S]{0,120}?method: "OPTIONS"/);
+assert.deepEqual(getTool("getcode").health, {
+  key: "module-get-code", type: "module", path: "/assets/js/features/get-code.js", method: "HEAD", strict: true
+});
 assert.match(stability, /meta&&meta\.mode==="module"&&raw==="offline"\) return "degraded"/);
-assert.match(lazy, /ASSET_VERSION = '6\.4\.0'/);
+assert.equal(config.version, "6.4.0");
+assert.match(lazy, /ASSET_VERSION = config\.version/);
 assert.ok(index.includes('assets/js/core/stability.js?v=6.4.0'));
 assert.ok(index.includes('assets/js/core/lazy-loader.js?v=6.4.0'));
 
