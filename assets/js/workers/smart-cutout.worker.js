@@ -2,8 +2,10 @@
 (function(){
   'use strict';
 
-  var LIBRARY_URL='https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.0';
-  var MODEL_ID='Xenova/slimsam-77-uniform';
+  var LIBRARY_URL='/assets/vendor/transformers/transformers.min.mjs?v=3.5.0-nexora1';
+  var MODEL_ID='slimsam-77-uniform';
+  var MODEL_ROOT='/assets/models/';
+  var WASM_ROOT='/assets/vendor/transformers/';
   var runtime=null,runtimeVariant='',model=null,processor=null,imageInput=null,imageProcessed=null,imageEmbeddings=null;
   var backend='',stage='idle';
 
@@ -43,12 +45,14 @@
     stage='runtime-import';
     var source=LIBRARY_URL+(variant==='primary'?'':'?nexora-runtime='+encodeURIComponent(variant));
     runtime=await import(source);runtimeVariant=variant;
-    runtime.env.allowLocalModels=false;
-    runtime.env.allowRemoteModels=true;
+    runtime.env.allowLocalModels=true;
+    runtime.env.allowRemoteModels=false;
+    runtime.env.localModelPath=MODEL_ROOT;
     runtime.env.useBrowserCache=allowCache!==false&&await cacheAllowed();
     if(runtime.env.backends&&runtime.env.backends.onnx&&runtime.env.backends.onnx.wasm){
       runtime.env.backends.onnx.wasm.numThreads=1;
       runtime.env.backends.onnx.wasm.proxy=false;
+      runtime.env.backends.onnx.wasm.wasmPaths=WASM_ROOT;
     }
     return runtime;
   }

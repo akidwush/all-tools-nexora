@@ -30,7 +30,7 @@ for (const token of [
 ]) assert.ok(main.includes(token), `UI Smart Cutout belum memuat ${token}`);
 
 for (const token of [
-  "Xenova/slimsam-77-uniform", "@huggingface/transformers@3.5.0", "get_image_embeddings", "input_points",
+  "slimsam-77-uniform", "transformers.min.mjs?v=3.5.0-nexora1", "get_image_embeddings", "input_points",
   "input_labels", "post_process_masks", "webgpu", "fp16", "wasm", "q8", "useBrowserCache", "cacheAllowed",
   "dispose", "reset-image"
 ]) assert.ok(worker.includes(token), `Worker Smart Cutout belum memuat ${token}`);
@@ -39,10 +39,28 @@ assert.doesNotMatch(worker, /device\s*:\s*['"]wasm['"]/, "Transformers.js 3.5 me
 assert.match(worker, /if\(device==='webgpu'\)\{\s*options\.device='webgpu'/, "Hanya backend WebGPU yang boleh dikirim sebagai opsi device");
 assert.match(worker, /wasm\.numThreads=1/, "Fallback mobile harus membatasi WASM ke satu thread");
 assert.doesNotMatch(worker, /useBrowserCache=true/, "Cache API tidak boleh dipaksa aktif pada browser yang tidak mendukung atau kekurangan kuota");
+assert.ok(worker.includes("allowRemoteModels=false"), "Smart Cutout tidak boleh bergantung pada model CDN eksternal");
+assert.ok(worker.includes("allowLocalModels=true"), "SlimSAM same-origin harus diaktifkan");
+assert.ok(worker.includes("wasmPaths=WASM_ROOT"), "ONNX WASM harus dimuat dari asset same-origin");
 assert.ok(worker.includes("navigator.storage.estimate"), "Cache model harus memeriksa kuota browser terlebih dahulu");
 assert.ok(worker.includes("shader-f16"), "WebGPU FP16 harus melewati capability preflight");
 assert.ok(worker.includes("wasm-no-cache"), "WASM harus punya retry tanpa Cache API");
-assert.ok(main.includes("smart-cutout3"), "Versi worker harus berubah agar browser tidak memakai runtime lama dari cache");
+assert.ok(main.includes("smart-cutout4"), "Versi worker harus berubah agar browser tidak memakai runtime lama dari cache");
+
+const localAssets = {
+  "assets/vendor/transformers/transformers.min.mjs": 843401,
+  "assets/vendor/transformers/ort-wasm-simd-threaded.jsep.mjs": 44484,
+  "assets/vendor/transformers/ort-wasm-simd-threaded.jsep.wasm": 21596019,
+  "assets/models/slimsam-77-uniform/config.json": 379,
+  "assets/models/slimsam-77-uniform/preprocessor_config.json": 466,
+  "assets/models/slimsam-77-uniform/onnx/vision_encoder_quantized.onnx": 8882165,
+  "assets/models/slimsam-77-uniform/onnx/prompt_encoder_mask_decoder_quantized.onnx": 4903810,
+  "assets/models/slimsam-77-uniform/onnx/vision_encoder_fp16.onnx": 12170657,
+  "assets/models/slimsam-77-uniform/onnx/prompt_encoder_mask_decoder_fp16.onnx": 8550118
+};
+for (const [file, size] of Object.entries(localAssets)) {
+  assert.equal(fs.statSync(path.join(root, file)).size, size, `${file} hilang atau unduhannya tidak lengkap`);
+}
 
 for (const forbidden of ["supabase", "api external", "base64 image", "pixel log"]) {
   assert.equal((main + worker).toLowerCase().includes(forbidden), false, `Inference lokal tidak boleh memuat ${forbidden}`);
@@ -72,5 +90,9 @@ assert.equal(Core.outputSize(8000, 6000, 12000000).downscaled, true, "Gambar eks
 const csp = vercel.headers[0].headers.find((item) => item.key === "Content-Security-Policy").value;
 for (const host of ["https://cdn.jsdelivr.net", "https://huggingface.co", "https://*.hf.co"]) assert.ok(csp.includes(host), `CSP belum mengizinkan ${host}`);
 assert.ok(csp.includes("worker-src 'self' blob:"), "CSP harus mengizinkan worker lokal");
+const modelHeaders = vercel.headers.find((item) => item.source === "/assets/models/(.*)");
+const runtimeHeaders = vercel.headers.find((item) => item.source === "/assets/vendor/transformers/(.*)");
+assert.ok(modelHeaders && runtimeHeaders, "Model dan runtime lokal harus memiliki cache header khusus");
+for (const group of [modelHeaders, runtimeHeaders]) assert.ok(group.headers.some((item) => item.key === "Cache-Control" && item.value.includes("immutable")), "Asset AI lokal harus dicache browser");
 
 console.log("Smart Cutout lulus: registry, SlimSAM worker, WebGPU/WASM, point refine, crop/export, cleanup, CSP, dan mobile geometry tervalidasi.");
