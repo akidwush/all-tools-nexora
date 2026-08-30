@@ -35,6 +35,11 @@ for (const token of [
   "dispose", "reset-image"
 ]) assert.ok(worker.includes(token), `Worker Smart Cutout belum memuat ${token}`);
 
+assert.doesNotMatch(worker, /device\s*:\s*['"]wasm['"]/, "Transformers.js 3.5 memilih WASM saat opsi device tidak diberikan");
+assert.match(worker, /if\(device==='webgpu'\)options\.device='webgpu'/, "Hanya backend WebGPU yang boleh dikirim sebagai opsi device");
+assert.match(worker, /wasm\.numThreads=1/, "Fallback mobile harus membatasi WASM ke satu thread");
+assert.ok(main.includes("smart-cutout2"), "Versi worker harus berubah agar browser tidak memakai runtime lama dari cache");
+
 for (const forbidden of ["supabase", "api external", "base64 image", "pixel log"]) {
   assert.equal((main + worker).toLowerCase().includes(forbidden), false, `Inference lokal tidak boleh memuat ${forbidden}`);
 }

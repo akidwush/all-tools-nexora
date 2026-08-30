@@ -4,7 +4,7 @@
 
   var MAX_FILE_BYTES=20*1024*1024;
   var ACCEPTED=new Set(['image/jpeg','image/png','image/webp']);
-  var WORKER_URL='assets/js/workers/smart-cutout.worker.js?v=6.4.0-smart-cutout1';
+  var WORKER_URL='assets/js/workers/smart-cutout.worker.js?v=6.4.0-smart-cutout2';
   var Core=window.NexoraSmartCutoutCore;
 
   function formatBytes(value){var bytes=Number(value)||0;if(bytes<1024)return bytes+' B';if(bytes<1048576)return(bytes/1024).toFixed(1)+' KB';return(bytes/1048576).toFixed(bytes<10485760?1:0)+' MB';}

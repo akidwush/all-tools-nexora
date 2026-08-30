@@ -40,14 +40,20 @@
     runtime.env.useBrowserCache=true;
     runtime.env.useWasmCache=true;
     runtime.env.cacheKey='nexora-smart-cutout-v1';
+    if(runtime.env.backends&&runtime.env.backends.onnx&&runtime.env.backends.onnx.wasm){
+      runtime.env.backends.onnx.wasm.numThreads=1;
+      runtime.env.backends.onnx.wasm.proxy=false;
+    }
     return runtime;
   }
   async function tryModel(device,dtype){
     var api=await loadRuntime();
-    var candidate=await api.SamModel.from_pretrained(MODEL_ID,{device:device,dtype:dtype,progress_callback:progressCallback});
+    var options={dtype:dtype,progress_callback:progressCallback};
+    if(device==='webgpu')options.device='webgpu';
+    var candidate=await api.SamModel.from_pretrained(MODEL_ID,options);
     model=candidate;
     var candidateProcessor=await api.AutoProcessor.from_pretrained(MODEL_ID,{progress_callback:progressCallback});
-    processor=candidateProcessor;backend=device;
+    processor=candidateProcessor;backend=device==='webgpu'?'webgpu':'wasm';
   }
   async function init(preferWebGpu){
     if(model){post('ready',{backend:backend,modelId:MODEL_ID,cached:true});return;}
@@ -59,7 +65,7 @@
     }
     if(!model){
       post('status',{message:webGpuError?'WebGPU tidak cocok, menyiapkan fallback WASM...':'Menyiapkan fallback WASM...'});
-      await tryModel('wasm','q8');
+      await tryModel(null,'q8');
     }
     post('ready',{backend:backend,modelId:MODEL_ID,cached:false});
   }
