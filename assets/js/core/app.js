@@ -1692,6 +1692,7 @@ function showTool(toolId) {
         case 'svgalight': renderSvgAlight(body); break;
         case 'alightpremium': renderAlightPremium(body); break;
         case 'imagevectorizer': renderImageVectorizer(body); break;
+        case 'smartcutout': renderNexoraSmartCutout(body); break;
         case 'text2d': renderNexoraText2D(body); break;
         case 'text3d': renderNexoraText3D(body); break;
         case 'textfxanimation': renderNexoraTextFxAnimation(body); break;

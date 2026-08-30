@@ -1,3 +1,12 @@
+## 6.4.0 Nexora Smart Cutout — 2026-08-30
+
+- Fitur: menambahkan Magic Object Selector berbasis `Xenova/slimsam-77-uniform` dengan point prompt positif/negatif, multi-point, Undo, Reset, overlay mask, serta kandidat mask score tertinggi.
+- Runtime: inference berjalan lokal di Web Worker melalui Transformers.js/ONNX Runtime Web; WebGPU fp16 diprioritaskan dan WASM q8 menjadi fallback.
+- Performa: model dan processor lazy-loaded setelah upload, image encoder hanya berjalan sekali per gambar, embedding dipakai ulang untuk setiap refine, dan inference image dibatasi 768–1024 px.
+- Export: PNG transparan memakai gambar sumber, opsi crop dengan padding 3%, edge Soft/Sharp, output mask hitam-putih, serta memory guard untuk gambar ekstrem.
+- Privacy: tidak ada Supabase, database, Storage, API inference, analytics gambar, atau upload pixel; hanya aset model yang boleh masuk Cache API.
+- Mobile: editor touch-first untuk 360, 375, 390, dan 412 px dengan target sentuh 44 px, pinch zoom, pan, orientasi landscape, dan mapping koordinat berbasis frame yang sudah ditransformasi.
+
 ## 6.4.0 HF45 Puter direct-tap authorization — 2026-08-28
 
 - Fix: `puter.ai.txt2vid()` sekarang dipanggil sinkron dari event tap Generate tanpa `await` SDK, validasi file, atau FileReader sebelumnya, sehingga user activation Chrome Android tetap aktif saat Puter meminta otorisasi.

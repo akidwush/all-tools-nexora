@@ -170,6 +170,15 @@
         "assets/js/features/image-vectorizer.js"
       ]
     },
+    "smart-cutout": {
+      "css": [
+        "assets/css/features/smart-cutout.css"
+      ],
+      "js": [
+        "assets/js/features/smart-cutout-core.js",
+        "assets/js/features/smart-cutout.js"
+      ]
+    },
     "comic-reader": {
       "css": [
         "assets/css/features/comic-reader.css"
@@ -347,6 +356,7 @@
     "svgalight": "svg-alight",
     "alightpremium": "alight-premium",
     "imagevectorizer": "image-vectorizer",
+    "smartcutout": "smart-cutout",
     "text2d": "nexora-text-2d",
     "text3d": "nexora-text-3d",
     "textfxanimation": "nexora-text-fx-animation",

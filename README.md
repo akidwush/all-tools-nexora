@@ -1,6 +1,6 @@
 # All Tools Nexora
 
-All Tools Nexora v6.4.0 adalah website toolkit statis dengan 61 tool, lazy-loaded feature modules, dashboard admin, Supabase opsional untuk fitur lama, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency `@google/genai`.
+All Tools Nexora v6.4.0 adalah website toolkit statis dengan 62 tool, lazy-loaded feature modules, dashboard admin, Supabase opsional untuk fitur lama, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency `@google/genai`.
 
 Konfigurasi branding, katalog tool, modul lazy-load, dan target health check sekarang dipusatkan di `assets/config.js`. Panduan edit manual tersedia di [docs/MAINTENANCE.md](docs/MAINTENANCE.md).
 
@@ -231,6 +231,10 @@ Migration `database/migrations/023_document_ai_vvip.sql` tetap mempertahankan ku
 Migration `database/migrations/016_hero_video_settings.sql` mengaktifkan pengaturan video header. Setelah migration dijalankan, buka **Dashboard Admin → Ringkasan Sistem → Video Header**, isi URL MP4/WebM HTTPS langsung, lalu simpan. Pengaturan tersimpan di `app_settings.site.heroVideo` dan dibaca halaman publik tanpa mengekspos service-role key.
 
 ## Pemeriksaan dan build
+
+### Nexora Smart Cutout
+
+Route tool mengikuti pola aplikasi statis: `#tool-smartcutout`. Model `Xenova/slimsam-77-uniform` dimuat saat gambar dipilih, berjalan di Web Worker melalui WebGPU fp16 atau fallback WASM q8, dan dicache oleh Cache API browser. Gambar pengguna hanya berada di memori lokal; fitur ini tidak memakai Supabase, database, Storage, API inference, atau Vercel Function.
 
 ```bash
 npm run check

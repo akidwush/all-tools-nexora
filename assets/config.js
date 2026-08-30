@@ -200,6 +200,15 @@
         "assets/js/features/image-vectorizer.js"
       ]
     },
+    "smart-cutout": {
+      "css": [
+        "assets/css/features/smart-cutout.css"
+      ],
+      "js": [
+        "assets/js/features/smart-cutout-core.js",
+        "assets/js/features/smart-cutout.js"
+      ]
+    },
     "comic-reader": {
       "css": [
         "assets/css/features/comic-reader.css"
@@ -1195,6 +1204,32 @@
           "key": "module-image-vectorizer",
           "type": "module",
           "path": "/assets/js/features/image-vectorizer.js",
+          "method": "HEAD",
+          "strict": true
+        }
+      },
+      {
+        "id": "smartcutout",
+        "icon": "fa-solid fa-object-ungroup",
+        "name": "Nexora Smart Cutout",
+        "description": "Tap objek, refine mask, lalu ekspor PNG transparan dengan SlimSAM lokal di browser",
+        "badge": "LOCAL AI",
+        "aliases": [
+          "smart cutout",
+          "magic object selector",
+          "object cutout",
+          "sam image"
+        ],
+        "runtime": {
+          "mode": "module",
+          "module": "smart-cutout",
+          "handler": "renderNexoraSmartCutout",
+          "dependency": "https://huggingface.co/Xenova/slimsam-77-uniform"
+        },
+        "health": {
+          "key": "module-smart-cutout",
+          "type": "module",
+          "path": "/assets/js/features/smart-cutout.js",
           "method": "HEAD",
           "strict": true
         }
