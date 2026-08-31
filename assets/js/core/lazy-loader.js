@@ -48,6 +48,7 @@
     [/ai-song\.(?:js|css)(?:$|\?)/, 'ai-song-v1'],
     [/hd4-enhancer\.(?:js|css)(?:$|\?)/, 'hd4-enhancer-v2'],
     [/smart-cutout(?:-core)?\.(?:js|css)(?:$|\?)/, 'smart-cutout-v3'],
+    [/placeholder-studio\.(?:js|css)(?:$|\?)/, 'placeholder-studio-v1'],
     [/document-ai\.(?:js|css)(?:$|\?)/, 'document-android-branding1'],
     [/text-to-pdf\.(?:js|css)(?:$|\?)/, 'auto-pdf-v2'],
     [/crypto-market\.(?:js|css)(?:$|\?)/, 'crypto-mtf'],

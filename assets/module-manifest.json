@@ -179,6 +179,14 @@
         "assets/js/features/smart-cutout.js"
       ]
     },
+    "placeholder-studio": {
+      "css": [
+        "assets/css/features/placeholder-studio.css"
+      ],
+      "js": [
+        "assets/js/features/placeholder-studio.js"
+      ]
+    },
     "comic-reader": {
       "css": [
         "assets/css/features/comic-reader.css"
@@ -357,6 +365,7 @@
     "alightpremium": "alight-premium",
     "imagevectorizer": "image-vectorizer",
     "smartcutout": "smart-cutout",
+    "placeholderstudio": "placeholder-studio",
     "text2d": "nexora-text-2d",
     "text3d": "nexora-text-3d",
     "textfxanimation": "nexora-text-fx-animation",

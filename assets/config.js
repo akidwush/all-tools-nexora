@@ -209,6 +209,14 @@
         "assets/js/features/smart-cutout.js"
       ]
     },
+    "placeholder-studio": {
+      "css": [
+        "assets/css/features/placeholder-studio.css"
+      ],
+      "js": [
+        "assets/js/features/placeholder-studio.js"
+      ]
+    },
     "comic-reader": {
       "css": [
         "assets/css/features/comic-reader.css"
@@ -1230,6 +1238,33 @@
           "key": "module-smart-cutout",
           "type": "module",
           "path": "/assets/js/features/smart-cutout.js",
+          "method": "HEAD",
+          "strict": true
+        }
+      },
+      {
+        "id": "placeholderstudio",
+        "icon": "fa-regular fa-image",
+        "name": "Nexora Placeholder Studio",
+        "description": "Buat placeholder Classic atau berbasis prompt melalui URL CDN publik",
+        "badge": "NO API KEY",
+        "aliases": [
+          "placeholder studio",
+          "placeholder image",
+          "classic placeholder",
+          "prompt placeholder",
+          "placeholdr"
+        ],
+        "runtime": {
+          "mode": "hybrid",
+          "module": "placeholder-studio",
+          "handler": "renderNexoraPlaceholderStudio",
+          "dependency": "https://placeholderimage.co/"
+        },
+        "health": {
+          "key": "module-placeholder-studio",
+          "type": "module",
+          "path": "/assets/js/features/placeholder-studio.js",
           "method": "HEAD",
           "strict": true
         }
