@@ -31,7 +31,7 @@ for (const token of [
 
 for (const token of [
   "vision_bundle.mjs?v=0.10.22-nexora1", "FilesetResolver.forVisionTasks", "InteractiveSegmenter.createFromOptions",
-  "magic_touch.tflite", "getAsFloat32Array", "outputConfidenceMasks:true", "delegate:'CPU'", "nextFrame",
+  "magic_touch.tflite", "getAsFloat32Array", "getAsUint8Array", "outputConfidenceMasks:true", "outputCategoryMask:true", "delegate:'CPU'", "nextFrame",
   "new Float32Array", "new Uint8Array", "positive", "negative", "pointMasks", "MAX_POINTS=8", "result.close", "releaseInference", "closeModel"
 ]) assert.ok(main.includes(token), `Runtime MagicTouch belum memuat ${token}`);
 
@@ -39,7 +39,9 @@ assert.doesNotMatch(main, /new Worker\(/, "Runtime final tidak boleh kembali mem
 assert.doesNotMatch(main, /SLIMSAM|slimsam-77-uniform|transformers\.min/i, "Brand/runtime SlimSAM lama harus hilang dari jalur aktif");
 assert.match(main, /var maxSide=memory<=3\?512:640/, "Inference mobile harus dibatasi ke 512/640px");
 assert.match(main, /positive\[m\]-\(negative\?negative\[m\]:0\)/, "Titik Remove harus mengurangi mask positive");
-assert.ok(lazy.includes("smart-cutout-v2"), "Cache key Smart Cutout harus diperbarui");
+assert.ok(lazy.includes("smart-cutout-v3"), "Cache key Smart Cutout harus diperbarui");
+assert.ok(css.includes(".nsc-stage-empty[hidden]{display:none!important}"), "Overlay loading harus benar-benar hilang setelah model siap");
+assert.ok(main.includes("decodeSelection(true)"), "Titik yang gagal harus di-rollback agar batas refine tidak habis");
 
 const localAssets = {
   "assets/vendor/mediapipe/vision_bundle.mjs": 137809,

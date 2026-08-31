@@ -145,7 +145,7 @@
       status('Loading AI model...',true);ui.modelBadge.textContent='LOADING · 6.2 MB';
       state.runtimePromise=import(MEDIAPIPE_URL).then(function(vision){
         return vision.FilesetResolver.forVisionTasks(MEDIAPIPE_WASM_ROOT).then(function(fileset){
-          return vision.InteractiveSegmenter.createFromOptions(fileset,{baseOptions:{modelAssetPath:MEDIAPIPE_MODEL,delegate:'CPU'},outputConfidenceMasks:true,outputCategoryMask:false});
+          return vision.InteractiveSegmenter.createFromOptions(fileset,{baseOptions:{modelAssetPath:MEDIAPIPE_MODEL,delegate:'CPU'},outputConfidenceMasks:true,outputCategoryMask:true});
         });
       }).then(function(segmenter){
         state.segmenter=segmenter;state.modelReady=true;state.backend='wasm';ui.modelBadge.textContent='LOCAL WASM · READY';ui.modelBadge.className='is-ready';return segmenter;
@@ -156,12 +156,22 @@
       if(!state.segmenter||!state.inferenceCanvas)throw new Error('MODEL_FAILED');
       var result=state.segmenter.segment(state.inferenceCanvas,{keypoint:{x:point.x,y:point.y}});
       try{
-        var masks=result&&result.confidenceMasks;if(!masks||!masks.length)throw new Error('EMPTY_MASK');
-        var foreground=masks[masks.length-1];var values=foreground.getAsFloat32Array();
-        return{data:new Float32Array(values),width:foreground.width,height:foreground.height,quality:result.qualityScores&&result.qualityScores.length?Math.max.apply(Math,result.qualityScores):0};
+        var quality=result.qualityScores&&result.qualityScores.length?Math.max.apply(Math,result.qualityScores):0;
+        if(result.categoryMask){
+          var category=result.categoryMask;var labels=category.getAsUint8Array();var categoryX=Math.min(category.width-1,Math.max(0,Math.floor(point.x*category.width)));var categoryY=Math.min(category.height-1,Math.max(0,Math.floor(point.y*category.height)));var selectedLabel=labels[categoryY*category.width+categoryX];var categoryData=new Float32Array(labels.length);var selectedPixels=0;
+          for(var c=0;c<labels.length;c++)if(labels[c]===selectedLabel){categoryData[c]=1;selectedPixels++;}
+          if(selectedPixels>0&&selectedPixels<labels.length*.98)return{data:categoryData,width:category.width,height:category.height,quality:quality};
+        }
+        var masks=result&&result.confidenceMasks;if(!masks||!masks.length)throw new Error('EMPTY_MASK');var best=null,bestValues=null,bestPoint=-Infinity;
+        for(var maskIndex=0;maskIndex<masks.length;maskIndex++){
+          var mask=masks[maskIndex];var values=mask.getAsFloat32Array();var maskX=Math.min(mask.width-1,Math.max(0,Math.floor(point.x*mask.width)));var maskY=Math.min(mask.height-1,Math.max(0,Math.floor(point.y*mask.height)));var pointValue=Number(values[maskY*mask.width+maskX]);if(Number.isFinite(pointValue)&&pointValue>bestPoint){best=mask;bestValues=values;bestPoint=pointValue;}
+        }
+        if(!best||!bestValues)throw new Error('EMPTY_MASK');var normalizedPoint=bestPoint<0||bestPoint>1?1/(1+Math.exp(-bestPoint)):bestPoint;var threshold=Math.max(.08,Math.min(.5,normalizedPoint*.55));var confidenceData=new Float32Array(bestValues.length);var confidencePixels=0;
+        for(var v=0;v<bestValues.length;v++){var value=Number(bestValues[v]);if(!Number.isFinite(value))continue;if(value<0||value>1)value=1/(1+Math.exp(-value));if(value>=threshold){confidenceData[v]=1;confidencePixels++;}}
+        if(!confidencePixels)throw new Error('EMPTY_MASK');return{data:confidenceData,width:best.width,height:best.height,quality:quality};
       }finally{if(result&&typeof result.close==='function')result.close();}
     }
-    async function decodeSelection(){
+    async function decodeSelection(rollbackOnFailure){
       var requestId=++state.request;releaseResult();
       if(!state.points.length){state.mask=null;clearMask();status('Ready — tap an object',false);return;}
       status('Selecting object...',true);
@@ -176,9 +186,9 @@
         }
         if(requestId!==state.request||state.destroyed)return;
         if(!positive)throw new Error('EMPTY_MASK');var output=new Uint8Array(positive.length);var filled=0;
-        for(var m=0;m<positive.length;m++){var confidence=Math.max(0,positive[m]-(negative?negative[m]:0));if(confidence>=.35){output[m]=Math.round(Math.min(1,confidence)*255);filled++;}}
+        for(var m=0;m<positive.length;m++){var confidence=Math.max(0,positive[m]-(negative?negative[m]:0));if(confidence>=.5){output[m]=255;filled++;}}
         if(!filled)throw new Error('EMPTY_MASK');state.mask=output;state.maskWidth=width;state.maskHeight=height;state.score=quality;drawMask();releaseResult();status(quality?'Mask ready · '+Math.round(quality*100)+'% confidence':'Mask ready',false);
-      }catch(error){if(requestId!==state.request)return;status('Ready — coba titik lain',false);toast(friendly(error&&error.message),'is-error');}
+      }catch(error){if(requestId!==state.request)return;if(rollbackOnFailure){state.points.pop();state.pointMasks.pop();drawPoints();}console.warn('[SmartCutout] segmentation failed',error&&error.message);status('Ready — coba titik lain',false);toast(friendly(error&&error.message),'is-error');}
     }
 
     function prepareInference(bitmap,width,height){
@@ -203,7 +213,7 @@
 
     function addPoint(clientX,clientY){
       if(!state.modelReady||state.busy)return;if(state.points.length>=MAX_POINTS){toast('Maksimal 8 titik refine agar memori HP tetap aman.','is-error');return;}var point=Core.pointFromRect(clientX,clientY,ui.frame.getBoundingClientRect());if(!point)return;
-      state.points.push({x:point.x,y:point.y,label:state.mode==='negative'?0:1});drawPoints();decodeSelection();
+      state.points.push({x:point.x,y:point.y,label:state.mode==='negative'?0:1});drawPoints();decodeSelection(true);
     }
     function pointerDown(event){
       if(!state.modelReady)return;ui.stage.setPointerCapture&&ui.stage.setPointerCapture(event.pointerId);state.activePointers.set(event.pointerId,{x:event.clientX,y:event.clientY,startX:event.clientX,startY:event.clientY});state.moved=false;
