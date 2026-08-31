@@ -59,9 +59,14 @@ assert.equal(tool.runtime.handler, "renderNexoraPlaceholderStudio");
 assert.equal(tool.runtime.mode, "hybrid");
 assert.ok(config.modules["placeholder-studio"]);
 assert.match(shell, /placeholderstudio:\{renderer:'renderNexoraPlaceholderStudio'/);
-assert.match(lazy, /placeholder-studio-v1/);
+assert.match(lazy, /placeholder-studio-v2/);
 
-assert.match(source, /loading="lazy" decoding="async"/);
+assert.match(source, /loading="eager" decoding="async" fetchpriority="high"/);
+assert.doesNotMatch(source, /loading="lazy"/);
+assert.match(source, /PREVIEW_TIMEOUT_MS=15000/);
+assert.match(source, /ui\.image\.naturalWidth<1/);
+assert.match(source, /ui\.image\.hidden=false;ui\.image\.classList\.add\('is-pending'\)/);
+assert.match(source, /Preview tidak merespons, tetapi URL gambar tetap siap digunakan/);
 assert.match(source, /navigator\.clipboard/);
 assert.match(source, /fetch\(state\.resultUrl,\{mode:'cors'/);
 assert.match(source, /state\.resultMode==='prompt'.+image\/svg\+xml/);
@@ -76,6 +81,8 @@ assert.match(css, /@media\(max-width:390px\)/);
 assert.match(css, /@media\(max-width:360px\)/);
 assert.match(css, /max-width:100%/);
 assert.match(css, /\.nps \[hidden\]\{display:none!important\}/);
+assert.match(css, /\.nps-preview img\.is-pending\{opacity:0/);
+assert.match(css, /\.nps-loading\{position:absolute/);
 
 const globalHeaders = vercel.headers.find((entry) => entry.source === "/(.*)")?.headers || [];
 const csp = globalHeaders.find((entry) => String(entry.key).toLowerCase() === "content-security-policy")?.value || "";

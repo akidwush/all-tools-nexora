@@ -4,6 +4,7 @@
 
   var CLASSIC_BASE='https://placeholderimage.co/';
   var PROMPT_BASE='https://placeholdr.dev/';
+  var PREVIEW_TIMEOUT_MS=15000;
   var CLASSIC_FORMATS=Object.freeze(['png','jpg','webp','svg','avif','gif']);
   var CLASSIC_FONTS=Object.freeze(['lato','lora','montserrat','noto-sans','open-sans','oswald','playfair-display','poppins','pt-sans','raleway','roboto','source-sans-pro']);
   var PLACEHOLDER_STYLES=Object.freeze(['photographic','artistic','anime','oil-painting','3d-render','cartoon']);
@@ -166,7 +167,7 @@
           <header><div><span>03</span><h3>Preview</h3></div><b id="npsResultMode">CLASSIC</b></header>
           <div class="nps-preview" id="npsPreview">
             <div class="nps-loading" id="npsLoading"><i class="fa-solid fa-circle-notch fa-spin"></i><span>Creating placeholder...</span></div>
-            <img id="npsResultImage" alt="Placeholder hasil Nexora" loading="lazy" decoding="async" hidden>
+            <img id="npsResultImage" alt="Placeholder hasil Nexora" loading="eager" decoding="async" fetchpriority="high" hidden>
           </div>
           <p class="nps-error" id="npsError" role="alert" hidden></p>
           <label class="nps-url-label" for="npsResultUrl">Image URL</label>
@@ -187,7 +188,7 @@
       prompt:root.querySelector('#npsPrompt'),promptWidth:root.querySelector('#npsPromptWidth'),promptHeight:root.querySelector('#npsPromptHeight'),style:root.querySelector('#npsStyle'),seed:root.querySelector('#npsSeed'),randomSeed:root.querySelector('#npsRandomSeed'),promptGenerate:root.querySelector('#npsPromptGenerate'),
       result:root.querySelector('#npsResult'),resultMode:root.querySelector('#npsResultMode'),preview:root.querySelector('#npsPreview'),loading:root.querySelector('#npsLoading'),image:root.querySelector('#npsResultImage'),error:root.querySelector('#npsError'),url:root.querySelector('#npsResultUrl'),inlineCopy:root.querySelector('#npsInlineCopy'),download:root.querySelector('#npsDownload'),copy:root.querySelector('#npsCopy'),refresh:root.querySelector('#npsRefresh'),toast:root.querySelector('#npsToast')
     };
-    var state={mode:'classic',resultUrl:'',resultMode:'',request:0,destroyed:false,downloadBusy:false};
+    var state={mode:'classic',resultUrl:'',resultMode:'',request:0,destroyed:false,downloadBusy:false,loadTimer:0};
 
     function toast(message,tone){
       ui.toast.textContent=message;
@@ -205,7 +206,7 @@
     }
 
     function clearResult(){
-      state.request++;state.resultUrl='';state.resultMode='';ui.result.hidden=true;ui.image.hidden=true;ui.image.removeAttribute('src');ui.error.hidden=true;ui.url.value='';
+      state.request++;clearTimeout(state.loadTimer);state.loadTimer=0;state.resultUrl='';state.resultMode='';ui.result.hidden=true;ui.image.onload=null;ui.image.onerror=null;ui.image.hidden=true;ui.image.classList.remove('is-pending');ui.image.removeAttribute('aria-hidden');ui.image.removeAttribute('src');ui.error.hidden=true;ui.url.value='';setLoading(false);
     }
 
     function setMode(mode){
@@ -220,14 +221,28 @@
     }
 
     function showError(message){
-      setLoading(false);ui.image.hidden=true;ui.error.textContent=message;ui.error.hidden=false;toast(message,'is-error');
+      clearTimeout(state.loadTimer);state.loadTimer=0;setLoading(false);ui.image.hidden=true;ui.image.classList.remove('is-pending');ui.image.removeAttribute('aria-hidden');ui.error.textContent=message;ui.error.hidden=false;toast(message,'is-error');
+    }
+
+    function finishPreview(request){
+      if(state.destroyed||request!==state.request||!ui.image.complete||ui.image.naturalWidth<1)return false;
+      clearTimeout(state.loadTimer);state.loadTimer=0;setLoading(false);ui.image.hidden=false;ui.image.classList.remove('is-pending');ui.image.setAttribute('aria-hidden','false');ui.error.hidden=true;return true;
+    }
+
+    function loadPreview(url){
+      var request=++state.request;clearTimeout(state.loadTimer);state.loadTimer=0;ui.error.hidden=true;ui.image.hidden=false;ui.image.classList.add('is-pending');ui.image.setAttribute('aria-hidden','true');setLoading(true);
+      ui.image.onload=function(){if(!finishPreview(request)&&!state.destroyed&&request===state.request)showError('Gambar gagal dibuat.');};
+      ui.image.onerror=function(){if(state.destroyed||request!==state.request)return;showError('Provider placeholder sedang tidak tersedia.');};
+      ui.image.src=url;
+      if(ui.image.complete)setTimeout(function(){finishPreview(request);},0);
+      state.loadTimer=setTimeout(function(){
+        if(finishPreview(request)||state.destroyed||request!==state.request)return;
+        setLoading(false);ui.image.hidden=true;ui.image.classList.remove('is-pending');ui.image.removeAttribute('aria-hidden');ui.error.textContent='Preview membutuhkan waktu lebih lama. Coba Refresh Preview atau Download Image.';ui.error.hidden=false;toast('Preview tidak merespons, tetapi URL gambar tetap siap digunakan.','is-error');
+      },PREVIEW_TIMEOUT_MS);
     }
 
     function showResult(url,mode){
-      var request=++state.request;state.resultUrl=url;state.resultMode=mode;ui.result.hidden=false;ui.resultMode.textContent=mode==='prompt'?'PROMPT':'CLASSIC';ui.url.value=url;ui.error.hidden=true;ui.image.hidden=true;ui.refresh.hidden=mode!=='prompt';setLoading(true);
-      ui.image.onload=function(){if(state.destroyed||request!==state.request)return;setLoading(false);ui.image.hidden=false;ui.error.hidden=true;};
-      ui.image.onerror=function(){if(state.destroyed||request!==state.request)return;showError('Provider placeholder sedang tidak tersedia.');};
-      ui.image.src=url;
+      state.resultUrl=url;state.resultMode=mode;ui.result.hidden=false;ui.resultMode.textContent=mode==='prompt'?'PROMPT':'CLASSIC';ui.url.value=url;ui.refresh.hidden=mode!=='prompt';loadPreview(url);
       ui.result.scrollIntoView({block:'nearest'});
     }
 
@@ -284,7 +299,7 @@
 
     function refreshPreview(){
       if(!state.resultUrl)return;
-      var request=++state.request;ui.image.hidden=true;ui.error.hidden=true;setLoading(true);ui.image.onload=function(){if(state.destroyed||request!==state.request)return;setLoading(false);ui.image.hidden=false;};ui.image.onerror=function(){if(state.destroyed||request!==state.request)return;showError('Provider placeholder sedang tidak tersedia.');};ui.image.removeAttribute('src');requestAnimationFrame(function(){if(!state.destroyed&&request===state.request)ui.image.src=state.resultUrl;});
+      var separator=state.resultUrl.indexOf('?')===-1?'?':'&';loadPreview(state.resultUrl+separator+'_nexora_refresh='+Date.now());
     }
 
     ui.tabs.forEach(function(tab){tab.addEventListener('click',function(){setMode(tab.dataset.mode);});});
@@ -298,7 +313,7 @@
     ui.classicGenerate.addEventListener('click',function(){generate('classic');});
     ui.promptGenerate.addEventListener('click',function(){generate('prompt');});
     ui.copy.addEventListener('click',copyUrl);ui.inlineCopy.addEventListener('click',copyUrl);ui.download.addEventListener('click',download);ui.refresh.addEventListener('click',refreshPreview);
-    body.__nxCleanup=function(){state.destroyed=true;state.request++;clearTimeout(ui.toast.__timer);ui.image.onload=null;ui.image.onerror=null;ui.image.removeAttribute('src');};
+    body.__nxCleanup=function(){state.destroyed=true;state.request++;clearTimeout(state.loadTimer);clearTimeout(ui.toast.__timer);ui.image.onload=null;ui.image.onerror=null;ui.image.removeAttribute('src');};
     setMode('classic');
   };
 })();
