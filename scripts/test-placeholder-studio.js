@@ -47,6 +47,9 @@ assert.equal(
   "https://placeholdr.dev/1024x768/cyberpunk%20city%20at%20night?style=anime&seed=1"
 );
 assert.match(studio.buildPromptUrl({ width: 128, height: 2048, prompt: "kucing/awan & bulan?", style: "3d-render", seed: 3 }), /kucing%2Fawan%20%26%20bulan%3F\?style=3d-render&seed=3$/);
+assert.equal(studio.isPendingPromptResponse("image/svg+xml", "<text>Generating...</text>"), true);
+assert.equal(studio.isPendingPromptResponse("image/svg+xml", "<svg><path /></svg>"), false);
+assert.equal(studio.isPendingPromptResponse("image/jpeg", "Generating..."), false);
 assert.throws(() => studio.buildClassicUrl({ width: 999999, height: 400, background: "#000", textColor: "#fff", format: "png", font: "lato", retina: 1 }), /INVALID_DIMENSIONS/);
 assert.throws(() => studio.buildPromptUrl({ width: 100, height: 400, prompt: "test", style: "anime", seed: 1 }), /INVALID_DIMENSIONS/);
 assert.throws(() => studio.buildPromptUrl({ width: 512, height: 512, prompt: "", style: "anime", seed: 1 }), /EMPTY_PROMPT/);
@@ -59,11 +62,19 @@ assert.equal(tool.runtime.handler, "renderNexoraPlaceholderStudio");
 assert.equal(tool.runtime.mode, "hybrid");
 assert.ok(config.modules["placeholder-studio"]);
 assert.match(shell, /placeholderstudio:\{renderer:'renderNexoraPlaceholderStudio'/);
-assert.match(lazy, /placeholder-studio-v2/);
+assert.match(lazy, /placeholder-studio-v3/);
 
 assert.match(source, /loading="eager" decoding="async" fetchpriority="high"/);
 assert.doesNotMatch(source, /loading="lazy"/);
 assert.match(source, /PREVIEW_TIMEOUT_MS=15000/);
+assert.match(source, /PROMPT_POLL_INTERVAL_MS=1800/);
+assert.match(source, /PROMPT_POLL_TIMEOUT_MS=60000/);
+assert.match(source, /fetch\(url,\{mode:'cors',credentials:'omit',cache:'no-store',signal:controller\.signal\}\)/);
+assert.match(source, /isPendingPromptResponse\(type,type==='image\/svg\+xml'\?await blob\.text\(\):''\)/);
+assert.match(source, /showPromptBlob\(blob,request\)/);
+assert.match(source, /URL\.createObjectURL\(blob\)/);
+assert.match(source, /if\(state\.resultMode==='prompt'\)startPromptPreview\(state\.resultUrl\)/);
+assert.doesNotMatch(source, /_nexora_refresh/);
 assert.match(source, /ui\.image\.naturalWidth<1/);
 assert.match(source, /ui\.image\.hidden=false;ui\.image\.classList\.add\('is-pending'\)/);
 assert.match(source, /Preview tidak merespons, tetapi URL gambar tetap siap digunakan/);

@@ -5,6 +5,9 @@
   var CLASSIC_BASE='https://placeholderimage.co/';
   var PROMPT_BASE='https://placeholdr.dev/';
   var PREVIEW_TIMEOUT_MS=15000;
+  var PROMPT_POLL_INTERVAL_MS=1800;
+  var PROMPT_POLL_TIMEOUT_MS=60000;
+  var PROMPT_REQUEST_TIMEOUT_MS=12000;
   var CLASSIC_FORMATS=Object.freeze(['png','jpg','webp','svg','avif','gif']);
   var CLASSIC_FONTS=Object.freeze(['lato','lora','montserrat','noto-sans','open-sans','oswald','playfair-display','poppins','pt-sans','raleway','roboto','source-sans-pro']);
   var PLACEHOLDER_STYLES=Object.freeze(['photographic','artistic','anime','oil-painting','3d-render','cartoon']);
@@ -39,6 +42,10 @@
   }
 
   function includes(list,value){return list.indexOf(String(value||'').toLowerCase())!==-1;}
+
+  function isPendingPromptResponse(type,body){
+    return String(type||'').toLowerCase()==='image/svg+xml'&&/(?:generating|processing|pending)/i.test(String(body||''));
+  }
 
   function buildClassicUrl(options){
     var size=dimensions('classic',options.width,options.height);
@@ -79,7 +86,8 @@
     normalizeHex:normalizeHex,
     dimensions:dimensions,
     buildClassicUrl:buildClassicUrl,
-    buildPromptUrl:buildPromptUrl
+    buildPromptUrl:buildPromptUrl,
+    isPendingPromptResponse:isPendingPromptResponse
   });
   window.PLACEHOLDER_STYLES=PLACEHOLDER_STYLES;
   window.NexoraPlaceholderStudio=api;
@@ -188,7 +196,7 @@
       prompt:root.querySelector('#npsPrompt'),promptWidth:root.querySelector('#npsPromptWidth'),promptHeight:root.querySelector('#npsPromptHeight'),style:root.querySelector('#npsStyle'),seed:root.querySelector('#npsSeed'),randomSeed:root.querySelector('#npsRandomSeed'),promptGenerate:root.querySelector('#npsPromptGenerate'),
       result:root.querySelector('#npsResult'),resultMode:root.querySelector('#npsResultMode'),preview:root.querySelector('#npsPreview'),loading:root.querySelector('#npsLoading'),image:root.querySelector('#npsResultImage'),error:root.querySelector('#npsError'),url:root.querySelector('#npsResultUrl'),inlineCopy:root.querySelector('#npsInlineCopy'),download:root.querySelector('#npsDownload'),copy:root.querySelector('#npsCopy'),refresh:root.querySelector('#npsRefresh'),toast:root.querySelector('#npsToast')
     };
-    var state={mode:'classic',resultUrl:'',resultMode:'',request:0,destroyed:false,downloadBusy:false,loadTimer:0};
+    var state={mode:'classic',resultUrl:'',resultMode:'',request:0,destroyed:false,downloadBusy:false,loadTimer:0,pollTimer:0,pollAbort:null,previewBlobUrl:''};
 
     function toast(message,tone){
       ui.toast.textContent=message;
@@ -199,6 +207,16 @@
 
     function modeInputs(){return state.mode==='prompt'?{width:ui.promptWidth,height:ui.promptHeight}:{width:ui.classicWidth,height:ui.classicHeight};}
 
+    function stopPromptPoll(){
+      clearTimeout(state.pollTimer);state.pollTimer=0;
+      if(state.pollAbort){state.pollAbort.abort();state.pollAbort=null;}
+    }
+
+    function revokePreviewBlob(){
+      if(!state.previewBlobUrl)return;
+      URL.revokeObjectURL(state.previewBlobUrl);state.previewBlobUrl='';
+    }
+
     function syncPreset(){
       var fields=modeInputs();var width=integer(fields.width.value);var height=integer(fields.height.value);var found=false;
       ui.presets.forEach(function(button){var active=false;if(button.dataset.preset==='custom')active=!DIMENSION_PRESETS.some(function(item){return item.width===width&&item.height===height;});else active=Number(button.dataset.width)===width&&Number(button.dataset.height)===height;button.classList.toggle('is-active',active);if(active)found=true;});
@@ -206,7 +224,7 @@
     }
 
     function clearResult(){
-      state.request++;clearTimeout(state.loadTimer);state.loadTimer=0;state.resultUrl='';state.resultMode='';ui.result.hidden=true;ui.image.onload=null;ui.image.onerror=null;ui.image.hidden=true;ui.image.classList.remove('is-pending');ui.image.removeAttribute('aria-hidden');ui.image.removeAttribute('src');ui.error.hidden=true;ui.url.value='';setLoading(false);
+      state.request++;stopPromptPoll();clearTimeout(state.loadTimer);state.loadTimer=0;revokePreviewBlob();state.resultUrl='';state.resultMode='';ui.result.hidden=true;ui.image.onload=null;ui.image.onerror=null;ui.image.hidden=true;ui.image.classList.remove('is-pending');ui.image.removeAttribute('aria-hidden');ui.image.removeAttribute('src');ui.error.hidden=true;ui.url.value='';setLoading(false);
     }
 
     function setMode(mode){
@@ -217,7 +235,7 @@
     }
 
     function setLoading(loading){
-      ui.preview.classList.toggle('is-loading',loading);ui.loading.hidden=!loading;ui.classicGenerate.disabled=loading;ui.promptGenerate.disabled=loading;ui.download.disabled=loading;ui.refresh.disabled=loading;
+      ui.preview.classList.toggle('is-loading',loading);ui.loading.hidden=!loading;ui.classicGenerate.disabled=false;ui.promptGenerate.disabled=false;ui.download.disabled=!state.resultUrl||state.downloadBusy;ui.refresh.disabled=loading;
     }
 
     function showError(message){
@@ -229,8 +247,8 @@
       clearTimeout(state.loadTimer);state.loadTimer=0;setLoading(false);ui.image.hidden=false;ui.image.classList.remove('is-pending');ui.image.setAttribute('aria-hidden','false');ui.error.hidden=true;return true;
     }
 
-    function loadPreview(url){
-      var request=++state.request;clearTimeout(state.loadTimer);state.loadTimer=0;ui.error.hidden=true;ui.image.hidden=false;ui.image.classList.add('is-pending');ui.image.setAttribute('aria-hidden','true');setLoading(true);
+    function loadPreview(url,activeRequest){
+      var request=activeRequest||++state.request;clearTimeout(state.loadTimer);state.loadTimer=0;ui.error.hidden=true;ui.image.hidden=false;ui.image.classList.add('is-pending');ui.image.setAttribute('aria-hidden','true');setLoading(true);
       ui.image.onload=function(){if(!finishPreview(request)&&!state.destroyed&&request===state.request)showError('Gambar gagal dibuat.');};
       ui.image.onerror=function(){if(state.destroyed||request!==state.request)return;showError('Provider placeholder sedang tidak tersedia.');};
       ui.image.src=url;
@@ -241,8 +259,42 @@
       },PREVIEW_TIMEOUT_MS);
     }
 
+    function showPromptBlob(blob,request){
+      if(state.destroyed||request!==state.request)return;
+      stopPromptPoll();revokePreviewBlob();state.previewBlobUrl=URL.createObjectURL(blob);loadPreview(state.previewBlobUrl,request);
+    }
+
+    function schedulePromptPoll(url,request,startedAt){
+      if(state.destroyed||request!==state.request)return;
+      if(Date.now()-startedAt>=PROMPT_POLL_TIMEOUT_MS){showError('Provider belum menyelesaikan gambar. Coba Refresh Preview atau Download Image.');return;}
+      clearTimeout(state.pollTimer);state.pollTimer=setTimeout(function(){pollPromptPreview(url,request,startedAt);},PROMPT_POLL_INTERVAL_MS);
+    }
+
+    async function pollPromptPreview(url,request,startedAt){
+      if(state.destroyed||request!==state.request)return;
+      var controller=new AbortController();var requestTimer=setTimeout(function(){controller.abort();},PROMPT_REQUEST_TIMEOUT_MS);state.pollAbort=controller;
+      try{
+        var response=await fetch(url,{mode:'cors',credentials:'omit',cache:'no-store',signal:controller.signal});
+        if(!response.ok){schedulePromptPoll(url,request,startedAt);return;}
+        var blob=await response.blob();
+        if(state.destroyed||request!==state.request)return;
+        var type=String(blob.type||response.headers.get('content-type')||'').split(';')[0].toLowerCase();
+        if(!blob.size||type.indexOf('image/')!==0){schedulePromptPoll(url,request,startedAt);return;}
+        if(isPendingPromptResponse(type,type==='image/svg+xml'?await blob.text():'')){schedulePromptPoll(url,request,startedAt);return;}
+        showPromptBlob(blob,request);
+      }catch(_error){
+        if(!state.destroyed&&request===state.request)schedulePromptPoll(url,request,startedAt);
+      }finally{
+        clearTimeout(requestTimer);if(state.pollAbort===controller)state.pollAbort=null;
+      }
+    }
+
+    function startPromptPreview(url){
+      var request=++state.request;stopPromptPoll();clearTimeout(state.loadTimer);state.loadTimer=0;revokePreviewBlob();ui.image.onload=null;ui.image.onerror=null;ui.image.hidden=true;ui.image.removeAttribute('src');ui.error.hidden=true;setLoading(true);pollPromptPreview(url,request,Date.now());
+    }
+
     function showResult(url,mode){
-      state.resultUrl=url;state.resultMode=mode;ui.result.hidden=false;ui.resultMode.textContent=mode==='prompt'?'PROMPT':'CLASSIC';ui.url.value=url;ui.refresh.hidden=mode!=='prompt';loadPreview(url);
+      stopPromptPoll();revokePreviewBlob();state.resultUrl=url;state.resultMode=mode;ui.result.hidden=false;ui.resultMode.textContent=mode==='prompt'?'PROMPT':'CLASSIC';ui.url.value=url;ui.refresh.hidden=mode!=='prompt';if(mode==='prompt')startPromptPreview(url);else loadPreview(url);
       ui.result.scrollIntoView({block:'nearest'});
     }
 
@@ -285,13 +337,14 @@
 
     async function download(){
       if(!state.resultUrl||state.downloadBusy)return;
-      state.downloadBusy=true;ui.download.disabled=true;ui.download.classList.add('is-busy');
+      var downloadRequest=state.request;state.downloadBusy=true;ui.download.disabled=true;ui.download.classList.add('is-busy');
       try{
         var response=await fetch(state.resultUrl,{mode:'cors',credentials:'omit',cache:'no-store'});
         if(!response.ok)throw new Error('DOWNLOAD_FAILED');
         var blob=await response.blob();
         if(!blob.size||String(blob.type||'').indexOf('image/')!==0)throw new Error('DOWNLOAD_FAILED');
         if(state.resultMode==='prompt'&&String(blob.type||'').toLowerCase()==='image/svg+xml'){toast('Hasil akhir masih diproses. Tunggu beberapa detik lalu Refresh Preview.');return;}
+        if(state.resultMode==='prompt'&&downloadRequest===state.request)showPromptBlob(blob,downloadRequest);
         saveBlob(blob);toast('Download dimulai','is-success');
       }catch(_error){openDirect();toast('Download langsung tidak didukung provider. Gambar dibuka di tab baru.');}
       finally{state.downloadBusy=false;ui.download.disabled=false;ui.download.classList.remove('is-busy');}
@@ -299,7 +352,7 @@
 
     function refreshPreview(){
       if(!state.resultUrl)return;
-      var separator=state.resultUrl.indexOf('?')===-1?'?':'&';loadPreview(state.resultUrl+separator+'_nexora_refresh='+Date.now());
+      if(state.resultMode==='prompt')startPromptPreview(state.resultUrl);else loadPreview(state.resultUrl);
     }
 
     ui.tabs.forEach(function(tab){tab.addEventListener('click',function(){setMode(tab.dataset.mode);});});
@@ -313,7 +366,7 @@
     ui.classicGenerate.addEventListener('click',function(){generate('classic');});
     ui.promptGenerate.addEventListener('click',function(){generate('prompt');});
     ui.copy.addEventListener('click',copyUrl);ui.inlineCopy.addEventListener('click',copyUrl);ui.download.addEventListener('click',download);ui.refresh.addEventListener('click',refreshPreview);
-    body.__nxCleanup=function(){state.destroyed=true;state.request++;clearTimeout(state.loadTimer);clearTimeout(ui.toast.__timer);ui.image.onload=null;ui.image.onerror=null;ui.image.removeAttribute('src');};
+    body.__nxCleanup=function(){state.destroyed=true;state.request++;stopPromptPoll();clearTimeout(state.loadTimer);clearTimeout(ui.toast.__timer);ui.image.onload=null;ui.image.onerror=null;ui.image.removeAttribute('src');revokePreviewBlob();};
     setMode('classic');
   };
 })();
