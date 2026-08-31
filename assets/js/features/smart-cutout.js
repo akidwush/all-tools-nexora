@@ -3,8 +3,11 @@
   'use strict';
 
   var MAX_FILE_BYTES=20*1024*1024;
+  var MAX_POINTS=8;
   var ACCEPTED=new Set(['image/jpeg','image/png','image/webp']);
-  var WORKER_URL='assets/js/workers/smart-cutout.worker.js?v=6.4.0-smart-cutout4';
+  var MEDIAPIPE_URL='/assets/vendor/mediapipe/vision_bundle.mjs?v=0.10.22-nexora1';
+  var MEDIAPIPE_WASM_ROOT='/assets/vendor/mediapipe/wasm';
+  var MEDIAPIPE_MODEL='/assets/models/mediapipe/magic_touch.tflite';
   var Core=window.NexoraSmartCutoutCore;
 
   function formatBytes(value){var bytes=Number(value)||0;if(bytes<1024)return bytes+' B';if(bytes<1048576)return(bytes/1024).toFixed(1)+' KB';return(bytes/1048576).toFixed(bytes<10485760?1:0)+' MB';}
@@ -31,7 +34,7 @@
     body.innerHTML=`
       <main class="nsc" aria-label="Nexora Smart Cutout">
         <section class="nsc-intro">
-          <div class="nsc-kicker"><i class="fa-solid fa-wand-magic-sparkles"></i><span>LOCAL AI · SLIMSAM</span></div>
+          <div class="nsc-kicker"><i class="fa-solid fa-wand-magic-sparkles"></i><span>LOCAL AI · MAGIC TOUCH</span></div>
           <h2>Nexora Smart Cutout</h2>
           <p>Tap any object to cut it out.</p>
           <div class="nsc-privacy"><i class="fa-solid fa-shield-halved"></i><span>Gambar tetap di perangkat. Tidak diupload ke server.</span></div>
@@ -95,21 +98,21 @@
       undo:root.querySelector('#nscUndo'),reset:root.querySelector('#nscReset'),extract:root.querySelector('#nscExtract'),crop:root.querySelector('#nscCrop'),zoomOut:root.querySelector('#nscZoomOut'),zoomIn:root.querySelector('#nscZoomIn'),zoomReset:root.querySelector('#nscZoomReset'),zoomValue:root.querySelector('#nscZoomValue'),
       result:root.querySelector('#nscResult'),resultImage:root.querySelector('#nscResultImage'),resultMeta:root.querySelector('#nscResultMeta'),download:root.querySelector('#nscDownload'),downloadMask:root.querySelector('#nscDownloadMask'),toast:root.querySelector('#nscToast')
     };
-    var state={file:null,sourceUrl:'',inferenceUrl:'',bitmap:null,width:0,height:0,worker:null,workerReady:false,backend:'',points:[],mask:null,maskWidth:0,maskHeight:0,score:0,mode:'positive',edge:'soft',zoom:1,panX:0,panY:0,request:0,busy:false,resultBlob:null,resultUrl:'',maskBlob:null,destroyed:false,activePointers:new Map(),gesture:null,moved:false};
-    var pendingInit=null,pendingEncode=null;
+    var state={file:null,sourceUrl:'',bitmap:null,width:0,height:0,inferenceCanvas:null,segmenter:null,runtimePromise:null,modelReady:false,backend:'',points:[],pointMasks:[],mask:null,maskWidth:0,maskHeight:0,score:0,mode:'positive',edge:'soft',zoom:1,panX:0,panY:0,request:0,busy:false,resultBlob:null,resultUrl:'',maskBlob:null,destroyed:false,activePointers:new Map(),gesture:null,moved:false};
 
     function toast(message,tone){ui.toast.textContent=message;ui.toast.className='nsc-toast is-show '+(tone||'');clearTimeout(ui.toast.__timer);ui.toast.__timer=setTimeout(function(){ui.toast.className='nsc-toast';},3600);}
     function status(message,busy){ui.status.textContent=message;ui.status.classList.toggle('is-busy',!!busy);state.busy=!!busy;syncControls();}
-    function syncControls(){var hasPoints=state.points.length>0;ui.undo.disabled=!hasPoints||state.busy;ui.reset.disabled=!hasPoints||state.busy;ui.extract.disabled=!state.mask||state.busy;ui.stage.classList.toggle('is-ready',state.workerReady&&!state.busy);}
+    function syncControls(){var hasPoints=state.points.length>0;ui.undo.disabled=!hasPoints||state.busy;ui.reset.disabled=!hasPoints||state.busy;ui.extract.disabled=!state.mask||state.busy;ui.stage.classList.toggle('is-ready',state.modelReady&&!state.busy);}
     function revoke(key){if(state[key]){URL.revokeObjectURL(state[key]);state[key]='';}}
     function releaseResult(){revoke('resultUrl');state.resultBlob=null;state.maskBlob=null;ui.result.hidden=true;ui.resultImage.removeAttribute('src');}
-    function terminateWorker(){if(state.worker){try{state.worker.postMessage({type:'dispose'});}catch(_error){}state.worker.terminate();state.worker=null;}state.workerReady=false;pendingInit=null;pendingEncode=null;}
+    function releaseInference(){if(state.inferenceCanvas){state.inferenceCanvas.width=1;state.inferenceCanvas.height=1;state.inferenceCanvas=null;}}
+    function closeModel(){if(state.segmenter&&typeof state.segmenter.close==='function')try{state.segmenter.close();}catch(_error){}state.segmenter=null;state.runtimePromise=null;state.modelReady=false;}
     function releaseImage(){
-      terminateWorker();revoke('sourceUrl');revoke('inferenceUrl');releaseResult();
+      revoke('sourceUrl');releaseResult();releaseInference();
       if(state.bitmap&&typeof state.bitmap.close==='function')try{state.bitmap.close();}catch(_error){}
-      state.bitmap=null;state.file=null;state.width=0;state.height=0;state.points=[];state.mask=null;state.maskWidth=0;state.maskHeight=0;state.score=0;clearMask();resetTransform();
+      state.bitmap=null;state.file=null;state.width=0;state.height=0;state.points=[];state.pointMasks=[];state.mask=null;state.maskWidth=0;state.maskHeight=0;state.score=0;clearMask();resetTransform();
     }
-    function cleanup(){state.destroyed=true;window.removeEventListener('resize',layoutFrame);releaseImage();state.activePointers.clear();}
+    function cleanup(){state.destroyed=true;window.removeEventListener('resize',layoutFrame);releaseImage();closeModel();state.activePointers.clear();}
     body.__nxCleanup=cleanup;
 
     function clearMask(){var context=ui.mask.getContext('2d');context.clearRect(0,0,ui.mask.width||1,ui.mask.height||1);ui.points.innerHTML='';syncControls();}
@@ -134,51 +137,54 @@
       for(var i=0;i<state.mask.length;i++)if(state.mask[i]){var offset=i*4;pixels[offset]=168;pixels[offset+1]=85;pixels[offset+2]=247;pixels[offset+3]=112;}
       context.putImageData(image,0,0);drawPoints();
     }
-    function progressText(message){
-      if(message.total&&message.loaded>=0)return'Downloading segmentation model... '+Math.min(100,Math.round(message.loaded/message.total*100))+'% · '+formatBytes(message.total);
-      if(message.status==='progress')return'Downloading segmentation model...';
-      return'Loading AI model...';
+    function nextFrame(){return new Promise(function(resolve){requestAnimationFrame(function(){resolve();});});}
+    function loadModel(){
+      if(state.modelReady&&state.segmenter)return Promise.resolve(state.segmenter);
+      if(state.runtimePromise)return state.runtimePromise;
+      if(!window.WebAssembly||!window.Promise)return Promise.reject(new Error('UNSUPPORTED'));
+      status('Loading AI model...',true);ui.modelBadge.textContent='LOADING · 6.2 MB';
+      state.runtimePromise=import(MEDIAPIPE_URL).then(function(vision){
+        return vision.FilesetResolver.forVisionTasks(MEDIAPIPE_WASM_ROOT).then(function(fileset){
+          return vision.InteractiveSegmenter.createFromOptions(fileset,{baseOptions:{modelAssetPath:MEDIAPIPE_MODEL,delegate:'CPU'},outputConfidenceMasks:true,outputCategoryMask:false});
+        });
+      }).then(function(segmenter){
+        state.segmenter=segmenter;state.modelReady=true;state.backend='wasm';ui.modelBadge.textContent='LOCAL WASM · READY';ui.modelBadge.className='is-ready';return segmenter;
+      }).catch(function(error){state.runtimePromise=null;state.modelReady=false;throw new Error(/memory|allocation/i.test(String(error&&error.message))?'OUT_OF_MEMORY':'MODEL_FAILED');});
+      return state.runtimePromise;
     }
-    function workerMessage(event){
-      if(state.destroyed)return;var message=event.data||{};
-      if(message.type==='progress'){status(progressText(message),true);return;}
-      if(message.type==='status'){status(message.message||'Processing...',true);return;}
-      if(message.type==='ready'){
-        state.workerReady=true;state.backend=message.backend||'wasm';ui.modelBadge.textContent=(state.backend==='webgpu'?'WEBGPU':'WASM FALLBACK')+' · READY';ui.modelBadge.className='is-ready';
-        if(pendingInit){pendingInit.resolve();pendingInit=null;}return;
-      }
-      if(message.type==='encoded'){
-        if(pendingEncode){pendingEncode.resolve(message);pendingEncode=null;}return;
-      }
-      if(message.type==='mask'&&message.requestId===state.request){
-        state.mask=new Uint8Array(message.data);state.maskWidth=message.width;state.maskHeight=message.height;state.score=message.score||0;drawMask();releaseResult();status('Mask ready · '+Math.round(state.score*100)+'% confidence',false);return;
-      }
-      if(message.type==='error'){
-        var error=new Error(message.code||'INFERENCE_FAILED');
-        if(pendingInit){pendingInit.reject(error);pendingInit=null;}else if(pendingEncode){pendingEncode.reject(error);pendingEncode=null;}else{status('Ready — coba titik lain',false);toast(friendly(error.message),'is-error');}
-      }
+    function pointMask(point){
+      if(!state.segmenter||!state.inferenceCanvas)throw new Error('MODEL_FAILED');
+      var result=state.segmenter.segment(state.inferenceCanvas,{keypoint:{x:point.x,y:point.y}});
+      try{
+        var masks=result&&result.confidenceMasks;if(!masks||!masks.length)throw new Error('EMPTY_MASK');
+        var foreground=masks[masks.length-1];var values=foreground.getAsFloat32Array();
+        return{data:new Float32Array(values),width:foreground.width,height:foreground.height,quality:result.qualityScores&&result.qualityScores.length?Math.max.apply(Math,result.qualityScores):0};
+      }finally{if(result&&typeof result.close==='function')result.close();}
     }
-    function ensureWorker(){
-      if(state.workerReady)return Promise.resolve();if(pendingInit)return pendingInit.promise;
-      if(!window.Worker||!window.Promise)return Promise.reject(new Error('UNSUPPORTED'));
-      state.worker=new Worker(WORKER_URL);state.worker.onmessage=workerMessage;state.worker.onerror=function(){if(pendingInit){pendingInit.reject(new Error('MODEL_FAILED'));pendingInit=null;}else toast(friendly('MODEL_FAILED'),'is-error');};
-      var resolveInit,rejectInit;var promise=new Promise(function(resolve,reject){resolveInit=resolve;rejectInit=reject;});pendingInit={promise:promise,resolve:resolveInit,reject:rejectInit};
-      state.worker.postMessage({type:'init',preferWebGpu:Boolean(navigator.gpu)});return promise;
-    }
-    function encodeCurrent(){
-      var resolveEncode,rejectEncode;var promise=new Promise(function(resolve,reject){resolveEncode=resolve;rejectEncode=reject;});pendingEncode={promise:promise,resolve:resolveEncode,reject:rejectEncode};
-      state.worker.postMessage({type:'encode',url:state.inferenceUrl,requestId:state.request});return promise;
-    }
-    function decodeSelection(){
-      state.request++;releaseResult();
+    async function decodeSelection(){
+      var requestId=++state.request;releaseResult();
       if(!state.points.length){state.mask=null;clearMask();status('Ready — tap an object',false);return;}
-      status('Selecting object...',true);state.worker.postMessage({type:'decode',requestId:state.request,points:state.points});
+      status('Selecting object...',true);
+      try{
+        await nextFrame();var positive=null,negative=null,width=0,height=0,quality=0;
+        for(var p=0;p<state.points.length;p++){
+          if(requestId!==state.request||state.destroyed)return;
+          var point=state.points[p];var candidate=state.pointMasks[p]||(state.pointMasks[p]=pointMask(point));width=candidate.width;height=candidate.height;quality=Math.max(quality,candidate.quality||0);
+          var target=point.label?(positive||(positive=new Float32Array(candidate.data.length))):(negative||(negative=new Float32Array(candidate.data.length)));
+          for(var i=0;i<candidate.data.length;i++)if(candidate.data[i]>target[i])target[i]=candidate.data[i];
+          if(p+1<state.points.length)await nextFrame();
+        }
+        if(requestId!==state.request||state.destroyed)return;
+        if(!positive)throw new Error('EMPTY_MASK');var output=new Uint8Array(positive.length);var filled=0;
+        for(var m=0;m<positive.length;m++){var confidence=Math.max(0,positive[m]-(negative?negative[m]:0));if(confidence>=.35){output[m]=Math.round(Math.min(1,confidence)*255);filled++;}}
+        if(!filled)throw new Error('EMPTY_MASK');state.mask=output;state.maskWidth=width;state.maskHeight=height;state.score=quality;drawMask();releaseResult();status(quality?'Mask ready · '+Math.round(quality*100)+'% confidence':'Mask ready',false);
+      }catch(error){if(requestId!==state.request)return;status('Ready — coba titik lain',false);toast(friendly(error&&error.message),'is-error');}
     }
 
-    async function prepareInference(bitmap,width,height){
-      var memory=Number(navigator.deviceMemory)||4;var maxSide=memory<=3?768:1024;var fit=Core.fitSize(width,height,maxSide);
-      var canvas=document.createElement('canvas');canvas.width=fit.width;canvas.height=fit.height;var context=canvas.getContext('2d',{alpha:false});if(!context)throw new Error('CANVAS_FAILED');
-      context.drawImage(bitmap,0,0,fit.width,fit.height);var blob=await canvasBlob(canvas,'image/jpeg');canvas.width=1;canvas.height=1;return{blob:blob,width:fit.width,height:fit.height};
+    function prepareInference(bitmap,width,height){
+      var memory=Number(navigator.deviceMemory)||4;var maxSide=memory<=3?512:640;var fit=Core.fitSize(width,height,maxSide);
+      var canvas=document.createElement('canvas');canvas.width=fit.width;canvas.height=fit.height;var context=canvas.getContext('2d',{alpha:false,willReadFrequently:true});if(!context)throw new Error('CANVAS_FAILED');
+      context.drawImage(bitmap,0,0,fit.width,fit.height);return canvas;
     }
     async function acceptFile(file){
       if(!file)return;
@@ -189,18 +195,18 @@
         state.bitmap=await imageBitmap(file);state.width=state.bitmap.width||state.bitmap.naturalWidth;state.height=state.bitmap.height||state.bitmap.naturalHeight;
         if(!state.width||!state.height)throw new Error('IMAGE_DECODE');
         ui.fileMeta.textContent=formatBytes(file.size)+' · '+state.width+'×'+state.height;
-        ui.frame.style.aspectRatio=state.width+' / '+state.height;layoutFrame();var inference=await prepareInference(state.bitmap,state.width,state.height);state.inferenceUrl=URL.createObjectURL(inference.blob);
-        ui.stageEmpty.querySelector('span').textContent='Loading AI model...';await ensureWorker();status('Analyzing image...',true);await encodeCurrent();revoke('inferenceUrl');
+        ui.frame.style.aspectRatio=state.width+' / '+state.height;layoutFrame();state.inferenceCanvas=prepareInference(state.bitmap,state.width,state.height);
+        ui.stageEmpty.querySelector('span').textContent='Loading AI model...';await loadModel();status('Analyzing image...',true);await nextFrame();
         if(state.destroyed)return;ui.stageEmpty.hidden=true;status('Ready — tap an object',false);ui.hint.innerHTML='<i class="fa-regular fa-hand-pointer"></i> Tap objek untuk memilih. Gunakan Remove − bila mask mengambil area berlebih.';syncControls();
       }catch(error){status('Model unavailable',false);toast(friendly(error&&error.message),'is-error');ui.stageEmpty.hidden=false;ui.stageEmpty.querySelector('span').textContent=friendly(error&&error.message);}
     }
 
     function addPoint(clientX,clientY){
-      if(!state.workerReady||state.busy)return;var point=Core.pointFromRect(clientX,clientY,ui.frame.getBoundingClientRect());if(!point)return;
+      if(!state.modelReady||state.busy)return;if(state.points.length>=MAX_POINTS){toast('Maksimal 8 titik refine agar memori HP tetap aman.','is-error');return;}var point=Core.pointFromRect(clientX,clientY,ui.frame.getBoundingClientRect());if(!point)return;
       state.points.push({x:point.x,y:point.y,label:state.mode==='negative'?0:1});drawPoints();decodeSelection();
     }
     function pointerDown(event){
-      if(!state.workerReady)return;ui.stage.setPointerCapture&&ui.stage.setPointerCapture(event.pointerId);state.activePointers.set(event.pointerId,{x:event.clientX,y:event.clientY,startX:event.clientX,startY:event.clientY});state.moved=false;
+      if(!state.modelReady)return;ui.stage.setPointerCapture&&ui.stage.setPointerCapture(event.pointerId);state.activePointers.set(event.pointerId,{x:event.clientX,y:event.clientY,startX:event.clientX,startY:event.clientY});state.moved=false;
       if(state.activePointers.size===2){var values=Array.from(state.activePointers.values());var dx=values[0].x-values[1].x,dy=values[0].y-values[1].y;state.gesture={distance:Math.hypot(dx,dy),zoom:state.zoom,panX:state.panX,panY:state.panY,midX:(values[0].x+values[1].x)/2,midY:(values[0].y+values[1].y)/2};}
     }
     function pointerMove(event){
@@ -242,8 +248,8 @@
     ui.change.addEventListener('click',function(){ui.file.click();});
     root.querySelectorAll('[data-mode]').forEach(function(button){button.addEventListener('click',function(){state.mode=button.dataset.mode;root.querySelectorAll('[data-mode]').forEach(function(item){item.classList.toggle('is-active',item===button);});});});
     root.querySelectorAll('[data-edge]').forEach(function(button){button.addEventListener('click',function(){state.edge=button.dataset.edge;root.querySelectorAll('[data-edge]').forEach(function(item){item.classList.toggle('is-active',item===button);});releaseResult();});});
-    ui.undo.addEventListener('click',function(){state.points.pop();drawPoints();decodeSelection();});
-    ui.reset.addEventListener('click',function(){state.points=[];state.mask=null;clearMask();releaseResult();decodeSelection();});
+    ui.undo.addEventListener('click',function(){state.points.pop();state.pointMasks.pop();drawPoints();decodeSelection();});
+    ui.reset.addEventListener('click',function(){state.points=[];state.pointMasks=[];state.mask=null;clearMask();releaseResult();decodeSelection();});
     ui.extract.addEventListener('click',extract);
     ui.download.addEventListener('click',function(){download(state.resultBlob,'cutout');});
     ui.downloadMask.addEventListener('click',async function(){try{status('Creating mask PNG...',true);var output=await buildOutput(true);state.maskBlob=output.blob;download(output.blob,'mask');status('PNG ready',false);}catch(error){status('PNG ready',false);toast(friendly(error&&error.message),'is-error');}});

@@ -234,7 +234,7 @@ Migration `database/migrations/016_hero_video_settings.sql` mengaktifkan pengatu
 
 ### Nexora Smart Cutout
 
-Route tool mengikuti pola aplikasi statis: `#tool-smartcutout`. Model `Xenova/slimsam-77-uniform` dimuat saat gambar dipilih, berjalan di Web Worker melalui WebGPU fp16 atau fallback WASM q8, dan dicache oleh Cache API browser. Gambar pengguna hanya berada di memori lokal; fitur ini tidak memakai Supabase, database, Storage, API inference, atau Vercel Function.
+Route tool mengikuti pola aplikasi statis: `#tool-smartcutout`. Model MediaPipe MagicTouch 6,23 MB dimuat saat gambar dipilih dan berjalan lokal melalui WebAssembly SIMD dengan fallback WebAssembly non-SIMD. Aset model dicache oleh browser. Gambar pengguna hanya berada di memori lokal; fitur ini tidak memakai Supabase, database, Storage, API inference, atau Vercel Function.
 
 ```bash
 npm run check

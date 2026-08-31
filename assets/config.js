@@ -1212,7 +1212,7 @@
         "id": "smartcutout",
         "icon": "fa-solid fa-object-ungroup",
         "name": "Nexora Smart Cutout",
-        "description": "Tap objek, refine mask, lalu ekspor PNG transparan dengan SlimSAM lokal di browser",
+        "description": "Tap objek, refine mask, lalu ekspor PNG transparan dengan MagicTouch lokal di browser",
         "badge": "LOCAL AI",
         "aliases": [
           "smart cutout",
@@ -1224,7 +1224,7 @@
           "mode": "module",
           "module": "smart-cutout",
           "handler": "renderNexoraSmartCutout",
-          "dependency": "https://huggingface.co/Xenova/slimsam-77-uniform"
+          "dependency": "https://storage.googleapis.com/mediapipe-models/interactive_segmenter/magic_touch/float32/1/magic_touch.tflite"
         },
         "health": {
           "key": "module-smart-cutout",

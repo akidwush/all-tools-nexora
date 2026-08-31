@@ -63,7 +63,7 @@
       ]
     },
     {
-      "source": "/assets/vendor/transformers/(.*)",
+      "source": "/assets/vendor/mediapipe/(.*)",
       "headers": [
         {
           "key": "Cache-Control",

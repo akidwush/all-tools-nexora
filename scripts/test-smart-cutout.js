@@ -17,9 +17,9 @@ assert.equal(tool.runtime.handler, "renderNexoraSmartCutout");
 assert.equal(config.modules["smart-cutout"].js.length, 2, "Core harus dimuat sebelum UI");
 
 const main = read("assets/js/features/smart-cutout.js");
-const worker = read("assets/js/workers/smart-cutout.worker.js");
 const css = read("assets/css/features/smart-cutout.css");
 const shell = read("assets/js/core/shell.js");
+const lazy = read("assets/js/core/lazy-loader.js");
 const app = read("assets/js/core/app.js");
 const vercel = JSON.parse(read("vercel.json"));
 
@@ -30,54 +30,47 @@ for (const token of [
 ]) assert.ok(main.includes(token), `UI Smart Cutout belum memuat ${token}`);
 
 for (const token of [
-  "slimsam-77-uniform", "transformers.min.mjs?v=3.5.0-nexora1", "get_image_embeddings", "input_points",
-  "input_labels", "post_process_masks", "webgpu", "fp16", "wasm", "q8", "useBrowserCache", "cacheAllowed",
-  "dispose", "reset-image"
-]) assert.ok(worker.includes(token), `Worker Smart Cutout belum memuat ${token}`);
+  "vision_bundle.mjs?v=0.10.22-nexora1", "FilesetResolver.forVisionTasks", "InteractiveSegmenter.createFromOptions",
+  "magic_touch.tflite", "getAsFloat32Array", "outputConfidenceMasks:true", "delegate:'CPU'", "nextFrame",
+  "new Float32Array", "new Uint8Array", "positive", "negative", "pointMasks", "MAX_POINTS=8", "result.close", "releaseInference", "closeModel"
+]) assert.ok(main.includes(token), `Runtime MagicTouch belum memuat ${token}`);
 
-assert.doesNotMatch(worker, /device\s*:\s*['"]wasm['"]/, "Transformers.js 3.5 memilih WASM saat opsi device tidak diberikan");
-assert.match(worker, /if\(device==='webgpu'\)\{\s*options\.device='webgpu'/, "Hanya backend WebGPU yang boleh dikirim sebagai opsi device");
-assert.match(worker, /wasm\.numThreads=1/, "Fallback mobile harus membatasi WASM ke satu thread");
-assert.doesNotMatch(worker, /useBrowserCache=true/, "Cache API tidak boleh dipaksa aktif pada browser yang tidak mendukung atau kekurangan kuota");
-assert.ok(worker.includes("allowRemoteModels=false"), "Smart Cutout tidak boleh bergantung pada model CDN eksternal");
-assert.ok(worker.includes("allowLocalModels=true"), "SlimSAM same-origin harus diaktifkan");
-assert.ok(worker.includes("wasmPaths=WASM_ROOT"), "ONNX WASM harus dimuat dari asset same-origin");
-assert.ok(worker.includes("navigator.storage.estimate"), "Cache model harus memeriksa kuota browser terlebih dahulu");
-assert.ok(worker.includes("shader-f16"), "WebGPU FP16 harus melewati capability preflight");
-assert.ok(worker.includes("wasm-no-cache"), "WASM harus punya retry tanpa Cache API");
-assert.ok(main.includes("smart-cutout4"), "Versi worker harus berubah agar browser tidak memakai runtime lama dari cache");
+assert.doesNotMatch(main, /new Worker\(/, "Runtime final tidak boleh kembali memuat worker SlimSAM lama");
+assert.doesNotMatch(main, /SLIMSAM|slimsam-77-uniform|transformers\.min/i, "Brand/runtime SlimSAM lama harus hilang dari jalur aktif");
+assert.match(main, /var maxSide=memory<=3\?512:640/, "Inference mobile harus dibatasi ke 512/640px");
+assert.match(main, /positive\[m\]-\(negative\?negative\[m\]:0\)/, "Titik Remove harus mengurangi mask positive");
+assert.ok(lazy.includes("smart-cutout-v2"), "Cache key Smart Cutout harus diperbarui");
 
 const localAssets = {
-  "assets/vendor/transformers/transformers.min.mjs": 843401,
-  "assets/vendor/transformers/ort-wasm-simd-threaded.jsep.mjs": 44484,
-  "assets/vendor/transformers/ort-wasm-simd-threaded.jsep.wasm": 21596019,
-  "assets/models/slimsam-77-uniform/config.json": 379,
-  "assets/models/slimsam-77-uniform/preprocessor_config.json": 466,
-  "assets/models/slimsam-77-uniform/onnx/vision_encoder_quantized.onnx": 8882165,
-  "assets/models/slimsam-77-uniform/onnx/prompt_encoder_mask_decoder_quantized.onnx": 4903810,
-  "assets/models/slimsam-77-uniform/onnx/vision_encoder_fp16.onnx": 12170657,
-  "assets/models/slimsam-77-uniform/onnx/prompt_encoder_mask_decoder_fp16.onnx": 8550118
+  "assets/vendor/mediapipe/vision_bundle.mjs": 137809,
+  "assets/vendor/mediapipe/wasm/vision_wasm_internal.js": 204284,
+  "assets/vendor/mediapipe/wasm/vision_wasm_internal.wasm": 9574032,
+  "assets/vendor/mediapipe/wasm/vision_wasm_nosimd_internal.js": 204137,
+  "assets/vendor/mediapipe/wasm/vision_wasm_nosimd_internal.wasm": 9448638,
+  "assets/models/mediapipe/magic_touch.tflite": 6227884
 };
 for (const [file, size] of Object.entries(localAssets)) {
   assert.equal(fs.statSync(path.join(root, file)).size, size, `${file} hilang atau unduhannya tidak lengkap`);
 }
+assert.ok(read("assets/vendor/mediapipe/LICENSE.md").includes("Apache License"));
+assert.ok(read("assets/models/mediapipe/LICENSE.md").includes("magic_touch.tflite"));
 
 for (const forbidden of ["supabase", "api external", "base64 image", "pixel log"]) {
-  assert.equal((main + worker).toLowerCase().includes(forbidden), false, `Inference lokal tidak boleh memuat ${forbidden}`);
+  assert.equal(main.toLowerCase().includes(forbidden), false, `Inference lokal tidak boleh memuat ${forbidden}`);
 }
 
 assert.ok(shell.includes("smartcutout:{renderer:'renderNexoraSmartCutout'"), "Universal room belum mendaftarkan Smart Cutout");
+assert.ok(shell.includes("MagicTouch · Local AI"), "Badge katalog belum memakai engine final");
 assert.ok(app.includes("case 'smartcutout': renderNexoraSmartCutout(body)"), "Dispatcher belum mendaftarkan Smart Cutout");
 assert.match(css, /@media\(max-width:390px\)/, "Layout 390px belum diaudit");
 assert.match(css, /min-height:44px/, "Target sentuh minimal 44px belum diterapkan");
 assert.match(css, /touch-action:none/, "Canvas belum mengendalikan gesture sentuh");
 
-const fit4k = Core.fitSize(3840, 2160, 1024);
-assert.deepEqual(fit4k, { width: 1024, height: 576, scale: 1024 / 3840 });
+const fit4k = Core.fitSize(3840, 2160, 640);
+assert.deepEqual(fit4k, { width: 640, height: 360, scale: 640 / 3840 });
 const point = Core.pointFromRect(195, 300, { left: 15, top: 105, width: 360, height: 390 });
 assert.equal(point.x, 0.5);
 assert.equal(point.y, 0.5);
-assert.equal(Core.bestMaskIndex([0.4, 0.91, 0.7]), 1);
 
 const mask = new Uint8Array(10 * 8);
 for (let y = 2; y <= 5; y++) for (let x = 3; x <= 7; x++) mask[y * 10 + x] = 255;
@@ -87,12 +80,9 @@ assert.ok(plan.width > 500 && plan.height >= 400 && plan.width <= 1000 && plan.h
 assert.equal(Core.outputSize(3840, 2160, 12000000).downscaled, false, "4K harus tetap full resolution pada profil mobile");
 assert.equal(Core.outputSize(8000, 6000, 12000000).downscaled, true, "Gambar ekstrem harus memakai memory guard");
 
-const csp = vercel.headers[0].headers.find((item) => item.key === "Content-Security-Policy").value;
-for (const host of ["https://cdn.jsdelivr.net", "https://huggingface.co", "https://*.hf.co"]) assert.ok(csp.includes(host), `CSP belum mengizinkan ${host}`);
-assert.ok(csp.includes("worker-src 'self' blob:"), "CSP harus mengizinkan worker lokal");
 const modelHeaders = vercel.headers.find((item) => item.source === "/assets/models/(.*)");
-const runtimeHeaders = vercel.headers.find((item) => item.source === "/assets/vendor/transformers/(.*)");
+const runtimeHeaders = vercel.headers.find((item) => item.source === "/assets/vendor/mediapipe/(.*)");
 assert.ok(modelHeaders && runtimeHeaders, "Model dan runtime lokal harus memiliki cache header khusus");
 for (const group of [modelHeaders, runtimeHeaders]) assert.ok(group.headers.some((item) => item.key === "Cache-Control" && item.value.includes("immutable")), "Asset AI lokal harus dicache browser");
 
-console.log("Smart Cutout lulus: registry, SlimSAM worker, WebGPU/WASM, point refine, crop/export, cleanup, CSP, dan mobile geometry tervalidasi.");
+console.log("Smart Cutout lulus: MediaPipe MagicTouch lokal, WASM SIMD/fallback, point refine, crop/export, cleanup, cache, dan mobile geometry tervalidasi.");

@@ -1,6 +1,6 @@
 ## 6.4.0 Nexora Smart Cutout — 2026-08-30
 
-- Fitur: menambahkan Magic Object Selector berbasis `Xenova/slimsam-77-uniform` dengan point prompt positif/negatif, multi-point, Undo, Reset, overlay mask, serta kandidat mask score tertinggi.
+- Fitur: Nexora Smart Cutout kini memakai MediaPipe MagicTouch lokal yang lebih ringan untuk point prompt positif/negatif, multi-point, Undo, Reset, overlay mask, dan ekspor PNG transparan di mobile.
 - Runtime: inference berjalan lokal di Web Worker melalui Transformers.js/ONNX Runtime Web; WebGPU fp16 diprioritaskan dan WASM q8 menjadi fallback.
 - Performa: model dan processor lazy-loaded setelah upload, image encoder hanya berjalan sekali per gambar, embedding dipakai ulang untuk setiap refine, dan inference image dibatasi 768–1024 px.
 - Export: PNG transparan memakai gambar sumber, opsi crop dengan padding 3%, edge Soft/Sharp, output mask hitam-putih, serta memory guard untuk gambar ekstrem.
