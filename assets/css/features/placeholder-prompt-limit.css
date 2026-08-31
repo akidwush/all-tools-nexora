@@ -1,0 +1,25 @@
+/* Nexora Placeholder Studio — compact 1,000-word counter */
+.nx-placeholder-word-counter{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:2px;
+  min-height:18px;
+  margin:6px 4px 0;
+  color:rgba(196,181,253,.66);
+  font:700 11px/1.35 Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  letter-spacing:.01em;
+}
+.nx-placeholder-word-counter.is-limit{color:#c4b5fd}
+.nx-placeholder-word-counter[data-limit-message]::before{
+  content:attr(data-limit-message);
+  margin-right:auto;
+  color:#f0abfc;
+  font-weight:650;
+}
+textarea[data-nx-placeholder-word-limit]:focus + .nx-placeholder-word-counter{
+  color:rgba(216,180,254,.9);
+}
+@media (prefers-reduced-motion:reduce){
+  .nx-placeholder-word-counter{transition:none!important}
+}
