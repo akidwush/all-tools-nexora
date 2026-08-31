@@ -4,6 +4,7 @@
 #nxUniversalRoom[data-tool="comicreader"] .nx-room-scroll{
   overflow:hidden!important;
   padding:0!important;
+  overscroll-behavior:none!important;
 }
 #nxUniversalRoom[data-tool="comicreader"] .nx-room-wrap{
   width:100%!important;
@@ -24,6 +25,50 @@
   box-shadow:none!important;
   overflow:hidden!important;
 }
+#nxUniversalRoom[data-tool="comicreader"] .nx-room-topbar{
+  min-height:54px!important;
+  padding:6px 10px!important;
+  gap:8px!important;
+  border-bottom-color:rgba(167,139,250,.16)!important;
+  background:rgba(7,4,13,.94)!important;
+  backdrop-filter:blur(12px)!important;
+  -webkit-backdrop-filter:blur(12px)!important;
+  box-shadow:none!important;
+}
+#nxUniversalRoom[data-tool="comicreader"] .nx-room-back{
+  width:38px!important;
+  min-width:38px!important;
+  max-width:38px!important;
+  flex-basis:38px!important;
+  height:38px!important;
+  min-height:38px!important;
+  padding:0!important;
+  border-radius:12px!important;
+  box-shadow:none!important;
+}
+#nxUniversalRoom[data-tool="comicreader"] .nx-room-top-title{
+  gap:8px!important;
+  font-size:10px!important;
+  letter-spacing:.7px!important;
+  text-align:center!important;
+}
+#nxUniversalRoom[data-tool="comicreader"] .nx-room-top-title i{
+  font-size:15px!important;
+  filter:none!important;
+}
+#nxUniversalRoom[data-tool="comicreader"] .nx-room-status{
+  width:32px!important;
+  height:32px!important;
+  padding:0!important;
+  justify-content:center!important;
+  border-radius:11px!important;
+  box-shadow:none!important;
+}
+#nxUniversalRoom[data-tool="comicreader"] .nx-room-status::before{
+  width:7px!important;
+  height:7px!important;
+  box-shadow:0 0 8px rgba(74,222,128,.38)!important;
+}
 #nxUniversalRoom[data-tool="comicreader"] .nx-room-tool-body{
   height:100%!important;
   min-height:0!important;
@@ -34,8 +79,8 @@
 .nx-comic-embed{
   position:relative;
   width:100%;
-  height:calc(100dvh - 76px);
-  min-height:620px;
+  height:calc(100dvh - 54px);
+  min-height:0;
   overflow:hidden;
   background:#07000f;
 }
@@ -78,7 +123,7 @@
 }
 @media all{
   .nx-comic-embed{
-    height:calc(100dvh - 64px);
-    min-height:520px;
+    height:calc(100dvh - 54px);
+    min-height:0;
   }
 }
