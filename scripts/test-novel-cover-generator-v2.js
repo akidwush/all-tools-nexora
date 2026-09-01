@@ -175,7 +175,7 @@ async function puterContracts() {
   const calls = [];
   let chatCalls = 0;
   const nodes = {
-    "puter-model": { value: "google/imagen-4.0-fast" },
+    "puter-model": { value: "gpt-image-2" },
     "director-state": { textContent: "" },
     "puter-name": { textContent: "" },
     "puter-usage": { textContent: "" },
@@ -222,7 +222,7 @@ async function puterContracts() {
   });
   assert.equal(generated.mode, "puter");
   assert.equal(generated.result.provider, "Puter User-Pays");
-  assert.equal(generated.result.model, "Imagen 4 Fast");
+  assert.equal(generated.result.model, "GPT Image 2");
   assert.equal(generated.result.director.source, "genre-director");
   assert.match(generated.result.images[0].url, /^data:image\/png;base64,/);
   assert.equal(chatCalls, 0, "Cover Director tidak boleh memakai request Puter chat terpisah.");
@@ -230,14 +230,15 @@ async function puterContracts() {
   assert.match(calls[0].prompt, /FINISHED PROFESSIONAL NOVEL COVER ARTWORK/);
   assert.match(calls[0].prompt, /quiet negative space/);
   assert.match(calls[0].prompt, /No title, no author|No title|no words/i);
+  assert.equal(calls[0].options.model, "gpt-image-2");
+  assert.equal(calls[0].options.provider, "openai-image-generation");
+  assert.equal(calls[0].options.quality, "low");
   assert.deepEqual({ ...calls[0].options.ratio }, { w: 2, h: 3 });
 
   calls.length = 0;
-  let queueAttempts = 0;
   puterClient.ai.txt2img = async (prompt, options) => {
     calls.push({ prompt, options });
-    queueAttempts += 1;
-    if (queueAttempts === 1) {
+    if (options.model === "gpt-image-2") {
       const error = new Error("another request is already processing");
       error.status = 429;
       throw error;
@@ -246,8 +247,23 @@ async function puterContracts() {
   };
   const recovered = await window.NexoraNovelCoverPuter.generate(root, { ...input, typographyMode: "overlay" });
   assert.equal(recovered.ok, true);
-  assert.equal(calls.length, 2, "Antrean Puter hanya boleh dicoba ulang satu kali.");
-  assert.match(nodes["director-state"].textContent, /mencoba ulang sekali/i);
+  assert.equal(recovered.result.model, "GPT Image Mini");
+  assert.equal(calls.length, 2, "Rate limit harus berpindah model secara berurutan, bukan mengulang model yang sama.");
+  assert.deepEqual(calls.map((call) => call.options.model), ["gpt-image-2", "gpt-image-1-mini"]);
+  assert.match(nodes["director-state"].textContent, /model cadangan 2\/3/i);
+
+  calls.length = 0;
+  puterClient.ai.txt2img = async (prompt, options) => {
+    calls.push({ prompt, options });
+    const error = new Error("too many requests");
+    error.status = 429;
+    throw error;
+  };
+  await assert.rejects(
+    window.NexoraNovelCoverPuter.generate(root, { ...input, typographyMode: "overlay" }),
+    /sudah mencoba GPT Image 2, GPT Image Mini, Imagen 4 Fast/i
+  );
+  assert.deepEqual(calls.map((call) => call.options.model), ["gpt-image-2", "gpt-image-1-mini", "google/imagen-4.0-fast"]);
 }
 
 async function directorContracts() {
@@ -321,7 +337,7 @@ async function main() {
   for (const text of ["renderNovelCoverGenerator", "Puter Free", "Pro Auto", "Compare", "AI COVER DIRECTOR", "Pakai Artwork Sendiri", "Buat Cover Profesional", "Edit Lanjutan", "toBlob", "pointermove", "Reference Character", "API key configured", "diagnostics"]) {
     assert.ok(ui.includes(text), text);
   }
-  for (const text of ["NexoraPuterRuntime", "puter.ai.txt2img", "Puter User-Pays", "buildPrompt", "localArtwork", "openai/gpt-image-1-mini", "director().createLocalPlan", "generateImage"]) {
+  for (const text of ["NexoraPuterRuntime", "puter.ai.txt2img", "Puter User-Pays", "buildPrompt", "localArtwork", "gpt-image-1-mini", "director().createLocalPlan", "generateWithFallback", "openai-image-generation"]) {
     assert.ok(puter.includes(text), text);
   }
   const directorUi = read("assets/js/features/novel-cover-director.js");
@@ -348,7 +364,7 @@ async function main() {
     assert.ok(card >= 145 && card * 2 + 38 <= shell, `${width}px mengalami overflow.`);
   }
 
-  console.log("Novel Cover V4.2 lulus: single-request AI Cover Director, queue retry terkontrol, one-click typography, 7 provider Pro, dan mobile 360/375/390/412 tervalidasi.");
+  console.log("Novel Cover V4.3 lulus: sequential GPT Image 2/Mini/Imagen fallback, no parallel request, one-click typography, 7 provider Pro, dan mobile 360/375/390/412 tervalidasi.");
 }
 
 main().catch((error) => {

@@ -1,15 +1,15 @@
 (function () {
   "use strict";
 
-  var DEFAULT_MODEL = "google/imagen-4.0-fast";
-  var FALLBACK_MODEL = "openai/gpt-image-1-mini";
+  var DEFAULT_MODEL = "gpt-image-2";
+  var AUTO_MODELS = Object.freeze(["gpt-image-2", "gpt-image-1-mini", "google/imagen-4.0-fast"]);
   var FLASH_IMAGE_MODEL = "google/" + "gem" + "ini-3.1-flash-image-preview";
   var modelLabels = {
-    "openai/gpt-image-1-mini": "GPT Image Mini",
+    "gpt-image-1-mini": "GPT Image Mini",
     "google/imagen-4.0-fast": "Imagen 4 Fast",
     "black-forest-labs/flux-schnell": "FLUX Schnell",
     "qwen/qwen-image-2.0-pro": "Qwen Image 2 Pro",
-    "openai/gpt-image-2": "GPT Image 2"
+    "gpt-image-2": "GPT Image 2"
   };
   modelLabels[FLASH_IMAGE_MODEL] = "Nexora Flash Image";
   var MODELS = Object.freeze(modelLabels);
@@ -19,20 +19,6 @@
     "4:5": { w: 4, h: 5 },
     "9:16": { w: 9, h: 16 },
     "1:1": { w: 1, h: 1 }
-  });
-  var GPT_MINI_RATIOS = Object.freeze({
-    "2:3": { w: 1024, h: 1536 },
-    "3:4": { w: 1024, h: 1536 },
-    "4:5": { w: 1024, h: 1536 },
-    "9:16": { w: 1024, h: 1536 },
-    "1:1": { w: 1024, h: 1024 }
-  });
-  var GPT_2_RATIOS = Object.freeze({
-    "2:3": { w: 768, h: 1024 },
-    "3:4": { w: 768, h: 1024 },
-    "4:5": { w: 768, h: 1024 },
-    "9:16": { w: 576, h: 1024 },
-    "1:1": { w: 1024, h: 1024 }
   });
 
   function field(root, key) {
@@ -74,47 +60,54 @@
     return "Puter belum dapat membuat gambar. Coba model lain atau gunakan Upload Artwork.";
   }
 
-  function canFallback(error) {
+  function canTryNextModel(error) {
     var info = details(error);
     var raw = (info.code + " " + info.status + " " + info.message).toLowerCase();
-    if ([401, 402, 403, 429].indexOf(info.status) !== -1) return false;
-    if (/allowance|credit|quota|payment|safety|moderation|policy|cancel|denied|unauthor|rate|concurren/.test(raw)) return false;
-    return /model not found|model.*unavailable|unsupported model|no provider|non-serverless|extract image url/.test(raw);
-  }
-
-  function isQueueError(error) {
-    var info = details(error);
-    var raw = (info.code + " " + info.status + " " + info.message).toLowerCase();
-    return info.status === 429 || /concurren|already.*processing|request.*progress|too many requests/.test(raw);
+    if ([400, 401, 402, 403].indexOf(info.status) !== -1 && !/model not found|model.*unavailable|unsupported model|no provider/.test(raw)) return false;
+    if (/allowance|credit|quota|payment|safety|moderation|policy|cancel|denied|unauthor|invalid prompt|bad request/.test(raw)) return false;
+    return info.status === 429 || info.status >= 500 || /rate|too many|concurren|already.*processing|request.*progress|timeout|network|fetch|offline|model not found|model.*unavailable|unsupported model|no provider|non-serverless|extract image url/.test(raw);
   }
 
   function wait(milliseconds) {
     return new Promise(function (resolve) { setTimeout(resolve, milliseconds); });
   }
 
-  async function generateImage(puter, prompt, options, onQueue) {
-    try {
-      return await puter.ai.txt2img(prompt, options);
-    } catch (error) {
-      if (!isQueueError(error)) throw error;
-      if (typeof onQueue === "function") onQueue();
-      await wait(3000);
-      return puter.ai.txt2img(prompt, options);
+  function candidateModels(selected) {
+    var candidates = [selected].concat(AUTO_MODELS).filter(function (model, index, values) {
+      return MODELS[model] && values.indexOf(model) === index;
+    });
+    return candidates.slice(0, 3);
+  }
+
+  async function generateWithFallback(puter, prompt, ratio, selected, onAttempt) {
+    var candidates = candidateModels(selected);
+    var failures = [];
+    for (var index = 0; index < candidates.length; index += 1) {
+      var model = candidates[index];
+      if (index > 0) await wait(index * 2000);
+      if (typeof onAttempt === "function") onAttempt(model, index + 1, candidates.length);
+      try {
+        return { generated: await puter.ai.txt2img(prompt, generationOptions(model, ratio)), model: model, failures: failures };
+      } catch (error) {
+        failures.push({ model: model, error: error });
+        if (!canTryNextModel(error) || index === candidates.length - 1) {
+          if (failures.length > 1 && canTryNextModel(error)) {
+            throw new Error("Semua model Puter sedang sibuk atau dibatasi. Nexora sudah mencoba " + failures.map(function (item) { return MODELS[item.model] || item.model; }).join(", ") + ". Tunggu beberapa menit lalu coba lagi.");
+          }
+          throw new Error(errorMessage(error));
+        }
+      }
     }
+    throw new Error("Model Puter belum dapat digunakan saat ini.");
   }
 
   function generationOptions(model, ratio) {
-    var options = { model: model };
-    if (model === "openai/gpt-image-1-mini") {
+    var options = { model: model, ratio: RATIOS[ratio] || RATIOS["2:3"] };
+    if (/^gpt-image-/.test(model)) {
+      options.provider = "openai-image-generation";
       options.quality = "low";
-      options.ratio = GPT_MINI_RATIOS[ratio] || GPT_MINI_RATIOS["2:3"];
-    } else if (model === "openai/gpt-image-2") {
-      options.quality = "low";
-      options.ratio = GPT_2_RATIOS[ratio] || GPT_2_RATIOS["2:3"];
-    } else {
-      options.ratio = RATIOS[ratio] || RATIOS["2:3"];
-      if (model === FLASH_IMAGE_MODEL) options.quality = "1K";
     }
+    if (model === FLASH_IMAGE_MODEL) options.quality = "1K";
     return options;
   }
 
@@ -186,31 +179,24 @@
     await refreshAccount(root);
     var selected = field(root, "puter-model").value;
     if (!MODELS[selected]) selected = DEFAULT_MODEL;
-    var model = selected;
-    var generated;
     var plan = director().createLocalPlan(input);
     input.director = plan;
     var directorState = field(root, "director-state");
-    if (directorState) directorState.textContent = "Creative brief cover siap · membuat 1 artwork…";
+    if (directorState) directorState.textContent = "Creative brief cover siap · menyiapkan model utama…";
     var prompt = buildPrompt(input);
-    var queued = function () {
-      if (directorState) directorState.textContent = "Antrean Puter sibuk · mencoba ulang sekali…";
-    };
-    try {
-      generated = await generateImage(puter, prompt, generationOptions(model, input.aspectRatio), queued);
-    } catch (firstError) {
-      if (!canFallback(firstError)) throw new Error(errorMessage(firstError));
-      model = selected === DEFAULT_MODEL ? FALLBACK_MODEL : DEFAULT_MODEL;
-      generated = await generateImage(puter, prompt, generationOptions(model, input.aspectRatio), queued);
-    }
-    var source = imageSource(generated);
+    var outcome = await generateWithFallback(puter, prompt, input.aspectRatio, selected, function (model, attempt, total) {
+      if (directorState) directorState.textContent = attempt === 1
+        ? "Membuat artwork dengan " + (MODELS[model] || model) + "…"
+        : "Model cadangan " + attempt + "/" + total + " · " + (MODELS[model] || model) + "…";
+    });
+    var source = imageSource(outcome.generated);
     if (!/^(data:image\/|blob:|https:\/\/)/i.test(source)) throw new Error("Puter mengembalikan format gambar yang tidak dikenali.");
     return {
       ok: true,
       mode: "puter",
       result: {
         provider: "Puter User-Pays",
-        model: MODELS[model] || model,
+        model: MODELS[outcome.model] || outcome.model,
         images: [{ url: source }],
         director: plan
       },
@@ -248,7 +234,7 @@
     field(root, "puter-account").hidden = !free;
     field(root, "puter-model-field").hidden = !free;
     field(root, "cost").innerHTML = free
-      ? "Mode gratis: <b>1 request artwork</b>. AI Cover Director memasukkan arahan genre, hierarchy, palette, dan ruang judul langsung ke prompt gambar."
+      ? "Mode gratis: <b>1 hasil artwork</b>. Model cadangan hanya dicoba berurutan jika model utama sibuk atau tidak tersedia."
       : "Mode Pro: <b>1 provider × 1 image</b>. Auto mencoba maksimal 3 provider dengan API credit server.";
     field(root, "generate").querySelector("span").textContent = free ? "Buat Cover Profesional" : "Buat Cover Pro";
   }
