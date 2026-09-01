@@ -1,8 +1,8 @@
 (function () {
   "use strict";
 
-  var DEFAULT_MODEL = "openai/gpt-image-1-mini";
-  var FALLBACK_MODEL = "black-forest-labs/flux-schnell";
+  var DEFAULT_MODEL = "google/imagen-4.0-fast";
+  var FALLBACK_MODEL = "openai/gpt-image-1-mini";
   var FLASH_IMAGE_MODEL = "google/" + "gem" + "ini-3.1-flash-image-preview";
   var modelLabels = {
     "openai/gpt-image-1-mini": "GPT Image Mini",
@@ -42,6 +42,11 @@
   function runtime() {
     if (!window.NexoraPuterRuntime) throw new Error("Puter runtime belum tersedia. Muat ulang halaman lalu coba lagi.");
     return window.NexoraPuterRuntime;
+  }
+
+  function director() {
+    if (!window.NexoraNovelCoverDirector) throw new Error("AI Cover Director belum tersedia. Muat ulang halaman lalu coba lagi.");
+    return window.NexoraNovelCoverDirector;
   }
 
   function details(error) {
@@ -92,25 +97,9 @@
     return options;
   }
 
-  function clean(value, limit) {
-    return String(value || "").replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim().slice(0, limit || 3000);
-  }
-
   function buildPrompt(input) {
-    var overlay = input.typographyMode !== "ai";
-    return [
-      "Professional vertical novel cover artwork for commercial digital publishing.",
-      "Novel genre: " + clean(input.genre, 60) + ".",
-      "Story concept: " + clean(input.description, 3000) + ".",
-      input.character ? "Main character: " + clean(input.character, 1200) + "." : "Derive only the necessary character direction from the story.",
-      "Mood: " + clean(input.mood, 60) + ". Composition: " + clean(input.composition, 100) + ".",
-      "Visual direction: " + clean(input.visualStyle, 100) + ".",
-      overlay
-        ? "Do not render words, letters, logos, title, author, watermark, or random text. Leave controlled negative space for title typography."
-        : "Render the exact title \"" + clean(input.title, 160) + "\"" + (input.author ? " and author \"" + clean(input.author, 120) + "\"" : "") + " as intentional legible cover typography. Invent no other text.",
-      "Use one strong focal hierarchy, clear silhouette, safe margins and professional publishing composition. Keep the cover readable as a small thumbnail. Avoid clutter, excessive glow and random text.",
-      input.customDirection ? "Additional direction: " + clean(input.customDirection, 800) + "." : ""
-    ].filter(Boolean).join("\n");
+    var plan = input.director || director().createLocalPlan(input);
+    return director().buildArtworkPrompt(input, plan);
   }
 
   async function refreshAccount(root) {
@@ -178,6 +167,10 @@
     if (!MODELS[selected]) selected = DEFAULT_MODEL;
     var model = selected;
     var generated;
+    var plan = await director().direct(puter, input);
+    input.director = plan;
+    var directorState = field(root, "director-state");
+    if (directorState) directorState.textContent = plan.source === "ai-director" ? "Creative brief AI siap · membuat artwork…" : "Creative brief genre siap · membuat artwork…";
     try {
       generated = await puter.ai.txt2img(buildPrompt(input), generationOptions(model, input.aspectRatio));
     } catch (firstError) {
@@ -193,14 +186,15 @@
       result: {
         provider: "Puter User-Pays",
         model: MODELS[model] || model,
-        images: [{ url: source }]
+        images: [{ url: source }],
+        director: plan
       },
       attempts: ["puter"],
       diagnostics: []
     };
   }
 
-  function localArtwork(file) {
+  function localArtwork(file, input) {
     return new Promise(function (resolve, reject) {
       if (!file || ["image/jpeg", "image/png", "image/webp"].indexOf(file.type) === -1 || file.size > 12000000) {
         reject(new Error("Artwork harus JPG, PNG, atau WebP maksimal 12 MB."));
@@ -214,7 +208,8 @@
           result: {
             provider: "Local Artwork",
             model: "Tanpa AI · diproses di perangkat",
-            images: [{ base64: reader.result }]
+            images: [{ base64: reader.result }],
+            director: director().createLocalPlan(input || { genre: "Fantasy" })
           }
         });
       };
@@ -228,9 +223,9 @@
     field(root, "puter-account").hidden = !free;
     field(root, "puter-model-field").hidden = !free;
     field(root, "cost").innerHTML = free
-      ? "Mode gratis: <b>1 akun Puter × 1 artwork</b>. Nexora tidak memakai API key atau saldo developer."
+      ? "Mode gratis: <b>AI Cover Director + 1 artwork</b> memakai allowance akun Puter. Jika Director tidak tersedia, arahan genre lokal mengambil alih."
       : "Mode Pro: <b>1 provider × 1 image</b>. Auto mencoba maksimal 3 provider dengan API credit server.";
-    field(root, "generate").querySelector("span").textContent = free ? "Generate Free Cover" : "Generate Cover";
+    field(root, "generate").querySelector("span").textContent = free ? "Buat Cover Profesional" : "Buat Cover Pro";
   }
 
   function bind(root, hooks) {
@@ -249,9 +244,10 @@
       field(root, "artwork-name").textContent = selected.name;
       hooks.status(root, "Membuka artwork di Nexora Composer…", "loading");
       try {
-        var result = await localArtwork(selected);
+        var input = typeof hooks.input === "function" ? hooks.input(root) : { genre: "Fantasy" };
+        var result = await localArtwork(selected, input);
         hooks.show(root, result);
-        hooks.status(root, "Artwork siap. Tambahkan title dan author di Composer.", "success");
+        hooks.status(root, "Artwork siap. Director memasang title dan author secara otomatis.", "success");
       } catch (error) {
         hooks.status(root, error.message, "error");
       }

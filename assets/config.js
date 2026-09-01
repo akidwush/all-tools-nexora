@@ -133,6 +133,7 @@
       ],
       "js": [
         "assets/js/features/puter-runtime.js",
+        "assets/js/features/novel-cover-director.js",
         "assets/js/features/novel-cover-puter.js",
         "assets/js/features/novel-cover-generator.js"
       ]
@@ -908,8 +909,8 @@
         "id": "novelcover",
         "icon": "fa-solid fa-book-atlas",
         "name": "Nexora Novel Cover Generator",
-        "description": "Buat cover novel dengan allowance Puter gratis atau provider Pro, lalu susun judul dan author",
-        "badge": "FREE-FIRST COVER",
+        "description": "AI Cover Director mengatur artwork, hierarchy, palet, dan typography novel secara otomatis",
+        "badge": "AI COVER DIRECTOR",
         "aliases": [
           "novel cover",
           "cover generator",

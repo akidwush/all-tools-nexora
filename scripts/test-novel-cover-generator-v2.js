@@ -175,6 +175,7 @@ async function puterContracts() {
   const calls = [];
   const nodes = {
     "puter-model": { value: "google/imagen-4.0-fast" },
+    "director-state": { textContent: "" },
     "puter-name": { textContent: "" },
     "puter-usage": { textContent: "" },
     "puter-connect": {
@@ -189,6 +190,14 @@ async function puterContracts() {
       getMonthlyUsage: async () => ({ allowanceInfo: { monthUsageAllowance: 100, remaining: 80 } })
     },
     ai: {
+      async chat() {
+        return { message: { content: JSON.stringify({
+          visualStyle: "Elegant Fantasy", mood: "Dreamlike", composition: "Character + Environment",
+          titleZone: "top", alignment: "center", fontMood: "editorial-serif", subjectPlacement: "lower-right",
+          palette: ["#f6ead3", "#d7b36a", "#34234f"], lighting: "soft library window light",
+          motif: "one emerald book clasp", artDirection: "Elegant fantasy library cover with calm publishing hierarchy"
+        }) } };
+      },
       async txt2img(prompt, options) {
         calls.push({ prompt, options });
         return { src: "data:image/png;base64,dGVzdA==" };
@@ -202,6 +211,7 @@ async function puterContracts() {
       percentRemaining: () => "80% allowance tersisa"
     }
   };
+  vm.runInNewContext(read("assets/js/features/novel-cover-director.js"), { window });
   vm.runInNewContext(read("assets/js/features/novel-cover-puter.js"), { window, FileReader: class {} });
   const root = { querySelector(selector) { return nodes[selector.match(/data-nc="([^"]+)"/)?.[1]]; } };
   const generated = await window.NexoraNovelCoverPuter.generate(root, {
@@ -212,15 +222,41 @@ async function puterContracts() {
   assert.equal(generated.mode, "puter");
   assert.equal(generated.result.provider, "Puter User-Pays");
   assert.equal(generated.result.model, "Imagen 4 Fast");
+  assert.equal(generated.result.director.source, "ai-director");
   assert.match(generated.result.images[0].url, /^data:image\/png;base64,/);
   assert.equal(calls.length, 1, "Mode gratis hanya membuat satu generation.");
-  assert.match(calls[0].prompt, /Professional vertical novel cover artwork/);
-  assert.match(calls[0].prompt, /Do not render words/);
+  assert.match(calls[0].prompt, /FINISHED PROFESSIONAL NOVEL COVER ARTWORK/);
+  assert.match(calls[0].prompt, /quiet negative space/);
+  assert.match(calls[0].prompt, /No title, no author|No title|no words/i);
   assert.deepEqual({ ...calls[0].options.ratio }, { w: 2, h: 3 });
 }
 
+async function directorContracts() {
+  const window = {};
+  vm.runInNewContext(read("assets/js/features/novel-cover-director.js"), { window });
+  const director = window.NexoraNovelCoverDirector;
+  const fantasy = director.createLocalPlan({ genre: "Fantasy", description: "A princess discovers a magic library.", character: "pink-haired scholar" });
+  const action = director.createLocalPlan({ genre: "Action", description: "A hero fights a war across a ruined city.", character: "armored heroine" });
+  assert.equal(fantasy.titleZone, "top");
+  assert.equal(fantasy.fontMood, "editorial-serif");
+  assert.equal(action.fontMood, "display-sans");
+  assert.notDeepEqual([...fantasy.palette], [...action.palette]);
+  const artworkPrompt = director.buildArtworkPrompt({ ...input, customDirection: "emerald book" }, fantasy);
+  assert.match(artworkPrompt, /not a poster/i);
+  assert.match(artworkPrompt, /top 28%/i);
+  assert.match(artworkPrompt, /no title, no author/i);
+  assert.match(artworkPrompt, /bookstore thumbnail/i);
+  assert.ok(director.titleScale("A Very Long Novel Title That Must Fit") < director.titleScale("Nexora"));
+
+  const aiPlan = await director.direct({ ai: { chat: async () => ({ message: { content: '{"visualStyle":"Light Novel","mood":"Elegant","composition":"Bust Portrait","titleZone":"top","alignment":"center","fontMood":"modern-serif","subjectPlacement":"lower-right","palette":["#f8ead8","#aa6688","#22192d"],"lighting":"window light","motif":"book clasp","artDirection":"polished commercial cover"}' } }) } }, input);
+  assert.equal(aiPlan.source, "ai-director");
+  assert.equal(aiPlan.fontMood, "modern-serif");
+  const fallback = await director.direct({ ai: { chat: async () => ({ message: { content: "not json" } }) } }, input);
+  assert.equal(fallback.source, "genre-director-fallback");
+}
+
 async function main() {
-  assert.match(input.prompt, /Professional vertical novel cover/);
+  assert.match(input.prompt, /FINISHED PROFESSIONAL NOVEL COVER ARTWORK/);
   assert.match(input.prompt, /Do not render words/);
   assert.match(input.negativePrompt, /watermark/);
   assert.throws(() => parseInput({ title: "x", description: "short" }), /minimal 20/);
@@ -236,6 +272,7 @@ async function main() {
 
   await adapterContracts();
   await routerContracts();
+  await directorContracts();
   await puterContracts();
 
   const config = require("../assets/config");
@@ -254,6 +291,7 @@ async function main() {
   assert.equal(manifest.tools.novelcover, "novel-cover-generator");
   assert.deepEqual(config.modules["novel-cover-generator"].js, [
     "assets/js/features/puter-runtime.js",
+    "assets/js/features/novel-cover-director.js",
     "assets/js/features/novel-cover-puter.js",
     "assets/js/features/novel-cover-generator.js"
   ]);
@@ -262,21 +300,28 @@ async function main() {
   assert.equal(packageJson.dependencies["@fal-ai/client"], "1.10.1");
   assert.equal(packageJson.dependencies["@huggingface/inference"], "4.13.28");
 
-  for (const text of ["renderNovelCoverGenerator", "Puter Free", "Pro Auto", "Compare", "Nexora Composer", "Upload Artwork Sendiri", "toBlob", "pointermove", "Reference Character", "API key configured", "diagnostics"]) {
+  for (const text of ["renderNovelCoverGenerator", "Puter Free", "Pro Auto", "Compare", "AI COVER DIRECTOR", "Pakai Artwork Sendiri", "Buat Cover Profesional", "Edit Lanjutan", "toBlob", "pointermove", "Reference Character", "API key configured", "diagnostics"]) {
     assert.ok(ui.includes(text), text);
   }
-  for (const text of ["NexoraPuterRuntime", "puter.ai.txt2img", "Puter User-Pays", "buildPrompt", "localArtwork", "openai/gpt-image-1-mini"]) {
+  for (const text of ["NexoraPuterRuntime", "puter.ai.txt2img", "Puter User-Pays", "buildPrompt", "localArtwork", "openai/gpt-image-1-mini", "director().direct"]) {
     assert.ok(puter.includes(text), text);
   }
+  const directorUi = read("assets/js/features/novel-cover-director.js");
+  for (const text of ["puter.ai.chat", "gpt-5-nano", "createLocalPlan", "buildArtworkPrompt", "providerDirection", "zoneMetrics", "titleScale"]) assert.ok(directorUi.includes(text), text);
   for (const secret of ["IDEOGRAM_API_KEY", "RECRAFT_API_KEY", "FAL_KEY", "RUNWARE_API_KEY", "STABILITY_API_KEY", "OPENAI_API_KEY", "HF_TOKEN"]) {
     assert.equal(ui.includes(secret), false, `${secret} tidak boleh masuk frontend.`);
     assert.equal(puter.includes(secret), false, `${secret} tidak boleh masuk Puter frontend.`);
+    assert.equal(directorUi.includes(secret), false, `${secret} tidak boleh masuk Cover Director frontend.`);
   }
   assert.ok(css.includes("safe-area-inset-bottom"));
   assert.ok(css.includes("nc-puter-account"));
   assert.ok(css.includes("nc-local-upload"));
+  assert.ok(css.includes("nc-director-card"));
+  assert.ok(css.includes("nc-direction-summary"));
+  assert.ok(css.includes("nc-primary-actions"));
   assert.doesNotMatch(ui, /localStorage|sessionStorage/, "Generation dan reference tidak boleh disimpan di browser storage.");
   assert.doesNotMatch(puter, /localStorage|sessionStorage/, "Puter generation dan artwork tidak boleh disimpan di browser storage.");
+  assert.doesNotMatch(directorUi, /localStorage|sessionStorage/, "Director plan tidak boleh disimpan di browser storage.");
 
   for (const width of [360, 375, 390, 412]) {
     const shell = width - 32;
@@ -284,7 +329,7 @@ async function main() {
     assert.ok(card >= 145 && card * 2 + 38 <= shell, `${width}px mengalami overflow.`);
   }
 
-  console.log("Novel Cover V3 lulus: Puter free-first, 7 provider Pro, local artwork, prompt, composer, dan mobile 360/375/390/412 tervalidasi.");
+  console.log("Novel Cover V4 lulus: AI Cover Director, genre direction, one-click typography, Puter fallback, 7 provider Pro, dan mobile 360/375/390/412 tervalidasi.");
 }
 
 main().catch((error) => {

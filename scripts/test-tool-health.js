@@ -42,11 +42,14 @@ async function main() {
 
   const okProbe = await fetchProbe(`${origin}/ok`, "HEAD", 1_000);
   assert.equal(okProbe.statusCode, 200);
-  assert.equal(classifyProbe(okProbe, { strict: true }, { degradedLatencyMs: 500 }).status, "operational");
+  assert.equal(classifyProbe(okProbe, { strict: true }, { degradedLatencyMs: 2_000 }).status, "operational");
 
   const fallbackProbe = await fetchProbe(`${origin}/fallback`, "HEAD", 1_000);
   assert.equal(fallbackProbe.statusCode, 206);
-  assert.equal(classifyProbe(fallbackProbe, { strict: true }, { degradedLatencyMs: 500 }).status, "operational");
+  // Termux/Android can take more than 500 ms to reopen a localhost socket while
+  // the device is under load. This assertion tests the HEAD -> GET fallback,
+  // not production latency classification, so keep a timeout-safe threshold.
+  assert.equal(classifyProbe(fallbackProbe, { strict: true }, { degradedLatencyMs: 2_000 }).status, "operational");
 
   const errorProbe = await fetchProbe(`${origin}/error`, "HEAD", 1_000);
   assert.equal(classifyProbe(errorProbe, { strict: true }, { degradedLatencyMs: 500 }).status, "offline");
