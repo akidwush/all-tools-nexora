@@ -132,6 +132,8 @@
         "assets/css/features/novel-cover-generator.css"
       ],
       "js": [
+        "assets/js/features/puter-runtime.js",
+        "assets/js/features/novel-cover-puter.js",
         "assets/js/features/novel-cover-generator.js"
       ]
     },
@@ -906,23 +908,22 @@
         "id": "novelcover",
         "icon": "fa-solid fa-book-atlas",
         "name": "Nexora Novel Cover Generator",
-        "description": "Buat artwork cover novel AI lalu susun judul dan author di Nexora Composer",
-        "badge": "COVER AI",
+        "description": "Buat cover novel dengan allowance Puter gratis atau provider Pro, lalu susun judul dan author",
+        "badge": "FREE-FIRST COVER",
         "aliases": [
           "novel cover",
           "cover generator",
           "cover novel ai"
         ],
         "runtime": {
-          "mode": "api",
+          "mode": "module",
           "module": "novel-cover-generator",
-          "handler": "renderNovelCoverGenerator",
-          "dependency": "https://all-tools-nexora.vercel.app/api/ai/novel-cover"
+          "handler": "renderNovelCoverGenerator"
         },
         "health": {
-          "key": "novel-cover-api",
-          "type": "internal-api",
-          "path": "/api/ai/novel-cover",
+          "key": "module-novel-cover",
+          "type": "module",
+          "path": "/assets/js/features/novel-cover-generator.js",
           "method": "HEAD",
           "strict": true
         }

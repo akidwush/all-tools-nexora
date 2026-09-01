@@ -102,6 +102,8 @@
         "assets/css/features/novel-cover-generator.css"
       ],
       "js": [
+        "assets/js/features/puter-runtime.js",
+        "assets/js/features/novel-cover-puter.js",
         "assets/js/features/novel-cover-generator.js"
       ]
     },

@@ -3,6 +3,7 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
+const vm = require("node:vm");
 
 const root = path.resolve(__dirname, "..");
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
@@ -74,6 +75,10 @@ async function adapterContracts() {
     fetch: jsonFetch({ data: [{ imageURL: "https://cdn.example/runware.jpg", seed: 42 }] })
   });
   assert.equal(result.images[0].url, "https://cdn.example/runware.jpg");
+  await assert.rejects(adapters.runware.generate(input, {
+    apiKey: "x",
+    fetch: jsonFetch({ errors: [{ code: "insufficientFunds", message: "credit balance is empty", status: 402 }] })
+  }), /credit balance is empty/i, "Runware HTTP 200 errors harus diteruskan ke diagnosis aman.");
 
   result = await adapters.stability.generate(input, {
     apiKey: "x",
@@ -101,7 +106,7 @@ async function adapterContracts() {
   });
   assert.match(result.images[0].base64, /^data:image\/png;base64,/);
 
-  assert.equal(requests.length, 4, "Empat adapter REST JSON harus membentuk request valid.");
+  assert.equal(requests.length, 5, "Lima request REST JSON termasuk error Runware harus tervalidasi.");
   assert.throws(() => normalizeResult("test", "model", { images: [] }), /tidak mengembalikan gambar/i);
 }
 
@@ -166,6 +171,54 @@ async function routerContracts() {
   assert.equal(compared.length, 4, "Compare wajib dibatasi maksimal empat provider.");
 }
 
+async function puterContracts() {
+  const calls = [];
+  const nodes = {
+    "puter-model": { value: "google/imagen-4.0-fast" },
+    "puter-name": { textContent: "" },
+    "puter-usage": { textContent: "" },
+    "puter-connect": {
+      disabled: false,
+      querySelector() { return { textContent: "" }; }
+    }
+  };
+  const puterClient = {
+    auth: {
+      isSignedIn: () => true,
+      getUser: async () => ({ username: "nexora-test" }),
+      getMonthlyUsage: async () => ({ allowanceInfo: { monthUsageAllowance: 100, remaining: 80 } })
+    },
+    ai: {
+      async txt2img(prompt, options) {
+        calls.push({ prompt, options });
+        return { src: "data:image/png;base64,dGVzdA==" };
+      }
+    }
+  };
+  const window = {
+    NexoraPuterRuntime: {
+      loadSdk: async () => puterClient,
+      safeName: (user) => user.username,
+      percentRemaining: () => "80% allowance tersisa"
+    }
+  };
+  vm.runInNewContext(read("assets/js/features/novel-cover-puter.js"), { window, FileReader: class {} });
+  const root = { querySelector(selector) { return nodes[selector.match(/data-nc="([^"]+)"/)?.[1]]; } };
+  const generated = await window.NexoraNovelCoverPuter.generate(root, {
+    ...input,
+    typographyMode: "overlay",
+    customDirection: "soft moonlight"
+  });
+  assert.equal(generated.mode, "puter");
+  assert.equal(generated.result.provider, "Puter User-Pays");
+  assert.equal(generated.result.model, "Imagen 4 Fast");
+  assert.match(generated.result.images[0].url, /^data:image\/png;base64,/);
+  assert.equal(calls.length, 1, "Mode gratis hanya membuat satu generation.");
+  assert.match(calls[0].prompt, /Professional vertical novel cover artwork/);
+  assert.match(calls[0].prompt, /Do not render words/);
+  assert.deepEqual({ ...calls[0].options.ratio }, { w: 2, h: 3 });
+}
+
 async function main() {
   assert.match(input.prompt, /Professional vertical novel cover/);
   assert.match(input.prompt, /Do not render words/);
@@ -173,6 +226,7 @@ async function main() {
   assert.throws(() => parseInput({ title: "x", description: "short" }), /minimal 20/);
   assert.equal(providerError("openai", Object.assign(new Error("organization must be verified"), { status: 400 })).code, "COVER_PROVIDER_VERIFICATION");
   assert.equal(providerError("fal", Object.assign(new Error("insufficient credit balance"), { status: 400 })).code, "COVER_BILLING_REQUIRED");
+  assert.equal(providerError("openai", Object.assign(new Error("insufficient_quota: credit_balance_exhausted"), { status: 429 })).code, "COVER_BILLING_REQUIRED");
 
   const registry = createRegistry({ IDEOGRAM_API_KEY: "x", OPENAI_API_KEY: "y" });
   assert.equal(registry.get("ideogram").enabled, true);
@@ -182,29 +236,47 @@ async function main() {
 
   await adapterContracts();
   await routerContracts();
+  await puterContracts();
 
   const config = require("../assets/config");
   const manifest = JSON.parse(read("assets/module-manifest.json"));
   const ui = read("assets/js/features/novel-cover-generator.js");
+  const puter = read("assets/js/features/novel-cover-puter.js");
   const css = read("assets/css/features/novel-cover-generator.css");
   const vercel = JSON.parse(read("vercel.json"));
   const packageJson = JSON.parse(read("package.json"));
 
   assert.equal(Object.values(config.tools).flat().length, 64);
-  assert.equal(config.tools.tools.find((tool) => tool.id === "novelcover").runtime.module, "novel-cover-generator");
+  const tool = config.tools.tools.find((entry) => entry.id === "novelcover");
+  assert.equal(tool.runtime.module, "novel-cover-generator");
+  assert.equal(tool.runtime.mode, "module", "Mode gratis tidak boleh bergantung pada health API provider Pro.");
+  assert.equal(tool.health.type, "module");
   assert.equal(manifest.tools.novelcover, "novel-cover-generator");
+  assert.deepEqual(config.modules["novel-cover-generator"].js, [
+    "assets/js/features/puter-runtime.js",
+    "assets/js/features/novel-cover-puter.js",
+    "assets/js/features/novel-cover-generator.js"
+  ]);
+  assert.deepEqual(manifest.modules["novel-cover-generator"].js, config.modules["novel-cover-generator"].js);
   assert.ok(vercel.rewrites.some((route) => route.source === "/api/ai/novel-cover"));
   assert.equal(packageJson.dependencies["@fal-ai/client"], "1.10.1");
   assert.equal(packageJson.dependencies["@huggingface/inference"], "4.13.28");
 
-  for (const text of ["renderNovelCoverGenerator", "Compare", "Nexora Composer", "toBlob", "pointermove", "Reference Character", "API key configured", "diagnostics"]) {
+  for (const text of ["renderNovelCoverGenerator", "Puter Free", "Pro Auto", "Compare", "Nexora Composer", "Upload Artwork Sendiri", "toBlob", "pointermove", "Reference Character", "API key configured", "diagnostics"]) {
     assert.ok(ui.includes(text), text);
+  }
+  for (const text of ["NexoraPuterRuntime", "puter.ai.txt2img", "Puter User-Pays", "buildPrompt", "localArtwork", "openai/gpt-image-1-mini"]) {
+    assert.ok(puter.includes(text), text);
   }
   for (const secret of ["IDEOGRAM_API_KEY", "RECRAFT_API_KEY", "FAL_KEY", "RUNWARE_API_KEY", "STABILITY_API_KEY", "OPENAI_API_KEY", "HF_TOKEN"]) {
     assert.equal(ui.includes(secret), false, `${secret} tidak boleh masuk frontend.`);
+    assert.equal(puter.includes(secret), false, `${secret} tidak boleh masuk Puter frontend.`);
   }
   assert.ok(css.includes("safe-area-inset-bottom"));
+  assert.ok(css.includes("nc-puter-account"));
+  assert.ok(css.includes("nc-local-upload"));
   assert.doesNotMatch(ui, /localStorage|sessionStorage/, "Generation dan reference tidak boleh disimpan di browser storage.");
+  assert.doesNotMatch(puter, /localStorage|sessionStorage/, "Puter generation dan artwork tidak boleh disimpan di browser storage.");
 
   for (const width of [360, 375, 390, 412]) {
     const shell = width - 32;
@@ -212,7 +284,7 @@ async function main() {
     assert.ok(card >= 145 && card * 2 + 38 <= shell, `${width}px mengalami overflow.`);
   }
 
-  console.log("Novel Cover V2 lulus: 7 adapter, Auto/fallback/Compare, prompt, secret isolation, composer, dan mobile 360/375/390/412 tervalidasi.");
+  console.log("Novel Cover V3 lulus: Puter free-first, 7 provider Pro, local artwork, prompt, composer, dan mobile 360/375/390/412 tervalidasi.");
 }
 
 main().catch((error) => {

@@ -39,7 +39,7 @@
   var ASSET_PATCHES = [
     [/(?:assets\/(?:vendor\/nexora|js\/features\/nexora)\/|nexora-generators\.css(?:$|\?))/, 'nexora'],
     [/prompt-generator\.(?:js|css)(?:$|\?)/, 'prompt-android-branding1'],
-    [/novel-cover-generator\.(?:js|css)(?:$|\?)/, 'novel-cover-v22'],
+    [/novel-cover(?:-generator|-puter)?\.(?:js|css)(?:$|\?)/, 'novel-cover-v3'],
     [/puter-image\.(?:js|css)(?:$|\?)/, 'puter-image-hf28'],
     [/(?:puter-runtime|puter-video)\.(?:js|css)(?:$|\?)/, 'puter-video-hf47'],
     [/genmail\.(?:js|css)(?:$|\?)/, 'genmail-v1'],
