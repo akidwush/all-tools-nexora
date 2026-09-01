@@ -6,6 +6,7 @@ const handlePersonalAi = require("../lib/personal-ai-http");
 const { handleDocumentAi } = require("../lib/document-ai");
 const { handlePromptGenerator } = require("../lib/prompt-generator");
 const { handleComicReader } = require("../lib/comic-reader");
+const { handleNovelCover } = require("../lib/ai-cover/http");
 const { handleTextToPdf } = require("../lib/text-to-pdf");
 const { authorizeTool } = require("../lib/account-membership");
 
@@ -28,6 +29,10 @@ module.exports = async function handler(request, response) {
     return handlePromptGenerator(request, response);
   }
   if (requestUrl.searchParams.get("mode") === "comic-reader") return handleComicReader(request, response);
+  if (requestUrl.searchParams.get("mode") === "novel-cover") {
+    if (request.method === "POST" && !(await authorizeTool(request, response, "novelcover"))) return;
+    return handleNovelCover(request, response);
+  }
   if (requestUrl.searchParams.get("mode") === "text-to-pdf") return handleTextToPdf(request, response);
   if (requestUrl.searchParams.get("mode") === "database") {
     return publicDatabaseHandler(request, response);

@@ -1700,6 +1700,7 @@ function showTool(toolId) {
         case 'trimpath': renderNexoraTrimpath(body); break;
         case 'logoanimate': renderNexoraLogoAnimate(body); break;
         case 'promptgenerate': renderPromptGenerator(body); break;
+        case 'novelcover': renderNovelCoverGenerator(body); break;
         case 'aiimage': renderPuterImage(body); break;
         case 'aivideo': renderPuterVideo(body); break;
         case 'genmail': renderGenMail(body); break;

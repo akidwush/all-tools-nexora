@@ -127,6 +127,14 @@
         "assets/js/features/prompt-generator.js"
       ]
     },
+    "novel-cover-generator": {
+      "css": [
+        "assets/css/features/novel-cover-generator.css"
+      ],
+      "js": [
+        "assets/js/features/novel-cover-generator.js"
+      ]
+    },
     "puter-image": {
       "css": [
         "assets/css/features/puter-image.css"
@@ -890,6 +898,31 @@
           "key": "prompt-generator-api",
           "type": "internal-api",
           "path": "/api/prompt-generator",
+          "method": "HEAD",
+          "strict": true
+        }
+      },
+      {
+        "id": "novelcover",
+        "icon": "fa-solid fa-book-atlas",
+        "name": "Nexora Novel Cover Generator",
+        "description": "Buat artwork cover novel AI lalu susun judul dan author di Nexora Composer",
+        "badge": "COVER AI",
+        "aliases": [
+          "novel cover",
+          "cover generator",
+          "cover novel ai"
+        ],
+        "runtime": {
+          "mode": "api",
+          "module": "novel-cover-generator",
+          "handler": "renderNovelCoverGenerator",
+          "dependency": "https://all-tools-nexora.vercel.app/api/ai/novel-cover"
+        },
+        "health": {
+          "key": "novel-cover-api",
+          "type": "internal-api",
+          "path": "/api/ai/novel-cover",
           "method": "HEAD",
           "strict": true
         }

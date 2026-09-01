@@ -1,6 +1,6 @@
 # All Tools Nexora
 
-All Tools Nexora v6.4.0 adalah website toolkit statis dengan 62 tool, lazy-loaded feature modules, dashboard admin, Supabase opsional untuk fitur lama, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency `@google/genai`.
+All Tools Nexora v6.4.0 adalah website toolkit statis dengan 64 tool, lazy-loaded feature modules, dashboard admin, Supabase opsional untuk fitur lama, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency server-side sesuai provider.
 
 Konfigurasi branding, katalog tool, modul lazy-load, dan target health check sekarang dipusatkan di `assets/config.js`. Panduan edit manual tersedia di [docs/MAINTENANCE.md](docs/MAINTENANCE.md).
 
@@ -229,6 +229,14 @@ Migration `database/migrations/030_danbooru_search.sql` menambahkan Danbooru Sea
 Migration `database/migrations/023_document_ai_vvip.sql` tetap mempertahankan kuota Document AI, tetapi v6.4.0 mengubah akses katalognya menjadi FREE. Jalankan ulang migration ini satu kali pada database lama agar Dashboard Admin menampilkan status yang sama dengan frontend.
 
 Migration `database/migrations/016_hero_video_settings.sql` mengaktifkan pengaturan video header. Setelah migration dijalankan, buka **Dashboard Admin → Ringkasan Sistem → Video Header**, isi URL MP4/WebM HTTPS langsung, lalu simpan. Pengaturan tersimpan di `app_settings.site.heroVideo` dan dibaca halaman publik tanpa mengekspos service-role key.
+
+## Nexora Novel Cover Generator
+
+Tool `#tool-novelcover` membuat artwork cover novel melalui satu router server-side. Mode Auto memakai satu provider yang tersedia dan hanya melakukan fallback terbatas untuk timeout, rate limit, atau gangguan provider. Compare Mode harus dipilih secara manual dan dibatasi 2–4 provider.
+
+Provider yang didukung: Ideogram, Recraft, fal.ai, Runware, Stability AI, OpenAI GPT Image, dan Hugging Face Inference Providers. Provider tanpa environment key otomatis dinonaktifkan. Reference image tidak disimpan oleh Nexora dan hanya diteruskan kepada provider yang dipilih.
+
+Default generation adalah Artwork Only. Title dan author ditambahkan secara lokal melalui Nexora Composer, lalu dapat diekspor sebagai PNG atau JPEG.
 
 ## Pemeriksaan dan build
 

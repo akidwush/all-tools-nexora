@@ -97,6 +97,14 @@
         "assets/js/features/prompt-generator.js"
       ]
     },
+    "novel-cover-generator": {
+      "css": [
+        "assets/css/features/novel-cover-generator.css"
+      ],
+      "js": [
+        "assets/js/features/novel-cover-generator.js"
+      ]
+    },
     "puter-image": {
       "css": [
         "assets/css/features/puter-image.css"
@@ -349,6 +357,7 @@
     "animetoreal": "anime-to-real",
     "aisong": "ai-song",
     "promptgenerate": "prompt-generator",
+    "novelcover": "novel-cover-generator",
     "fakeovo": "imported-tools",
     "quotegenerator": "imported-tools",
     "carifakta": "imported-tools",

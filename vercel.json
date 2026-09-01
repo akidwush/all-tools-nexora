@@ -103,6 +103,10 @@
       "destination": "/api/health?mode=comic-reader"
     },
     {
+      "source": "/api/ai/novel-cover",
+      "destination": "/api/health?mode=novel-cover"
+    },
+    {
       "source": "/api/admin/ai",
       "destination": "/api/admin/dashboard?mode=personal-ai"
     },
