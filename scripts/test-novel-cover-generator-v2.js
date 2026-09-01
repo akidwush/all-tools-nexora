@@ -173,6 +173,7 @@ async function routerContracts() {
 
 async function puterContracts() {
   const calls = [];
+  let chatCalls = 0;
   const nodes = {
     "puter-model": { value: "google/imagen-4.0-fast" },
     "director-state": { textContent: "" },
@@ -191,12 +192,8 @@ async function puterContracts() {
     },
     ai: {
       async chat() {
-        return { message: { content: JSON.stringify({
-          visualStyle: "Elegant Fantasy", mood: "Dreamlike", composition: "Character + Environment",
-          titleZone: "top", alignment: "center", fontMood: "editorial-serif", subjectPlacement: "lower-right",
-          palette: ["#f6ead3", "#d7b36a", "#34234f"], lighting: "soft library window light",
-          motif: "one emerald book clasp", artDirection: "Elegant fantasy library cover with calm publishing hierarchy"
-        }) } };
+        chatCalls += 1;
+        throw new Error("Director tidak boleh membuat request chat terpisah.");
       },
       async txt2img(prompt, options) {
         calls.push({ prompt, options });
@@ -212,7 +209,11 @@ async function puterContracts() {
     }
   };
   vm.runInNewContext(read("assets/js/features/novel-cover-director.js"), { window });
-  vm.runInNewContext(read("assets/js/features/novel-cover-puter.js"), { window, FileReader: class {} });
+  vm.runInNewContext(read("assets/js/features/novel-cover-puter.js"), {
+    window,
+    FileReader: class {},
+    setTimeout(callback) { callback(); return 1; }
+  });
   const root = { querySelector(selector) { return nodes[selector.match(/data-nc="([^"]+)"/)?.[1]]; } };
   const generated = await window.NexoraNovelCoverPuter.generate(root, {
     ...input,
@@ -222,13 +223,31 @@ async function puterContracts() {
   assert.equal(generated.mode, "puter");
   assert.equal(generated.result.provider, "Puter User-Pays");
   assert.equal(generated.result.model, "Imagen 4 Fast");
-  assert.equal(generated.result.director.source, "ai-director");
+  assert.equal(generated.result.director.source, "genre-director");
   assert.match(generated.result.images[0].url, /^data:image\/png;base64,/);
-  assert.equal(calls.length, 1, "Mode gratis hanya membuat satu generation.");
+  assert.equal(chatCalls, 0, "Cover Director tidak boleh memakai request Puter chat terpisah.");
+  assert.equal(calls.length, 1, "Mode gratis normal hanya membuat satu request AI.");
   assert.match(calls[0].prompt, /FINISHED PROFESSIONAL NOVEL COVER ARTWORK/);
   assert.match(calls[0].prompt, /quiet negative space/);
   assert.match(calls[0].prompt, /No title, no author|No title|no words/i);
   assert.deepEqual({ ...calls[0].options.ratio }, { w: 2, h: 3 });
+
+  calls.length = 0;
+  let queueAttempts = 0;
+  puterClient.ai.txt2img = async (prompt, options) => {
+    calls.push({ prompt, options });
+    queueAttempts += 1;
+    if (queueAttempts === 1) {
+      const error = new Error("another request is already processing");
+      error.status = 429;
+      throw error;
+    }
+    return { src: "data:image/png;base64,cmV0cnk=" };
+  };
+  const recovered = await window.NexoraNovelCoverPuter.generate(root, { ...input, typographyMode: "overlay" });
+  assert.equal(recovered.ok, true);
+  assert.equal(calls.length, 2, "Antrean Puter hanya boleh dicoba ulang satu kali.");
+  assert.match(nodes["director-state"].textContent, /mencoba ulang sekali/i);
 }
 
 async function directorContracts() {
@@ -248,11 +267,10 @@ async function directorContracts() {
   assert.match(artworkPrompt, /bookstore thumbnail/i);
   assert.ok(director.titleScale("A Very Long Novel Title That Must Fit") < director.titleScale("Nexora"));
 
-  const aiPlan = await director.direct({ ai: { chat: async () => ({ message: { content: '{"visualStyle":"Light Novel","mood":"Elegant","composition":"Bust Portrait","titleZone":"top","alignment":"center","fontMood":"modern-serif","subjectPlacement":"lower-right","palette":["#f8ead8","#aa6688","#22192d"],"lighting":"window light","motif":"book clasp","artDirection":"polished commercial cover"}' } }) } }, input);
-  assert.equal(aiPlan.source, "ai-director");
-  assert.equal(aiPlan.fontMood, "modern-serif");
-  const fallback = await director.direct({ ai: { chat: async () => ({ message: { content: "not json" } }) } }, input);
-  assert.equal(fallback.source, "genre-director-fallback");
+  let chatCalls = 0;
+  const directed = await director.direct({ ai: { chat: async () => { chatCalls += 1; } } }, input);
+  assert.equal(directed.source, "genre-director");
+  assert.equal(chatCalls, 0, "Director harus menyusun brief lokal agar artwork memakai satu request Puter saja.");
 }
 
 async function main() {
@@ -303,11 +321,12 @@ async function main() {
   for (const text of ["renderNovelCoverGenerator", "Puter Free", "Pro Auto", "Compare", "AI COVER DIRECTOR", "Pakai Artwork Sendiri", "Buat Cover Profesional", "Edit Lanjutan", "toBlob", "pointermove", "Reference Character", "API key configured", "diagnostics"]) {
     assert.ok(ui.includes(text), text);
   }
-  for (const text of ["NexoraPuterRuntime", "puter.ai.txt2img", "Puter User-Pays", "buildPrompt", "localArtwork", "openai/gpt-image-1-mini", "director().direct"]) {
+  for (const text of ["NexoraPuterRuntime", "puter.ai.txt2img", "Puter User-Pays", "buildPrompt", "localArtwork", "openai/gpt-image-1-mini", "director().createLocalPlan", "generateImage"]) {
     assert.ok(puter.includes(text), text);
   }
   const directorUi = read("assets/js/features/novel-cover-director.js");
-  for (const text of ["puter.ai.chat", "gpt-5-nano", "createLocalPlan", "buildArtworkPrompt", "providerDirection", "zoneMetrics", "titleScale"]) assert.ok(directorUi.includes(text), text);
+  for (const text of ["createLocalPlan", "buildArtworkPrompt", "providerDirection", "zoneMetrics", "titleScale", "single-concurrency lock"]) assert.ok(directorUi.includes(text), text);
+  assert.doesNotMatch(directorUi, /puter\.ai\.chat|gpt-5-nano/, "Director tidak boleh menghabiskan request chat sebelum image generation.");
   for (const secret of ["IDEOGRAM_API_KEY", "RECRAFT_API_KEY", "FAL_KEY", "RUNWARE_API_KEY", "STABILITY_API_KEY", "OPENAI_API_KEY", "HF_TOKEN"]) {
     assert.equal(ui.includes(secret), false, `${secret} tidak boleh masuk frontend.`);
     assert.equal(puter.includes(secret), false, `${secret} tidak boleh masuk Puter frontend.`);
@@ -329,7 +348,7 @@ async function main() {
     assert.ok(card >= 145 && card * 2 + 38 <= shell, `${width}px mengalami overflow.`);
   }
 
-  console.log("Novel Cover V4 lulus: AI Cover Director, genre direction, one-click typography, Puter fallback, 7 provider Pro, dan mobile 360/375/390/412 tervalidasi.");
+  console.log("Novel Cover V4.2 lulus: single-request AI Cover Director, queue retry terkontrol, one-click typography, 7 provider Pro, dan mobile 360/375/390/412 tervalidasi.");
 }
 
 main().catch((error) => {

@@ -82,6 +82,27 @@
     return /model not found|model.*unavailable|unsupported model|no provider|non-serverless|extract image url/.test(raw);
   }
 
+  function isQueueError(error) {
+    var info = details(error);
+    var raw = (info.code + " " + info.status + " " + info.message).toLowerCase();
+    return info.status === 429 || /concurren|already.*processing|request.*progress|too many requests/.test(raw);
+  }
+
+  function wait(milliseconds) {
+    return new Promise(function (resolve) { setTimeout(resolve, milliseconds); });
+  }
+
+  async function generateImage(puter, prompt, options, onQueue) {
+    try {
+      return await puter.ai.txt2img(prompt, options);
+    } catch (error) {
+      if (!isQueueError(error)) throw error;
+      if (typeof onQueue === "function") onQueue();
+      await wait(3000);
+      return puter.ai.txt2img(prompt, options);
+    }
+  }
+
   function generationOptions(model, ratio) {
     var options = { model: model };
     if (model === "openai/gpt-image-1-mini") {
@@ -167,16 +188,20 @@
     if (!MODELS[selected]) selected = DEFAULT_MODEL;
     var model = selected;
     var generated;
-    var plan = await director().direct(puter, input);
+    var plan = director().createLocalPlan(input);
     input.director = plan;
     var directorState = field(root, "director-state");
-    if (directorState) directorState.textContent = plan.source === "ai-director" ? "Creative brief AI siap · membuat artwork…" : "Creative brief genre siap · membuat artwork…";
+    if (directorState) directorState.textContent = "Creative brief cover siap · membuat 1 artwork…";
+    var prompt = buildPrompt(input);
+    var queued = function () {
+      if (directorState) directorState.textContent = "Antrean Puter sibuk · mencoba ulang sekali…";
+    };
     try {
-      generated = await puter.ai.txt2img(buildPrompt(input), generationOptions(model, input.aspectRatio));
+      generated = await generateImage(puter, prompt, generationOptions(model, input.aspectRatio), queued);
     } catch (firstError) {
       if (!canFallback(firstError)) throw new Error(errorMessage(firstError));
       model = selected === DEFAULT_MODEL ? FALLBACK_MODEL : DEFAULT_MODEL;
-      generated = await puter.ai.txt2img(buildPrompt(input), generationOptions(model, input.aspectRatio));
+      generated = await generateImage(puter, prompt, generationOptions(model, input.aspectRatio), queued);
     }
     var source = imageSource(generated);
     if (!/^(data:image\/|blob:|https:\/\/)/i.test(source)) throw new Error("Puter mengembalikan format gambar yang tidak dikenali.");
@@ -223,7 +248,7 @@
     field(root, "puter-account").hidden = !free;
     field(root, "puter-model-field").hidden = !free;
     field(root, "cost").innerHTML = free
-      ? "Mode gratis: <b>AI Cover Director + 1 artwork</b> memakai allowance akun Puter. Jika Director tidak tersedia, arahan genre lokal mengambil alih."
+      ? "Mode gratis: <b>1 request artwork</b>. AI Cover Director memasukkan arahan genre, hierarchy, palette, dan ruang judul langsung ke prompt gambar."
       : "Mode Pro: <b>1 provider × 1 image</b>. Auto mencoba maksimal 3 provider dengan API credit server.";
     field(root, "generate").querySelector("span").textContent = free ? "Buat Cover Profesional" : "Buat Cover Pro";
   }

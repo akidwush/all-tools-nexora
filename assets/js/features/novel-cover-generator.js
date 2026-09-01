@@ -53,7 +53,7 @@
       '<label class="wide">Arahan Tambahan<textarea data-nc="direction" maxlength="800" rows="2" placeholder="Hanya jika ada detail yang benar-benar wajib…"></textarea></label>' +
       '</div></details>' +
       '<section class="nc-puter-account" data-nc="puter-account"><i class="fa-solid fa-cloud"></i><div><b data-nc="puter-name">Menyiapkan Puter…</b><small data-nc="puter-usage">Login tidak dilakukan otomatis.</small></div><button type="button" data-nc="puter-connect"><i class="fa-solid fa-right-to-bracket"></i><span>Hubungkan Puter</span></button></section>' +
-      '<div class="nc-cost" data-nc="cost">Mode gratis: <b>AI Cover Director + 1 artwork</b> memakai allowance akun Puter.</div>' +
+      '<div class="nc-cost" data-nc="cost">Mode gratis: <b>1 request artwork</b>. AI Cover Director mengatur cover langsung di prompt gambar.</div>' +
       '<label class="nc-local-upload"><input data-nc="artwork" type="file" accept="image/png,image/jpeg,image/webp"><i class="fa-solid fa-upload"></i><span><b>Pakai Artwork Sendiri</b><small data-nc="artwork-name">Director tetap memasang typography otomatis</small></span></label>' +
       '<button class="nc-generate" data-nc="generate"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Buat Cover Profesional</span></button><p class="nc-status" data-nc="status" hidden></p></form>' +
       '<aside class="nc-output"><div class="nc-empty" data-nc="empty"><i class="fa-regular fa-image"></i><h3>Cover Siap Terbit</h3><p>Artwork, hierarchy, dan typography final akan muncul di sini.</p></div>' +

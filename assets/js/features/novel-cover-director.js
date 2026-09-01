@@ -1,14 +1,6 @@
 (function () {
   "use strict";
 
-  var CHAT_MODEL = "gpt-5-nano";
-  var ZONES = ["top", "center", "bottom"];
-  var ALIGNS = ["left", "center", "right"];
-  var FONT_MOODS = ["editorial-serif", "modern-serif", "clean-sans", "display-sans"];
-  var STYLES = ["Anime Painterly", "Light Novel", "Manhwa", "Semi Realistic", "Realistic", "Dark Fantasy", "Elegant Fantasy", "Cinematic", "Soft Illustration", "Graphic Cover"];
-  var MOODS = ["Soft", "Elegant", "Romantic", "Dark", "Mysterious", "Epic", "Melancholic", "Warm", "Cold", "Dreamlike"];
-  var COMPOSITIONS = ["Close-up Portrait", "Bust Portrait", "Full Body", "Character + Environment", "Duo Character", "Silhouette", "Minimal Character", "Scenic Cover"];
-
   var PROFILES = Object.freeze({
     Fantasy: profile("Elegant Fantasy", "Dreamlike", "Character + Environment", "top", "center", "editorial-serif", "lower-center", ["#f6ead3", "#d7b36a", "#34234f"], "luminous magical atmosphere", "one refined magical motif"),
     Romance: profile("Soft Illustration", "Romantic", "Bust Portrait", "top", "center", "modern-serif", "lower-center", ["#fff4ed", "#d98f9f", "#503044"], "soft window light and intimate warmth", "subtle flowers or fabric movement"),
@@ -32,10 +24,6 @@
     return String(value || "").replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim().slice(0, limit || 1000);
   }
 
-  function pick(value, values, fallback) {
-    return values.indexOf(value) === -1 ? fallback : value;
-  }
-
   function hex(value, fallback) {
     return /^#[0-9a-f]{6}$/i.test(String(value || "")) ? String(value).toLowerCase() : fallback;
   }
@@ -52,75 +40,11 @@
     return plan;
   }
 
-  function directorPrompt(input, fallback) {
-    return [
-      "You are Nexora Cover Director, a specialist in commercial novel-cover art direction.",
-      "Analyze this novel and return one strict JSON object only. Do not use markdown and do not name living artists.",
-      "Title: " + clean(input.title, 160),
-      "Genre: " + clean(input.genre, 60),
-      "Story: " + clean(input.description, 3000),
-      input.character ? "Main character: " + clean(input.character, 1200) : "",
-      "The final title is overlaid separately, so artwork must contain no words and must reserve a quiet title zone.",
-      "Use these exact keys: visualStyle, mood, composition, titleZone, alignment, fontMood, subjectPlacement, palette, lighting, motif, artDirection.",
-      "Allowed titleZone: top, center, bottom. Allowed alignment: left, center, right.",
-      "Allowed fontMood: editorial-serif, modern-serif, clean-sans, display-sans.",
-      "Allowed visualStyle: " + STYLES.join(", ") + ".",
-      "Allowed mood: " + MOODS.join(", ") + ".",
-      "Allowed composition: " + COMPOSITIONS.join(", ") + ".",
-      "palette must contain exactly three #RRGGBB colors. Keep lighting, motif and artDirection under 140 characters each.",
-      "Genre-safe fallback direction: " + JSON.stringify(fallback)
-    ].filter(Boolean).join("\n");
-  }
-
-  function responseText(response) {
-    if (typeof response === "string") return response;
-    var content = response && response.message && response.message.content;
-    if (typeof content === "string") return content;
-    if (Array.isArray(content)) return content.map(function (item) { return typeof item === "string" ? item : item && (item.text || item.content) || ""; }).join("");
-    if (response && typeof response.text === "string") return response.text;
-    if (response && typeof response.content === "string") return response.content;
-    return "";
-  }
-
-  function parseJson(text) {
-    var value = clean(text, 6000).replace(/^```(?:json)?/i, "").replace(/```$/i, "").trim();
-    var start = value.indexOf("{");
-    var end = value.lastIndexOf("}");
-    if (start === -1 || end <= start) throw new Error("DIRECTOR_INVALID_RESPONSE");
-    return JSON.parse(value.slice(start, end + 1));
-  }
-
-  function normalize(raw, fallback) {
-    raw = raw && typeof raw === "object" ? raw : {};
-    var palette = Array.isArray(raw.palette) ? raw.palette.slice(0, 3) : [];
-    while (palette.length < 3) palette.push(fallback.palette[palette.length]);
-    return {
-      visualStyle: pick(raw.visualStyle, STYLES, fallback.visualStyle),
-      mood: pick(raw.mood, MOODS, fallback.mood),
-      composition: pick(raw.composition, COMPOSITIONS, fallback.composition),
-      titleZone: pick(raw.titleZone, ZONES, fallback.titleZone),
-      alignment: pick(raw.alignment, ALIGNS, fallback.alignment),
-      fontMood: pick(raw.fontMood, FONT_MOODS, fallback.fontMood),
-      subjectPlacement: clean(raw.subjectPlacement, 80) || fallback.subjectPlacement,
-      palette: [hex(palette[0], fallback.palette[0]), hex(palette[1], fallback.palette[1]), hex(palette[2], fallback.palette[2])],
-      lighting: clean(raw.lighting, 140) || fallback.lighting,
-      motif: clean(raw.motif, 140) || fallback.motif,
-      artDirection: clean(raw.artDirection, 220) || fallback.artDirection,
-      source: "ai-director",
-      directorModel: CHAT_MODEL
-    };
-  }
-
-  async function direct(puter, input) {
-    var fallback = createLocalPlan(input);
-    if (!puter || !puter.ai || typeof puter.ai.chat !== "function") return fallback;
-    try {
-      var answer = await puter.ai.chat(directorPrompt(input, fallback), { model: CHAT_MODEL, temperature: 0.2, max_tokens: 700 });
-      return normalize(parseJson(responseText(answer)), fallback);
-    } catch (_) {
-      fallback.source = "genre-director-fallback";
-      return fallback;
-    }
+  async function direct(_puter, input) {
+    // The artwork model receives the complete cover brief directly. Keeping the
+    // plan local guarantees one Puter AI request per click and avoids the
+    // provider's single-concurrency lock between chat and image generation.
+    return createLocalPlan(input);
   }
 
   function buildArtworkPrompt(input, plan) {
@@ -211,14 +135,11 @@
   }
 
   window.NexoraNovelCoverDirector = Object.freeze({
-    chatModel: CHAT_MODEL,
     createLocalPlan: createLocalPlan,
     direct: direct,
     buildArtworkPrompt: buildArtworkPrompt,
     providerDirection: providerDirection,
     typography: typography,
-    titleScale: titleScale,
-    normalize: normalize,
-    responseText: responseText
+    titleScale: titleScale
   });
 })();
