@@ -50,6 +50,7 @@ async function adapterContracts() {
     fetch: jsonFetch({ data: [{ url: "https://cdn.example/recraft.jpg" }] })
   });
   assert.equal(result.images[0].width, 1024);
+  assert.equal(JSON.parse(requests.at(-1).options.body).size, "2:3", "Recraft V4.1 harus memakai rasio yang didukung, bukan custom pixel Pro.");
 
   result = await adapters.fal.generate(input, {
     apiKey: "x",
@@ -122,6 +123,25 @@ async function routerContracts() {
   _health.clear();
   calls.length = 0;
   registry = new Map([
+    ["recraft", provider("recraft", async () => { calls.push("recraft"); const error = new Error("Provider HTTP 400: unsupported size"); error.status = 400; throw error; })],
+    ["fal", provider("fal", async () => { calls.push("fal"); return { images: [{ url: "https://cdn.example/request-fallback.jpg" }] }; })]
+  ]);
+  generated = await generateAuto(input, { registry });
+  assert.equal(generated.result.provider, "fal");
+  assert.deepEqual(calls, ["recraft", "fal"], "HTTP 400 konfigurasi provider harus fallback di Auto Mode.");
+
+  _health.clear();
+  calls.length = 0;
+  registry = new Map([
+    ["recraft", provider("recraft", async () => { calls.push("recraft"); const error = new Error("content policy safety rejection"); error.status = 400; throw error; })],
+    ["fal", provider("fal", async () => { calls.push("fal"); return { images: [{ url: "https://cdn.example/should-not-run-safety.jpg" }] }; })]
+  ]);
+  await assert.rejects(generateAuto(input, { registry }), (error) => error.code === "COVER_SAFETY_REJECTED");
+  assert.deepEqual(calls, ["recraft"], "Safety rejection tidak boleh dikirim ke provider lain.");
+
+  _health.clear();
+  calls.length = 0;
+  registry = new Map([
     ["recraft", provider("recraft", async () => { calls.push("recraft"); const error = new Error("invalid prompt"); error.status = 400; throw error; })],
     ["fal", provider("fal", async () => { calls.push("fal"); return { images: [{ url: "https://cdn.example/should-not-run.jpg" }] }; })]
   ]);
@@ -150,6 +170,7 @@ async function main() {
   assert.equal(registry.get("ideogram").enabled, true);
   assert.equal(registry.get("recraft").enabled, false);
   assert.equal(registry.size, 7);
+  assert.equal(require("../lib/ai-cover/provider-models").huggingface.model, "black-forest-labs/FLUX.1-schnell");
 
   await adapterContracts();
   await routerContracts();
