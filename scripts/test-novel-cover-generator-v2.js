@@ -9,6 +9,7 @@ const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 const { parseInput } = require("../lib/ai-cover/http");
 const { createRegistry } = require("../lib/ai-cover/registry");
 const { normalizeResult } = require("../lib/ai-cover/normalizer");
+const { providerError } = require("../lib/ai-cover/errors");
 const { generateAuto, generateComparison, _health } = require("../lib/ai-cover/router");
 const adapters = require("../lib/ai-cover/registry").adapters;
 
@@ -44,6 +45,10 @@ async function adapterContracts() {
     fetch: jsonFetch({ data: [{ url: "https://cdn.example/ideogram.jpg", width: 1024, height: 1536 }] })
   });
   assert.equal(result.images[0].url, "https://cdn.example/ideogram.jpg");
+  assert.equal(requests[0].options.body.get("text_prompt"), input.prompt);
+  assert.equal(requests[0].options.body.get("resolution"), "832x1248");
+  assert.equal(requests[0].options.body.has("prompt"), false, "Ideogram V4 tidak boleh menerima field prompt lama.");
+  assert.equal(requests[0].options.body.has("aspect_ratio"), false, "Ideogram V4 memakai resolution, bukan aspect_ratio.");
 
   result = await adapters.recraft.generate(input, {
     apiKey: "x",
@@ -110,6 +115,7 @@ async function routerContracts() {
   let generated = await generateAuto(input, { registry });
   assert.equal(generated.result.provider, "fal");
   assert.deepEqual(calls, ["recraft", "fal"]);
+  assert.equal(generated.diagnostics[0].code, "COVER_TIMEOUT");
 
   _health.clear();
   calls.length = 0;
@@ -165,6 +171,8 @@ async function main() {
   assert.match(input.prompt, /Do not render words/);
   assert.match(input.negativePrompt, /watermark/);
   assert.throws(() => parseInput({ title: "x", description: "short" }), /minimal 20/);
+  assert.equal(providerError("openai", Object.assign(new Error("organization must be verified"), { status: 400 })).code, "COVER_PROVIDER_VERIFICATION");
+  assert.equal(providerError("fal", Object.assign(new Error("insufficient credit balance"), { status: 400 })).code, "COVER_BILLING_REQUIRED");
 
   const registry = createRegistry({ IDEOGRAM_API_KEY: "x", OPENAI_API_KEY: "y" });
   assert.equal(registry.get("ideogram").enabled, true);
@@ -189,7 +197,7 @@ async function main() {
   assert.equal(packageJson.dependencies["@fal-ai/client"], "1.10.1");
   assert.equal(packageJson.dependencies["@huggingface/inference"], "4.13.28");
 
-  for (const text of ["renderNovelCoverGenerator", "Compare", "Nexora Composer", "toBlob", "pointermove", "Reference Character"]) {
+  for (const text of ["renderNovelCoverGenerator", "Compare", "Nexora Composer", "toBlob", "pointermove", "Reference Character", "API key configured", "diagnostics"]) {
     assert.ok(ui.includes(text), text);
   }
   for (const secret of ["IDEOGRAM_API_KEY", "RECRAFT_API_KEY", "FAL_KEY", "RUNWARE_API_KEY", "STABILITY_API_KEY", "OPENAI_API_KEY", "HF_TOKEN"]) {
