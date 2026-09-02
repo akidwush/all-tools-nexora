@@ -78,7 +78,7 @@
     body.innerHTML=
       '<div class="nx-comic-embed">'+
         '<div class="nx-comic-loading" id="nxComicLoading">Loading Comic Core</div>'+
-        '<iframe class="nx-comic-frame" id="nxComicFrame" title="All Tools Nexora Baca Komik Full" sandbox="allow-scripts allow-forms allow-popups allow-modals allow-downloads" allow="clipboard-write" referrerpolicy="no-referrer" loading="eager"></iframe>'+
+        '<iframe class="nx-comic-frame" id="nxComicFrame" title="All Tools Nexora Baca Komik Full" sandbox="allow-scripts allow-forms allow-popups allow-modals allow-downloads allow-same-origin" allow="clipboard-write" referrerpolicy="no-referrer" loading="eager"></iframe>'+
       '</div>';
 
     var frame=document.getElementById('nxComicFrame');
