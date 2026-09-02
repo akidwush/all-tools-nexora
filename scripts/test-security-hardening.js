@@ -26,13 +26,17 @@ for (const removed of ["nexora-ai.js", "pix-vault.js"]) {
   assert.equal(fs.existsSync(path.join(root, "assets/js/features", removed)), false, `${removed} masih tersimpan`);
 }
 for (const relative of [
-  "assets/js/features/imported-tools.js", "assets/js/features/comic-reader.js",
+  "assets/js/features/imported-tools.js",
   "assets/js/features/tiktok-quote.js", "assets/js/features/virus-scan.js"
 ]) {
   const source = read(relative);
   assert.match(source, /<iframe[^>]+sandbox=/i);
   assert.doesNotMatch(source, /allow-same-origin/i);
 }
+const comicShell = read("assets/js/features/comic-reader.js");
+assert.match(comicShell, /\/assets\/comic-reader\/index\.html\?v=standalone-v1/);
+assert.doesNotMatch(comicShell, /COMIC_READER_APP_B64|srcdoc|allow-same-origin|nxComicApiBridgeHandler|nx-comic-api-request/);
+assert.match(read("assets/comic-reader/app.js"), /const SOURCE_API = '\/api\/comics'/);
 
 const siteGrabber = read("lib/sitegrabber-proxy.js");
 for (const token of ["redirect: \"manual\"", "headers.delete(\"authorization\")", "MAX_ARCHIVE_BYTES = 4_000_000"]) {

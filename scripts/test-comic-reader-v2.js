@@ -102,11 +102,15 @@ async function call(query) {
   assert.equal(invalid.payload.error, "COMIC_ID_INVALID");
 
   const client = fs.readFileSync(path.join(root, "assets/js/features/comic-reader.js"), "utf8");
-  assert.match(client, /const SOURCE_API = '\/api\/comics'/);
-  assert.match(client, /sandbox="allow-scripts allow-forms/);
-  assert.doesNotMatch(client, /allow-same-origin/);
-  assert.match(client, /MangaDex<\/a>/);
-  assert.match(client, /quality:state\.readerQuality/);
+  const comicHtml = fs.readFileSync(path.join(root, "assets/comic-reader/index.html"), "utf8");
+  const comicApp = fs.readFileSync(path.join(root, "assets/comic-reader/app.js"), "utf8");
+  assert.match(client, /\/assets\/comic-reader\/index\.html\?v=standalone-v1/);
+  assert.match(client, /frame\.src=COMIC_APP_URL/);
+  assert.doesNotMatch(client, /COMIC_READER_APP_B64|srcdoc|nxComicApiBridgeHandler|nx-comic-api-request/);
+  assert.match(comicApp, /const SOURCE_API = '\/api\/comics'/);
+  assert.match(comicHtml, /MangaDex<\/a>/);
+  assert.match(comicApp, /quality:state\.readerQuality/);
+  assert.doesNotMatch(comicApp, /nxComicBridgeFetch|NX_COMIC_BRIDGE_PENDING/);
   assert.match(fs.readFileSync(path.join(root, "assets/js/core/lazy-loader.js"), "utf8"), /'comic-reader'/);
 
   const vercel = JSON.parse(fs.readFileSync(path.join(root, "vercel.json"), "utf8"));

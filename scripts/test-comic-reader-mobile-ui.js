@@ -3,77 +3,47 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
-const vm = require("node:vm");
 
 const root = path.resolve(__dirname, "..");
-const clientPath = path.join(root, "assets/js/features/comic-reader.js");
-const mobileCssPath = path.join(root, "assets/css/features/comic-reader-mobile.css");
-const shellCssPath = path.join(root, "assets/css/features/comic-reader.css");
+const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
 
-const client = fs.readFileSync(clientPath, "utf8");
-const mobileCss = fs.readFileSync(mobileCssPath, "utf8");
-const shellCss = fs.readFileSync(shellCssPath, "utf8");
+const shell = read("assets/js/features/comic-reader.js");
+const html = read("assets/comic-reader/index.html");
+const css = read("assets/comic-reader/app.css");
+const app = read("assets/comic-reader/app.js");
+const shellCss = read("assets/css/features/comic-reader.css");
 
-let renderedHtml = "";
-const frame = {
-  contentWindow: {},
-  addEventListener() {},
-  set srcdoc(value) { renderedHtml = String(value); },
-  get srcdoc() { return renderedHtml; }
-};
-const body = { innerHTML: "" };
-const classList = { add() {}, remove() {}, contains() { return false; } };
+assert.match(shell, /COMIC_APP_URL\s*=\s*['"]\/assets\/comic-reader\/index\.html\?v=standalone-v1['"]/);
+assert.match(shell, /frame\.src=COMIC_APP_URL/);
+assert.doesNotMatch(shell, /COMIC_READER_APP_B64|srcdoc|nxComicApiBridgeHandler|nx-comic-api-request/);
+assert.match(html, /data-nexora-comic-ui="standalone-v1"/);
+assert.match(html, /\/assets\/comic-reader\/app\.css\?v=standalone-v1/);
+assert.match(html, /\/assets\/comic-reader\/app\.js\?v=standalone-v1/);
+assert.doesNotMatch(html, /<style\b|<script(?!\s+src=)/i);
 
-const documentMock = {
-  body: { classList, style: {} },
-  addEventListener() {},
-  getElementById(id) {
-    if (id === "nxComicFrame") return frame;
-    return null;
-  }
-};
-const windowMock = { addEventListener() {} };
+assert.match(html, /id="mangaTabs" class="tabs" data-label="Sort"/);
+assert.match(html, /id="mangaCategoryTabs" class="tabs" data-label="Type"/);
+assert.match(html, /id="mangaStatusTabs" class="tabs" data-label="Status"/);
+assert.match(html, /type="search"[^>]+enterkeyhint="search"/);
+assert.match(html, /manga-attribution/);
+assert.match(app, /function mangaResetFilters\(\)/);
+assert.match(app, /Coba kata kunci atau filter lain\./);
+assert.match(app, /Tidak dapat memuat daftar komik\./);
+assert.match(app, /loading="lazy" decoding="async" alt="cover"/);
+assert.match(app, /decoding="async" alt="Halaman \$\{pageIndex\+1\}"/);
+assert.match(app, /const SOURCE_API = '\/api\/comics'/);
+assert.doesNotMatch(app, /NX_COMIC_BRIDGE_PENDING|nxComicBridgeFetch|nx-comic-api-request/);
+assert.match(app, /const json=await fetchJson\(url,timeout\)/);
 
-vm.runInNewContext(client, {
-  atob(value) { return Buffer.from(value, "base64").toString("binary"); },
-  console,
-  decodeURIComponent,
-  document: documentMock,
-  history: { state: null },
-  location: { hash: "", href: "http://localhost/", hostname: "localhost" },
-  TextDecoder,
-  Uint8Array,
-  URL,
-  window: windowMock
-}, { filename: clientPath });
-
-assert.equal(typeof windowMock.renderComicReader, "function");
-windowMock.renderComicReader(body);
-assert.ok(renderedHtml.length > 50_000, "Payload Comic Reader gagal dirender.");
-
-assert.match(renderedHtml, /comic-reader-mobile\.css\?v=20260831/);
-assert.match(renderedHtml, /id="mangaTabs" class="tabs" data-label="Sort"/);
-assert.match(renderedHtml, /id="mangaCategoryTabs" class="tabs" data-label="Type"/);
-assert.match(renderedHtml, /id="mangaStatusTabs" class="tabs" data-label="Status"/);
-assert.match(renderedHtml, /type="search"[^>]+enterkeyhint="search"/);
-assert.match(renderedHtml, /function mangaResetFilters\(\)/);
-assert.match(renderedHtml, /Coba kata kunci atau filter lain\./);
-assert.match(renderedHtml, /Tidak dapat memuat daftar komik\./);
-assert.match(renderedHtml, /loading="lazy" decoding="async" alt="cover"/);
-assert.match(renderedHtml, /decoding="async" alt="Halaman \$\{pageIndex\+1\}"/);
-assert.doesNotMatch(renderedHtml, /Gagal memuat data komik\.<br><small>\$\{escapeHtml\(error\.message/);
-assert.doesNotMatch(renderedHtml, /Gagal memuat daftar chapter\.<br><small>\$\{escapeHtml\(error\.message/);
-
-assert.match(mobileCss, /\.manga-grid\{[\s\S]*repeat\(auto-fit,minmax\(min\(172px,calc\(50% - 6px\)\),1fr\)\)/);
-assert.match(mobileCss, /#mangaTabs\{grid-template-columns:repeat\(3,minmax\(0,1fr\)\)\}/);
-assert.match(mobileCss, /#mangaCategoryTabs\{grid-template-columns:repeat\(4,minmax\(0,1fr\)\)\}/);
-assert.match(mobileCss, /height:54px/);
-assert.match(mobileCss, /aspect-ratio:2\/3/);
-assert.match(renderedHtml, /-webkit-line-clamp:2/);
-assert.match(mobileCss, /content-visibility:auto/);
-assert.match(mobileCss, /@media\(max-width:374px\)/);
-assert.doesNotMatch(mobileCss, /@media[^\{]*min-width/i);
-assert.match(mobileCss, /scrollbar-width:none/);
+assert.match(css, /\.manga-grid\{[\s\S]*repeat\(auto-fit,minmax\(min\(172px,calc\(50% - 6px\)\),1fr\)\)/);
+assert.match(css, /#mangaTabs\{grid-template-columns:repeat\(3,minmax\(0,1fr\)\)\}/);
+assert.match(css, /#mangaCategoryTabs\{grid-template-columns:repeat\(4,minmax\(0,1fr\)\)\}/);
+assert.match(css, /height:54px/);
+assert.match(css, /aspect-ratio:2\/3/);
+assert.match(css, /-webkit-line-clamp:2/);
+assert.match(css, /content-visibility:auto/);
+assert.match(css, /@media\(max-width:374px\)/);
+assert.match(css, /scrollbar-width:none/);
 assert.match(shellCss, /height:calc\(100dvh - 54px\)/);
 assert.match(shellCss, /data-tool="comicreader"[\s\S]*\.nx-room-topbar/);
 
@@ -94,7 +64,7 @@ const viewportResults = [360, 375, 390, 412].map((viewport) => {
   assert.ok(statusWidth >= 100, `${viewport}px: segmented Status berpotensi terpotong.`);
   assert.ok(searchInputWidth >= 220, `${viewport}px: input pencarian berpotensi terpotong.`);
 
-  return { viewport, contentWidth, cardWidth: Number(cardWidth.toFixed(1)), columns: 2 };
+  return { viewport, cardWidth: Number(cardWidth.toFixed(1)), columns: 2 };
 });
 
-console.log(`Comic Reader mobile UI lulus: ${viewportResults.map((row) => `${row.viewport}px=${row.columns} kolom/${row.cardWidth}px`).join(", ")}; shell compact, toolbar, filter tanpa overflow, card lazy, state aman, chapter, dan reader tervalidasi.`);
+console.log(`Comic Reader standalone UI lulus: ${viewportResults.map((row) => `${row.viewport}px=${row.columns} kolom/${row.cardWidth}px`).join(", ")}; UI canonical terpisah dari shell, tanpa Base64/srcdoc/bridge.`);

@@ -1,0 +1,74 @@
+<!-- NEXORA COMIC READER STANDALONE v1: canonical UI; no Base64/srcdoc runtime patching. -->
+<!DOCTYPE html>
+<html lang="id" data-nexora-comic-ui="standalone-v1">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07000f">
+<title>ALL TOOLS NEXORA — BACA KOMIK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+
+
+
+<link rel="stylesheet" href="/assets/comic-reader/app.css?v=standalone-v1">
+</head>
+<body>
+
+<div class="shell" id="comicShell">
+  <div class="hero-min">
+    <span class="kicker"><i class="fa-solid fa-book-open-reader"></i> Nexora // Comic Reader</span>
+  </div>
+
+  <main class="workspace"><div class="manga-attribution"><i class="fa-solid fa-circle-info"></i><span>Data dan halaman dari <a href="https://mangadex.org" target="_blank" rel="noopener noreferrer">MangaDex</a>. Hak karya milik kreator; chapter dikreditkan kepada grup scanlation terkait.</span></div>
+    <div class="manga-topbar">
+      <button class="icon-btn" id="mangaBackBtn" type="button" title="Kembali"><i class="fa-solid fa-arrow-left"></i></button>
+      <div class="manga-title" id="mangaTitleBar"><i class="fa-solid fa-book-open"></i> Baca Komik</div>
+      <button class="icon-btn" type="button" onclick="mangaShowHome(true)" title="Daftar Komik"><i class="fa-solid fa-house"></i></button>
+    </div>
+
+    <div id="mangaSearchBar" class="search-bar">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="search" id="mangaSearchInput" placeholder="Cari manga, manhwa, atau manhua" aria-label="Cari komik" autocomplete="off" enterkeyhint="search">
+      <button id="mangaSearchBtn" type="button" aria-label="Cari komik"><i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+
+    <div id="mangaTabs" class="tabs" data-label="Sort">
+      <button class="tab active" data-tab="latest" type="button"><i class="fa-solid fa-fire"></i> Update Terbaru</button>
+      <button class="tab" data-tab="popular" type="button"><i class="fa-solid fa-star"></i> Populer</button>
+      <button class="tab" data-tab="xyz" type="button"><i class="fa-solid fa-compass"></i> Pilihan</button>
+      <button class="tab" data-tab="favorite" type="button"><i class="fa-solid fa-heart"></i> Favorit</button>
+      <button class="tab" data-tab="history" type="button"><i class="fa-solid fa-clock-rotate-left"></i> Riwayat</button>
+    </div>
+
+    <div id="mangaCategoryTabs" class="tabs" data-label="Type">
+      <button class="tab active" data-category="all" type="button"><i class="fa-solid fa-border-all"></i> Semua</button>
+      <button class="tab" data-category="manga" type="button"><i class="fa-solid fa-book"></i> Manga</button>
+      <button class="tab" data-category="manhwa" type="button"><i class="fa-solid fa-book-open"></i> Manhwa</button>
+      <button class="tab" data-category="manhua" type="button"><i class="fa-solid fa-book-atlas"></i> Manhua</button>
+    </div>
+
+    <div id="mangaStatusTabs" class="tabs" data-label="Status">
+      <button class="tab active" data-status="all" type="button"><i class="fa-solid fa-list-check"></i> Semua Status</button>
+      <button class="tab" data-status="ongoing" type="button"><i class="fa-solid fa-rotate"></i> Ongoing</button>
+      <button class="tab" data-status="tamat" type="button"><i class="fa-solid fa-check-double"></i> Tamat</button>
+    </div>
+
+    <div id="mangaContent" class="manga-grid">
+      <div class="loading"><i class="fa-solid fa-spinner spin"></i><span>Memuat komik terbaru...</span></div>
+    </div>
+  </main>
+</div>
+<div class="toast-wrap" id="toastWrap"></div>
+
+
+
+
+
+
+
+<script src="/assets/comic-reader/app.js?v=standalone-v1"></script>
+</body>
+</html>

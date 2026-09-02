@@ -3,6 +3,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
+const crypto = require("node:crypto");
 
 const root = path.resolve(__dirname, "..");
 require("./sync-config.js").syncConfig({ silent: true });
@@ -14,6 +15,21 @@ const json = (relative) => {
   catch (error) { fail(`${relative}: JSON tidak valid (${error.message})`); return {}; }
 };
 const sameSet = (left, right) => left.length === right.length && left.every((item) => right.includes(item));
+
+// Frozen Comic Reader architecture. Any accidental replacement/revert aborts the build.
+const COMIC_READER_LOCK = Object.freeze({
+  "assets/js/features/comic-reader.js": "9f751be2e67f9ce72518f9d6d2544c4df31ea01b96dac617555934d68bb0cacc",
+  "assets/comic-reader/index.html": "448d1cdfea7ed368e53c8fbbd38237c05d1b23af8349756195d820c082913864",
+  "assets/comic-reader/app.css": "2a6ca41369f11c8583ec2f000408deb3834d9725b08d683416d5d3092142e9a6",
+  "assets/comic-reader/app.js": "02d1bcb2b95a735cca9dc1d9feeae0276b3326ea17bea7b579b3d526af0e15ac",
+  "assets/css/features/comic-reader.css": "61e079135af952ecebfa5a10e3a88c01cc9eb441bf4c7aa5dc70df6dd2007b2a"
+});
+for (const [relative, expected] of Object.entries(COMIC_READER_LOCK)) {
+  const absolute = path.join(root, relative);
+  if (!fs.existsSync(absolute)) { fail(`COMIC READER LOCK: file hilang: ${relative}`); continue; }
+  const actual = crypto.createHash("sha256").update(fs.readFileSync(absolute)).digest("hex");
+  if (actual !== expected) fail(`COMIC READER LOCK: ${relative} berubah. Build diblokir agar UI/engine tidak tertimpa.`);
+}
 
 const packageJson = json("package.json");
 const version = String(packageJson.version || "");
@@ -124,13 +140,19 @@ for (const removed of [
 ]) if (fs.existsSync(path.join(root, removed))) fail(`Modul mati/berisiko masih tersimpan: ${removed}`);
 
 const embeddedFrames = [
-  "assets/js/features/imported-tools.js", "assets/js/features/comic-reader.js",
+  "assets/js/features/imported-tools.js",
   "assets/js/features/tiktok-quote.js", "assets/js/features/virus-scan.js"
 ];
 for (const relative of embeddedFrames) {
   const source = read(relative);
   if (!/<iframe[^>]+sandbox=/i.test(source)) fail(`${relative}: iframe srcdoc belum diberi sandbox.`);
   if (/allow-same-origin/i.test(source)) fail(`${relative}: sandbox srcdoc masih memiliki allow-same-origin.`);
+}
+const comicShell = read("assets/js/features/comic-reader.js");
+if (!/COMIC_APP_URL\s*=\s*["']\/assets\/comic-reader\/index\.html\?v=standalone-v1["']/.test(comicShell)) fail("Comic Reader tidak memakai app standalone canonical.");
+if (/COMIC_READER_APP_B64|srcdoc|nxComicApiBridgeHandler|nx-comic-api-request/.test(comicShell)) fail("Comic Reader legacy Base64/srcdoc/bridge kembali terdeteksi.");
+for (const relative of ["assets/comic-reader/index.html", "assets/comic-reader/app.css", "assets/comic-reader/app.js"]) {
+  if (!fs.existsSync(path.join(root, relative))) fail(`Comic Reader standalone asset hilang: ${relative}`);
 }
 const index = read("index.html");
 if (index.indexOf("assets/config.js") < 0 || index.indexOf("assets/config.js") > index.indexOf("assets/js/core/app.js")) fail("assets/config.js harus dimuat sebelum app.js.");
