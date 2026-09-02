@@ -7,7 +7,7 @@
   function timeoutOf(init){
     var explicit=Number(init&&init.nexoraTimeoutMs);
     if(Number.isFinite(explicit)&&explicit>0)return Math.min(explicit,90000);
-    return init&&typeof FormData!=="undefined"&&init.body instanceof FormData?45000:18000;
+    return init&&typeof FormData!=="undefined"&&init.body instanceof FormData?150000:18000;
   }
   function dispatch(kind,detail){try{document.dispatchEvent(new CustomEvent(kind,{detail:detail}));}catch(_){ }}
   async function request(input,init){

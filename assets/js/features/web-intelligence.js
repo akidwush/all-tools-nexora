@@ -110,7 +110,7 @@
       var controller=new AbortController();state.controller=controller;body.__nxCleanup=function(){controller.abort();clearInterval(state.stageTimer);};
       var mode=scanMode();root.querySelector('#nwiScanHost').textContent=parsed.hostname;show('scanning');startProgress(mode);
       try{
-        var response=await window.NexoraFetch('/api/web-intelligence',{method:'POST',cache:'no-store',credentials:'same-origin',headers:{Accept:'application/json','Content-Type':'application/json'},body:JSON.stringify({url:urlInput.value,mode:mode}),signal:controller.signal,nexoraTimeoutMs:mode==='deep'?45000:22000,nexoraRetries:0});
+        var response=await window.NexoraFetch('/api/web-intelligence',{method:'POST',cache:'no-store',credentials:'same-origin',headers:{Accept:'application/json','Content-Type':'application/json'},body:JSON.stringify({url:urlInput.value,mode:mode}),signal:controller.signal,nexoraTimeoutMs:mode==='deep'?150000:22000,nexoraRetries:0});
         var payload=await response.json().catch(function(){return {};});
         if(!response.ok||!payload.ok)throw new Error(payload.message||payload.error||('HTTP '+response.status));
         if(state.controller!==controller)return;
