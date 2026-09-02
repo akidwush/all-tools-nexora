@@ -10,6 +10,7 @@ const index = read("index.html");
 const app = read("assets/js/core/app.js");
 const css = read("assets/css/features/visual-website.css");
 const client = read("assets/js/features/visual-website.js");
+const postload = read("assets/js/core/postload.js");
 const manifest = JSON.parse(read("assets/visuals/manifest.json"));
 const vercel = JSON.parse(read("vercel.json"));
 
@@ -45,7 +46,7 @@ assert.match(index, /id="tab-visuals"/);
 assert.match(index, /id="nxVisualRoom"/);
 assert.match(index, /sandbox="allow-scripts allow-forms allow-pointer-lock allow-modals"/);
 assert.match(index, /visual-website\.css\?v=6\.4\.0/);
-assert.match(index, /visual-website\.js\?v=6\.4\.0/);
+assert.match(postload, /visual-website\.js\?v=6\.4\.0/);
 assert.match(client, /PAGE_SIZE\s*=\s*18/);
 assert.doesNotMatch(client, /grid[^\n]*iframe/i, "Katalog tidak boleh menyalakan banyak iframe sekaligus.");
 assert.match(client, /frame\.src\s*=\s*demo\.path/);

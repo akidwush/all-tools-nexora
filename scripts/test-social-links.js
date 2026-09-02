@@ -22,7 +22,8 @@ for (const token of ["requireAdmin", "verifyMutationRequest", "recordAdminAudit"
 
 const index = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const shell = fs.readFileSync(path.join(root, "assets/js/core/shell.js"), "utf8");
-assert.equal(index.includes("assets/js/core/social-links.js"), true);
+const postload = fs.readFileSync(path.join(root, "assets/js/core/postload.js"), "utf8");
+assert.equal(postload.includes("assets/js/core/social-links.js"), true);
 for (const secretDestination of ["0029Vb7yYjE8PgsKrQ5ghQ3s", "6285196639720"]) {
   assert.equal(index.includes(secretDestination), false, `index.html masih memuat tujuan sosial ${secretDestination}`);
   assert.equal(shell.includes(secretDestination), false, `shell.js masih memuat tujuan sosial ${secretDestination}`);

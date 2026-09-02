@@ -16,6 +16,7 @@ const {
 async function main() {
   const html = fs.readFileSync("index.html", "utf8");
   const client = fs.readFileSync("assets/js/core/personal-ai.js", "utf8");
+  const postload = fs.readFileSync("assets/js/core/postload.js", "utf8");
   const style = fs.readFileSync("assets/css/personal-ai.css", "utf8");
   const adminHtml = fs.readFileSync("admin/index.html", "utf8");
   const adminClient = fs.readFileSync("assets/js/admin/personal-ai.js", "utf8");
@@ -27,7 +28,7 @@ async function main() {
 
   assert.match(html, /id="nxAiLauncher"/);
   assert.match(html, /id="nxPersonalAi"/);
-  assert.match(html, /assets\/js\/core\/personal-ai\.js/);
+  assert.match(postload, /assets\/js\/core\/personal-ai\.js/);
   assert.match(client, /fetch\("\/api\/ai\/chat"/);
   assert.doesNotMatch(client, /@google\/genai|GEMINI_API_KEY|innerHTML\s*=/);
   assert.match(client, /createDocumentFragment\(\)/);

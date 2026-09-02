@@ -1,10 +1,27 @@
 <!DOCTYPE html>
 <html lang="id"><head>
-<script src="assets/config.js?v=6.4.0-config1"></script>
-<script src="assets/js/core/downloader-client.js?v=6.4.0-dl1-hf6-dl4"></script>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" name="viewport"/>
-<script data-runtime-observer="assets/js/core/runtime-observer.js?v=6.4.0" src="assets/js/core/bootstrap.js?v=6.4.0"></script>
+<script data-runtime-observer="assets/js/core/runtime-observer.js?v=6.4.0">
+/* Nexora v6.3 — tiny critical bootstrap. */
+(function(){
+  "use strict";
+  try{
+    var connection=navigator.connection||navigator.mozConnection||navigator.webkitConnection;
+    var reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var lowPower=Boolean((connection&&connection.saveData)||(navigator.deviceMemory&&navigator.deviceMemory<=4)||reduced);
+    if(lowPower)document.documentElement.classList.add("nx-low-power");
+    var params=new URLSearchParams(location.search);
+    if(params.get("__nexora_visual_test")==="1"){
+      var current=document.currentScript;
+      var script=document.createElement("script");
+      script.src=current&&current.dataset.runtimeObserver||"assets/js/core/runtime-observer.js";
+      script.async=true;
+      document.head.appendChild(script);
+    }
+  }catch(_){ }
+})();
+</script>
 <meta content="All Tools Nexora oleh Developer Dika — kumpulan downloader, maker, dan utilitas web dalam satu tempat." name="description"/>
 <link href="https://all-tools-nexora.vercel.app/" rel="canonical"/>
 <meta content="website" property="og:type"/>
@@ -27,6 +44,8 @@
 <title>All Tools Nexora — Developer Dika</title>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"All Tools Nexora","url":"https://all-tools-nexora.vercel.app/","description":"Kumpulan downloader, maker, AI, dan utilitas web Nexora dalam satu tempat.","applicationCategory":"UtilitiesApplication","operatingSystem":"Android, iOS, Windows, macOS, Linux","featureList":["Downloader media","Baca komik","Generator visual","AI utilities","SVG ke Alight Motion XML"]}</script>
 <link href="favicon.svg" rel="icon" type="image/svg+xml"/>
+<link as="script" href="assets/config.js?v=6.4.0-config1" rel="preload"/>
+<link as="script" href="assets/js/core/downloader-client.js?v=6.4.0-dl1-hf6-dl4" rel="preload"/>
 <link crossorigin="anonymous" href="https://cdnjs.cloudflare.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="anonymous" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -49,8 +68,8 @@
 
 
 
-<link href="assets/css/core.css?v=6.4.0-hf17-desktop-nav2-hf21-fling1-hf22-original-unified1" rel="stylesheet"/><link href="assets/css/components.css?v=6.4.0-hf14-mobile-dedup1-hf22-original-unified1" rel="stylesheet"/><link href="assets/css/account.css?v=6.4.0-membership1-hf22-original-unified1-dashboard-only1" rel="stylesheet"/><link href="assets/css/personal-ai.css?v=6.4.0-hf16-mobile-paint1-hf22-original-unified1" rel="stylesheet"/><link href="assets/css/mobile-usability.css?v=6.4.0-responsive-audit3-hf22-original-unified1" rel="stylesheet"/><link as="script" href="assets/js/core/app.js?v=6.4.0-lr4-hf5-download1-hf6-dl4-hf13-catalog-merge-hf21-svg-v18-audit1-document-ai-v1-hf25-puter-image1-genmail1-branding1-hf47-puter-video1-dashboard-only1-unique-icons1" rel="preload"/><link href="assets/css/custom-select.css?v=6.4.0-global-select-final1" rel="stylesheet"/><link href="assets/css/features/visual-website.css?v=6.4.0-visual-website1" rel="stylesheet"/><link href="assets/css/features/placeholder-prompt-limit.css?v=6.4.0-placeholder-limit1" rel="stylesheet"/></head>
-<body><noscript><section class="nx-noscript-shell"><strong>All Tools Nexora</strong><p>Daftar fitur tersedia, tetapi pemrosesan tool membutuhkan JavaScript. Aktifkan JavaScript untuk membuka downloader, maker, AI, dan SVG Alight Motion.</p></section></noscript>
+<link href="assets/css/core.css?v=6.4.0-hf17-desktop-nav2-hf21-fling1-hf22-original-unified1" rel="stylesheet"/><link href="assets/css/components.css?v=6.4.0-hf14-mobile-dedup1-hf22-original-unified1" rel="stylesheet"/><link href="assets/css/account.css?v=6.4.0-membership1-hf22-original-unified1-dashboard-only1" rel="stylesheet"/><link as="style" href="assets/css/personal-ai.css?v=6.4.0-hf16-mobile-paint1-hf22-original-unified1" onload="this.onload=null;this.rel='stylesheet'" rel="preload"/><link href="assets/css/mobile-usability.css?v=6.4.0-responsive-audit3-hf22-original-unified1" rel="stylesheet"/><link as="script" href="assets/js/core/app.js?v=6.4.0-lr4-hf5-download1-hf6-dl4-hf13-catalog-merge-hf21-svg-v18-audit1-document-ai-v1-hf25-puter-image1-genmail1-branding1-hf47-puter-video1-dashboard-only1-unique-icons1" rel="preload"/><link as="style" href="assets/css/custom-select.css?v=6.4.0-global-select-final1" onload="this.onload=null;this.rel='stylesheet'" rel="preload"/><link as="style" href="assets/css/features/visual-website.css?v=6.4.0-visual-website1" onload="this.onload=null;this.rel='stylesheet'" rel="preload"/><link as="style" href="assets/css/features/placeholder-prompt-limit.css?v=6.4.0-placeholder-limit1" onload="this.onload=null;this.rel='stylesheet'" rel="preload"/></head>
+<body><a class="nx-skip-link" href="#main-content">Lewati ke konten utama</a><noscript><section class="nx-noscript-shell"><strong>All Tools Nexora</strong><p>Daftar fitur tersedia, tetapi pemrosesan tool membutuhkan JavaScript. Aktifkan JavaScript untuk membuka downloader, maker, AI, dan SVG Alight Motion.</p></section></noscript>
 <script src="assets/js/core/account.js?v=6.4.0-membership2-document-ai-v1"></script>
 <div class="bg-glow" aria-hidden="true">
 <span class="nx-membrane nx-membrane-a"></span>
@@ -138,7 +157,7 @@
 </h1>
 </div>
 </div>
-<div class="container">
+<div class="container" id="main-content" tabindex="-1">
 <section aria-label="Developer" class="nx-about-dev-top-entry">
 <button class="nx-about-dev-trigger nx-about-dev-trigger-top" id="nxAboutDevOpen" type="button">
 <span class="nx-about-dev-trigger-icon">
@@ -501,7 +520,7 @@
   <div class="nx-ai-suggestions" id="nxAiSuggestions" aria-label="Saran pertanyaan"></div>
   <form class="nx-ai-compose" id="nxAiForm"><div class="nx-ai-input-wrap"><textarea class="nx-ai-input" id="nxAiInput" rows="1" maxlength="4000" placeholder="Tulis pesan untuk Personal AI…" aria-label="Pesan untuk Personal AI"></textarea><button class="nx-ai-send" id="nxAiSend" type="submit" aria-label="Kirim pesan"><i class="fa-solid fa-arrow-up"></i></button></div><div class="nx-ai-compose-meta"><span>Nexora AI · respons dapat keliru</span><button class="nx-ai-stop" id="nxAiStop" type="button" hidden><i class="fa-solid fa-stop"></i> Hentikan respons</button></div></form>
 </section>
-<script src="assets/js/core/network.js?v=6.4.0-dl1"></script><script src="assets/js/core/performance.js?v=6.4.0-hf18-desktop-hero3-hf21-mobile-loop1"></script><script src="assets/js/core/app.js?v=6.4.0-lr4-hf5-download1-hf6-dl4-hf13-catalog-merge-hf21-svg-v18-audit1-document-ai-v1-crypto-mtf1-prompt-v2-responsive-audit2-hf25-puter-image1-genmail1-branding1-hf47-puter-video1-dashboard-only1-unique-icons1"></script><script src="assets/js/core/downloader-renderers.js?v=6.4.0-hf5-download1-hf6-dl4"></script><script src="assets/js/core/social-links.js?v=6.4.0-hf11.1-no-wa-notif"></script><script src="assets/js/core/shell.js?v=6.4.0-hf11.1-no-wa-notif-crypto-mtf1-prompt-v2-responsive-audit2-hf25-puter-image1-genmail1-branding1-hf47-puter-video1"></script><script src="assets/js/core/liquid-reactor.js?v=6.4.0-hf18-desktop-hero1-hf22-original-unified1"></script><script src="assets/branding.js?v=6.4.0-branding1"></script><script src="assets/js/core/tool-health.js?v=6.4.0"></script><script src="assets/js/core/analytics.js?v=6.4.0"></script><script src="assets/js/core/tool-registry.js?v=6.4.0-document-ai-v1-prompt-v2-responsive-audit2-hf25-puter-image1-genmail1-branding1-hf47-puter-video1"></script><script src="assets/js/core/stability.js?v=6.4.0-healthfix1"></script><script src="assets/js/core/lazy-loader.js?v=6.4.0-document-ai-v5-android-picker-crypto-mtf1-prompt-v2-state5-android-picker-comic-reader-v4-responsive-audit2-hf25-puter-image1-hf26-puter-runtime2-hf27-models1-hf28-provider-recovery1-genmail1-hf30-all-email1-branding1-hf47-puter-video1"></script><script src="assets/js/core/personal-ai.js?v=6.4.0-hf16-mobile-paint1-dashboard-only1"></script><script src="assets/js/core/custom-select.js?v=6.4.0-global-select-final1" defer></script><section class="nx-visual-room" id="nxVisualRoom" aria-hidden="true" aria-label="Nexora Visual Website">
+<script src="assets/config.js?v=6.4.0-config1"></script><script src="assets/js/core/downloader-client.js?v=6.4.0-dl1-hf6-dl4"></script><script src="assets/js/core/network.js?v=6.4.0-dl1"></script><script src="assets/js/core/performance.js?v=6.4.0-hf18-desktop-hero3-hf21-mobile-loop1"></script><script src="assets/js/core/app.js?v=6.4.0-lr4-hf5-download1-hf6-dl4-hf13-catalog-merge-hf21-svg-v18-audit1-document-ai-v1-crypto-mtf1-prompt-v2-responsive-audit2-hf25-puter-image1-genmail1-branding1-hf47-puter-video1-dashboard-only1-unique-icons1"></script><script src="assets/js/core/downloader-renderers.js?v=6.4.0-hf5-download1-hf6-dl4"></script><script src="assets/js/core/shell.js?v=6.4.0-hf11.1-no-wa-notif-crypto-mtf1-prompt-v2-responsive-audit2-hf25-puter-image1-genmail1-branding1-hf47-puter-video1"></script><script src="assets/js/core/liquid-reactor.js?v=6.4.0-hf18-desktop-hero1-hf22-original-unified1"></script><script src="assets/js/core/tool-registry.js?v=6.4.0-document-ai-v1-prompt-v2-responsive-audit2-hf25-puter-image1-genmail1-branding1-hf47-puter-video1"></script><script src="assets/js/core/stability.js?v=6.4.0-healthfix1"></script><script src="assets/js/core/lazy-loader.js?v=6.4.0-document-ai-v5-android-picker-crypto-mtf1-prompt-v2-state5-android-picker-comic-reader-v4-responsive-audit2-hf25-puter-image1-hf26-puter-runtime2-hf27-models1-hf28-provider-recovery1-genmail1-hf30-all-email1-branding1-hf47-puter-video1"></script><section class="nx-visual-room" id="nxVisualRoom" aria-hidden="true" aria-label="Nexora Visual Website">
 <header class="nx-visual-room-head">
 <button class="nx-visual-back" id="nxVisualBack" type="button" aria-label="Kembali ke katalog visual"><i class="fa-solid fa-arrow-left"></i></button>
 <div class="nx-visual-room-title"><b id="nxVisualRoomTitle">Visual</b><span id="nxVisualRoomMeta">Nexora Visual Website</span></div>
@@ -515,4 +534,4 @@
 <iframe class="nx-visual-frame" id="nxVisualFrame" src="about:blank" title="Nexora Visual" loading="eager" referrerpolicy="no-referrer" sandbox="allow-scripts allow-forms allow-pointer-lock allow-modals"></iframe>
 </div>
 </section>
-<script src="assets/js/features/visual-website.js?v=6.4.0-visual-website1" defer></script><script src="assets/js/features/placeholder-prompt-limit.js?v=6.4.0-placeholder-limit1" defer></script></body></html>
+<script src="assets/js/core/postload.js?v=6.4.0-safe-pass1"></script></body></html>

@@ -25,12 +25,13 @@ assert.equal(feature.truncateToWordLimit("satu  dua\ntiga", 1000), "satu  dua\nt
 const script = fs.readFileSync(scriptPath, "utf8");
 const css = fs.readFileSync(cssPath, "utf8");
 const index = fs.readFileSync(indexPath, "utf8");
+const postload = fs.readFileSync(path.join(root, "assets/js/core/postload.js"), "utf8");
 
 assert.match(script, /removeAttribute\("maxlength"\)/, "maxlength karakter lama harus dilepas pada field target");
 assert.match(script, /MutationObserver/, "field yang dirender secara lazy harus tetap terdeteksi");
 assert.match(script, /Dimension\\s\+Presets/, "guard harus terbatas pada Placeholder Studio");
 assert.match(css, /nx-placeholder-word-counter/, "counter 1.000 kata harus memiliki style terisolasi");
 assert.match(index, /assets\/css\/features\/placeholder-prompt-limit\.css\?v=6\.4\.0-placeholder-limit1/);
-assert.match(index, /assets\/js\/features\/placeholder-prompt-limit\.js\?v=6\.4\.0-placeholder-limit1/);
+assert.match(postload, /assets\/js\/features\/placeholder-prompt-limit\.js\?v=6\.4\.0-placeholder-limit1/);
 
 console.log("Placeholder Studio prompt limit: 1.000 kata, lazy-safe, dan scoped — OK");

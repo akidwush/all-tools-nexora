@@ -3,9 +3,9 @@ const path=require('path');
 const root=path.resolve(__dirname,'..');
 function read(p){return fs.readFileSync(path.join(root,p),'utf8')}
 function ok(cond,msg){if(!cond){console.error('FAIL:',msg);process.exitCode=1}else console.log('PASS:',msg)}
-const index=read('index.html'),admin=read('admin/index.html'),feedback=read('feedback.html');
+const index=read('index.html'),postload=read('assets/js/core/postload.js'),admin=read('admin/index.html'),feedback=read('feedback.html');
 const js=read('assets/js/core/custom-select.js'),css=read('assets/css/custom-select.css');
-ok(index.includes('assets/css/custom-select.css')&&index.includes('assets/js/core/custom-select.js'),'public app loads global custom select assets');
+ok(index.includes('assets/css/custom-select.css')&&postload.includes('assets/js/core/custom-select.js'),'public app loads global custom select CSS and postloads its noncritical JS');
 ok(admin.includes('../assets/css/custom-select.css')&&admin.includes('../assets/js/core/custom-select.js'),'admin loads global custom select assets');
 ok(feedback.includes('assets/css/custom-select.css')&&feedback.includes('assets/js/core/custom-select.js'),'feedback page loads global custom select assets');
 ok(js.includes('MutationObserver')&&js.includes('querySelectorAll("select")'),'dynamic tool selects are auto-enhanced');
