@@ -36,6 +36,7 @@
     "/api/document-ai",
     "/api/prompt-generator",
     "/api/ai/novel-cover",
+    "/api/elevenlabs",
     "/api/tools/text-to-pdf",
     "/api/comics",
     "/api/admin/auth",

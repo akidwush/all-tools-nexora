@@ -83,6 +83,7 @@ const API_ROUTES = Object.freeze({
   "/api/document-ai": { file: "api/health.js", mode: "document-ai" },
   "/api/prompt-generator": { file: "api/health.js", mode: "prompt-generator" },
   "/api/ai/novel-cover": { file: "api/health.js", mode: "novel-cover" },
+  "/api/elevenlabs": { file: "api/health.js", mode: "elevenlabs" },
   "/api/tools/text-to-pdf": { file: "api/health.js", mode: "text-to-pdf" },
   "/api/comics": { file: "api/health.js", mode: "comic-reader" },
   "/api/admin/auth": { file: "api/admin/auth.js" },
@@ -113,6 +114,7 @@ function bodyLimit(pathname, requestUrl) {
   if (pathname === "/api/audit") return 230_000;
   if (pathname === "/api/ai/chat" || pathname === "/api/admin/ai") return 80_000;
   if (pathname === "/api/ai/novel-cover" || mode === "novel-cover") return 12_500_000;
+  if (pathname === "/api/elevenlabs" || mode === "elevenlabs") return 21_000_000;
   if (pathname === "/api/document-ai" || mode === "document-ai" || pathname === "/api/prompt-generator" || mode === "prompt-generator") return 4_150_000;
   if (pathname === "/api/tools/text-to-pdf" || mode === "text-to-pdf") return 750_000;
   return 550_000;

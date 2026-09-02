@@ -195,6 +195,14 @@
         "assets/js/features/ai-song.js"
       ]
     },
+    "elevenlabs-studio": {
+      "css": [
+        "assets/css/features/elevenlabs-studio.css"
+      ],
+      "js": [
+        "assets/js/features/elevenlabs-studio.js"
+      ]
+    },
     "hd4-enhancer": {
       "css": [
         "assets/css/features/hd4-enhancer.css"
@@ -879,6 +887,33 @@
           "key": "module-ai-song",
           "type": "module",
           "path": "/assets/js/features/ai-song.js",
+          "method": "HEAD",
+          "strict": true
+        }
+      },
+      {
+        "id": "elevenlabs",
+        "icon": "fa-solid fa-wave-square",
+        "name": "Nexora ElevenLabs Studio",
+        "description": "Text to Speech, Voice Changer, Speech to Text, dan Sound FX dalam satu studio audio AI",
+        "badge": "AUDIO AI",
+        "aliases": [
+          "elevenlabs studio",
+          "text to speech",
+          "voice changer",
+          "speech to text",
+          "sound effect generator"
+        ],
+        "runtime": {
+          "mode": "api",
+          "module": "elevenlabs-studio",
+          "handler": "renderElevenLabsStudio",
+          "dependency": "https://all-tools-nexora.vercel.app/api/elevenlabs"
+        },
+        "health": {
+          "key": "module-elevenlabs-studio",
+          "type": "module",
+          "path": "/assets/js/features/elevenlabs-studio.js",
           "method": "HEAD",
           "strict": true
         }

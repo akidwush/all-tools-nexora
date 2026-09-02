@@ -34,7 +34,7 @@ assert.equal(getTool("aivideo").health.path, "/assets/js/features/puter-video.js
 assert.match(lazy, /puter-video-hf47/);
 assert.match(index, /hf47-puter-video1/);
 assert.match(readme, /#tool-aivideo/);
-assert.match(readme, /64 tool/);
+assert.match(readme, /65 tool/);
 
 assert.equal(routeManifest.apiRoutes.some((route) => /ai-video|aivideo/.test(route)), false, "AI Video tidak boleh menambah backend route");
 assert.doesNotMatch([feature, runtime, css].join("\n"), /supabase|api[_-]?key|openai[_-]?api|google[_-]?api/i);

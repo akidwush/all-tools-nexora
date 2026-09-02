@@ -1,0 +1,80 @@
+.nel-studio {
+  --nel-panel: #151320;
+  --nel-line: rgba(177, 143, 255, .18);
+  --nel-muted: #a8a1b9;
+  --nel-violet: #9b6cff;
+  --nel-cyan: #73e7ee;
+  width: min(100%, 920px);
+  margin: 0 auto;
+  padding: 18px clamp(14px, 4vw, 28px) calc(28px + env(safe-area-inset-bottom));
+  color: #f7f3ff;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+.nel-studio * { box-sizing: border-box; }
+.nel-hero { padding: 8px 2px 18px; }
+.nel-kicker { display: inline-flex; align-items: center; gap: 8px; color: var(--nel-cyan); font-size: 11px; font-weight: 800; letter-spacing: .14em; }
+.nel-hero h2 { margin: 10px 0 6px; font-size: clamp(23px, 7vw, 34px); line-height: 1.1; }
+.nel-hero p, .nel-section-head p { margin: 0; color: var(--nel-muted); font-size: 13px; line-height: 1.55; }
+.nel-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 7px; border: 1px solid var(--nel-line); border-radius: 18px; background: rgba(13, 11, 21, .8); }
+.nel-tabs button { min-width: 0; min-height: 48px; border: 1px solid transparent; border-radius: 13px; background: transparent; color: #aaa3bb; font: inherit; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 7px; cursor: pointer; }
+.nel-tabs button.is-active { background: rgba(138, 87, 255, .17); border-color: rgba(162, 112, 255, .5); color: #fff; }
+.nel-tabs button i { color: var(--nel-cyan); }
+.nel-tabs button:disabled { opacity: .55; }
+.nel-status { display: flex; align-items: flex-start; gap: 9px; margin: 13px 0; padding: 11px 13px; border: 1px solid rgba(115, 231, 238, .16); border-radius: 13px; background: rgba(115, 231, 238, .06); color: #c8f7f8; font-size: 12px; line-height: 1.5; }
+.nel-status.success { border-color: rgba(74, 222, 128, .18); background: rgba(74, 222, 128, .07); color: #adf0c2; }
+.nel-status.error { border-color: rgba(251, 113, 133, .23); background: rgba(127, 29, 52, .19); color: #ffc0cc; }
+.nel-panel { padding: 18px 0; }
+.nel-section-head { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.nel-section-head > span { flex: 0 0 40px; height: 40px; display: grid; place-items: center; border: 1px solid rgba(155, 108, 255, .42); border-radius: 12px; background: rgba(155, 108, 255, .12); font-weight: 800; color: #d6c6ff; }
+.nel-section-head h3 { margin: 0 0 3px; font-size: 20px; }
+.nel-field { display: block; min-width: 0; margin: 0 0 15px; color: #d7caed; font-size: 13px; font-weight: 700; }
+.nel-field > span { display: block; margin: 0 0 7px; }
+.nel-field small { display: block; margin-top: 7px; color: #8e879e; font-size: 11px; line-height: 1.45; font-weight: 500; }
+.nel-field textarea, .nel-field select { width: 100%; border: 1px solid rgba(255, 255, 255, .13); border-radius: 14px; background: #0d0c13; color: #f7f3ff; font: inherit; font-size: 15px; outline: none; }
+.nel-field textarea { min-height: 128px; padding: 14px; resize: vertical; line-height: 1.55; }
+.nel-field select { height: 50px; padding: 0 38px 0 12px; }
+.nel-field textarea:focus, .nel-field select:focus { border-color: rgba(155, 108, 255, .72); box-shadow: 0 0 0 3px rgba(155, 108, 255, .09); }
+.nel-counter { text-align: right; margin-top: 6px; color: #888092; font-size: 11px; font-weight: 600; }
+.nel-grid, .nel-slider-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.nel-settings { margin: 2px 0 16px; border: 1px solid var(--nel-line); border-radius: 14px; background: rgba(255, 255, 255, .02); }
+.nel-settings summary { padding: 13px 14px; cursor: pointer; color: #d9cdf0; font-size: 13px; font-weight: 800; }
+.nel-slider-grid { padding: 4px 14px 15px; gap: 15px; }
+.nel-slider { display: block; min-width: 0; }
+.nel-slider span { display: flex; justify-content: space-between; margin-bottom: 7px; color: #a9a1b8; font-size: 11px; font-weight: 700; }
+.nel-slider input { width: 100%; accent-color: var(--nel-violet); }
+.nel-primary { width: 100%; min-height: 54px; border: 1px solid rgba(194, 164, 255, .55); border-radius: 16px; background: linear-gradient(135deg, #8f55ee, #6230bc); color: #fff; font: inherit; font-size: 14px; font-weight: 850; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; box-shadow: 0 10px 28px rgba(79, 38, 145, .18); }
+.nel-primary:disabled { opacity: .62; cursor: wait; }
+.nel-upload { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 150px; margin-bottom: 15px; padding: 17px; border: 1px dashed rgba(155, 108, 255, .45); border-radius: 16px; background: rgba(155, 108, 255, .045); text-align: center; cursor: pointer; }
+.nel-upload i { font-size: 25px; color: var(--nel-cyan); margin-bottom: 9px; }
+.nel-upload strong { font-size: 15px; }
+.nel-upload span, .nel-upload small { margin-top: 4px; color: #948da3; font-size: 11px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nel-upload input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.nel-original, .nel-result-card { margin: 0 0 16px; padding: 14px; border: 1px solid var(--nel-line); border-radius: 16px; background: var(--nel-panel); }
+.nel-original span, .nel-result-label { display: block; margin-bottom: 10px; color: #cfc2e9; font-size: 12px; font-weight: 800; }
+.nel-studio audio { display: block; width: 100%; max-width: 100%; height: 44px; }
+.nel-note { display: flex; gap: 9px; margin: 0 0 15px; padding: 11px 12px; border: 1px solid rgba(115, 231, 238, .14); border-radius: 12px; color: #a9a2b7; background: rgba(115, 231, 238, .035); font-size: 11px; line-height: 1.5; }
+.nel-note i { color: var(--nel-cyan); margin-top: 2px; }
+.nel-result-card { margin-top: 17px; padding: 15px; }
+.nel-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 13px; }
+.nel-actions > * { flex: 1 1 130px; }
+.nel-secondary { min-height: 42px; padding: 9px 13px; border: 1px solid rgba(155, 108, 255, .35); border-radius: 11px; background: rgba(155, 108, 255, .08); color: #e5d9ff; font: inherit; font-size: 12px; font-weight: 750; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 7px; cursor: pointer; }
+.nel-toggle { min-height: 50px; display: flex; align-items: center; gap: 8px; padding: 0 10px; border: 1px solid rgba(255, 255, 255, .13); border-radius: 14px; background: #0d0c13; cursor: pointer; }
+.nel-toggle input { position: absolute; opacity: 0; }
+.nel-toggle span { flex: 0 0 38px; width: 38px; height: 22px; border-radius: 22px; background: #393344; padding: 3px; transition: background .18s; }
+.nel-toggle span::before { content: ""; display: block; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform .18s; }
+.nel-toggle input:checked + span { background: var(--nel-violet); }
+.nel-toggle input:checked + span::before { transform: translateX(16px); }
+.nel-toggle b { min-width: 0; font-size: 11px; }
+.nel-prompts { display: flex; gap: 7px; overflow-x: auto; padding: 0 0 14px; scrollbar-width: none; }
+.nel-prompts::-webkit-scrollbar { display: none; }
+.nel-prompts button { flex: 0 0 auto; max-width: 230px; min-height: 38px; padding: 8px 11px; border: 1px solid var(--nel-line); border-radius: 999px; background: #13111b; color: #aaa2b7; font: inherit; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nel-transcript { max-height: 360px; overflow: auto; margin: 0; padding: 14px; border-radius: 12px; background: #0b0a10; color: #eee9f7; font: inherit; font-size: 13px; line-height: 1.65; white-space: pre-wrap; word-break: break-word; }
+.nel-empty { padding: 35px 18px; border: 1px solid var(--nel-line); border-radius: 18px; background: var(--nel-panel); text-align: center; }
+.nel-empty i { font-size: 30px; color: #fb7185; }
+.nel-empty h3 { margin: 14px 0 7px; }
+.nel-empty p { color: var(--nel-muted); font-size: 13px; line-height: 1.55; }
+.nel-empty .nel-secondary { margin-top: 8px; }
+@media (prefers-reduced-motion: reduce) {
+  .nel-studio * { scroll-behavior: auto !important; transition: none !important; }
+}

@@ -1707,6 +1707,7 @@ function showTool(toolId) {
         case 'danbooru': renderDanbooruSearch(body); break;
         case 'animetoreal': renderAnimeToReal(body); break;
         case 'aisong': renderAiSong(body); break;
+        case 'elevenlabs': renderElevenLabsStudio(body); break;
         case 'fakeovo': renderFakeOvo(body); break;
         case 'quotegenerator': renderQuoteGenerator(body); break;
         case 'carifakta': renderCariFakta(body); break;

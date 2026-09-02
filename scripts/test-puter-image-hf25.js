@@ -65,7 +65,7 @@ assert.match(readme, /https:\/\/all-tools-nexora\.vercel\.app\/#tool-aiimage/);
 assert.match(readme, /Hubungkan Puter/);
 assert.match(readme, /termasuk pengguna VVIP Nexora/);
 assert.match(readme, /Nexora tidak melihat password/);
-assert.match(readme, /64 tool/);
+assert.match(readme, /65 tool/);
 
 const serverless = [];
 (function walk(dir) {

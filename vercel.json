@@ -107,6 +107,10 @@
       "destination": "/api/health?mode=novel-cover"
     },
     {
+      "source": "/api/elevenlabs",
+      "destination": "/api/health?mode=elevenlabs"
+    },
+    {
       "source": "/api/admin/ai",
       "destination": "/api/admin/dashboard?mode=personal-ai"
     },

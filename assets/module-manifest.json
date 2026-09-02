@@ -165,6 +165,14 @@
         "assets/js/features/ai-song.js"
       ]
     },
+    "elevenlabs-studio": {
+      "css": [
+        "assets/css/features/elevenlabs-studio.css"
+      ],
+      "js": [
+        "assets/js/features/elevenlabs-studio.js"
+      ]
+    },
     "hd4-enhancer": {
       "css": [
         "assets/css/features/hd4-enhancer.css"
@@ -359,6 +367,7 @@
     "danbooru": "danbooru-search",
     "animetoreal": "anime-to-real",
     "aisong": "ai-song",
+    "elevenlabs": "elevenlabs-studio",
     "promptgenerate": "prompt-generator",
     "novelcover": "novel-cover-generator",
     "fakeovo": "imported-tools",

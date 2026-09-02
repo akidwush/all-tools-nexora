@@ -7,6 +7,7 @@ const { handleDocumentAi } = require("../lib/document-ai");
 const { handlePromptGenerator } = require("../lib/prompt-generator");
 const { handleComicReader } = require("../lib/comic-reader");
 const { handleNovelCover } = require("../lib/ai-cover/http");
+const { handleElevenLabs } = require("../lib/elevenlabs-studio");
 const { handleTextToPdf } = require("../lib/text-to-pdf");
 const { authorizeTool } = require("../lib/account-membership");
 
@@ -32,6 +33,10 @@ module.exports = async function handler(request, response) {
   if (requestUrl.searchParams.get("mode") === "novel-cover") {
     if (request.method === "POST" && !(await authorizeTool(request, response, "novelcover"))) return;
     return handleNovelCover(request, response);
+  }
+  if (requestUrl.searchParams.get("mode") === "elevenlabs") {
+    if (request.method === "POST" && !(await authorizeTool(request, response, "elevenlabs"))) return;
+    return handleElevenLabs(request, response);
   }
   if (requestUrl.searchParams.get("mode") === "text-to-pdf") return handleTextToPdf(request, response);
   if (requestUrl.searchParams.get("mode") === "database") {

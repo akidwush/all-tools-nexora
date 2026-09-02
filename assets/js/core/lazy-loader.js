@@ -47,6 +47,7 @@
     [/danbooru-search\.(?:js|css)(?:$|\?)/, 'danbooru-search-hf35'],
     [/anime-to-real\.(?:js|css)(?:$|\?)/, 'anime-to-real-hf37'],
     [/ai-song\.(?:js|css)(?:$|\?)/, 'ai-song-v1'],
+    [/elevenlabs-studio\.(?:js|css)(?:$|\?)/, 'elevenlabs-studio-v1'],
     [/hd4-enhancer\.(?:js|css)(?:$|\?)/, 'hd4-enhancer-v2'],
     [/smart-cutout(?:-core)?\.(?:js|css)(?:$|\?)/, 'smart-cutout-v3'],
     [/placeholder-studio\.(?:js|css)(?:$|\?)/, 'placeholder-studio-v3'],

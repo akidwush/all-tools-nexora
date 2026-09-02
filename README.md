@@ -1,6 +1,6 @@
 # All Tools Nexora
 
-All Tools Nexora v6.4.0 adalah website toolkit statis dengan 64 tool, lazy-loaded feature modules, dashboard admin, Supabase opsional untuk fitur lama, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency server-side sesuai provider.
+All Tools Nexora v6.4.0 adalah website toolkit statis dengan 65 tool, lazy-loaded feature modules, dashboard admin, Supabase opsional untuk fitur lama, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency server-side sesuai provider.
 
 Konfigurasi branding, katalog tool, modul lazy-load, dan target health check sekarang dipusatkan di `assets/config.js`. Panduan edit manual tersedia di [docs/MAINTENANCE.md](docs/MAINTENANCE.md).
 
@@ -233,6 +233,10 @@ Migration `database/migrations/016_hero_video_settings.sql` mengaktifkan pengatu
 ## Nexora Novel Cover Generator
 
 Tool `#tool-novelcover` membuat artwork cover novel melalui satu router server-side. Mode Auto memakai satu provider yang tersedia dan hanya melakukan fallback terbatas untuk timeout, rate limit, atau gangguan provider. Compare Mode harus dipilih secara manual dan dibatasi 2–4 provider.
+
+## Nexora ElevenLabs Studio
+
+Tool `#tool-elevenlabs` menyatukan Text to Speech, Voice Changer, Speech to Text, dan Sound FX dalam satu modul mobile-first. Browser hanya memanggil `/api/elevenlabs`; `ELEVENLABS_API_KEY` dibaca server-side dan tidak pernah dikirim ke frontend. Upload, audio hasil, dan transcript bersifat sementara serta tidak disimpan ke database.
 
 Provider yang didukung: Ideogram, Recraft, fal.ai, Runware, Stability AI, OpenAI GPT Image, dan Hugging Face Inference Providers. Provider tanpa environment key otomatis dinonaktifkan. Reference image tidak disimpan oleh Nexora dan hanya diteruskan kepada provider yang dipilih.
 
