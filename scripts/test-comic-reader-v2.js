@@ -113,7 +113,7 @@ async function call(query) {
   assert.ok(vercel.rewrites.some((row) => row.source === "/api/comics" && /comic-reader/.test(row.destination)));
   assert.match(fs.readFileSync(path.join(root, "serve-local.js"), "utf8"), /"\/api\/comics"/);
   assert.match(fs.readFileSync(path.join(root, "api/health.js"), "utf8"), /handleComicReader/);
-  assert.match(fs.readFileSync(path.join(root, "lib/comic-reader.js"), "utf8"), /Access-Control-Allow-Origin/);
+  assert.doesNotMatch(fs.readFileSync(path.join(root, "lib/comic-reader.js"), "utf8"), /Access-Control-Allow-Origin\s*["']?\s*,\s*["']\*["']/);
 
   console.log("Comic Reader v2 lulus: katalog, pencarian, detail, chapter, kredit scanlation, proxy sampul dan setiap halaman reader, cache bust, serta route deploy tervalidasi.");
 })().catch((error) => { console.error(error); process.exit(1); });

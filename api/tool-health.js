@@ -1,5 +1,5 @@
 const crypto = require("node:crypto");
-const { handleMediaDownload, mediaProvider } = require("../lib/media-download");
+const { handleMediaDownload } = require("../lib/media-download");
 const { handleDownloader } = require("../lib/downloader-service");
 const { handleSiteGrabber } = require("../lib/sitegrabber-proxy");
 const { handleCryptoMarket } = require("../lib/crypto-market");
@@ -17,7 +17,13 @@ const { handleAnimeToReal } = require("../lib/kuroneko-anime-to-real");
 const { handleAiSong } = require("../lib/kuroneko-ai-song");
 const { handleHD4 } = require("../lib/kuroneko-hd4");
 const { authorizeTool, handleAccount } = require("../lib/account-membership");
+const {
+  publicToolHealthProbe: publicHealthOnly,
+  toolHealthToolId: protectedToolId,
+  toolHealthToolIds: protectedToolIds
+} = require("../lib/server-access-policy");
 const { sendJson: send } = require("../lib/http-response");
+const { verifySameOriginRequest } = require("../lib/request-security");
 const {
   TOOL_CATALOG,
   getHealthConfig,
@@ -30,48 +36,6 @@ const {
 
 let activeRun = null;
 let lastPublicRunAt = 0;
-const DOWNLOADER_TOOL_IDS = new Set(["terabox", "instagram", "tiktok", "youtube", "spotify"]);
-
-function protectedToolId(mode, request, url) {
-  if (mode === "downloader") {
-    const provider = String(request.body?.provider || url.searchParams.get("provider") || "").toLowerCase();
-    return DOWNLOADER_TOOL_IDS.has(provider) ? provider : "";
-  }
-  if (mode === "media-download") {
-    let detected = "";
-    try { detected = mediaProvider(new URL(String(url.searchParams.get("url") || "")).hostname); } catch {}
-    const requested = String(url.searchParams.get("tool") || "").toLowerCase();
-    if (["tiktok", "instagram", "terabox"].includes(detected)) return detected;
-    if (detected === "nexray" && ["instagram", "terabox"].includes(requested)) return requested;
-    return "";
-  }
-  return ({
-    sitegrabber: "getcode",
-    "crypto-market": "cryptomarket",
-    "space-explorer": "spaceexplorer",
-    "ocr-intelligence": "ocrintel",
-    "svg-alight": "svgalight",
-    "alight-premium": "alightpremium",
-    "image-vectorizer": "imagevectorizer",
-    "ip-intelligence": "ipintel",
-    "bmkg-open-data": "bmkg"
-  })[mode] || "";
-}
-
-function publicHealthOnly(mode, request, url) {
-  if (request.method !== "GET") return false;
-  if (mode === "alight-premium") return !url.searchParams.get("action");
-  if (mode === "sitegrabber") return String(url.searchParams.get("action") || "health").toLowerCase() === "health";
-  if (mode === "svg-alight") return true;
-  return new Set([
-    "downloader",
-    "space-explorer",
-    "ocr-intelligence",
-    "image-vectorizer",
-    "ip-intelligence",
-    "bmkg-open-data"
-  ]).has(mode) && url.searchParams.get("health") === "1";
-}
 
 function requestOrigin(request) {
   const forwardedProto = String(request.headers["x-forwarded-proto"] || "").split(",")[0].trim();
@@ -115,23 +79,36 @@ module.exports = async function handler(request, response) {
   catch { return send(response, 400, { ok: false, error: "INVALID_REQUEST_HOST" }); }
 
   const url = new URL(request.url || "/api/tool-health", origin);
-  if (url.searchParams.get("_service") === "danbooru-search") {
+  const service = String(url.searchParams.get("_service") || "").toLowerCase();
+  const mode = String(url.searchParams.get("mode") || "").toLowerCase();
+  if (mode === "account") return handleAccount(request, response);
+
+  // Resolve and enforce access before any provider handler. This ordering is
+  // deliberate: a direct call to a rewritten _service route must not bypass
+  // membership by reaching the upstream provider first.
+  const protectedIds = protectedToolIds(mode, request, url);
+  const healthOnly = publicHealthOnly(mode, request, url);
+  if (protectedIds.length && !verifySameOriginRequest(request)) {
+    return send(response, 403, { ok: false, error: "ORIGIN_NOT_ALLOWED", message: "Permintaan lintas situs ditolak." });
+  }
+  if (!healthOnly) {
+    for (const protectedId of protectedIds) {
+      if (!(await authorizeTool(request, response, protectedId))) return;
+    }
+  }
+
+  if (service === "danbooru-search") {
     return handleDanbooruSearch(request, response, url);
   }
-  if (url.searchParams.get("_service") === "anime-to-real") {
+  if (service === "anime-to-real") {
     return handleAnimeToReal(request, response, url);
   }
-  if (url.searchParams.get("_service") === "ai-song") {
+  if (service === "ai-song") {
     return handleAiSong(request, response, url);
   }
-  if (url.searchParams.get("_service") === "hd4-enhancer") {
+  if (service === "hd4-enhancer") {
     return handleHD4(request, response, url);
   }
-  const mode = url.searchParams.get("mode");
-  if (mode === "account") return handleAccount(request, response);
-  const protectedId = protectedToolId(mode, request, url);
-  const healthOnly = publicHealthOnly(mode, request, url);
-  if (protectedId && !healthOnly && !(await authorizeTool(request, response, protectedId))) return;
   if (url.searchParams.get("mode") === "media-download") {
     return handleMediaDownload(request, response, url);
   }

@@ -1,46 +1,80 @@
-# Audit Keamanan dan Stabilitas
+# Audit Keamanan Nexora
 
-Tanggal audit: 12 Agustus 2026  
-Versi hasil perbaikan: 6.3.18
+Tanggal audit: 2 September 2026  
+Basis source: Nexora 6.4.0
 
-## Ringkasan
+## Model ancaman
 
-Audit mencakup frontend, iframe tool, 12 Vercel Functions, proxy pihak ketiga, autentikasi admin, database, server lokal, build, dan regression test. Temuan fatal yang dapat diperbaiki tanpa mengubah produk telah ditutup dalam versi ini.
+Audit menganggap penyerang dapat menyalin seluruh HTML/CSS/JavaScript, membuka route tersembunyi, mengubah state browser, menghapus atribut `disabled`, memalsukan body/query, dan memanggil API Nexora secara langsung. Kode frontend diperlakukan sebagai data publik dan bukan batas keamanan.
 
-| Tingkat | Temuan | Perbaikan |
+Keputusan akses authoritative sekarang berjalan sebagai berikut:
+
+1. browser memanggil route Nexora;
+2. dispatcher memetakan route ke ID tool server;
+3. server menolak origin browser yang tidak dipercaya;
+4. server membaca `tools.access_level` dari database;
+5. untuk VVIP, server memvalidasi cookie session HttpOnly melalui Supabase Auth;
+6. server membaca profil, subscription aktif, masa berlaku, dan status suspend;
+7. handler baru boleh memanggil provider.
+
+Nilai `vip`, `isVip`, `role`, `isAdmin`, `credits`, `quota`, atau `userId` dari body browser tidak digunakan sebagai identitas maupun entitlement.
+
+## Temuan dan perbaikan
+
+| Tingkat | Temuan nyata | Perbaikan |
 |---|---|---|
-| Kritis | Modul browser yang sudah tidak terdaftar masih dikirim dan memuat kredensial API lama | Modul, CSS, dan referensi manifest/lazy loader dihapus |
-| Kritis | HTML legacy dari payload dapat berjalan dalam iframe tanpa isolasi memadai | Semua iframe `srcdoc` memakai sandbox tanpa `allow-same-origin`; pesan lintas frame memvalidasi `event.source` |
-| Tinggi | Server lokal dapat menyajikan `.env`, SQL, package metadata, dan source backend | Static file diubah menjadi whitelist halaman/asset publik; jalur privat selalu 404 |
-| Tinggi | Server lokal tidak meniru sebagian besar rewrite dan membatasi semua JSON ke 64 KB | Seluruh rute manifest didukung; query, JSON/binary body, `.json()`/`.send()`, serta batas per endpoint ditambahkan |
-| Tinggi | URL hasil FreeConvert dapat mengarah ke host/IP privat dan respons dibuffer tanpa batas aman | Resolusi publik, DNS pinning, HTTPS, redirect limit, timeout, dan batas 4 MB diterapkan |
-| Tinggi | Redirect SiteGrabber dapat meneruskan bearer token ke origin lain | Redirect ditangani manual; mutasi/lintas-origin ditolak dan Authorization dihapus untuk download yang diizinkan |
-| Tinggi | Deploy Center memuat JSZip dari CDN tanpa verifikasi isi | Dependensi CDN dikunci dengan SHA-512 Subresource Integrity, CORS anonim, dan tanpa referrer |
-| Tinggi | ZIP 3,6 MB menjadi payload base64 yang berisiko melewati body Function 4,5 MB | Batas ZIP diturunkan menjadi 3,2 MB |
-| Tinggi | Cache dan rate-limit `Map` dapat tumbuh tanpa batas pada instance yang hidup lama | Helper bounded store, expiry pruning, dan batas in-flight diterapkan |
-| Sedang | Katalog UI memiliki 43 tool tetapi health catalog/seed hanya 42 | `svgalight` ditambahkan dan audit sinkronisasi otomatis dibuat |
-| Sedang | Feedback tidak memiliki batas body dan fallback hash salt dapat ditebak | Body dibatasi 8 KB dan salt fallback dibuat acak per proses |
-| Sedang | Test/build bergantung pada nomor rilis serta dokumen historis | Audit dinamis, test runner, dan build deterministik menggantikannya |
-| Sedang | Situs tidak mengirim CSP dan metadata social sharing tidak lengkap | CSP kompatibel dipasang pada Vercel/server lokal; Open Graph dan Twitter Card dilengkapi |
-| Sedang | Image Vectorizer hanya memantau task ekspor sehingga penyebab task induk hilang | Task convert dan export dipantau terpisah; kode kuota, autentikasi, timeout, dan provider diteruskan ke UI |
+| Kritis | Route `_service` Danbooru, Anime-to-Real, AI Song, dan HD4 dipanggil sebelum pemeriksaan akses dinamis | Resolusi policy dan `authorizeTool()` kini selalu berjalan sebelum handler provider |
+| Kritis | GenMail, AIO Downloader, Comic Reader, Document AI, dan Text-to-PDF belum seluruhnya masuk mapping VVIP server | Seluruh route server-backed dipetakan terpusat di `lib/server-access-policy.js` |
+| Kritis | Admin dapat memberi label VVIP ke tool yang seluruh logic-nya berada di JS publik atau URL eksternal | Admin API menolak `access_level=vvip` dengan 422 sampai tool memiliki gerbang API Nexora; public catalogue menormalkan lock palsu menjadi Free |
+| Tinggi | Client dapat mengganti query `tool` pada proxy media host bersama untuk mencoba memilih policy yang lebih ringan | Host Nexray memeriksa seluruh kandidat server tool, bukan mempercayai satu label dari browser |
+| Tinggi | Login akun/admin belum konsisten menolak browser cross-site | Same-origin / `Sec-Fetch-Site` verification diterapkan; allowlist tambahan harus berupa exact origin |
+| Tinggi | Helper entitlement tersebar dan error handling tidak seragam | Ditambahkan `requireAuthenticatedUser`, `requireEntitlement`, `requirePermission`, dan `authorizeTool` yang fail-closed |
+| Tinggi | Tool lokal/external terlihat terlindungi UI padahal clone tetap memiliki logic tersebut | Hanya 28 ID server-backed yang boleh VVIP; migration 033 membersihkan status lama yang tidak enforceable |
+| Tinggi | Build belum melakukan audit ulang setelah file dipindahkan ke `public/` | Build sekarang gagal jika secret-like token, private key, source map, atau file privat muncul pada bundle publik |
+| Sedang | Account login/register/recovery belum memiliki limiter lokal terpusat | Fixed-window rate limit bounded ditambahkan tanpa menyimpan email/IP mentah sebagai key |
+| Sedang | Alight Premium dan IPinfo belum memiliki limiter handler sendiri | Rate limit dan `Retry-After` ditambahkan; raw error provider Alight tidak lagi dikirim ke browser |
+| Sedang | Validasi target SiteGrabber hanya memeriksa protocol | Validator publik yang memblokir localhost, private/reserved IP, kredensial URL, dan port berbahaya digunakan kembali |
+| Sedang | CSP mengizinkan `base-uri` dan `form-action` ke HTTPS mana pun | Keduanya dipersempit ke `'self'`; CORP, HSTS, dan cross-domain policy header ditambahkan |
+
+## Endpoint server-authorized
+
+Policy server mencakup All-in-One Downloader; Instagram, TikTok, YouTube, Spotify, dan Terabox; Alight Premium; AI Song; Anime-to-Real; Auto PDF; BMKG; Comic Reader; Crypto Market; Danbooru; Document AI; ElevenLabs; HD4; GenMail; SiteGrabber; Image Vectorizer; IP Intelligence; Novel Cover; OCR; Prompt Generator; Space Explorer; SVG-to-Alight; VDeploy; dan Web Intelligence.
+
+Metadata/configuration serta probe kesehatan yang tidak menjalankan provider tetap dapat dibaca publik. Saat sebuah tool diatur VVIP, operasi sebenarnya tetap meminta session dan entitlement server.
+
+## Session dan admin
+
+- Access/refresh token akun dan admin berada pada cookie HttpOnly.
+- Cookie produksi memakai `Secure`; refresh dan CSRF memakai `SameSite=Strict`.
+- Mutasi akun/admin memakai double-submit CSRF dan origin verification.
+- Semua operasi `/api/admin/*` memanggil `requireAdmin()`; role edit tetap diperiksa server.
+- Admin UI guard hanya untuk pengalaman pengguna dan tidak menjadi authorization.
+
+## Secret dan build
+
+Provider key hanya dibaca dari `process.env` pada `api/` atau `lib/`. Frontend tidak menerima nilai key. `scripts/audit-public-build.js` memeriksa hasil final `public/`, termasuk token Google/OpenAI/Hugging Face/GitHub/JWT, header authorization literal, private key, source map, serta file backend atau environment yang tidak boleh diterbitkan.
 
 ## Verifikasi
-
-Jalankan:
 
 ```bash
 npm run check
 npm test
 npm run build
-npm audit --omit=dev
 ```
 
-Regression test memeriksa konsistensi 44 tool, sintaks seluruh JavaScript, batas 12 Functions, isolasi iframe, bounded memory, ukuran payload, route emulation, dan penolakan akses file privat dari server lokal.
+Regression `test-security-authorization-v7.js` mencakup clone origin, spoof body VIP/admin, session kosong (401), akun non-VVIP (403), session VVIP aktif, default-deny tool frontend, urutan guard dispatcher, downgrade proxy media, sinkronisasi SQL-policy, header, dan audit bundle publik.
+
+## Konfigurasi manual
+
+1. Jalankan `database/migrations/033_server_authorization_hardening.sql` pada Supabase production.
+2. Biarkan `NEXORA_ALLOWED_ORIGINS` kosong untuk same-origin default. Isi hanya jika ada frontend resmi lain, dengan daftar exact origin dipisahkan koma. Jangan memakai `*`.
+3. Pastikan secret Vercel hanya tersedia pada environment yang diperlukan lalu redeploy.
+4. Rotasi credential yang pernah dipublikasikan di screenshot, repository, chat publik, atau bundle lama.
 
 ## Risiko tersisa
 
-- Tool yang memakai API pihak ketiga mengikuti ketersediaan, kuota, dan kontrak provider tersebut.
-- Source HTML legacy berukuran besar masih dipertahankan untuk beberapa tool aktif. Sandbox membatasi haknya, tetapi migrasi bertahap ke komponen native akan membuat pemeliharaan lebih mudah.
-- CSP aktif masih mengizinkan inline script/style dan sejumlah origin eksternal untuk kompatibilitas payload legacy. Migrasikan handler dan payload tersebut bertahap agar `'unsafe-inline'` serta allowlist yang tidak lagi diperlukan dapat dihapus.
-- Token deployment memiliki hak tinggi. Gunakan token scoped, rotasi berkala, lindungi `NEXORA_DEPLOY_ACCESS_KEY`, dan audit aktivitas provider.
-- Audit ini tidak menggantikan penetration test terhadap deployment produksi beserta konfigurasi akun/provider yang sebenarnya.
+- Tampilan dan logic tool yang memang berjalan lokal di browser tetap dapat disalin; tool tersebut sengaja tidak boleh diberi status VVIP sampai operasinya dipindahkan ke server.
+- Rate limit in-memory bekerja per instance Function. Untuk pembatasan global yang konsisten lintas region, gunakan store terdistribusi dan user-based quota pada tahap berikutnya.
+- CSP masih membutuhkan inline script/style dan beberapa origin eksternal karena kompatibilitas tool legacy. Penghapusannya memerlukan migrasi frontend bertahap dan tidak dilakukan secara membabi buta.
+- Origin check adalah defense-in-depth, bukan pengganti session, entitlement, admin role, quota, atau rate limit.
+- Audit source tidak menggantikan penetration test deployment production dan pemeriksaan konfigurasi provider nyata.

@@ -10,6 +10,21 @@ const { handleNovelCover } = require("../lib/ai-cover/http");
 const { handleElevenLabs } = require("../lib/elevenlabs-studio");
 const { handleTextToPdf } = require("../lib/text-to-pdf");
 const { authorizeTool } = require("../lib/account-membership");
+const { healthToolId } = require("../lib/server-access-policy");
+const { verifySameOriginRequest } = require("../lib/request-security");
+
+function publicMetadataRequest(mode, request, requestUrl) {
+  const method = String(request.method || "GET").toUpperCase();
+  if (!["GET", "HEAD"].includes(method)) return false;
+  if (mode === "comic-reader") return !requestUrl.searchParams.get("action");
+  return new Set([
+    "document-ai",
+    "prompt-generator",
+    "novel-cover",
+    "elevenlabs",
+    "text-to-pdf"
+  ]).has(mode);
+}
 
 function send(response, status, payload, headOnly) {
   response.setHeader("Cache-Control", "no-store, max-age=0");
@@ -21,31 +36,25 @@ function send(response, status, payload, headOnly) {
 
 module.exports = async function handler(request, response) {
   const requestUrl = new URL(request.url || "/api/health", `http://${request.headers.host || "localhost"}`);
-  if (requestUrl.searchParams.get("mode") === "ai-chat") return handlePersonalAi(request, response);
-  if (requestUrl.searchParams.get("mode") === "document-ai") {
-    return handleDocumentAi(request, response);
+  const mode = String(requestUrl.searchParams.get("mode") || "").toLowerCase();
+  if (mode === "ai-chat") return handlePersonalAi(request, response);
+
+  const protectedId = healthToolId(mode);
+  if (protectedId && !verifySameOriginRequest(request)) {
+    return send(response, 403, { ok: false, error: "ORIGIN_NOT_ALLOWED", message: "Permintaan lintas situs ditolak." });
   }
-  if (requestUrl.searchParams.get("mode") === "prompt-generator") {
-    if (request.method === "POST" && !(await authorizeTool(request, response, "promptgenerate"))) return;
-    return handlePromptGenerator(request, response);
-  }
-  if (requestUrl.searchParams.get("mode") === "comic-reader") return handleComicReader(request, response);
-  if (requestUrl.searchParams.get("mode") === "novel-cover") {
-    if (request.method === "POST" && !(await authorizeTool(request, response, "novelcover"))) return;
-    return handleNovelCover(request, response);
-  }
-  if (requestUrl.searchParams.get("mode") === "elevenlabs") {
-    if (request.method === "POST" && !(await authorizeTool(request, response, "elevenlabs"))) return;
-    return handleElevenLabs(request, response);
-  }
-  if (requestUrl.searchParams.get("mode") === "text-to-pdf") return handleTextToPdf(request, response);
-  if (requestUrl.searchParams.get("mode") === "database") {
+  if (protectedId && !publicMetadataRequest(mode, request, requestUrl) && !(await authorizeTool(request, response, protectedId))) return;
+
+  if (mode === "document-ai") return handleDocumentAi(request, response);
+  if (mode === "prompt-generator") return handlePromptGenerator(request, response);
+  if (mode === "comic-reader") return handleComicReader(request, response);
+  if (mode === "novel-cover") return handleNovelCover(request, response);
+  if (mode === "elevenlabs") return handleElevenLabs(request, response);
+  if (mode === "text-to-pdf") return handleTextToPdf(request, response);
+  if (mode === "database") {
     return publicDatabaseHandler(request, response);
   }
-  if (requestUrl.searchParams.get("mode") === "vdeploy") {
-    if (!(await authorizeTool(request, response, "vdeploy"))) return;
-    return handleVDeploy(request, response);
-  }
+  if (mode === "vdeploy") return handleVDeploy(request, response);
   if (request.method !== "GET" && request.method !== "HEAD") {
     response.setHeader("Allow", "GET, HEAD");
     return send(response, 405, { ok: false, error: "METHOD_NOT_ALLOWED" }, false);

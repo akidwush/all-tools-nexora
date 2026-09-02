@@ -28,6 +28,12 @@ for (const filename of ["index.html", "about.html", "feedback.html", "favicon.sv
 fs.cpSync(path.join(root, "assets"), path.join(output, "assets"), { recursive: true, force: true });
 fs.cpSync(path.join(root, "admin"), path.join(output, "admin"), { recursive: true, force: true });
 
+try { require("./audit-public-build.js").auditPublicBuild(output); }
+catch (error) {
+  console.error(error.message || "Audit keamanan bundle publik gagal.");
+  process.exit(1);
+}
+
 const manifest = JSON.parse(fs.readFileSync(path.join(root, "assets/module-manifest.json"), "utf8"));
 const expected = [
   "public/index.html", "public/about.html", "public/feedback.html", "public/favicon.svg",

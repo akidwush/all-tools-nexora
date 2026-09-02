@@ -3,6 +3,7 @@ const { requireAdmin, verifyMutationRequest } = require("../../lib/admin-auth");
 const { recordAdminAudit } = require("../../lib/admin-audit");
 const { TOOL_CATALOG } = require("../../lib/tool-health");
 const { sendJson: send } = require("../../lib/http-response");
+const { isServerAuthorizedTool } = require("../../lib/server-access-policy");
 
 const ALLOWED_CATEGORIES = new Set(["downloader", "maker", "tools", "vault", "external"]);
 const BUILTIN_TOOL_IDS = new Set(TOOL_CATALOG.map((item) => item.id));
@@ -78,7 +79,15 @@ async function ensureBuiltinCatalogRows(rows) {
 }
 
 function responseShape(item) {
-  return item ? { ...item, is_custom: isCustomTool(item) } : null;
+  if (!item) return null;
+  const vipEligible = isServerAuthorizedTool(item.id);
+  return {
+    ...item,
+    access_level: vipEligible && item.access_level === "vvip" ? "vvip" : "free",
+    is_custom: isCustomTool(item),
+    vip_eligible: vipEligible,
+    security_warning: !vipEligible && item.access_level === "vvip" ? "UNENFORCEABLE_VIP_RESET_TO_FREE" : null
+  };
 }
 
 function auditShape(item) {
@@ -103,7 +112,7 @@ function toolId(value) {
   return /^[a-z0-9][a-z0-9_-]{1,79}$/.test(id) ? id : null;
 }
 
-function toolPayload(body, current) {
+function toolPayload(body, current, id) {
   const category = clean(body.category, 30).toLowerCase() || current?.category || "external";
   if (!ALLOWED_CATEGORIES.has(category)) return { error: "INVALID_CATEGORY" };
   let url = null;
@@ -114,6 +123,16 @@ function toolPayload(body, current) {
   if (!icon) return { error: "INVALID_ICON", message: "Icon harus berupa class Font Awesome yang valid." };
   const name = clean(body.name, 80);
   if (name.length < 2) return { error: "INVALID_NAME" };
+  const accessLevel = ["free", "vvip"].includes(clean(body.accessLevel, 10).toLowerCase())
+    ? clean(body.accessLevel, 10).toLowerCase()
+    : (current?.access_level || "free");
+  if (accessLevel === "vvip" && !isServerAuthorizedTool(id || current?.id)) {
+    return {
+      error: "VIP_REQUIRES_SERVER_GATE",
+      status: 422,
+      message: "Tool frontend atau tautan eksternal tidak dapat dijadikan VVIP dengan aman. Pindahkan operasinya ke API Nexora terlebih dahulu."
+    };
+  }
   return {
     name,
     description: clean(body.description, 240),
@@ -122,7 +141,7 @@ function toolPayload(body, current) {
     icon,
     external_url: url,
     is_active: booleanValue(body.isActive, current ? Boolean(current.is_active) : true),
-    access_level: ["free","vvip"].includes(clean(body.accessLevel,10).toLowerCase()) ? clean(body.accessLevel,10).toLowerCase() : (current?.access_level || "free"),
+    access_level: accessLevel,
     sort_order: sortValue(body.sortOrder),
     updated_at: new Date().toISOString(),
     ...(current ? { metadata: current.metadata || {} } : { metadata: customMetadata() })
@@ -192,8 +211,8 @@ module.exports = async function handler(request, response) {
       if (BUILTIN_TOOL_IDS.has(id)) return send(response, 409, { ok: false, error: "BUILTIN_ID_RESERVED", message: "ID ini dipakai oleh tool bawaan." });
       const existing = await findTool(id);
       if (existing) return send(response, 409, { ok: false, error: "TOOL_ID_EXISTS", message: "ID tool sudah digunakan." });
-      const payload = toolPayload(body);
-      if (payload.error) return send(response, 400, payload);
+      const payload = toolPayload(body, null, id);
+      if (payload.error) return send(response, payload.status || 400, payload);
       if (!payload.external_url) return send(response, 400, { ok: false, error: "CUSTOM_URL_REQUIRED", message: "Tool baru wajib memiliki URL eksternal." });
 
       const rows = await databaseRequest("tools", {
@@ -238,8 +257,8 @@ module.exports = async function handler(request, response) {
       return send(response, 200, { ok: true, deleted: id, auditLogged, deletedBy: session.user.email || session.user.id });
     }
 
-    const payload = toolPayload(body, current);
-    if (payload.error) return send(response, 400, payload);
+    const payload = toolPayload(body, current, id);
+    if (payload.error) return send(response, payload.status || 400, payload);
     const rows = await databaseRequest(`tools?id=eq.${encodeURIComponent(id)}`, {
       method: "PATCH",
       headers: { Prefer: "return=representation" },

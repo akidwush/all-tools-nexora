@@ -163,7 +163,8 @@ async function main() {
     assert.ok(manifest.modules["prompt-generator"].js.includes("assets/js/features/prompt-generator.js"));
     const vercel = JSON.parse(read("vercel.json"));
     assert.ok(vercel.rewrites.some((row) => row.source === "/api/prompt-generator" && row.destination.includes("mode=prompt-generator")));
-    assert.match(read("api/health.js"), /authorizeTool\(request, response, "promptgenerate"\)/);
+    assert.match(read("api/health.js"), /healthToolId\(mode\)/);
+    assert.equal(require("../lib/server-access-policy").healthToolId("prompt-generator"), "promptgenerate");
     assert.match(read("database/migrations/025_prompt_generator_vision.sql"), /Tidak mengubah access_level/);
 
     console.log("Prompt Generator v2 lulus: Gemini Vision server-side, magic-byte image validation, model presets, privacy, Free/VVIP gate, responsive UI, copy/download, dan route aman aktif.");

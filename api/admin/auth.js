@@ -13,6 +13,7 @@ const {
 const { databaseRequest } = require("../../lib/database");
 const { recordAdminAudit } = require("../../lib/admin-audit");
 const { takeFixedWindow } = require("../../lib/memory-store");
+const { verifySameOriginRequest } = require("../../lib/request-security");
 const { sendJson: send } = require("../../lib/http-response");
 
 const attempts = new Map();
@@ -56,6 +57,9 @@ module.exports = async function handler(request, response) {
   }
 
   if (request.method === "POST") {
+    if (!verifySameOriginRequest(request)) {
+      return send(response, 403, { ok: false, error: "ORIGIN_NOT_ALLOWED", message: "Permintaan lintas situs ditolak." });
+    }
     const body = request.body && typeof request.body === "object" ? request.body : {};
     const email = clean(body.email, 254).toLowerCase();
     const password = String(body.password || "").slice(0, 200);

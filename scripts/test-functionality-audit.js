@@ -23,7 +23,11 @@ function responseMock() {
   delete require.cache[membershipPath];
   let membership = require(membershipPath);
   let response = responseMock();
-  assert.equal(await membership.authorizeTool({ method: "GET", headers: {}, socket: {} }, response, "calc"), true);
+  assert.equal(await membership.authorizeTool({ method: "GET", headers: {}, socket: {} }, response, "webintel"), true);
+
+  response = responseMock();
+  assert.equal(await membership.authorizeTool({ method: "GET", headers: {}, socket: {} }, response, "calc"), false);
+  assert.equal(response.statusCode, 403, "tool frontend harus default-deny jika dipanggil sebagai permission server");
 
   database.databaseRequest = async () => [{ access_level: "vvip" }];
   delete require.cache[membershipPath];

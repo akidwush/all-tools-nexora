@@ -202,6 +202,8 @@ function applySecurityHeaders(response) {
   response.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
   response.setHeader("Permissions-Policy", "camera=(), geolocation=(), microphone=(self)");
   response.setHeader("X-Frame-Options", "SAMEORIGIN");
+  response.setHeader("X-Permitted-Cross-Domain-Policies", "none");
+  response.setHeader("Cross-Origin-Resource-Policy", "same-site");
   response.setHeader("Content-Security-Policy", CONTENT_SECURITY_POLICY);
 }
 
