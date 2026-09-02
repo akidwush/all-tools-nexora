@@ -246,7 +246,15 @@
       }
       var health=healthMap[meta.id]||null;
       var healthStatus=normalizedHealth(health);
-      if(status==="ready"&&healthStatus==="offline"){status="offline";issues.push(health.lastError||"Dependensi tidak dapat dijangkau.");}
+      if(status==="ready"&&healthStatus==="offline"){
+        var healthMessage=String(health&&health.lastError||"");
+        var timeoutOnly=/HEALTH_TIMEOUT|melewati batas waktu|timeout/i.test(healthMessage);
+        // A single health timeout is an inconclusive probe. Do not label a tool
+        // as fully broken when its module/handler loaded and runtime fallback may
+        // still work; surface it as degraded until a hard failure is confirmed.
+        status=timeoutOnly?"degraded":"offline";
+        issues.push(healthMessage||(timeoutOnly?"Health probe melewati batas waktu.":"Dependensi tidak dapat dijangkau."));
+      }
       else if(status==="ready"&&healthStatus==="degraded"){status="degraded";issues.push(health.lastError||"Dependensi merespons terbatas.");}
       var card=findRenderedCard(meta.id);
       var catalogPresent=Boolean(card)||catalogHas(meta.id);
@@ -258,7 +266,7 @@
     }
     var counts={ready:0,degraded:0,offline:0,restricted:0,missing:0};
     results.forEach(function(item){counts[item.status]=(counts[item.status]||0)+1;});
-    lastAudit={version:"6.4.0",startedAt:new Date(started).toISOString(),completedAt:new Date().toISOString(),durationMs:Date.now()-started,counts:counts,total:results.length,results:results};
+    lastAudit={version:"6.4.0-healthfix1",startedAt:new Date(started).toISOString(),completedAt:new Date().toISOString(),durationMs:Date.now()-started,counts:counts,total:results.length,results:results};
     try{localStorage.setItem("nexora-functional-audit-v62",JSON.stringify(lastAudit));}catch(_){ }
     window.dispatchEvent(new CustomEvent("nexora:functional-audit-complete",{detail:lastAudit}));
     return lastAudit;
@@ -295,6 +303,6 @@
   else{initializeRecovery();initializeStatus();}
 
   window.NexoraViewportRecovery={reconcile:reconcileScrollLock};
-  window.NexoraStability={version:"6.3.21-hf11.1",audit:audit,loadHealth:loadHealth,applyCardStatus:applyCardStatus,notify:notify,fetchJson:fetchJson,reconcileScrollLock:reconcileScrollLock,getLastAudit:function(){return lastAudit;},getHealth:function(id){return healthMap[id]||null;}};
+  window.NexoraStability={version:"6.4.0-healthfix1",audit:audit,loadHealth:loadHealth,applyCardStatus:applyCardStatus,notify:notify,fetchJson:fetchJson,reconcileScrollLock:reconcileScrollLock,getLastAudit:function(){return lastAudit;},getHealth:function(id){return healthMap[id]||null;}};
   window.dispatchEvent(new CustomEvent("nexora:stability-ready"));
 })();

@@ -58,6 +58,29 @@ async function main() {
   assert.equal(classifyProbe(slowProbe, { strict: true }, { degradedLatencyMs: 20 }).status, "degraded");
   assert.equal(classifyProbe({ statusCode: 403, latencyMs: 10 }, { strict: false }, { degradedLatencyMs: 500 }).status, "degraded");
   assert.equal(classifyProbe({ statusCode: 405, latencyMs: 10 }, { strict: false }, { degradedLatencyMs: 500 }).status, "degraded");
+  assert.equal(classifyProbe({ errorCode: "HEALTH_TIMEOUT", errorMessage: "Melewati batas waktu 4500 ms.", latencyMs: 4501 }, { type: "external-api", strict: false }, { degradedLatencyMs: 500 }).status, "degraded");
+  assert.equal(classifyProbe({ errorCode: "HEALTH_TIMEOUT", errorMessage: "Melewati batas waktu 4500 ms.", latencyMs: 4501 }, { type: "module", strict: true }, { degradedLatencyMs: 500 }).status, "offline");
+
+  const { providerHealth } = require("../lib/downloader-service");
+  const nativeFetch = global.fetch;
+  global.fetch = (url, options = {}) => {
+    const text = String(url);
+    if (text.includes("api.siputzx.my.id")) {
+      return Promise.resolve(new Response("{}", { status: 200, headers: { "Content-Type": "application/json" } }));
+    }
+    return new Promise((_resolve, reject) => {
+      const abort = () => reject(Object.assign(new Error("aborted"), { name: "AbortError" }));
+      if (options.signal?.aborted) return abort();
+      options.signal?.addEventListener("abort", abort, { once: true });
+    });
+  };
+  const providerStarted = Date.now();
+  try {
+    assert.equal(await providerHealth("instagram"), true);
+    assert.ok(Date.now() - providerStarted < 1_000, "provider health must return on first healthy fallback instead of waiting for slow peers");
+  } finally {
+    global.fetch = nativeFetch;
+  }
 
   const run = await runToolHealthChecks({
     origin,

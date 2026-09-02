@@ -23,6 +23,6 @@ assert.doesNotMatch(stability, /new MutationObserver/);
 assert.match(stability, /document\.addEventListener\("click"/);
 assert.match(ai, /if\(Math\.abs\(scale-1\)>0\.025\)return/);
 assert.match(html, /core\.css\?v=6\.4\.0-hf17-desktop-nav2/);
-assert.match(html, /stability\.js\?v=6\.4\.0-hf11\.1-health-auto/);
+assert.match(html, /stability\.js\?v=6\.4\.0-healthfix1/);
 
 console.log("HF7/HF8 mobile recovery lulus: pinch zoom stabil, scroll lock pulih, pull-to-refresh browser aktif, dan tombol refresh tambahan tidak dibuat.");
