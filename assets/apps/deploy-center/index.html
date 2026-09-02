@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head><base href="/">
+<meta charset="UTF-8">
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1,viewport-fit=cover"
+>
+<title>Nexora Deploy Center</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+
+:root{
+  --bg:#050505;
+  --panel:#0d0d0f;
+  --panel2:#121216;
+  --panel3:#17171c;
+  --line:rgba(255,255,255,.075);
+  --line-strong:rgba(255,255,255,.14);
+  --text:#f3f3f5;
+  --muted:#7d7d88;
+  --soft:#a6a6af;
+  --green:#4ade80;
+  --red:#fb7185;
+  --yellow:#fbbf24;
+  --radius:25px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--bg);color-scheme:dark}
+body{
+  min-height:100dvh;
+  padding:calc(26px + env(safe-area-inset-top)) 18px calc(52px + env(safe-area-inset-bottom));
+  color:var(--text);
+  background:
+    radial-gradient(circle at 100% -8%,rgba(95,90,120,.22),transparent 34%),
+    radial-gradient(circle at -8% 105%,rgba(70,70,90,.15),transparent 30%),
+    #050505;
+  font-family:'Space Grotesk',Inter,system-ui,-apple-system,'Segoe UI',sans-serif;
+  overflow-x:hidden;
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:48px 48px;
+  mask-image:linear-gradient(to bottom,rgba(0,0,0,.8),transparent 82%);
+}
+button,input,textarea{font:inherit}
+button,a{-webkit-tap-highlight-color:transparent}
+.shell{
+  position:relative;z-index:1;width:min(100%,900px);margin:0 auto;
+  animation:deployReveal .48s cubic-bezier(.2,.9,.4,1.1)
+}
+@keyframes deployReveal{
+  from{opacity:0;transform:translateY(16px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.hero{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  margin-bottom:26px;padding:0 0 22px;border-bottom:1px solid var(--line)
+}
+.brand{display:flex;align-items:center;gap:13px;min-width:0}
+.brand-icon{
+  width:50px;height:50px;display:grid;place-items:center;flex:0 0 auto;
+  border:1px solid var(--line);border-radius:17px;
+  background:linear-gradient(145deg,#19191d,#0b0b0d);color:#f8f8fa;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 16px 34px rgba(0,0,0,.28)
+}
+.brand-icon svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.05;stroke-linecap:round;stroke-linejoin:round}
+.brand-copy{min-width:0}
+.brand-copy h1{
+  font-size:clamp(20px,4vw,28px);font-weight:750;letter-spacing:-.055em;
+  background:linear-gradient(135deg,#fff,#a7a7ad);-webkit-background-clip:text;background-clip:text;color:transparent
+}
+.brand-copy p{
+  margin-top:5px;overflow:hidden;color:#73737d;font-size:10px;font-weight:650;
+  letter-spacing:.02em;text-overflow:ellipsis;white-space:nowrap
+}
+.server-status{
+  min-height:34px;display:inline-flex;align-items:center;gap:8px;padding:0 12px;flex:0 0 auto;
+  border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.025);
+  color:#777781;font-size:9px;font-weight:800
+}
+.server-status i{width:7px;height:7px;border-radius:50%;background:#60606a}
+.server-status.checking i{background:var(--yellow);box-shadow:0 0 12px rgba(251,191,36,.26)}
+.server-status.ok i{background:var(--green);box-shadow:0 0 12px rgba(74,222,128,.45)}
+.server-status.error i{background:var(--red);box-shadow:0 0 12px rgba(251,113,133,.34)}
+.platform-picker{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px
+}
+.platform-option{
+  position:relative;min-height:78px;display:flex;align-items:center;gap:12px;padding:13px 14px;
+  overflow:hidden;border:1px solid var(--line);border-radius:20px;
+  background:linear-gradient(145deg,rgba(20,20,24,.9),rgba(10,10,13,.76));
+  color:var(--text);text-align:left;cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+  transition:border-color .2s ease,background .2s ease,transform .2s ease,box-shadow .2s ease
+}
+.platform-option::before{
+  content:"";position:absolute;inset:auto -34px -48px auto;width:110px;height:110px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.09),transparent 67%);opacity:0;transition:opacity .2s ease
+}
+.platform-option:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.16)}
+.platform-option.active{
+  border-color:rgba(255,255,255,.25);
+  background:linear-gradient(145deg,#1b1b20,#0e0e11);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 14px 35px rgba(0,0,0,.24)
+}
+.platform-option.active::before{opacity:1}
+.platform-logo{
+  width:44px;height:44px;display:grid;place-items:center;flex:0 0 auto;
+  border:1px solid var(--line);border-radius:14px;background:#09090b;color:#f5f5f7
+}
+.platform-logo svg{width:22px;height:22px;display:block}
+.platform-logo.vercel svg{fill:currentColor}
+.platform-logo.netlify svg{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.platform-copy{min-width:0;display:grid;gap:4px}
+.platform-copy b{font-size:12px;font-weight:800;letter-spacing:-.02em}
+.platform-copy small{
+  overflow:hidden;color:#6f6f79;font-size:8px;font-weight:700;text-overflow:ellipsis;white-space:nowrap
+}
+.platform-check{
+  width:20px;height:20px;display:grid;place-items:center;margin-left:auto;flex:0 0 auto;
+  border:1px solid var(--line);border-radius:50%;color:transparent;background:#0a0a0c
+}
+.platform-check svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.platform-option.active .platform-check{border-color:#ededf0;background:#ededf0;color:#08080a}
+.card{
+  overflow:hidden;border:1px solid var(--line);border-radius:var(--radius);
+  background:rgba(10,10,12,.86);backdrop-filter:blur(18px);
+  box-shadow:0 28px 90px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.025)
+}
+.tabs{
+  display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:8px;
+  border-bottom:1px solid var(--line);background:rgba(255,255,255,.015)
+}
+.tab{
+  min-height:44px;border:1px solid transparent;border-radius:14px;background:transparent;
+  color:#696973;font-size:10px;font-weight:850;letter-spacing:.035em;cursor:pointer;transition:.2s ease
+}
+.tab:hover{color:#c7c7cd;background:rgba(255,255,255,.025)}
+.tab.active{
+  border-color:var(--line-strong);background:linear-gradient(145deg,#1a1a1f,#111114);
+  color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.035)
+}
+.form{padding:22px}
+.field{display:grid;gap:8px;margin-bottom:16px}
+.field label{
+  color:#9b9ba4;font-size:9px;font-weight:850;letter-spacing:.11em;text-transform:uppercase
+}
+.field input,.field textarea{
+  width:100%;border:1px solid var(--line);border-radius:15px;outline:none;
+  background:#08080a;color:var(--text);font-size:12px;font-weight:650;
+  transition:border-color .18s ease,box-shadow .18s ease,background .18s ease
+}
+.field input{min-height:50px;padding:0 14px}
+.field textarea{
+  min-height:280px;resize:vertical;padding:14px;
+  font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:10px;line-height:1.65
+}
+.field input:focus,.field textarea:focus{
+  border-color:rgba(255,255,255,.22);background:#0b0b0e;box-shadow:0 0 0 4px rgba(255,255,255,.035)
+}
+.hint{color:#62626b;font-size:9px;font-weight:650;line-height:1.55}
+.panel{display:none}.panel.active{display:block}
+.drop{
+  position:relative;min-height:168px;display:grid;place-items:center;padding:20px;
+  border:1px dashed rgba(255,255,255,.17);border-radius:20px;
+  background:linear-gradient(145deg,rgba(255,255,255,.025),rgba(255,255,255,.008));
+  text-align:center;cursor:pointer;transition:border-color .18s ease,background .18s ease,transform .18s ease
+}
+.drop:hover,.drop.over{
+  border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.04);transform:translateY(-1px)
+}
+.drop input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.drop svg{
+  width:31px;height:31px;margin-bottom:12px;fill:none;stroke:#d5d5da;stroke-width:1.8;
+  stroke-linecap:round;stroke-linejoin:round
+}
+.drop b{display:block;color:#f0f0f2;font-size:12px;font-weight:800}
+.drop span{display:block;margin-top:6px;color:#65656e;font-size:9px;font-weight:650}
+.file-chip{
+  display:none;align-items:center;gap:11px;margin-top:11px;padding:11px;
+  border:1px solid var(--line);border-radius:15px;background:rgba(255,255,255,.02)
+}
+.file-chip.show{display:flex}
+.file-chip svg{
+  width:21px;height:21px;flex:0 0 auto;fill:none;stroke:#c8c8ce;stroke-width:1.9;
+  stroke-linecap:round;stroke-linejoin:round
+}
+.file-info{min-width:0;flex:1}
+.file-info b,.file-info span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-info b{font-size:10px;color:#efeff1}
+.file-info span{margin-top:3px;color:#64646d;font-size:8px;font-weight:700}
+.file-remove{
+  min-height:33px;padding:0 11px;border:1px solid rgba(251,113,133,.18);border-radius:10px;
+  background:rgba(251,113,133,.07);color:#fb8da0;font-size:8px;font-weight:850;cursor:pointer
+}
+.actions{display:grid;grid-template-columns:.72fr 1.28fr;gap:10px;margin-top:18px}
+.btn{
+  min-height:49px;display:flex;align-items:center;justify-content:center;gap:9px;
+  border:1px solid var(--line);border-radius:15px;font-size:10px;font-weight:850;
+  letter-spacing:.025em;cursor:pointer;transition:transform .18s ease,background .18s ease,border-color .18s ease
+}
+.btn:hover{transform:translateY(-1px)}
+.btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-preview{background:#111115;color:#b5b5bd}
+.btn-preview:hover{background:#17171c;border-color:var(--line-strong)}
+.btn-deploy{
+  border-color:#ededf0;background:linear-gradient(135deg,#fff,#d8d8dd);color:#08080a;
+  box-shadow:0 14px 36px rgba(255,255,255,.08)
+}
+.btn-deploy:hover{background:#fff}
+.progress{
+  display:none;margin-top:15px;padding:14px;border:1px solid var(--line);border-radius:17px;background:#08080a
+}
+.progress.show{display:block}
+.progress-top{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;
+  color:#92929c;font-size:9px;font-weight:800
+}
+.bar{height:5px;overflow:hidden;border-radius:99px;background:#202026}
+.bar span{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,#8e8e98,#fff);transition:width .25s ease}
+.log{
+  max-height:190px;margin-top:11px;overflow:auto;color:#6f6f78;
+  font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:8px;font-weight:650;line-height:1.7
+}
+.log div{margin-bottom:3px}.log .ok{color:#61dc91}.log .err{color:#fb8297}.log .warn{color:#f1c563}
+.result{
+  display:none;margin-top:15px;padding:15px;border:1px solid rgba(74,222,128,.20);
+  border-radius:18px;background:rgba(74,222,128,.055)
+}
+.result.show{display:block}
+.result b{display:block;color:#75e5a0;font-size:11px;font-weight:850}
+.result a{
+  display:block;margin-top:7px;overflow:hidden;color:#f4f4f6;font-size:10px;font-weight:750;
+  text-overflow:ellipsis;white-space:nowrap
+}
+.result span{display:block;margin-top:6px;color:#6c6c75;font-size:8px;font-weight:700}
+.preview{
+  position:fixed;inset:0;z-index:1000;display:none;flex-direction:column;background:#050505
+}
+.preview.show{display:flex}
+.preview-head{
+  min-height:62px;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:9px 13px;border-bottom:1px solid var(--line);background:rgba(7,7,9,.97);
+  backdrop-filter:blur(16px)
+}
+.preview-head b{font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+.preview-close{
+  min-height:38px;padding:0 13px;border:1px solid var(--line);border-radius:12px;
+  background:rgba(255,255,255,.04);color:#dddde1;font-size:9px;font-weight:850;cursor:pointer
+}
+.preview iframe{width:100%;flex:1;border:0;background:#fff}
+.modal{
+  position:fixed;inset:0;z-index:1200;display:none;place-items:center;padding:18px;
+  background:rgba(0,0,0,.76);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)
+}
+.modal.show{display:grid}
+.modal-card{
+  width:min(100%,410px);display:grid;gap:13px;padding:20px;border:1px solid var(--line-strong);
+  border-radius:23px;background:#0d0d10;box-shadow:0 30px 100px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.03)
+}
+.modal-card h2{font-size:16px;letter-spacing:-.02em}
+.modal-card p{color:#80808a;font-size:9px;font-weight:650;line-height:1.65}
+.modal-card code{color:#d8d8dc}
+.modal-card input{
+  width:100%;min-height:48px;padding:0 13px;border:1px solid var(--line);border-radius:14px;
+  outline:none;background:#070709;color:#fff;font-size:11px;font-weight:750
+}
+.modal-card input:focus{border-color:rgba(255,255,255,.22);box-shadow:0 0 0 4px rgba(255,255,255,.035)}
+.access-input-wrap{position:relative;display:flex;align-items:center}
+.access-input-wrap input{padding-right:52px}
+.access-eye{
+  position:absolute;right:7px;top:50%;width:36px;height:36px;display:grid;place-items:center;
+  transform:translateY(-50%);border:1px solid var(--line);border-radius:11px;
+  background:#121216;color:#a8a8b0;cursor:pointer;transition:.2s ease
+}
+.access-eye:hover,.access-eye:focus-visible{color:#fff;border-color:rgba(255,255,255,.22);outline:none}
+.access-eye svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.access-channel-link{
+  min-height:50px;display:grid;grid-template-columns:36px minmax(0,1fr) 18px;align-items:center;gap:10px;
+  padding:8px 11px;border:1px solid rgba(37,211,102,.22);border-radius:14px;
+  background:rgba(37,211,102,.065);color:#e9fff1;text-decoration:none;transition:.2s ease
+}
+.access-channel-link:hover{background:rgba(37,211,102,.11);border-color:rgba(37,211,102,.38);transform:translateY(-1px)}
+.access-channel-icon{width:36px;height:36px;display:grid;place-items:center;border-radius:11px;background:rgba(37,211,102,.14);color:#4ade80}
+.access-channel-icon svg,.access-channel-arrow svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.access-channel-copy{min-width:0;display:grid;gap:2px}
+.access-channel-copy b{font-size:10px;font-weight:900;letter-spacing:.01em}
+.access-channel-copy span{color:#77a986;font-size:8px;font-weight:700;line-height:1.35}
+.access-channel-arrow{display:grid;place-items:center;color:#4ade80}
+.modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.modal-actions button{
+  min-height:44px;border:1px solid var(--line);border-radius:13px;font-size:9px;font-weight:850;cursor:pointer
+}
+.modal-cancel{background:#141418;color:#aaaab2}
+.modal-save{border-color:#ededf0!important;background:#f2f2f4;color:#08080a}
+.toast{
+  position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));z-index:1500;
+  max-width:calc(100% - 28px);padding:11px 14px;border:1px solid var(--line-strong);
+  border-radius:13px;background:#151519;color:#eeeef1;font-size:9px;font-weight:800;
+  opacity:0;pointer-events:none;transform:translate(-50%,15px);
+  transition:opacity .2s ease,transform .2s ease;box-shadow:0 18px 45px rgba(0,0,0,.42)
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:620px){
+  body{padding:calc(18px + env(safe-area-inset-top)) 12px calc(36px + env(safe-area-inset-bottom))}
+  .hero{align-items:flex-start;margin-bottom:19px;padding-bottom:17px}
+  .brand-icon{width:44px;height:44px;border-radius:15px}
+  .brand-copy h1{font-size:19px}
+  .brand-copy p{max-width:190px;font-size:8px}
+  .server-status{min-height:30px;padding:0 9px;font-size:8px}
+  .platform-picker{gap:8px}
+  .platform-option{min-height:70px;padding:11px;border-radius:17px;gap:9px}
+  .platform-logo{width:38px;height:38px;border-radius:12px}
+  .platform-copy small{max-width:120px}
+  .card{border-radius:21px}
+  .form{padding:14px}
+  .field textarea{min-height:230px}
+  .actions{grid-template-columns:1fr}
+  .btn{min-height:47px}
+}
+
+</style>
+</head>
+<body>
+<main class="shell">
+  <header class="hero">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2v13"></path>
+          <path d="M7 7l5-5 5 5"></path>
+          <path d="M5 13v7h14v-7"></path>
+        </svg>
+      </div>
+
+      <div class="brand-copy">
+        <h1>Nexora Deploy</h1>
+        <p id="brandSubtitle">Platform Vercel · production workspace</p>
+      </div>
+    </div>
+
+    <div class="server-status checking" id="serverStatus">
+      <i></i>
+      <span>Memeriksa server</span>
+    </div>
+  </header>
+
+  <section class="platform-picker" aria-label="Pilih platform deploy">
+    <button class="platform-option active" data-platform="vercel" type="button" aria-pressed="true">
+      <span class="platform-logo vercel" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 3 22 21H2L12 3Z"></path>
+        </svg>
+      </span>
+      <span class="platform-copy">
+        <b>Vercel</b>
+        <small>Production deployment</small>
+      </span>
+      <span class="platform-check" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"></path></svg>
+      </span>
+    </button>
+
+    <button class="platform-option" data-platform="netlify" type="button" aria-pressed="false">
+      <span class="platform-logo netlify" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 3v4"></path>
+          <path d="M12 17v4"></path>
+          <path d="M3 12h4"></path>
+          <path d="M17 12h4"></path>
+          <path d="m5.6 5.6 2.8 2.8"></path>
+          <path d="m15.6 15.6 2.8 2.8"></path>
+          <path d="m18.4 5.6-2.8 2.8"></path>
+          <path d="m8.4 15.6-2.8 2.8"></path>
+          <rect x="8.5" y="8.5" width="7" height="7" rx="1.5"></rect>
+        </svg>
+      </span>
+      <span class="platform-copy">
+        <b>Netlify</b>
+        <small>Site deployment</small>
+      </span>
+      <span class="platform-check" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"></path></svg>
+      </span>
+    </button>
+  </section>
+
+  <section class="card">
+    <div class="tabs">
+      <button class="tab active" data-panel="filePanel" type="button">
+        Upload File
+      </button>
+
+      <button class="tab" data-panel="textPanel" type="button">
+        Kode HTML
+      </button>
+    </div>
+
+    <div class="form">
+      <div class="field">
+        <label for="projectName">Nama Project</label>
+        <input
+          id="projectName"
+          type="text"
+          placeholder="nama-project"
+          autocomplete="off"
+          autocorrect="off"
+          spellcheck="false"
+        >
+        <div class="hint">
+          Nama otomatis diubah menjadi huruf kecil dan spasi menjadi tanda "-".
+          Nama yang sama akan membuat deployment produksi terbaru.
+        </div>
+      </div>
+
+      <section class="panel active" id="filePanel">
+        <div class="drop" id="dropZone">
+          <input
+            id="fileInput"
+            type="file"
+            accept=".html,.zip"
+          >
+
+          <div>
+            <svg viewBox="0 0 24 24">
+              <path d="M12 16V4"></path>
+              <path d="M7 9l5-5 5 5"></path>
+              <path d="M5 15v5h14v-5"></path>
+            </svg>
+            <b>Pilih file HTML atau ZIP</b>
+            <span>Tap atau seret file ke area ini</span>
+          </div>
+        </div>
+
+        <div class="file-chip" id="fileChip">
+          <svg viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <path d="M14 2v6h6"></path>
+          </svg>
+
+          <div class="file-info">
+            <b id="fileName"></b>
+            <span id="fileSize"></span>
+          </div>
+
+          <button class="file-remove" id="removeFile" type="button">
+            Hapus
+          </button>
+        </div>
+      </section>
+
+      <section class="panel" id="textPanel">
+        <div class="field">
+          <label for="htmlCode">Kode HTML</label>
+          <textarea
+            id="htmlCode"
+            spellcheck="false"
+            placeholder="<!DOCTYPE html>&#10;<html>&#10;  <body>Hello Nexora</body>&#10;</html>"
+          ></textarea>
+        </div>
+      </section>
+
+      <div class="actions">
+        <button class="btn btn-preview" id="previewButton" type="button">
+          <svg viewBox="0 0 24 24">
+            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+          Preview
+        </button>
+
+        <button class="btn btn-deploy" id="deployButton" type="button">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 16V4"></path>
+            <path d="M7 9l5-5 5 5"></path>
+            <path d="M5 15v5h14v-5"></path>
+          </svg>
+          <span id="deployButtonText">Deploy / Update ke Vercel</span>
+        </button>
+      </div>
+
+      <div class="progress" id="progress">
+        <div class="progress-top">
+          <span id="progressLabel">Mempersiapkan</span>
+          <b id="progressPercent">0%</b>
+        </div>
+
+        <div class="bar">
+          <span id="progressBar"></span>
+        </div>
+
+        <div class="log" id="log"></div>
+      </div>
+
+      <div class="result" id="result">
+        <b>Deployment berhasil</b>
+        <a id="resultUrl" href="#" target="_blank" rel="noopener noreferrer"></a>
+        <span id="resultMeta"></span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<section class="preview" id="preview">
+  <div class="preview-head">
+    <b>HTML Preview</b>
+    <button class="preview-close" id="previewClose" type="button">
+      Kembali
+    </button>
+  </div>
+
+  <iframe
+    id="previewFrame"
+    title="HTML Preview"
+    sandbox="allow-scripts allow-forms allow-modals"
+  ></iframe>
+</section>
+
+<section class="modal" id="keyModal" aria-hidden="true">
+  <div class="modal-card">
+    <h2>Kunci Akses Developer</h2>
+    <p id="keyModalCopy">
+      Server deploy Vercel dilindungi dengan kunci akses developer.
+      Masukkan nilai <code>DEPLOY_ACCESS_KEY</code>.
+      Kunci hanya disimpan selama tab ini terbuka.
+    </p>
+
+    <div class="access-input-wrap">
+      <input
+        id="accessKeyInput"
+        type="password"
+        placeholder="Masukkan kode akses deploy"
+        autocomplete="off"
+        autocapitalize="off"
+        spellcheck="false"
+      >
+      <button class="access-eye" id="toggleAccessKey" type="button" aria-label="Tampilkan kode akses" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+      </button>
+    </div>
+
+    <a class="access-channel-link" href="https://whatsapp.com/channel/0029Vb7yYjE8PgsKrQ5ghQ3s" target="_blank" rel="noopener noreferrer">
+      <span class="access-channel-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M20.5 11.7a8.5 8.5 0 0 1-12.6 7.4L3 20.5l1.4-4.7A8.5 8.5 0 1 1 20.5 11.7Z"></path><path d="M8.3 8.1c.2-.5.4-.5.7-.5h.5c.2 0 .4.1.5.4l.8 1.9c.1.3.1.5-.1.7l-.6.7c-.2.2-.2.4-.1.6.5 1 1.3 1.8 2.3 2.3.2.1.4.1.6-.1l.8-1c.2-.2.4-.3.7-.1l1.8.8c.3.1.4.3.4.5 0 .4-.2 1.4-.9 1.9-.6.5-1.4.7-2.3.5-1.2-.3-2.7-1-4.2-2.5-1.3-1.3-2.2-2.9-2.5-4.1-.2-.8 0-1.5.4-2Z"></path></svg>
+      </span>
+      <span class="access-channel-copy">
+        <b>Ambil Kode Akses</b>
+        <span>Buka saluran WhatsApp resmi All Tools Nexora.</span>
+      </span>
+      <span class="access-channel-arrow" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M7 17 17 7"></path><path d="M8 7h9v9"></path></svg>
+      </span>
+    </a>
+
+    <div class="modal-actions">
+      <button class="modal-cancel" id="keyCancel" type="button">
+        Batal
+      </button>
+
+      <button class="modal-save" id="keySave" type="button">
+        Simpan dan Lanjutkan
+      </button>
+    </div>
+  </div>
+</section>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  function resolveDeployApi(){
+    try{
+      const parentOrigin = window.parent && window.parent.location && window.parent.location.origin;
+      if(parentOrigin && parentOrigin !== "null"){
+        return parentOrigin.replace(/\/+$/g,"") + "/api/vdeploy";
+      }
+    }catch(error){}
+    try{
+      const ownOrigin = window.location && window.location.origin;
+      if(ownOrigin && ownOrigin !== "null"){
+        return ownOrigin.replace(/\/+$/g,"") + "/api/vdeploy";
+      }
+    }catch(error){}
+    return ''; // origin tidak tersedia, tombol tetap bisa diklik
+  }
+
+  const DEPLOY_API_URL = resolveDeployApi();
+  const API_ENDPOINTS = {
+    vercel:DEPLOY_API_URL,
+    netlify:DEPLOY_API_URL
+  };
+
+  const PLATFORM_LABELS = {
+    vercel:"Vercel",
+    netlify:"Netlify"
+  };
+
+  let currentPlatform =
+    sessionStorage.getItem("nexora_deploy_platform") === "netlify"
+      ? "netlify"
+      : "vercel";
+
+  function platformLabel(){
+    return PLATFORM_LABELS[currentPlatform] || "Vercel";
+  }
+
+  function apiEndpoint(){
+    return API_ENDPOINTS[currentPlatform] || API_ENDPOINTS.vercel;
+  }
+
+  const TEXT_EXTENSIONS =
+    new Set([
+      "html","htm","css","js","mjs","cjs",
+      "json","txt","md","xml","svg","csv",
+      "map","webmanifest","yaml","yml"
+    ]);
+
+  let selectedFile = null;
+  let activePanel = "filePanel";
+  let pendingRetry = null;
+
+  const $ = id =>
+    document.getElementById(id);
+
+  function toast(message){
+    const node = $("toast");
+    node.textContent = message;
+    node.classList.add("show");
+
+    clearTimeout(node._timer);
+    node._timer = setTimeout(
+      () => node.classList.remove("show"),
+      2700
+    );
+  }
+
+  function log(message,type){
+    const line =
+      document.createElement("div");
+
+    line.textContent = message;
+
+    if(type){
+      line.className = type;
+    }
+
+    $("log").appendChild(line);
+    $("log").scrollTop =
+      $("log").scrollHeight;
+  }
+
+  function setProgress(value,label){
+    const number =
+      Math.max(
+        0,
+        Math.min(
+          100,
+          Math.round(value)
+        )
+      );
+
+    $("progress").classList.add("show");
+    $("progressBar").style.width =
+      number + "%";
+    $("progressPercent").textContent =
+      number + "%";
+
+    if(label){
+      $("progressLabel").textContent =
+        label;
+    }
+  }
+
+  function formatBytes(bytes){
+    const value =
+      Number(bytes || 0);
+
+    if(value < 1024){
+      return value + " B";
+    }
+
+    if(value < 1024 * 1024){
+      return (
+        value / 1024
+      ).toFixed(1) + " KB";
+    }
+
+    return (
+      value / 1024 / 1024
+    ).toFixed(2) + " MB";
+  }
+
+  function normalizeProject(value){
+    return String(value || "")
+      .toLowerCase()
+      .replace(/\s+/g,"-")
+      .replace(/[^a-z0-9-]/g,"-")
+      .replace(/-+/g,"-")
+      .replace(/^-+|-+$/g,"")
+      .slice(0,100);
+  }
+
+  function extensionOf(path){
+    const name =
+      String(path || "")
+        .split("/")
+        .pop() || "";
+
+    const parts =
+      name.toLowerCase().split(".");
+
+    return parts.length > 1
+      ? parts.pop()
+      : "";
+  }
+
+  function setServerStatus(state,text){
+    const node =
+      $("serverStatus");
+
+    node.className =
+      "server-status " + state;
+
+    node.querySelector("span").textContent =
+      text;
+  }
+
+  function normalizeDeployState(value){
+    const state =
+      String(value || "")
+        .trim()
+        .toUpperCase();
+
+    if(
+      [
+        "READY",
+        "PUBLISHED",
+        "SUCCESS",
+        "SUCCEEDED",
+        "COMPLETE",
+        "COMPLETED",
+        "LIVE"
+      ].includes(state)
+    ){
+      return "READY";
+    }
+
+    if(
+      [
+        "ERROR",
+        "FAILED",
+        "FAILURE"
+      ].includes(state)
+    ){
+      return "ERROR";
+    }
+
+    if(
+      [
+        "CANCELED",
+        "CANCELLED"
+      ].includes(state)
+    ){
+      return "CANCELED";
+    }
+
+    return state || "BUILDING";
+  }
+
+  function setPlatform(platform,skipCheck){
+    if(!PLATFORM_LABELS[platform]){
+      return;
+    }
+
+    currentPlatform = platform;
+
+    sessionStorage.setItem(
+      "nexora_deploy_platform",
+      currentPlatform
+    );
+
+    document
+      .querySelectorAll(".platform-option")
+      .forEach(button => {
+        const active =
+          button.dataset.platform ===
+          currentPlatform;
+
+        button.classList.toggle(
+          "active",
+          active
+        );
+
+        button.setAttribute(
+          "aria-pressed",
+          active ? "true" : "false"
+        );
+      });
+
+    const label =
+      platformLabel();
+
+    $("brandSubtitle").textContent =
+      "Platform " +
+      label +
+      " · production workspace";
+
+    $("deployButtonText").textContent =
+      "Deploy / Update ke " +
+      label;
+
+    $("keyModalCopy").innerHTML =
+      "Server deploy " +
+      label +
+      " dilindungi dengan kode akses developer. " +
+      "Masukkan kode Nexora Deploy yang valid. " +
+      "Kode hanya disimpan selama tab ini terbuka.";
+
+    $("result").classList.remove(
+      "show"
+    );
+
+    $("progress").classList.remove(
+      "show"
+    );
+
+    if(!skipCheck){
+      checkServer();
+    }
+  }
+
+  function accessKey(){
+    return sessionStorage.getItem(
+      "nexora_deploy_access"
+    ) || "";
+  }
+
+  function setAccessKeyVisibility(visible){
+    const input = $("accessKeyInput");
+    const button = $("toggleAccessKey");
+    input.type = visible ? "text" : "password";
+    button.setAttribute("aria-pressed", visible ? "true" : "false");
+    button.setAttribute("aria-label", visible ? "Sembunyikan kode akses" : "Tampilkan kode akses");
+    button.innerHTML = visible
+      ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"></path><path d="M10.6 5.2A11 11 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-2.1 3.1"></path><path d="M6.6 6.6C3.7 8.4 2 12 2 12s3.5 7 10 7c1.8 0 3.3-.5 4.7-1.2"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path></svg>'
+      : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+  }
+
+  function showKeyModal(retry){
+    pendingRetry =
+      typeof retry === "function"
+        ? retry
+        : null;
+
+    $("accessKeyInput").value =
+      accessKey();
+    setAccessKeyVisibility(false);
+
+    $("keyModal").classList.add("show");
+    $("keyModal").setAttribute(
+      "aria-hidden",
+      "false"
+    );
+
+    setTimeout(
+      () => $("accessKeyInput").focus(),
+      50
+    );
+  }
+
+  function closeKeyModal(){
+    $("keyModal").classList.remove("show");
+    $("keyModal").setAttribute(
+      "aria-hidden",
+      "true"
+    );
+  }
+
+  async function api(body,retry){
+    const _ep=apiEndpoint();
+    if(!_ep){
+      showKeyModal(retry);
+      throw new Error('Kunci akses diperlukan');
+    }
+    const response =
+      await fetch(
+        _ep,
+        {
+          method:"POST",
+          headers:{
+            "Content-Type":
+              "application/json",
+            "X-Deploy-Key":
+              accessKey()
+          },
+          body:JSON.stringify(body)
+        }
+      );
+
+    let data = {};
+
+    try{
+      data = await response.json();
+    }catch(error){}
+
+    if(
+      response.status === 401 &&
+      data.code ===
+        "access_key_required"
+    ){
+      showKeyModal(retry);
+      throw new Error(
+        "Kunci akses diperlukan"
+      );
+    }
+
+    if(!response.ok){
+      throw new Error(
+        data.error ||
+        data.message ||
+        "Server HTTP " +
+          response.status
+      );
+    }
+
+    return data;
+  }
+
+  async function checkServer(){
+    setServerStatus("checking","Memeriksa server");
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 9000);
+    try{
+      const _cep=apiEndpoint();
+      if(!_cep){ setServerStatus('error','Endpoint deploy tidak tersedia'); return; }
+      const response = await fetch(_cep,{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json",
+          "X-Deploy-Key":accessKey()
+        },
+        body:JSON.stringify({ action:"health", platform:currentPlatform }),
+        signal:controller.signal
+      });
+      const data = await response.json().catch(() => ({}));
+      if(response.ok){
+        setServerStatus("ok",platformLabel()+" siap");
+      }else if(response.status === 401){
+        setServerStatus("ok","API aktif · kunci diperlukan");
+      }else{
+        setServerStatus("error",data.message || data.error || ("HTTP "+response.status));
+      }
+    }catch(error){
+      setServerStatus("error",error && error.name === "AbortError" ? "Server timeout" : ((error && error.message) ? error.message : "API deploy belum tersedia"));
+    }finally{
+      clearTimeout(timer);
+    }
+  }
+
+  async function getPreviewHtml(){
+    if(activePanel === "textPanel"){
+      return $("htmlCode").value.trim();
+    }
+
+    if(!selectedFile){
+      return "";
+    }
+
+    if(
+      selectedFile.name
+        .toLowerCase()
+        .endsWith(".html") ||
+      selectedFile.name
+        .toLowerCase()
+        .endsWith(".htm")
+    ){
+      return selectedFile.text();
+    }
+
+    if(
+      selectedFile.name
+        .toLowerCase()
+        .endsWith(".zip")
+    ){
+      const zip =
+        await JSZip.loadAsync(
+          selectedFile
+        );
+
+      const candidates = [
+        "index.html",
+        "public/index.html",
+        "dist/index.html"
+      ];
+
+      for(const name of candidates){
+        if(zip.file(name)){
+          return zip.file(name)
+            .async("string");
+        }
+      }
+    }
+
+    return "";
+  }
+
+  function arrayBufferToBase64(buffer){
+    const bytes =
+      buffer instanceof Uint8Array
+        ? buffer
+        : new Uint8Array(buffer);
+
+    let binary = "";
+    const chunkSize = 0x8000;
+
+    for(
+      let offset = 0;
+      offset < bytes.length;
+      offset += chunkSize
+    ){
+      const chunk = bytes.subarray(
+        offset,
+        Math.min(
+          offset + chunkSize,
+          bytes.length
+        )
+      );
+
+      binary += String.fromCharCode.apply(
+        null,
+        chunk
+      );
+    }
+
+    return btoa(binary);
+  }
+
+  async function buildDeploymentArchive(){
+    const output = new JSZip();
+    let fileCount = 0;
+
+    if(activePanel === "textPanel"){
+      const code =
+        $("htmlCode").value.trim();
+
+      if(!code){
+        throw new Error(
+          "Masukkan kode HTML."
+        );
+      }
+
+      output.file(
+        "index.html",
+        code
+      );
+      fileCount = 1;
+    }else{
+      if(!selectedFile){
+        throw new Error(
+          "Pilih file HTML atau ZIP."
+        );
+      }
+
+      const lower =
+        selectedFile.name.toLowerCase();
+
+      if(
+        lower.endsWith(".html") ||
+        lower.endsWith(".htm")
+      ){
+        output.file(
+          "index.html",
+          await selectedFile.text()
+        );
+        fileCount = 1;
+      }else{
+        if(!lower.endsWith(".zip")){
+          throw new Error(
+            "Format harus HTML atau ZIP."
+          );
+        }
+
+        const source =
+          await JSZip.loadAsync(
+            selectedFile
+          );
+
+        const names =
+          Object.keys(source.files);
+
+        for(const name of names){
+          const item = source.files[name];
+
+          if(item.dir){
+            continue;
+          }
+
+          const cleanPath =
+            name
+              .replace(/\\/g,"/")
+              .replace(/^\/+/,"")
+              .replace(/\/+/g,"/");
+
+          if(
+            !cleanPath ||
+            cleanPath.includes("../") ||
+            cleanPath.includes("\0") ||
+            cleanPath.startsWith("__MACOSX/") ||
+            cleanPath.endsWith("/.DS_Store") ||
+            cleanPath === ".DS_Store"
+          ){
+            continue;
+          }
+
+          output.file(
+            cleanPath,
+            await item.async("uint8array"),
+            {binary:true}
+          );
+          fileCount++;
+        }
+      }
+    }
+
+    if(!fileCount){
+      throw new Error(
+        "ZIP tidak berisi file yang dapat dideploy."
+      );
+    }
+
+    const archiveBase64 =
+      await output.generateAsync({
+        type:"base64",
+        compression:"DEFLATE",
+        compressionOptions:{level:9},
+        platform:"UNIX"
+      });
+
+    const padding =
+      archiveBase64.endsWith("==")
+        ? 2
+        : archiveBase64.endsWith("=")
+          ? 1
+          : 0;
+
+    const archiveBytes =
+      Math.floor(
+        archiveBase64.length * 3 / 4
+      ) - padding;
+
+    if(
+      archiveBytes >
+      3 * 1024 * 1024
+    ){
+      throw new Error(
+        "ZIP terkompresi melebihi 3 MB. Batas ini menjaga request tetap di bawah batas 4,5 MB Vercel Function."
+      );
+    }
+
+    return {
+      archiveBase64,
+      archiveBytes,
+      fileCount
+    };
+  }
+
+  async function runDeploy(){
+    const project =
+      normalizeProject(
+        $("projectName").value
+      );
+
+    $("projectName").value =
+      project;
+
+    if(!project){
+      toast(
+        "Nama project diperlukan."
+      );
+      return;
+    }
+
+    const button =
+      $("deployButton");
+
+    button.disabled = true;
+    $("result").classList.remove("show");
+    $("log").innerHTML = "";
+
+    const start = Date.now();
+
+    try{
+      setProgress(
+        8,
+        "Membaca file"
+      );
+      log(
+        "Mempersiapkan file deployment..."
+      );
+
+      const archive =
+        await buildDeploymentArchive();
+
+      log(
+        archive.fileCount +
+        " file siap dikirim dalam ZIP " +
+        formatBytes(archive.archiveBytes) +
+        ".",
+        "ok"
+      );
+
+      setProgress(
+        28,
+        "Mengirim ke server"
+      );
+
+      const create =
+        await api(
+          {
+            action:"create",
+            platform:currentPlatform,
+            name:project,
+            archiveBase64:
+              archive.archiveBase64
+          },
+          runDeploy
+        );
+
+      const deploymentId =
+        create.id ||
+        create.deployId ||
+        create.deploy_id ||
+        create.site_id ||
+        "";
+
+      log(
+        platformLabel() +
+        " deployment dibuat" +
+        (
+          deploymentId
+            ? ": " + deploymentId
+            : "."
+        ),
+        "ok"
+      );
+
+      setProgress(
+        45,
+        "Build " +
+        platformLabel() +
+        " berjalan"
+      );
+
+      let state =
+        normalizeDeployState(
+          create.readyState ||
+          create.state ||
+          create.status
+        );
+
+      let info =
+        create;
+
+      for(
+        let attempt = 0;
+        attempt < 80;
+        attempt++
+      ){
+        if(
+          state === "READY" ||
+          state === "ERROR" ||
+          state === "CANCELED"
+        ){
+          break;
+        }
+
+        if(!deploymentId){
+          throw new Error(
+            "Server " +
+            platformLabel() +
+            " tidak mengembalikan ID deployment."
+          );
+        }
+
+        await new Promise(
+          resolve =>
+            setTimeout(
+              resolve,
+              2500
+            )
+        );
+
+        info =
+          await api(
+            {
+              action:"status",
+              platform:currentPlatform,
+              id:deploymentId
+            },
+            runDeploy
+          );
+
+        state =
+          normalizeDeployState(
+            info.readyState ||
+            info.state ||
+            info.status ||
+            state
+          );
+
+        const progress =
+          Math.min(
+            92,
+            48 + attempt
+          );
+
+        setProgress(
+          progress,
+          "Build " +
+          platformLabel() +
+          ": " +
+          state
+        );
+
+        log(
+          "Status " +
+          platformLabel() +
+          ": " +
+          state
+        );
+      }
+
+      if(state !== "READY"){
+        throw new Error(
+          "Build " +
+          platformLabel() +
+          " berakhir dengan status " +
+          state
+        );
+      }
+
+      const rawUrl =
+        info.url ||
+        info.ssl_url ||
+        info.deploy_ssl_url ||
+        info.deploy_url ||
+        info.site_url ||
+        create.url ||
+        create.ssl_url ||
+        create.deploy_ssl_url ||
+        create.deploy_url ||
+        create.site_url ||
+        (
+          project +
+          (
+            currentPlatform === "netlify"
+              ? ".netlify.app"
+              : ".vercel.app"
+          )
+        );
+
+      const finalUrl =
+        rawUrl.startsWith("http")
+          ? rawUrl
+          : "https://" + rawUrl;
+
+      setProgress(
+        100,
+        "Selesai"
+      );
+
+      log(
+        "Deployment " + platformLabel() + " berhasil.",
+        "ok"
+      );
+
+      $("resultUrl").textContent =
+        finalUrl;
+
+      $("resultUrl").href =
+        finalUrl;
+
+      $("resultMeta").textContent =
+        platformLabel() +
+        " · selesai dalam " +
+        (
+          (
+            Date.now() -
+            start
+          ) /
+          1000
+        ).toFixed(1) +
+        " detik";
+
+      $("result").classList.add(
+        "show"
+      );
+
+      toast(
+        "Deploy ke " + platformLabel() + " berhasil."
+      );
+    }catch(error){
+      if(
+        error.message !==
+        "Kunci akses diperlukan"
+      ){
+        setProgress(
+          0,
+          "Gagal"
+        );
+
+        log(
+          "ERROR: " +
+          error.message,
+          "err"
+        );
+
+        toast(
+          error.message
+        );
+      }
+    }finally{
+      button.disabled = false;
+    }
+  }
+
+  document
+    .querySelectorAll(".platform-option")
+    .forEach(button => {
+      button.addEventListener(
+        "click",
+        function(){
+          setPlatform(
+            this.dataset.platform
+          );
+        }
+      );
+    });
+
+  document
+    .querySelectorAll(".tab")
+    .forEach(
+      button => {
+        button.addEventListener(
+          "click",
+          function(){
+            document
+              .querySelectorAll(".tab")
+              .forEach(
+                item =>
+                  item.classList.remove(
+                    "active"
+                  )
+              );
+
+            document
+              .querySelectorAll(".panel")
+              .forEach(
+                item =>
+                  item.classList.remove(
+                    "active"
+                  )
+              );
+
+            this.classList.add(
+              "active"
+            );
+
+            activePanel =
+              this.dataset.panel;
+
+            $(
+              activePanel
+            ).classList.add(
+              "active"
+            );
+          }
+        );
+      }
+    );
+
+  $("projectName").addEventListener(
+    "input",
+    function(){
+      const cursor =
+        this.selectionStart;
+
+      const normalized =
+        normalizeProject(
+          this.value
+        );
+
+      this.value = normalized;
+
+      try{
+        this.setSelectionRange(
+          Math.min(
+            cursor,
+            normalized.length
+          ),
+          Math.min(
+            cursor,
+            normalized.length
+          )
+        );
+      }catch(error){}
+    }
+  );
+
+  $("fileInput").addEventListener(
+    "change",
+    function(){
+      const file =
+        this.files &&
+        this.files[0];
+
+      if(!file){
+        return;
+      }
+
+      selectedFile = file;
+
+      $("fileName").textContent =
+        file.name;
+
+      $("fileSize").textContent =
+        formatBytes(
+          file.size
+        );
+
+      $("fileChip").classList.add(
+        "show"
+      );
+    }
+  );
+
+  [
+    "dragenter",
+    "dragover"
+  ].forEach(
+    type =>
+      $("dropZone").addEventListener(
+        type,
+        event => {
+          event.preventDefault();
+          $("dropZone")
+            .classList.add("over");
+        }
+      )
+  );
+
+  [
+    "dragleave",
+    "drop"
+  ].forEach(
+    type =>
+      $("dropZone").addEventListener(
+        type,
+        event => {
+          event.preventDefault();
+          $("dropZone")
+            .classList.remove("over");
+        }
+      )
+  );
+
+  $("dropZone").addEventListener(
+    "drop",
+    function(event){
+      const file =
+        event.dataTransfer.files &&
+        event.dataTransfer.files[0];
+
+      if(!file){
+        return;
+      }
+
+      selectedFile = file;
+
+      $("fileName").textContent =
+        file.name;
+
+      $("fileSize").textContent =
+        formatBytes(
+          file.size
+        );
+
+      $("fileChip").classList.add(
+        "show"
+      );
+    }
+  );
+
+  $("removeFile").addEventListener(
+    "click",
+    function(){
+      selectedFile = null;
+      $("fileInput").value = "";
+      $("fileChip").classList.remove(
+        "show"
+      );
+    }
+  );
+
+  $("previewButton").addEventListener(
+    "click",
+    async function(){
+      try{
+        const content =
+          await getPreviewHtml();
+
+        if(!content){
+          throw new Error(
+            "Preview hanya tersedia jika ada index.html."
+          );
+        }
+
+        $("previewFrame").srcdoc =
+          content;
+
+        $("preview").classList.add(
+          "show"
+        );
+      }catch(error){
+        toast(
+          error.message
+        );
+      }
+    }
+  );
+
+  $("previewClose").addEventListener(
+    "click",
+    function(){
+      $("preview").classList.remove(
+        "show"
+      );
+      $("previewFrame").srcdoc = "";
+    }
+  );
+
+  $("deployButton").addEventListener(
+    "click",
+    runDeploy
+  );
+
+  $("keyCancel").addEventListener(
+    "click",
+    function(){
+      pendingRetry = null;
+      closeKeyModal();
+    }
+  );
+
+  $("keySave").addEventListener(
+    "click",
+    function(){
+      const value =
+        $("accessKeyInput")
+          .value
+          .trim();
+
+      if(!value){
+        toast(
+          "Kunci akses tidak boleh kosong."
+        );
+        return;
+      }
+
+      sessionStorage.setItem(
+        "nexora_deploy_access",
+        value
+      );
+
+      const retry =
+        pendingRetry;
+
+      pendingRetry = null;
+      closeKeyModal();
+
+      if(retry){
+        retry();
+      }
+    }
+  );
+
+  $("toggleAccessKey").addEventListener(
+    "click",
+    function(){
+      setAccessKeyVisibility(
+        $("accessKeyInput").type === "password"
+      );
+      $("accessKeyInput").focus();
+    }
+  );
+
+  $("accessKeyInput").addEventListener(
+    "keydown",
+    function(event){
+      if(event.key === "Enter"){
+        $("keySave").click();
+      }
+    }
+  );
+
+  $("keyModal").addEventListener(
+    "click",
+    function(event){
+      if(event.target === this){
+        pendingRetry = null;
+        closeKeyModal();
+      }
+    }
+  );
+
+  document.addEventListener(
+    "keydown",
+    function(event){
+      if(event.key === "Escape"){
+        if(
+          $("preview").classList
+            .contains("show")
+        ){
+          $("previewClose").click();
+        }else if(
+          $("keyModal").classList
+            .contains("show")
+        ){
+          pendingRetry = null;
+          closeKeyModal();
+        }
+      }
+    }
+  );
+
+  setPlatform(
+    currentPlatform,
+    true
+  );
+  checkServer();
+})();
+</script>
+</body>
+</html>

@@ -32,7 +32,15 @@ for (const relative of [
   const source = read(relative);
   assert.match(source, /<iframe[^>]+sandbox=/i);
   assert.doesNotMatch(source, /allow-same-origin/i);
+  assert.doesNotMatch(source, /(?:_B64\b|srcdoc\s*=|decodeUtf8Base64|decodeVirusApp|URL\.createObjectURL\(new Blob)/);
 }
+for (const [relative, url] of [
+  ["assets/js/features/tiktok-quote.js", "/assets/apps/tiktok-quote/index.html?v=standalone-v1"],
+  ["assets/js/features/virus-scan.js", "/assets/apps/virus-scan/index.html?v=standalone-v1"],
+  ["assets/js/features/unban-whatsapp.js", "/assets/apps/unban-whatsapp/index.html?v=standalone-v1"],
+  ["assets/js/features/deploy-center.js", "/assets/apps/deploy-center/index.html?v=standalone-v1"]
+]) assert.ok(read(relative).includes(url), `${relative} tidak memakai canonical standalone URL`);
+for (const url of ["/assets/apps/ml-tools/index.html?v=standalone-v1", "/assets/apps/prompt-generator/index.html?v=standalone-v1", "/assets/apps/fake-ovo/index.html?v=standalone-v1", "/assets/apps/quote-generator/index.html?v=standalone-v1", "/assets/apps/cari-fakta/index.html?v=standalone-v1"]) assert.ok(read("assets/js/features/imported-tools.js").includes(url));
 const comicShell = read("assets/js/features/comic-reader.js");
 assert.match(comicShell, /\/assets\/comic-reader\/index\.html\?v=standalone-v1/);
 assert.doesNotMatch(comicShell, /COMIC_READER_APP_B64|srcdoc|allow-same-origin|nxComicApiBridgeHandler|nx-comic-api-request/);
@@ -46,8 +54,10 @@ const database = read("lib/database.js");
 assert.ok(database.includes("crypto.randomBytes(32)"));
 assert.ok(!database.includes("all-tools-nexora-local-fallback"));
 const deployCenter = read("assets/js/features/deploy-center.js");
-assert.ok(deployCenter.includes("integrity=\"sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==\""));
-assert.ok(deployCenter.includes("crossorigin=\"anonymous\""));
+assert.doesNotMatch(deployCenter, /VD_B64|createObjectURL|new Blob|TextDecoder/);
+const deployApp = read("assets/apps/deploy-center/index.html");
+assert.ok(deployApp.includes('integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg=="'));
+assert.ok(deployApp.includes('crossorigin="anonymous"'));
 const vercel = JSON.parse(read("vercel.json"));
 const globalHeaders = vercel.headers.find((entry) => entry.source === "/(.*)")?.headers || [];
 const csp = globalHeaders.find((entry) => entry.key.toLowerCase() === "content-security-policy")?.value || "";

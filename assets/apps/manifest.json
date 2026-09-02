@@ -1,0 +1,51 @@
+{
+  "version": "standalone-v1",
+  "locked": true,
+  "apps": [
+    {
+      "id": "mltools",
+      "title": "ML Tools Nexora",
+      "url": "/assets/apps/ml-tools/index.html?v=standalone-v1"
+    },
+    {
+      "id": "promptgenerate",
+      "title": "Prompt Generator",
+      "url": "/assets/apps/prompt-generator/index.html?v=standalone-v1"
+    },
+    {
+      "id": "fakeovo",
+      "title": "Fake OVO",
+      "url": "/assets/apps/fake-ovo/index.html?v=standalone-v1"
+    },
+    {
+      "id": "quotegenerator",
+      "title": "Quote Generator",
+      "url": "/assets/apps/quote-generator/index.html?v=standalone-v1"
+    },
+    {
+      "id": "carifakta",
+      "title": "CariFakta",
+      "url": "/assets/apps/cari-fakta/index.html?v=standalone-v1"
+    },
+    {
+      "id": "ttquote",
+      "title": "TikTok Quote",
+      "url": "/assets/apps/tiktok-quote/index.html?v=standalone-v1"
+    },
+    {
+      "id": "unban",
+      "title": "Unban WhatsApp",
+      "url": "/assets/apps/unban-whatsapp/index.html?v=standalone-v1"
+    },
+    {
+      "id": "virusscan",
+      "title": "Virus Scan",
+      "url": "/assets/apps/virus-scan/index.html?v=standalone-v1"
+    },
+    {
+      "id": "deploy",
+      "title": "Deploy Center",
+      "url": "/assets/apps/deploy-center/index.html?v=standalone-v1"
+    }
+  ]
+}

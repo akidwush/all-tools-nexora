@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="id"><head><script>(function(){"use strict";window.nxSafeStorage={getItem:function(key){try{return window.localStorage.getItem(key);}catch(error){return null;}},setItem:function(key,value){try{window.localStorage.setItem(key,value);}catch(error){}},removeItem:function(key){try{window.localStorage.removeItem(key);}catch(error){}},clear:function(){try{window.localStorage.clear();}catch(error){}}};})();</script><base href="https://carifakta-tnz.vercel.app/">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CariFakta — Verifikasi Sebelum Percaya</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<style data-src="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">/* cyrillic-ext */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2JL7W0Q5n-wU.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa0ZL7W0Q5n-wU.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2ZL7W0Q5n-wU.woff2) format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7W0Q5n-wU.woff2) format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2pL7W0Q5n-wU.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7W0Q5n-wU.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2JL7W0Q5n-wU.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa0ZL7W0Q5n-wU.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2ZL7W0Q5n-wU.woff2) format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7W0Q5n-wU.woff2) format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2pL7W0Q5n-wU.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7W0Q5n-wU.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2JL7W0Q5n-wU.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa0ZL7W0Q5n-wU.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek-ext */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2ZL7W0Q5n-wU.woff2) format('woff2');
+  unicode-range: U+1F00-1FFF;
+}
+/* greek */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7W0Q5n-wU.woff2) format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2pL7W0Q5n-wU.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7W0Q5n-wU.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx3cwgknk-6nFg.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxTcwgknk-6nFg.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxPcwgknk-6nFg.woff2) format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx_cwgknk-6nFg.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx7cwgknk-6nFg.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwgknk-4.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* cyrillic-ext */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx3cwgknk-6nFg.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* cyrillic */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxTcwgknk-6nFg.woff2) format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* greek */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxPcwgknk-6nFg.woff2) format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx_cwgknk-6nFg.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPx7cwgknk-6nFg.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/jetbrainsmono/v24/tDbv2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKwBNntkaToggR7BYRbKPxDcwgknk-4.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPb54C_k3HqUtEw.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPb94C_k3HqUtEw.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPbF4C_k3HqU.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPb54C_k3HqUtEw.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPb94C_k3HqUtEw.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPbF4C_k3HqU.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPb54C_k3HqUtEw.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPb94C_k3HqUtEw.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPbF4C_k3HqU.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPb54C_k3HqUtEw.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPb94C_k3HqUtEw.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPbF4C_k3HqU.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+</style>
+<style>
+  :root{
+    --black:#0b0b0c;
+    --charcoal:#141415;
+    --panel:#1a1a1b;
+    --panel-2:#212123;
+    --line:#2b2b2d;
+    --line-soft:#222224;
+    --gray-1:#8d8d90;
+    --gray-2:#68686b;
+    --gray-3:#aeaeb1;
+    --white:#f3f3f4;
+    --dim:#d2d2d4;
+    --glow:#ffffff;
+    --glow-hoax:#ff6b5e;
+    --glow-valid:#5eff9d;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 50% -10%, #1c1c1e 0%, transparent 60%),
+      var(--black);
+    color:var(--white);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:600px; margin:0 auto; padding:26px 20px 70px;}
+  svg{display:block;}
+  .ic{stroke:currentColor; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round;}
+
+  /* Header */
+  header{display:flex; align-items:center; justify-content:space-between; margin-bottom:34px;}
+  .brand{display:flex; align-items:center; gap:11px;}
+  .brand-mark{
+    width:36px; height:36px; border-radius:10px;
+    background:linear-gradient(155deg,#3c3c3e,#0d0d0e);
+    border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    position:relative; overflow:hidden; color:var(--white);
+    box-shadow:0 0 0 1px rgba(255,255,255,.03), 0 0 18px -2px rgba(255,255,255,.35);
+  }
+  .brand-mark::after{
+    content:""; position:absolute; inset:0;
+    background:conic-gradient(from 0deg, transparent 0deg, rgba(255,255,255,.14) 45deg, transparent 100deg);
+    animation:spin 6s linear infinite;
+  }
+  .brand-mark svg{position:relative; z-index:1; width:17px; height:17px;}
+  .brand-name{font-family:'Space Grotesk',sans-serif; font-size:18px; font-weight:700; letter-spacing:-.02em;}
+  .brand-name span{color:var(--gray-1); font-weight:500;}
+  .counter-pill{
+    display:flex; align-items:center; gap:7px;
+    border:1px solid var(--line); padding:6px 12px; border-radius:100px;
+    font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--gray-3);
+    background:var(--panel);
+  }
+  .counter-pill .dot{width:5px; height:5px; border-radius:50%; background:var(--white); box-shadow:0 0 6px 1px rgba(255,255,255,.9);}
+
+  /* Hero */
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.16em;
+    text-transform:uppercase; color:var(--gray-2); margin-bottom:12px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .eyebrow::before{content:""; width:14px; height:1px; background:var(--gray-2);}
+  h1{
+    font-family:'Space Grotesk',sans-serif; font-size:clamp(30px,7.6vw,40px);
+    line-height:1.08; letter-spacing:-.03em; font-weight:700; margin-bottom:14px;
+  }
+  h1 em{
+    font-style:normal;
+    background:linear-gradient(95deg,var(--white) 30%, var(--gray-2));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .lede{color:var(--gray-1); font-size:14.5px; line-height:1.6; max-width:48ch; margin-bottom:28px;}
+
+  /* Stats */
+  .stats{
+    display:grid; grid-template-columns:repeat(3,1fr);
+    border:1px solid var(--line); border-radius:14px; overflow:hidden;
+    margin-bottom:26px; background:var(--charcoal);
+  }
+  .stat{padding:16px 8px; text-align:center; border-right:1px solid var(--line);}
+  .stat:last-child{border-right:none;}
+  .stat b{display:block; font-family:'Space Grotesk',sans-serif; font-size:21px; font-weight:700;}
+  .stat span{font-size:10.5px; color:var(--gray-2); letter-spacing:.02em;}
+
+  /* Input panel */
+  .panel{
+    border:1px solid var(--line); border-radius:16px; background:var(--charcoal);
+    padding:6px; margin-bottom:14px;
+    transition:box-shadow .25s ease, border-color .25s ease;
+  }
+  .panel:focus-within{
+    border-color:#3a3a3d;
+    box-shadow:0 0 0 1px rgba(255,255,255,.06), 0 0 28px -6px rgba(255,255,255,.45);
+  }
+  .panel-inner{padding:10px 14px 12px;}
+  .panel-label{
+    display:flex; align-items:center; gap:7px; font-size:11.5px; color:var(--gray-2);
+    padding:4px 8px 8px; letter-spacing:.02em;
+  }
+  .panel-label svg{width:14px; height:14px;}
+  textarea{
+    width:100%; min-height:76px; max-height:220px; resize:vertical;
+    background:transparent; border:none; outline:none;
+    color:var(--white); font-family:'Inter',sans-serif; font-size:14.5px; line-height:1.55;
+  }
+  textarea::placeholder{color:var(--gray-2);}
+  .charcount{
+    text-align:right; font-family:'JetBrains Mono',monospace; font-size:10.5px;
+    color:var(--gray-2); padding:2px 4px 0;
+  }
+
+  .cta{
+    width:100%; padding:14px; border-radius:12px; border:none;
+    background:var(--white); color:#0a0a0a;
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:14.5px;
+    cursor:pointer; display:flex; align-items:center; justify-content:center; gap:9px;
+    transition:transform .1s ease, opacity .15s ease, box-shadow .2s ease;
+    box-shadow:0 0 22px -6px rgba(255,255,255,.55);
+  }
+  .cta svg{width:16px; height:16px;}
+  .cta:hover{box-shadow:0 0 32px -4px rgba(255,255,255,.75);}
+  .cta:active{transform:scale(.985);}
+  .cta:disabled{opacity:.45; cursor:not-allowed; box-shadow:none;}
+
+  .examples{display:flex; gap:8px; flex-wrap:wrap; margin:14px 0 32px;}
+  .examples-label{width:100%; font-size:11px; color:var(--gray-2); margin-bottom:2px;}
+  .example-chip{
+    font-size:12px; color:var(--gray-3); border:1px solid var(--line-soft);
+    padding:7px 13px; border-radius:100px; cursor:pointer; background:var(--charcoal);
+    transition:.15s ease;
+  }
+  .example-chip:hover{border-color:var(--gray-1); color:var(--white); box-shadow:0 0 14px -4px rgba(255,255,255,.3);}
+
+  /* Loading */
+  #loading{display:none; border:1px solid var(--line); border-radius:16px; padding:22px; background:var(--charcoal); margin-bottom:24px;}
+  #loading.active{display:block;}
+  .load-head{display:flex; align-items:center; gap:13px; margin-bottom:18px;}
+  .scan-icon{
+    width:38px; height:38px; border-radius:10px; background:var(--panel-2);
+    border:1px solid var(--line); display:flex; align-items:center; justify-content:center;
+    position:relative; overflow:hidden; color:var(--white);
+    box-shadow:0 0 20px -4px rgba(255,255,255,.4);
+  }
+  .scan-icon svg{width:18px; height:18px; position:relative; z-index:1;}
+  .scan-icon::before{
+    content:""; position:absolute; left:-100%; top:0; bottom:0; width:60%;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,.3), transparent);
+    animation:sweep 1.3s linear infinite;
+  }
+  @keyframes sweep{ to{ left:140%; } }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .load-title{font-weight:600; font-size:14px; font-family:'Space Grotesk',sans-serif;}
+  .load-sub{font-size:11.5px; color:var(--gray-2); margin-top:2px;}
+  .stepline{height:5px; border-radius:100px; background:var(--panel-2); overflow:hidden; margin-bottom:8px;}
+  .stepline i{display:block; height:100%; width:0%; background:linear-gradient(90deg,var(--gray-2),var(--white)); transition:width .3s ease; box-shadow:0 0 10px 1px rgba(255,255,255,.5);}
+  .steptext{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--gray-2); display:flex; justify-content:space-between;}
+
+  /* Results */
+  #results{display:none;}
+  #results.active{display:block; animation:rise .4s ease;}
+  @keyframes rise{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+
+  .verdict-banner{
+    position:relative; overflow:hidden;
+    border:1px solid var(--line); border-radius:16px;
+    padding:20px; margin-bottom:14px; background:var(--panel);
+    transition:box-shadow .3s ease;
+  }
+  .verdict-banner.hoax{
+    background:linear-gradient(135deg,#1c1c1e,#252527);
+    border-color:#3a2a28;
+    box-shadow:0 0 40px -12px rgba(255,107,94,.35);
+  }
+  .verdict-banner.valid{
+    background:linear-gradient(135deg,#131314,#1a1a1b);
+    border-color:#243a2c;
+    box-shadow:0 0 40px -12px rgba(94,255,157,.3);
+  }
+  .verdict-top{display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:12px;}
+  .verdict-left{display:flex; align-items:center; gap:12px;}
+  .verdict-icon{
+    width:40px; height:40px; border-radius:11px; background:var(--panel-2);
+    border:1px solid var(--line); display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .verdict-banner.hoax .verdict-icon{color:var(--glow-hoax); box-shadow:0 0 16px -2px rgba(255,107,94,.6);}
+  .verdict-banner.valid .verdict-icon{color:var(--glow-valid); box-shadow:0 0 16px -2px rgba(94,255,157,.6);}
+  .verdict-icon svg{width:20px; height:20px;}
+  .verdict-title{font-family:'Space Grotesk',sans-serif; font-size:16.5px; font-weight:700; letter-spacing:-.01em;}
+  .conf-badge{
+    font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:600;
+    border:1px solid var(--line); border-radius:100px; padding:6px 13px; white-space:nowrap;
+    background:var(--panel-2);
+  }
+  .verdict-summary{font-size:13.5px; color:var(--gray-3); line-height:1.55;}
+
+  .card{
+    border:1px solid var(--line); border-radius:14px; background:var(--charcoal);
+    padding:18px; margin-bottom:14px;
+  }
+  .card h3{
+    font-family:'Space Grotesk',sans-serif; font-size:13.5px; font-weight:600;
+    display:flex; align-items:center; gap:8px; margin-bottom:13px; color:var(--dim);
+    letter-spacing:.01em;
+  }
+  .card h3 svg{width:15px; height:15px; color:var(--gray-1);}
+
+  .conf-row{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:9px;}
+  .conf-row span{color:var(--gray-2); font-size:11.5px;}
+  .conf-row b{font-family:'Space Grotesk',sans-serif; font-size:19px;}
+  .conf-bar{height:7px; border-radius:100px; background:var(--panel-2); overflow:hidden; margin-bottom:6px;}
+  .conf-bar i{display:block; height:100%; background:linear-gradient(90deg,var(--gray-2),var(--white)); box-shadow:0 0 10px 1px rgba(255,255,255,.45);}
+  .conf-scale{display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--gray-2);}
+
+  .card p{font-size:13.5px; line-height:1.68; color:var(--dim);}
+
+  .misleading-box{
+    border:1px solid var(--line-soft); border-radius:11px; padding:13px 15px;
+    background:var(--panel); margin-top:13px;
+  }
+  .misleading-box .label{
+    font-size:11.5px; font-weight:600; color:var(--white); display:flex; align-items:center; gap:7px; margin-bottom:9px;
+  }
+  .misleading-box .label svg{width:13px; height:13px; color:var(--gray-1);}
+  .misleading-box ul{list-style:none;}
+  .misleading-box li{
+    font-size:12.5px; color:var(--gray-3); line-height:1.6; margin-bottom:6px; padding-left:14px; position:relative;
+  }
+  .misleading-box li::before{content:"—"; position:absolute; left:0; color:var(--gray-2);}
+  .misleading-box li:last-child{margin-bottom:0;}
+
+  .claim-item{
+    font-size:13.5px; color:var(--dim); padding:10px 0;
+    border-bottom:1px solid var(--line-soft); display:flex; gap:10px; align-items:flex-start;
+  }
+  .claim-item:first-child{padding-top:0;}
+  .claim-item:last-child{border-bottom:none; padding-bottom:0;}
+  .claim-item .dot{width:5px; height:5px; border-radius:50%; background:var(--gray-1); margin-top:7px; flex-shrink:0;}
+
+  .tags{display:flex; flex-wrap:wrap; gap:8px;}
+  .tag{
+    font-size:11.5px; padding:6px 12px; border-radius:100px;
+    border:1px solid var(--line-soft); color:var(--gray-3); background:var(--panel);
+  }
+
+  .context-box{
+    border-left:2px solid var(--gray-1); padding:2px 0 2px 15px;
+    font-size:13px; color:var(--gray-3); line-height:1.65;
+  }
+
+  .disclaimer{font-size:11px; color:var(--gray-2); text-align:center; margin-top:26px; line-height:1.6;}
+
+  .history-section{margin-top:30px; padding-top:22px; border-top:1px solid var(--line);}
+  .history-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;}
+  .history-title{
+    display:flex; align-items:center; gap:8px; font-family:'Space Grotesk',sans-serif;
+    font-size:13.5px; font-weight:600; color:var(--dim);
+  }
+  .history-title svg{width:16px; height:16px; color:var(--gray-1);}
+  .history-clear{
+    font-size:11.5px; color:var(--gray-2); background:none; border:none; cursor:pointer;
+    text-decoration:underline;
+  }
+  .history-clear:hover{color:var(--white);}
+  .history-item{
+    display:flex; align-items:center; gap:12px;
+    border:1px solid var(--line); border-radius:13px; background:var(--charcoal);
+    padding:13px 14px; margin-bottom:10px;
+  }
+  .history-badge{
+    flex-shrink:0; width:38px; height:38px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--panel-2); border:1px solid var(--line);
+  }
+  .history-badge svg{width:18px; height:18px;}
+  .history-badge.hoax{color:var(--glow-hoax); box-shadow:0 0 14px -3px rgba(255,107,94,.5);}
+  .history-badge.valid{color:var(--glow-valid); box-shadow:0 0 14px -3px rgba(94,255,157,.5);}
+  .history-badge.uncertain{color:var(--gray-3);}
+  .history-body{flex:1; min-width:0;}
+  .history-query{
+    font-size:13px; color:var(--dim); line-height:1.4;
+    overflow:hidden; text-overflow:ellipsis; display:-webkit-box;
+    -webkit-line-clamp:2; -webkit-box-orient:vertical;
+    margin-bottom:5px;
+  }
+  .history-meta{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .history-time{
+    font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--gray-2);
+  }
+  .history-verdict-tag{
+    font-size:10px; font-weight:600; padding:3px 9px; border-radius:100px;
+    border:1px solid var(--line-soft); letter-spacing:.02em;
+  }
+  .history-verdict-tag.hoax{color:var(--glow-hoax); border-color:rgba(255,107,94,.35);}
+  .history-verdict-tag.valid{color:var(--glow-valid); border-color:rgba(94,255,157,.35);}
+  .history-verdict-tag.uncertain{color:var(--gray-3);}
+  .history-empty{font-size:12px; color:var(--gray-2); text-align:center; padding:14px;}
+  .reset-link{
+    display:block; text-align:center; margin-top:16px; font-size:12.5px;
+    color:var(--gray-2); text-decoration:underline; cursor:pointer; background:none; border:none;
+  }
+  .reset-link:hover{color:var(--white);}
+
+  ::-webkit-scrollbar{width:6px;}
+  ::-webkit-scrollbar-thumb{background:#333; border-radius:10px;}
+</style>
+
+<style id="nxSourceNexoraTheme">
+:root{
+  --black:#08030f!important;
+  --charcoal:#120a20!important;
+  --panel:#170d28!important;
+  --panel-2:#1d1131!important;
+  --line:rgba(192,132,252,.20)!important;
+  --line-soft:rgba(192,132,252,.13)!important;
+  --gray-1:#b49bc9!important;
+  --gray-2:#806d94!important;
+  --gray-3:#c4b1d7!important;
+  --white:#f7f0ff!important;
+  --dim:#d8c9e8!important;
+  --glow:#c084fc!important;
+}
+body{
+  background:
+    radial-gradient(ellipse 900px 520px at 50% -10%,rgba(168,85,247,.18),transparent 62%),
+    linear-gradient(180deg,#08030f,#0b0712)!important;
+}
+.wrap{
+  max-width:760px!important;
+  padding:24px 16px 72px!important;
+}
+.brand-mark,.panel,.stat,.card,.history-section,#loading{
+  border-color:rgba(192,132,252,.18)!important;
+  background:rgba(18,9,31,.94)!important;
+  box-shadow:0 18px 50px rgba(0,0,0,.26)!important;
+}
+.cta{
+  background:linear-gradient(135deg,#7c3aed,#a855f7)!important;
+  color:#fff!important;
+  box-shadow:0 13px 30px rgba(124,58,237,.24)!important;
+}
+.example-chip,.counter-pill,.history-item{
+  border-color:rgba(192,132,252,.16)!important;
+  background:rgba(168,85,247,.055)!important;
+}
+.panel:focus-within{
+  border-color:#a855f7!important;
+  box-shadow:0 0 0 3px rgba(168,85,247,.10)!important;
+}
+.conf-fill,.stepfill,#stepFill{
+  background:linear-gradient(90deg,#7c3aed,#c084fc)!important;
+}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" class="ic"><path d="M12 2 4 5v6c0 5 3.4 9 8 11 4.6-2 8-6 8-11V5l-8-3z"></path><path d="m9 12 2 2 4-4"></path></svg>
+      </div>
+      <div class="brand-name">Cari<span>Fakta</span></div>
+    </div>
+    <div class="counter-pill"><span class="dot"></span><span id="totalChecked">0</span> diverifikasi</div>
+  </header>
+
+  <div class="eyebrow">Verifikasi berbasis AI</div>
+  <h1>Cari faktanya,<br><em>bukan asumsinya.</em></h1>
+  <p class="lede">Tempel teks forward-an WhatsApp, status, atau berita yang meragukan — CariFakta membedah klaimnya sebelum kamu sempat membagikannya.</p>
+
+  <div class="stats">
+    <div class="stat"><b id="statTotal">0</b><span>Total Dicek</span></div>
+    <div class="stat"><b id="statHoax">0</b><span>Hoaks Diungkap</span></div>
+    <div class="stat"><b id="statValid">0</b><span>Fakta Valid</span></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-inner">
+      <div class="panel-label">
+        <svg viewBox="0 0 24 24" class="ic"><path d="M4 6h16M4 12h16M4 18h10"></path></svg>
+        Tempel teks yang ingin diverifikasi
+      </div>
+      <textarea id="textInput" maxlength="2000" placeholder="Tempel teks dari WhatsApp, forward-an berita, atau status media sosial di sini..."></textarea>
+      <div class="charcount"><span id="charCount">0</span>/2000</div>
+    </div>
+  </div>
+
+  <button class="cta" id="checkBtn">
+    <svg viewBox="0 0 24 24" class="ic" style="stroke:#0a0a0a;"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path></svg>
+    Cek Sekarang
+  </button>
+
+  <div class="examples">
+    <div class="examples-label">Coba contoh:</div>
+    <div class="example-chip" data-example="Vaksin COVID mengandung microchip 5G untuk melacak manusia">Vaksin COVID mengandung chip 5G</div>
+    <div class="example-chip" data-example="Gempa besar akan terjadi di Jakarta minggu depan, sudah diprediksi BMKG">Gempa besar akan terjadi</div>
+  </div>
+
+  <div id="loading">
+    <div class="load-head">
+      <div class="scan-icon">
+        <svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="8"></circle><path d="M12 8v4l3 2"></path></svg>
+      </div>
+      <div>
+        <div class="load-title">Menganalisis konten</div>
+        <div class="load-sub" id="loadSub">AI CariFakta sedang bekerja</div>
+      </div>
+    </div>
+    <div class="stepline"><i id="stepFill"></i></div>
+    <div class="steptext"><span id="stepLabel">Tahap 1/4</span><span id="stepPct">0%</span></div>
+  </div>
+
+  <div id="results">
+    <div class="verdict-banner" id="verdictBanner">
+      <div class="verdict-top">
+        <div class="verdict-left">
+          <div class="verdict-icon" id="verdictIconWrap">
+            <svg viewBox="0 0 24 24" class="ic" id="verdictIcon"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"></path></svg>
+          </div>
+          <div class="verdict-title" id="verdictTitle">HOAKS TERDETEKSI</div>
+        </div>
+        <div class="conf-badge" id="confBadge">0%</div>
+      </div>
+      <div class="verdict-summary" id="verdictSummary">Ringkasan klaim akan muncul di sini</div>
+    </div>
+
+    <div class="card">
+      <h3><svg viewBox="0 0 24 24" class="ic"><path d="M3 12a9 9 0 1 0 9-9"></path><path d="M12 7v5l3 3"></path></svg>Tingkat Keyakinan AI</h3>
+      <div class="conf-row"><span>Keyakinan model</span><b id="confNum">0%</b></div>
+      <div class="conf-bar"><i id="confFill" style="width:0%"></i></div>
+      <div class="conf-scale"><span>0%</span><span>50%</span><span>100%</span></div>
+    </div>
+
+    <div class="card">
+      <h3><svg viewBox="0 0 24 24" class="ic"><path d="M9 4h6a1 1 0 0 1 1 1v1H8V5a1 1 0 0 1 1-1Z"></path><rect x="5" y="6" width="14" height="15" rx="2"></rect><path d="M9 12h6M9 16h4"></path></svg>Analisis Detail</h3>
+      <p id="analysisText">—</p>
+      <div class="misleading-box" id="misleadingBox" style="display:none;">
+        <div class="label"><svg viewBox="0 0 24 24" class="ic"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"></path><path d="M12 9v4M12 17h.01"></path></svg>Elemen Menyesatkan</div>
+        <ul id="misleadingList"></ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3><svg viewBox="0 0 24 24" class="ic"><circle cx="11" cy="11" r="7"></circle><path d="m21 21-4.3-4.3"></path></svg>Klaim yang Ditemukan</h3>
+      <div id="claimsList"></div>
+    </div>
+
+    <div class="card">
+      <h3><svg viewBox="0 0 24 24" class="ic"><path d="M20.6 12.6 12.9 20.3a2 2 0 0 1-2.8 0l-7-7a2 2 0 0 1 0-2.8L10.8 3 20 3v9.2Z"></path><circle cx="14.5" cy="8.5" r="1"></circle></svg>Topik Terkait</h3>
+      <div class="tags" id="tagsList"></div>
+    </div>
+
+    <div class="card">
+      <h3><svg viewBox="0 0 24 24" class="ic"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.5.5.8 1 .8 1.7V16h6.4v-.8c0-.7.3-1.2.8-1.7A6 6 0 0 0 12 3Z"></path></svg>Konteks</h3>
+      <div class="context-box" id="contextText">—</div>
+    </div>
+
+    <button class="reset-link" id="resetBtn">Cek klaim lain</button>
+  </div>
+
+  <p class="disclaimer">CariFakta memakai beberapa model AI cadangan untuk analisis awal berbasis pengetahuan model — bukan pengganti verifikasi dari sumber berita resmi. Selalu cek silang untuk klaim yang berdampak besar.</p>
+
+  <div class="history-section" id="historySection" style="display:none;">
+    <div class="history-head">
+      <span class="history-title">
+        <svg viewBox="0 0 24 24" class="ic"><path d="M3 12a9 9 0 1 0 9-9"></path><path d="M12 7v5l3 3"></path></svg>
+        Riwayat Pencarian
+      </span>
+      <button class="history-clear" id="historyClearBtn">Hapus semua</button>
+    </div>
+    <div id="historyList"></div>
+  </div>
+
+</div>
+
+<script>
+/* ====================================================================
+   KONFIGURASI GROQ API
+   Ganti nilai di bawah ini dengan API key Groq kamu sendiri.
+   Dapatkan di: https://console.groq.com/keys
+
+   PERINGATAN: menaruh API key langsung di kode sisi klien (front-end)
+   berarti siapa pun yang membuka "view source" halaman ini bisa
+   melihat dan memakai key kamu. Untuk penggunaan publik, sebaiknya
+   panggilan ke Groq dilakukan lewat backend/proxy kecil yang menyimpan
+   key secara aman di server, bukan di browser.
+   ==================================================================== */
+const FACT_AI_PROVIDERS = [
+  {
+    id:"siputzx-deepseek",
+    label:"DeepSeek R1",
+    type:"siputzx",
+    endpoint:
+      "https://api.siputzx.my.id/api/ai/deepseekr1"
+  },
+  {
+    id:"nexray-gpt",
+    label:"NexRay GPT",
+    type:"nexray",
+    endpoint:
+      "https://api.nexray.eu.cc/ai/gpt-3.5-turbo"
+  },
+  {
+    id:"kuroneko-chatgpt",
+    label:"KuroNeko ChatGPT",
+    type:"kuroneko",
+    endpoint:
+      "https://sylvatica.my.id/api/ai/chatgpt"
+  },
+  {
+    id:"kuroneko-perplexity",
+    label:"KuroNeko Perplexity",
+    type:"kuroneko-perplexity",
+    endpoint:
+      "https://sylvatica.my.id/api/ai/perplexity"
+  }
+];
+
+let factProviderCursor = Number(
+  window.nxSafeStorage.getItem("carifakta:provider-cursor") || 0
+) || 0;
+
+const textInput = document.getElementById('textInput');
+const checkBtn = document.getElementById('checkBtn');
+
+// ---- Stats persistence ----
+let stats = { total: 0, hoax: 0, valid: 0 };
+
+async function loadStats(){
+  try{
+    if(window.storage){
+      const r = await window.storage.get('carifakta:stats', false);
+      if(r && r.value){ stats = JSON.parse(r.value); }
+    }
+  }catch(e){ /* belum ada data tersimpan */ }
+  renderStats();
+}
+async function saveStats(){
+  renderStats();
+  try{
+    if(window.storage){
+      await window.storage.set('carifakta:stats', JSON.stringify(stats), false);
+    }
+  }catch(e){ console.error('Gagal menyimpan statistik', e); }
+}
+function renderStats(){
+  document.getElementById('statTotal').textContent = stats.total;
+  document.getElementById('statHoax').textContent = stats.hoax;
+  document.getElementById('statValid').textContent = stats.valid;
+  document.getElementById('totalChecked').textContent = stats.total;
+}
+loadStats();
+
+// ---- History (kartu riwayat pencarian di bagian paling bawah) ----
+let history = [];
+
+async function loadHistory(){
+  try{
+    if(window.storage){
+      const r = await window.storage.get('carifakta:history', false);
+      if(r && r.value){ history = JSON.parse(r.value); }
+    }
+  }catch(e){ /* belum ada riwayat tersimpan */ }
+  renderHistory();
+}
+async function saveHistory(){
+  renderHistory();
+  try{
+    if(window.storage){
+      await window.storage.set('carifakta:history', JSON.stringify(history), false);
+    }
+  }catch(e){ console.error('Gagal menyimpan riwayat', e); }
+}
+
+const HARI_ID = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+const BULAN_ID = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+
+function formatIndoDateTime(ts){
+  const d = new Date(ts);
+  const hari = HARI_ID[d.getDay()];
+  const tanggal = d.getDate();
+  const bulan = BULAN_ID[d.getMonth()];
+  const tahun = d.getFullYear();
+  const jam = String(d.getHours()).padStart(2,'0');
+  const menit = String(d.getMinutes()).padStart(2,'0');
+  return `${hari}, ${tanggal} ${bulan} ${tahun} · ${jam}:${menit}`;
+}
+
+function addHistoryEntry(queryText, result){
+  history.unshift({
+    ts: Date.now(),
+    query: (result.summary && result.summary.trim()) ? result.summary.trim() : queryText.slice(0,140),
+    verdict: result.verdict || 'uncertain'
+  });
+  if(history.length > 50) history = history.slice(0, 50); // batasi biar tidak membengkak
+  saveHistory();
+}
+
+function verdictLabel(v){
+  if(v === 'hoax') return 'Hoaks';
+  if(v === 'valid') return 'Valid';
+  return 'Belum Pasti';
+}
+function verdictIconPath(v){
+  if(v === 'hoax') return '<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/>';
+  if(v === 'valid') return '<path d="M20 6 9 17l-5-5"/>';
+  return '<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2 2-2 3.5M12 17h.01"/>';
+}
+
+function renderHistory(){
+  const section = document.getElementById('historySection');
+  const list = document.getElementById('historyList');
+  if(!history.length){
+    section.style.display = 'none';
+    list.innerHTML = '';
+    return;
+  }
+  section.style.display = 'block';
+  list.innerHTML = '';
+  history.forEach(item=>{
+    const row = document.createElement('div');
+    row.className = 'history-item';
+    row.innerHTML = `
+      <div class="history-badge ${item.verdict}">
+        <svg viewBox="0 0 24 24" class="ic">${verdictIconPath(item.verdict)}</svg>
+      </div>
+      <div class="history-body">
+        <div class="history-query"></div>
+        <div class="history-meta">
+          <span class="history-time"></span>
+          <span class="history-verdict-tag ${item.verdict}"></span>
+        </div>
+      </div>
+    `;
+    row.querySelector('.history-query').textContent = item.query;
+    row.querySelector('.history-time').textContent = formatIndoDateTime(item.ts);
+    row.querySelector('.history-verdict-tag').textContent = verdictLabel(item.verdict);
+    list.appendChild(row);
+  });
+}
+
+document.getElementById('historyClearBtn').addEventListener('click', ()=>{
+  history = [];
+  saveHistory();
+});
+
+loadHistory();
+
+// ---- Char counter ----
+textInput.addEventListener('input', ()=>{
+  document.getElementById('charCount').textContent = textInput.value.length;
+});
+
+// ---- Example chips ----
+document.querySelectorAll('.example-chip').forEach(chip=>{
+  chip.addEventListener('click', ()=>{
+    textInput.value = chip.dataset.example;
+    document.getElementById('charCount').textContent = textInput.value.length;
+    textInput.focus();
+  });
+});
+
+// ---- Reset ----
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  textInput.value = '';
+  document.getElementById('charCount').textContent = '0';
+  document.getElementById('results').classList.remove('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+});
+
+// ---- Loading stepper ----
+const steps = ["Membaca konten", "Mengekstrak klaim", "Membandingkan pola hoaks", "Menyusun verifikasi"];
+let stepTimer = null;
+
+function delay(ms){ return new Promise(resolve => setTimeout(resolve, ms)); }
+
+// Loading berjalan minimal 6-8 detik (dipilih acak setiap kali) supaya proses
+// terasa "bekerja" dan tidak berkedip kalau responsnya kebetulan cepat.
+function startLoading(){
+  const loadingEl = document.getElementById('loading');
+  loadingEl.classList.add('active');
+  document.getElementById('results').classList.remove('active');
+  let i = 0;
+  document.getElementById('stepFill').style.width = '0%';
+  document.getElementById('stepPct').textContent = '0%';
+
+  const totalDurationMs = 6000 + Math.random() * 2000; // 6–8 detik
+  const stepInterval = totalDurationMs / steps.length;
+
+  stepTimer = setInterval(()=>{
+    i = (i+1) % steps.length;
+    const pct = Math.round(((i+1)/steps.length)*90);
+    document.getElementById('stepFill').style.width = pct + '%';
+    document.getElementById('stepLabel').textContent = `Tahap ${i+1}/${steps.length}`;
+    document.getElementById('stepPct').textContent = pct + '%';
+    document.getElementById('loadSub').textContent = steps[i];
+  }, stepInterval);
+
+  // Auto-scroll ke bagian loading begitu tombol "Cek Sekarang" ditekan
+  setTimeout(()=>{
+    loadingEl.scrollIntoView({behavior:'smooth', block:'start'});
+  }, 60);
+
+  return totalDurationMs;
+}
+function stopLoading(){
+  clearInterval(stepTimer);
+  document.getElementById('stepFill').style.width = '100%';
+  document.getElementById('stepPct').textContent = '100%';
+  setTimeout(()=>{
+    document.getElementById('loading').classList.remove('active');
+  }, 300);
+}
+
+// ---- Main check action ----
+checkBtn.addEventListener('click', runCheck);
+
+async function runCheck(){
+  if(!textInput.value.trim()){
+    alert('Masukkan teks terlebih dahulu.');
+    return;
+  }
+  checkBtn.disabled = true;
+  const queryText = textInput.value.trim();
+  const minLoadingMs = startLoading();
+
+  try{
+    // Tunggu hasil API DAN durasi loading minimum 6-8 detik, mana yang lebih lama.
+    const [result] = await Promise.all([
+      analyzeWithGroq(queryText),
+      delay(minLoadingMs)
+    ]);
+    renderResult(result);
+
+    stats.total += 1;
+    if(result.verdict === 'hoax') stats.hoax += 1;
+    if(result.verdict === 'valid') stats.valid += 1;
+    saveStats();
+
+    addHistoryEntry(queryText, result);
+
+  }catch(err){
+    console.error(err);
+    alert('Analisis belum dapat diselesaikan. Coba kembali setelah koneksi stabil.\n\n' + err.message);
+  }finally{
+    stopLoading();
+    checkBtn.disabled = false;
+  }
+}
+
+function buildSystemPrompt(){
+  return `Kamu adalah CariFakta, mesin verifikasi fakta berbahasa Indonesia yang independen, teliti, skeptis, dan JUJUR soal batas pengetahuanmu sendiri.
+
+INPUT BISA BERUPA APA SAJA: klaim/forward-an WhatsApp, potongan berita, status media sosial, ATAU pertanyaan langsung dari pengguna (misalnya "apakah benar X terjadi?", "apa itu Y?", "kenapa Z bisa viral?"). Kamu HARUS selalu memberi jawaban substantif untuk apa pun yang dikirim — jangan pernah menolak menjawab atau membalas kosong. Kalau berupa pertanyaan, jawab pertanyaannya secara faktual sambil tetap mengisi semua field JSON di bawah dengan konsisten.
+
+PENTING SOAL INPUT SINGKAT (1-2 kalimat/frasa pendek): Pengguna sering hanya mengetik sepotong kalimat singkat, tanpa detail lengkap — ini NORMAL, bukan input yang cacat. Tugasmu adalah AKTIF BERNALAR untuk memahami maksudnya menggunakan pengetahuan umum, BUKAN meminta klarifikasi atau membalas dengan analisis kosong seperti "terlalu singkat untuk dianalisis". Langkah wajib untuk input singkat:
+- Identifikasi topik/istilah/singkatan/nama yang disebut (walau cuma satu-dua kata) dan hubungkan dengan pengetahuan umum yang paling relevan (contoh: singkatan organisasi, peristiwa yang sudah dikenal luas, jenis klaim viral yang umum beredar).
+- Kalau kalimatnya menyerupai pola hoaks viral yang sudah dikenal luas (mis. klaim kesehatan ekstrem, teori konspirasi, prediksi bencana, klaim soal vaksin/5G/chip, hadiah/give-away palsu, dsb), langsung kenali polanya dan jelaskan kenapa itu mencurigakan — jangan hanya bilang "tidak ada konteks".
+- Hanya gunakan verdict "uncertain" dengan alasan "terlalu singkat" jika BENAR-BENAR tidak ada satupun entitas, istilah, atau pola yang bisa dikenali sama sekali (mis. input cuma "iya" atau "test"). Selama ada satu topik yang bisa dipegang, kerjakan analisisnya.
+- Analisis tetap harus konkret dan menyebut istilah spesifik dari input pengguna, bukan kalimat generik yang bisa dipakai untuk klaim apa saja.
+
+ATURAN ANTI-NGAWUR (WAJIB DIPATUHI):
+1. Jangan pernah mengarang angka statistik, tanggal persis, kutipan, nama pejabat, judul berita, atau nomor peraturan yang TIDAK kamu yakini benar. Kalau kamu tidak yakin dengan detail spesifik, katakan secara eksplisit "detail ini tidak bisa dipastikan tanpa sumber" — jangan menebak lalu menyajikannya seolah pasti.
+2. Bedakan dengan jelas antara: (a) hal yang kamu tahu dengan yakin, (b) hal yang masuk akal tapi perlu verifikasi lanjut, dan (c) hal yang benar-benar tidak kamu ketahui. Cerminkan perbedaan ini di field "confidence" — jangan kasih confidence tinggi (>70) kecuali kamu benar-benar yakin berdasarkan pengetahuan umum yang solid.
+3. Kalau topiknya sangat baru/spesifik/lokal sehingga kemungkinan besar di luar pengetahuanmu, JUJUR katakan itu di analysis dan gunakan verdict "uncertain" alih-alih memaksakan verdict hoax/valid.
+4. Jangan pernah mengarang nama media, lembaga fact-checking, atau URL yang tidak kamu yakini benar-benar ada.
+5. Konsisten secara logis: verdict, confidence, dan analysis harus saling mendukung — jangan bilang "valid" di verdict tapi isi analysis penuh keraguan, atau sebaliknya.
+
+Untuk setiap input, identifikasi SETIAP entitas spesifik di dalamnya (nama orang/organisasi, lokasi, tanggal/waktu, angka, kejadian) dan jelaskan secara eksplisit apa yang benar-benar kamu ketahui vs tidak tentang masing-masing entitas tersebut. Jangan menulis analisis generik seperti "kurang konteks" tanpa merujuk balik ke bagian spesifik yang membuatnya kurang jelas.
+
+Field "analysis" WAJIB terdiri dari minimal 4-6 kalimat yang membahas secara konkret: (1) entitas/nama/lokasi/organisasi spesifik yang disebut dan apa yang benar-benar diketahui/tidak diketahui tentangnya (jujur soal keterbatasan), (2) apakah strukturnya cocok dengan pola hoaks umum (klaim viral tanpa sumber, clickbait, tanpa waktu/tempat jelas, mengutip otoritas tanpa bukti, angka yang dilebih-lebihkan, dll) dan pola mana yang cocok, (3) bagian mana yang bisa/tidak bisa diverifikasi lebih lanjut dan kenapa, (4) rekomendasi langkah verifikasi konkret untuk pembaca (contoh: cek akun resmi instansi X, cari nama kejadian di mesin pencari, cek fact-checker resmi seperti Mafindo/Turnbackhoax). Tulis seakan menjelaskan ke teman yang butuh alasan konkret, bukan kesimpulan template kosong.
+
+Balas HANYA dengan JSON valid (tanpa markdown, tanpa teks lain), dengan struktur persis seperti ini:
+{
+  "verdict": "hoax" | "valid" | "uncertain",
+  "confidence": <angka 0-100, jujur — jangan digenapkan ke atas>,
+  "summary": "<ringkasan satu kalimat yang menyebut entitas utama>",
+  "analysis": "<analisis detail 4-6 kalimat sesuai instruksi di atas, jujur soal batas pengetahuan>",
+  "misleading_elements": ["<elemen menyesatkan spesifik, merujuk ke bagian klaim>", ...],
+  "claims": ["<klaim atau pertanyaan spesifik yang ditemukan, ditulis lengkap bukan potongan kata>", ...],
+  "topics": ["<tag topik singkat>", ...],
+  "context": "<konteks latar belakang singkat yang relevan, atau jawaban langsung kalau input berupa pertanyaan>"
+}
+Jika konten benar-benar tidak mengandung klaim faktual apa pun (misalnya cuma sapaan), gunakan verdict "uncertain" dengan confidence rendah dan jelaskan itu di analysis — tapi tetap isi semua field, jangan kosong.`;
+}
+
+function factReport(state,detail){
+  try{
+    parent.postMessage({
+      type:"nx-api-status",
+      provider:"groqfact",
+      state,
+      detail,
+      at:Date.now()
+    },"*");
+  }catch(error){}
+}
+
+function factDelay(ms){
+  return new Promise(resolve =>
+    setTimeout(resolve,ms)
+  );
+}
+
+function factWithTimeout(ms){
+  const controller = new AbortController();
+  const timer = setTimeout(
+    () => controller.abort(),
+    ms
+  );
+
+  return {
+    signal:controller.signal,
+    cleanup(){
+      clearTimeout(timer);
+    }
+  };
+}
+
+function factCompactPrompt(userContent){
+  return [
+    "Anda adalah CariFakta Indonesia.",
+    "Analisis klaim secara skeptis dan jujur.",
+    "Jangan mengarang sumber, angka, tanggal, atau kutipan.",
+    "Keluarkan HANYA JSON valid tanpa markdown dengan struktur:",
+    '{"verdict":"hoax|valid|uncertain","confidence":0,',
+    '"summary":"ringkasan","analysis":"4-6 kalimat konkret",',
+    '"misleading_elements":["..."],"claims":["..."],',
+    '"topics":["..."],"context":"langkah verifikasi konkret"}',
+    "Gunakan verdict uncertain bila bukti tidak cukup.",
+    "",
+    "INPUT:",
+    String(userContent || "")
+  ].join("\n");
+}
+
+function factExtractText(data,depth){
+  depth = depth || 0;
+
+  if(depth > 8){
+    throw new Error("Respons AI terlalu dalam");
+  }
+
+  if(typeof data === "string"){
+    const text = data.trim();
+
+    if(
+      text &&
+      !/^<!doctype|^<html/i.test(text)
+    ){
+      return text;
+    }
+
+    throw new Error("Respons AI bukan teks");
+  }
+
+  if(!data || typeof data !== "object"){
+    throw new Error("Respons AI kosong");
+  }
+
+  if(
+    data.success === false ||
+    data.status === false
+  ){
+    throw new Error(
+      data.error?.message ||
+      data.error ||
+      data.message ||
+      data.msg ||
+      "Provider gagal"
+    );
+  }
+
+  const choice =
+    data.choices &&
+    data.choices[0];
+
+  const choiceText =
+    choice &&
+    (
+      choice.message?.content ||
+      choice.text
+    );
+
+  if(
+    typeof choiceText === "string" &&
+    choiceText.trim()
+  ){
+    return choiceText.trim();
+  }
+
+  const directKeys = [
+    "result",
+    "response",
+    "answer",
+    "message",
+    "text",
+    "content",
+    "reply",
+    "output",
+    "generated_text"
+  ];
+
+  for(const key of directKeys){
+    const value = data[key];
+
+    if(
+      typeof value === "string" &&
+      value.trim()
+    ){
+      return value.trim();
+    }
+  }
+
+  for(const key of [
+    "data",
+    "result",
+    "response",
+    "output",
+    "payload"
+  ]){
+    const nested = data[key];
+
+    if(
+      nested &&
+      typeof nested === "object" &&
+      nested !== data
+    ){
+      try{
+        return factExtractText(
+          nested,
+          depth + 1
+        );
+      }catch(ignore){}
+    }
+  }
+
+  if(Array.isArray(data)){
+    for(const item of data){
+      try{
+        return factExtractText(
+          item,
+          depth + 1
+        );
+      }catch(ignore){}
+    }
+  }
+
+  throw new Error("Format respons AI tidak dikenali");
+}
+
+function factNormalizeResult(value,rawText){
+  const source =
+    value &&
+    typeof value === "object"
+      ? value
+      : {};
+
+  const allowed = [
+    "hoax",
+    "valid",
+    "uncertain"
+  ];
+
+  const verdict = allowed.includes(
+    String(source.verdict || "").toLowerCase()
+  )
+    ? String(source.verdict).toLowerCase()
+    : "uncertain";
+
+  const number = Number(source.confidence);
+  const confidence = Number.isFinite(number)
+    ? Math.max(0,Math.min(100,Math.round(number)))
+    : 45;
+
+  const toArray = input => {
+    if(Array.isArray(input)){
+      return input
+        .map(item => String(item || "").trim())
+        .filter(Boolean)
+        .slice(0,8);
+    }
+
+    if(typeof input === "string" && input.trim()){
+      return input
+        .split(/\n|;|•/)
+        .map(item => item.trim())
+        .filter(Boolean)
+        .slice(0,8);
+    }
+
+    return [];
+  };
+
+  const fallbackText = String(rawText || "").trim();
+
+  return {
+    verdict,
+    confidence,
+    summary:
+      String(
+        source.summary ||
+        source.ringkasan ||
+        ""
+      ).trim() ||
+      fallbackText.slice(0,220) ||
+      "Hasil perlu diverifikasi lebih lanjut.",
+    analysis:
+      String(
+        source.analysis ||
+        source.analisis ||
+        source.explanation ||
+        ""
+      ).trim() ||
+      fallbackText ||
+      "Provider AI tidak memberikan analisis terstruktur.",
+    misleading_elements:toArray(
+      source.misleading_elements ||
+      source.misleading ||
+      source.indikasi
+    ),
+    claims:toArray(
+      source.claims ||
+      source.klaim
+    ),
+    topics:toArray(
+      source.topics ||
+      source.topik ||
+      source.tags
+    ),
+    context:
+      String(
+        source.context ||
+        source.konteks ||
+        source.recommendation ||
+        source.saran ||
+        ""
+      ).trim() ||
+      "Periksa sumber primer, akun resmi, tanggal, lokasi, dan laporan pemeriksa fakta tepercaya."
+  };
+}
+
+function factParseResult(raw){
+  const text = String(raw || "")
+    .replace(/```json/gi,"")
+    .replace(/```/g,"")
+    .trim();
+
+  const candidates = [text];
+
+  const start = text.indexOf("{");
+  const end = text.lastIndexOf("}");
+
+  if(start >= 0 && end > start){
+    candidates.push(
+      text.slice(start,end + 1)
+    );
+  }
+
+  for(const candidate of candidates){
+    try{
+      const parsed = JSON.parse(candidate);
+      return factNormalizeResult(parsed,text);
+    }catch(ignore){}
+  }
+
+  // Respons AI tetap digunakan walau provider tidak menaati JSON.
+  return factNormalizeResult({},text);
+}
+
+function factProxyCandidates(target){
+  return Array.from(new Set([
+    target,
+    "https://api.allorigins.win/raw?url=" +
+      encodeURIComponent(target),
+    "https://corsproxy.io/?url=" +
+      encodeURIComponent(target)
+  ]));
+}
+
+async function factFetchText(url){
+  let lastError = null;
+
+  for(const candidate of factProxyCandidates(url)){
+    const timeout = factWithTimeout(18000);
+
+    try{
+      const response = await fetch(
+        candidate,
+        {
+          method:"GET",
+          headers:{
+            "Accept":
+              "application/json,text/plain,*/*"
+          },
+          signal:timeout.signal
+        }
+      );
+
+      if(!response.ok){
+        const error = new Error(
+          "HTTP " + response.status
+        );
+        error.status = response.status;
+        throw error;
+      }
+
+      const raw = await response.text();
+      let data = raw;
+
+      try{
+        data = JSON.parse(raw);
+      }catch(ignore){}
+
+      return factExtractText(data);
+    }catch(error){
+      lastError = error;
+    }finally{
+      timeout.cleanup();
+    }
+  }
+
+  throw lastError ||
+    new Error("Provider tidak dapat dihubungi");
+}
+
+async function requestFactProvider(provider,userContent){
+  const prompt = factCompactPrompt(userContent);
+  let url;
+
+  if(provider.type === "siputzx"){
+    url =
+      provider.endpoint +
+      "?prompt=" + encodeURIComponent(prompt) +
+      "&system=" +
+      encodeURIComponent(
+        "Keluarkan hanya JSON valid untuk mesin CariFakta."
+      ) +
+      "&temperature=0.2";
+  }else if(provider.type === "nexray"){
+    url =
+      provider.endpoint +
+      "?text=" + encodeURIComponent(prompt);
+  }else if(provider.type === "kuroneko-perplexity"){
+    url =
+      provider.endpoint +
+      "?q=" + encodeURIComponent(prompt);
+  }else{
+    url =
+      provider.endpoint +
+      "?prompt=" + encodeURIComponent(prompt);
+  }
+
+  const raw = await factFetchText(url);
+  return factParseResult(raw);
+}
+
+function factProviderOrder(){
+  const count = FACT_AI_PROVIDERS.length;
+
+  return Array.from(
+    {length:count},
+    (_,offset) =>
+      FACT_AI_PROVIDERS[
+        (factProviderCursor + offset) % count
+      ]
+  );
+}
+
+function factLocalFallback(userContent,failures){
+  const input = String(userContent || "").trim();
+  const lower = input.toLowerCase();
+
+  const knownHoaxPattern =
+    /(microchip|chip 5g|vaksin.*5g|melacak manusia|flat earth|bumi datar|hadiah gratis.*klik|transfer.*hadiah)/i
+      .test(input);
+
+  const verdict =
+    knownHoaxPattern
+      ? "hoax"
+      : "uncertain";
+
+  const confidence =
+    knownHoaxPattern
+      ? 78
+      : 28;
+
+  const topics = [];
+
+  if(/vaksin|covid/i.test(input)){
+    topics.push("Kesehatan","Vaksin");
+  }
+  if(/5g|internet|teknologi/i.test(input)){
+    topics.push("Teknologi");
+  }
+  if(!topics.length){
+    topics.push("Verifikasi Klaim");
+  }
+
+  return {
+    verdict,
+    confidence,
+    summary:
+      knownHoaxPattern
+        ? "Klaim tersebut cocok dengan pola misinformasi yang telah lama beredar."
+        : "Klaim belum dapat dipastikan tanpa akses ke layanan AI dan sumber primer.",
+    analysis:
+      knownHoaxPattern
+        ? "Klaim menghubungkan teknologi komunikasi dengan fungsi biologis atau pelacakan tanpa mekanisme dan bukti yang masuk akal. Vaksin dan jaringan 5G adalah dua teknologi berbeda yang tidak bekerja sebagai sistem pelacak manusia. Pola ini umum menggunakan istilah teknis untuk memberi kesan ilmiah tanpa menunjukkan sumber primer. Detail spesifik tetap perlu diperiksa melalui lembaga kesehatan dan sumber teknologi resmi. Jangan menyebarkan klaim sebelum menemukan dokumen atau laporan yang dapat diverifikasi."
+        : "Layanan AI cadangan tidak dapat dihubungi dari perangkat ini, sehingga sistem memakai analisis lokal yang konservatif. Isi klaim belum cukup untuk diberi label valid atau hoaks secara pasti. Periksa siapa sumber awalnya, kapan diterbitkan, lokasi kejadian, serta apakah ada bukti primer. Bandingkan dengan akun resmi instansi terkait dan pemeriksa fakta tepercaya. Jangan menganggap kesimpulan sementara ini sebagai verifikasi final.",
+    misleading_elements:
+      knownHoaxPattern
+        ? [
+            "Menghubungkan teknologi yang tidak memiliki mekanisme terkait",
+            "Tidak menunjukkan bukti primer yang dapat diuji"
+          ]
+        : [
+            "Sumber dan bukti primer belum tersedia"
+          ],
+    claims:[input].filter(Boolean),
+    topics,
+    context:
+      "Periksa situs resmi instansi terkait, cari laporan sumber primer, dan bandingkan dengan pemeriksa fakta seperti Mafindo/TurnBackHoax.",
+    _fallback:true,
+    _failures:failures || []
+  };
+}
+
+async function callGroq(userContent){
+  const providers = factProviderOrder();
+  const failures = [];
+
+  for(let index=0;index<providers.length;index++){
+    const provider = providers[index];
+    const started = performance.now();
+
+    factReport(
+      "checking",
+      "Mencoba " + provider.label + "…"
+    );
+
+    try{
+      const result = await requestFactProvider(
+        provider,
+        userContent
+      );
+
+      factProviderCursor =
+        (
+          FACT_AI_PROVIDERS.indexOf(provider) + 1
+        ) % FACT_AI_PROVIDERS.length;
+
+      try{
+        window.nxSafeStorage.setItem(
+          "carifakta:provider-cursor",
+          String(factProviderCursor)
+        );
+      }catch(ignore){}
+
+      factReport(
+        "ok",
+        provider.label +
+          " aktif · " +
+          Math.max(
+            1,
+            Math.round(
+              performance.now() - started
+            )
+          ) +
+          " ms"
+      );
+
+      return result;
+    }catch(error){
+      failures.push(
+        provider.label +
+          ": " +
+          (
+            error && error.message
+              ? error.message
+              : "gagal"
+          )
+      );
+
+      factReport(
+        index < providers.length - 1
+          ? "warn"
+          : "err",
+        provider.label +
+          " gagal · beralih ke cadangan"
+      );
+
+      await factDelay(120);
+    }
+  }
+
+  factReport(
+    "warn",
+    "Semua AI gagal · analisis lokal digunakan"
+  );
+
+  return factLocalFallback(
+    userContent,
+    failures
+  );
+}
+
+async function analyzeWithGroq(text){
+  return callGroq(
+    `Analisis input berikut secara konkret:\n\n"""${text}"""`
+  );
+}
+
+// ---- Render result ----
+function renderResult(r){
+  const banner = document.getElementById('verdictBanner');
+  banner.classList.remove('hoax','valid');
+  const iconEl = document.getElementById('verdictIcon');
+  const title = document.getElementById('verdictTitle');
+
+  if(r.verdict === 'hoax'){
+    banner.classList.add('hoax');
+    iconEl.innerHTML = '<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/>';
+    title.textContent = 'Hoaks Terdeteksi';
+  } else if(r.verdict === 'valid'){
+    banner.classList.add('valid');
+    iconEl.innerHTML = '<path d="M20 6 9 17l-5-5"/>';
+    title.textContent = 'Tampak Valid';
+  } else {
+    iconEl.innerHTML = '<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2 2-2 3.5M12 17h.01"/>';
+    title.textContent = 'Belum Dapat Dipastikan';
+  }
+  document.getElementById('verdictSummary').textContent = r.summary || '—';
+
+  const conf = Math.max(0, Math.min(100, Number(r.confidence)||0));
+  document.getElementById('confBadge').textContent = conf + '%';
+  document.getElementById('confNum').textContent = conf + '%';
+  document.getElementById('confFill').style.width = conf + '%';
+
+  document.getElementById('analysisText').textContent = r.analysis || '—';
+
+  const mBox = document.getElementById('misleadingBox');
+  const mList = document.getElementById('misleadingList');
+  mList.innerHTML = '';
+  if(r.misleading_elements && r.misleading_elements.length){
+    mBox.style.display = 'block';
+    r.misleading_elements.forEach(m=>{
+      const li = document.createElement('li');
+      li.textContent = m;
+      mList.appendChild(li);
+    });
+  } else {
+    mBox.style.display = 'none';
+  }
+
+  const claimsList = document.getElementById('claimsList');
+  claimsList.innerHTML = '';
+  (r.claims||[]).forEach(c=>{
+    const div = document.createElement('div');
+    div.className = 'claim-item';
+    div.innerHTML = `<span class="dot"></span><span></span>`;
+    div.querySelector('span:last-child').textContent = c;
+    claimsList.appendChild(div);
+  });
+  if(!r.claims || !r.claims.length){
+    claimsList.innerHTML = '<div class="claim-item"><span>Tidak ada klaim spesifik terdeteksi.</span></div>';
+  }
+
+  const tagsList = document.getElementById('tagsList');
+  tagsList.innerHTML = '';
+  (r.topics||[]).forEach(t=>{
+    const span = document.createElement('span');
+    span.className = 'tag';
+    span.textContent = t;
+    tagsList.appendChild(span);
+  });
+
+  document.getElementById('contextText').textContent = r.context || '—';
+
+  document.getElementById('results').classList.add('active');
+  document.getElementById('results').scrollIntoView({behavior:'smooth', block:'start'});
+}
+</script>
+
+
+
+<script id="nxCariFaktaApiStatusBridge">
+(function(){
+  "use strict";
+  // Status provider dikirim langsung oleh mesin failover CariFakta.
+})();
+</script>
+
+</body></html>

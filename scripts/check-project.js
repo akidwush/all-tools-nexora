@@ -148,6 +148,25 @@ for (const relative of embeddedFrames) {
   if (!/<iframe[^>]+sandbox=/i.test(source)) fail(`${relative}: iframe srcdoc belum diberi sandbox.`);
   if (/allow-same-origin/i.test(source)) fail(`${relative}: sandbox srcdoc masih memiliki allow-same-origin.`);
 }
+const standaloneApps = [
+  ["assets/js/features/imported-tools.js", ["/assets/apps/ml-tools/index.html?v=standalone-v1", "/assets/apps/prompt-generator/index.html?v=standalone-v1", "/assets/apps/fake-ovo/index.html?v=standalone-v1", "/assets/apps/quote-generator/index.html?v=standalone-v1", "/assets/apps/cari-fakta/index.html?v=standalone-v1"]],
+  ["assets/js/features/tiktok-quote.js", ["/assets/apps/tiktok-quote/index.html?v=standalone-v1"]],
+  ["assets/js/features/virus-scan.js", ["/assets/apps/virus-scan/index.html?v=standalone-v1"]],
+  ["assets/js/features/unban-whatsapp.js", ["/assets/apps/unban-whatsapp/index.html?v=standalone-v1"]],
+  ["assets/js/features/deploy-center.js", ["/assets/apps/deploy-center/index.html?v=standalone-v1"]]
+];
+for (const [relative, urls] of standaloneApps) {
+  const source = read(relative);
+  if (/(?:_B64\b|srcdoc\s*=|decodeUtf8Base64|decodeBase64|decodeVirusApp|URL\.createObjectURL\(new Blob)/.test(source)) fail(`${relative}: legacy embedded payload kembali terdeteksi.`);
+  for (const url of urls) if (!source.includes(url)) fail(`${relative}: URL canonical hilang: ${url}`);
+}
+for (const relative of [
+  "assets/apps/ml-tools/index.html", "assets/apps/prompt-generator/index.html", "assets/apps/fake-ovo/index.html",
+  "assets/apps/quote-generator/index.html", "assets/apps/cari-fakta/index.html", "assets/apps/tiktok-quote/index.html",
+  "assets/apps/unban-whatsapp/index.html", "assets/apps/virus-scan/index.html", "assets/apps/deploy-center/index.html",
+  "assets/apps/manifest.json"
+]) if (!fs.existsSync(path.join(root, relative))) fail(`Standalone canonical asset hilang: ${relative}`);
+
 const comicShell = read("assets/js/features/comic-reader.js");
 if (!/COMIC_APP_URL\s*=\s*["']\/assets\/comic-reader\/index\.html\?v=standalone-v1["']/.test(comicShell)) fail("Comic Reader tidak memakai app standalone canonical.");
 if (/COMIC_READER_APP_B64|srcdoc|nxComicApiBridgeHandler|nx-comic-api-request/.test(comicShell)) fail("Comic Reader legacy Base64/srcdoc/bridge kembali terdeteksi.");
@@ -161,7 +180,8 @@ if (/id=["']nxUnbanFrame["'][^>]*allow-same-origin/i.test(index)) fail("Iframe U
 const app = read("assets/js/core/app.js");
 if (!/event\.source\s*!==\s*sourceFrame\.contentWindow/.test(app)) fail("Handler postMessage iframe belum memvalidasi event.source.");
 const deployCenter = read("assets/js/features/deploy-center.js");
-if (!/jszip\.min\.js[^\n]+integrity=\\?"sha512-/.test(deployCenter)) fail("JSZip Deploy Center belum dikunci dengan Subresource Integrity.");
+const deployStandalone = read("assets/apps/deploy-center/index.html");
+if (!/jszip\.min\.js[^\n]+integrity="sha512-/.test(deployStandalone)) fail("JSZip Deploy Center standalone belum dikunci dengan Subresource Integrity.");
 const globalHeaders = (vercel.headers || []).find((entry) => entry.source === "/(.*)")?.headers || [];
 const csp = globalHeaders.find((entry) => String(entry.key).toLowerCase() === "content-security-policy")?.value || "";
 for (const directive of ["script-src 'self'", "connect-src 'self'", "frame-src 'self'", "object-src 'none'"]) {
