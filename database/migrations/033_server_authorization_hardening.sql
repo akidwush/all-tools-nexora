@@ -10,6 +10,8 @@ where access_level = 'vvip'
   and id not in (
     'aiodownloader',
     'aisong',
+    'aivideo',
+    'aiimage',
     'alightpremium',
     'animetoreal',
     'autopdf',

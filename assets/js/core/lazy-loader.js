@@ -37,6 +37,7 @@
   var ASSET_VERSION = config.version;
   var ASSET_PATCH = 'branding1';
   var ASSET_PATCHES = [
+    [/nexray-splus(?:-hooks)?\\.(?:js|css)(?:$|\\?)/, "nexray-splus-v1"],
     [/(?:assets\/(?:vendor\/nexora|js\/features\/nexora)\/|nexora-generators\.css(?:$|\?))/, 'nexora'],
     [/prompt-generator\.(?:js|css)(?:$|\?)/, 'prompt-android-branding1'],
     [/novel-cover(?:-generator|-puter|-director)?\.(?:js|css)(?:$|\?)/, 'novel-cover-v43'],
@@ -137,6 +138,10 @@
       setStatus('Memuat '+(moduleDisplayNames[name] || ('modul '+name.replace(/-/g,' ')))+'…','loading');
       await Promise.all(spec.css.map(loadStyle));
       for(var i=0;i<spec.js.length;i++) await loadScript(spec.js[i]);
+      if(["puter-image","puter-video","ai-song"].indexOf(name)!==-1){
+        await loadStyle("assets/css/features/nexray-splus.css");
+        await loadScript("assets/js/features/nexray-splus-hooks.js");
+      }
       setStatus('Fitur siap digunakan.','success');
       document.dispatchEvent(new CustomEvent('nexora:module-loaded',{detail:{name:name}}));
     })().catch(function(error){ modulePromises.delete(name); setStatus(error.message||'Modul gagal dimuat.','error'); throw error; });

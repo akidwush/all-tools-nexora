@@ -16,6 +16,7 @@ const { handleDanbooruSearch } = require("../lib/kuroneko-danbooru");
 const { handleAnimeToReal } = require("../lib/kuroneko-anime-to-real");
 const { handleAiSong } = require("../lib/kuroneko-ai-song");
 const { handleHD4 } = require("../lib/kuroneko-hd4");
+const { handleNexraySPlus } = require("../lib/nexray-splus");
 const { handleMakerOriginal } = require("../lib/maker-originals");
 const { authorizeTool, handleAccount } = require("../lib/account-membership");
 const {
@@ -109,6 +110,9 @@ module.exports = async function handler(request, response) {
   }
   if (service === "hd4-enhancer") {
     return handleHD4(request, response, url);
+  }
+  if (mode === "nexray-splus") {
+    return handleNexraySPlus(request, response, url);
   }
   if (url.searchParams.get("mode") === "media-download") {
     return handleMediaDownload(request, response, url);
