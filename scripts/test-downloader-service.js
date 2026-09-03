@@ -33,9 +33,9 @@ async function main() {
   assert.equal(instagram.media[0].type, "MP4");
   const tiktok = normalizeProvider("tiktok", { data: { title: "demo", play: "https://v16.tiktokcdn.com/a.mp4", music: "https://sf16.tiktokcdn.com/a.mp3", images: ["https://p16.tiktokcdn.com/a.jpg"] } }, "https://vm.tiktok.com/x");
   assert.deepEqual([...new Set(tiktok.media.map((item) => item.type))].sort(), ["JPG", "MP3", "MP4"]);
-  const youtube = normalizeProvider("youtube", { title: "Video", author_name: "Channel" }, "https://youtu.be/x");
-  assert.equal(youtube.media.length, 0);
-  assert.match(youtube.notice, /tidak disediakan/);
+  const youtube = normalizeProvider("youtube", { status: true, data: { title: "Video", dl: "https://cdn.example.net/video.mp4" } }, "https://youtu.be/x", { mediaType: "MP4" });
+  assert.equal(youtube.media.length, 1);
+  assert.equal(youtube.media[0].type, "MP4");
   assert.throws(() => normalizeProvider("instagram", { result: [] }, "https://instagram.com/p/x"), /tidak ditemukan/);
 
   let calls = 0;

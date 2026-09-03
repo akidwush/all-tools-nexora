@@ -468,11 +468,11 @@
       {
         "id": "youtube",
         "icon": "fa-brands fa-youtube",
-        "name": "YouTube Metadata",
-        "description": "Metadata dan tautan resmi YouTube",
-        "badge": "RESMI",
+        "name": "YouTube Downloader",
+        "description": "Video MP4 dan audio MP3 dengan fallback metadata",
+        "badge": "MP4/MP3",
         "runtime": {
-          "mode": "hybrid",
+          "mode": "api",
           "handler": "renderYoutube",
           "dependency": "https://all-tools-nexora.vercel.app/api/downloader"
         },
@@ -481,8 +481,7 @@
           "type": "module",
           "path": "/api/downloader?health=1&provider=youtube",
           "method": "HEAD",
-          "strict": true,
-          "forcedStatus": "degraded"
+          "strict": true
         }
       },
       {

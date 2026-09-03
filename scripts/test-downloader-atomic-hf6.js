@@ -68,7 +68,8 @@ async function main() {
   assert.match(client, /nexoraTimeoutMs:30000/);
   assert.match(client, /payload\.password=password/);
   assert.match(renderers, /NexoraDownloaderRenderSpotify/);
-  assert.match(renderers, /data-spotify-media/);
+  assert.match(renderers, /renderDownloadProvider/);
+  assert.match(renderers, /data-real-media/);
   assert.doesNotMatch(sourceFeatures + app, /api\.ikyyxd\.my\.id\/download\/spotifydl/);
   assert.doesNotMatch(health, /Spotify Metadata[\s\S]{0,200}forcedStatus/);
 

@@ -2165,16 +2165,17 @@ async function nxDownloadUrl(url, filename, meta) {
     const type = cleanName.split('.').pop().toUpperCase();
     const tool = (meta && meta.tool) || 'Tools';
     const declaredType = String((meta && meta.type) || type || 'FILE').toUpperCase();
+    const providerFileRoute = /^\/api\/downloader\?/i.test(String(url || ''));
     const proxyDownload = ['instagram', 'terabox', 'tiktok'].includes(String(tool).toLowerCase()) && /^https:\/\//i.test(String(url || ''));
 
-    if (!proxyDownload) {
+    if (!proxyDownload && !providerFileRoute) {
         recordDownload(tool, declaredType, url, cleanName, (meta && meta.title) || cleanName);
         nxTriggerDownload(url, cleanName, true, true);
         return true;
     }
 
-    const probeUrl = nxMediaDownloadEndpoint(url, cleanName, declaredType, true, tool);
-    const streamUrl = nxMediaDownloadEndpoint(url, cleanName, declaredType, false, tool);
+    const probeUrl = providerFileRoute ? (url + (url.includes('?') ? '&' : '?') + 'probe=1') : nxMediaDownloadEndpoint(url, cleanName, declaredType, true, tool);
+    const streamUrl = providerFileRoute ? url : nxMediaDownloadEndpoint(url, cleanName, declaredType, false, tool);
     const request = window.NexoraFetch || window.fetch.bind(window);
     const response = await request(probeUrl, {
         cache: 'no-store',

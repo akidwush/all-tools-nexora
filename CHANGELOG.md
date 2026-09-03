@@ -1,3 +1,9 @@
+## 6.4.0 HF7 Real Downloader — 2026-09-03
+
+- YouTube sekarang mencoba MP4 dan MP3 nyata melalui provider server-side SiputZX, bukan metadata-only.
+- Spotify mempertahankan MP3 best-effort tetapi file kini diberikan melalui route same-origin Nexora agar tombol Download benar-benar memulai unduhan.
+- Route file melakukan resolve ulang dari URL asli, validasi DNS publik + pinned lookup, redirect terbatas, probe sebelum history, dan fallback metadata saat provider media gagal.
+
 ## 6.4.0 Nexora Smart Cutout — 2026-08-30
 
 - Fitur: Nexora Smart Cutout kini memakai MediaPipe MagicTouch lokal yang lebih ringan untuk point prompt positif/negatif, multi-point, Undo, Reset, overlay mask, dan ekspor PNG transparan di mobile.
