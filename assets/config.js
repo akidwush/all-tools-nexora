@@ -513,67 +513,7 @@
       }
     ],
     "maker": [
-      {
-        "id": "fakebankjago",
-        "icon": "fa-solid fa-building-columns",
-        "name": "Fake Bank Jago",
-        "description": "Simulasi Bank Jago dari provider original dengan watermark permanen",
-        "badge": "SIMULASI",
-        "runtime": {
-          "mode": "api",
-          "module": "maker-originals",
-          "handler": "renderFakeBankJago",
-          "dependency": "https://www.keyrafara.com/"
-        },
-        "health": {
-          "key": "module-maker-originals",
-          "type": "module",
-          "path": "/assets/js/features/maker-originals.js",
-          "method": "HEAD",
-          "strict": true
-        }
-      },
-      {
-        "id": "brat",
-        "icon": "fa-solid fa-wand-magic-sparkles",
-        "name": "BRAT Generator",
-        "description": "BRAT original provider dengan fallback server-side",
-        "badge": "ORIGINAL",
-        "runtime": {
-          "mode": "api",
-          "module": "maker-originals",
-          "handler": "renderBrat",
-          "dependency": "https://www.keyrafara.com/"
-        },
-        "health": {
-          "key": "module-maker-originals",
-          "type": "module",
-          "path": "/assets/js/features/maker-originals.js",
-          "method": "HEAD",
-          "strict": true
-        }
-      },
-      {
-        "id": "iqc",
-        "icon": "fa-solid fa-images",
-        "name": "IQC Generator",
-        "description": "IQC original v1/simple dengan provider fallback stabil",
-        "badge": "ORIGINAL",
-        "runtime": {
-          "mode": "api",
-          "module": "maker-originals",
-          "handler": "renderIqc2",
-          "dependency": "https://www.keyrafara.com/"
-        },
-        "health": {
-          "key": "module-maker-originals",
-          "type": "module",
-          "path": "/assets/js/features/maker-originals.js",
-          "method": "HEAD",
-          "strict": true
-        }
-      },
-      {
+                        {
         "id": "sertifikat",
         "icon": "fa-solid fa-certificate",
         "name": "Sertifikat Meme",
@@ -611,47 +551,7 @@
           "strict": true
         }
       },
-      {
-        "id": "fakedana",
-        "icon": "fa-solid fa-money-bill-wave",
-        "name": "Fake Dana",
-        "description": "Simulasi DANA dari provider original dengan watermark permanen",
-        "badge": "SIMULASI",
-        "runtime": {
-          "mode": "api",
-          "module": "maker-originals",
-          "handler": "renderFakeDana",
-          "dependency": "https://www.keyrafara.com/"
-        },
-        "health": {
-          "key": "module-maker-originals",
-          "type": "module",
-          "path": "/assets/js/features/maker-originals.js",
-          "method": "HEAD",
-          "strict": true
-        }
-      },
-      {
-        "id": "fakedev",
-        "icon": "fa-solid fa-laptop-code",
-        "name": "FakeDev",
-        "description": "Novelty developer card dari provider original",
-        "badge": "ORIGINAL",
-        "runtime": {
-          "mode": "api",
-          "module": "maker-originals",
-          "handler": "renderFakeDev",
-          "dependency": "https://www.keyrafara.com/"
-        },
-        "health": {
-          "key": "module-maker-originals",
-          "type": "module",
-          "path": "/assets/js/features/maker-originals.js",
-          "method": "HEAD",
-          "strict": true
-        }
-      },
-      {
+                  {
         "id": "fakelobby",
         "icon": "fa-solid fa-gamepad",
         "name": "Fake Lobby",
@@ -707,26 +607,7 @@
           "method": "HEAD"
         }
       },
-      {
-        "id": "tanyaustadz",
-        "icon": "fa-solid fa-user-tie",
-        "name": "Tanya Ustadz",
-        "description": "Maker Ustadz melalui proxy Nexora dan endpoint aktif",
-        "badge": "ORIGINAL",
-        "runtime": {
-          "mode": "api",
-          "module": "maker-originals",
-          "handler": "renderTanyaUstadz",
-          "dependency": "https://api.nexray.eu.cc/"
-        },
-        "health": {
-          "key": "module-maker-originals",
-          "type": "module",
-          "path": "/assets/js/features/maker-originals.js",
-          "method": "HEAD",
-          "strict": true
-        }
-      }
+
     ],
     "tools": [
       {

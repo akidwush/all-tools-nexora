@@ -7,11 +7,10 @@ const path = require("node:path");
 
 const root = path.resolve(__dirname, "..");
 const locked = Object.freeze({
-  "assets/js/features/imported-tools.js": "eaab1db341953cffd6933178ef697bd19c2056b082fe6b0c81a94411fc69cd5d",
+  "assets/js/features/imported-tools.js": "69a29d6268babe669519617546edda60539cd8bd926212773fcab3a248c3c638",
   "assets/css/features/imported-tools.css": "e9ea25e11f09d6fd52ad30b84d5fcaf05a0bc860f40309fdca2a7580234ff758",
   "assets/apps/ml-tools/index.html": "7406c525548bc682206c83dcabbd8a7b6a5007a0e533a80825be9b35d05850f0",
   "assets/apps/prompt-generator/index.html": "df7745ac283be41771d9bdc78d8806df4cea1678b3e8ee328bda8160396fd425",
-  "assets/apps/fake-ovo/index.html": "48415bb9fd303cb971d8b7ec7156add5ef6d3167b269ecc8cd3d865eb1425db6",
   "assets/apps/quote-generator/index.html": "367eb73a66fcf6f1a1a598704128f465549ba94f35acadd8f28f5a3b39b38b7f",
   "assets/apps/cari-fakta/index.html": "2fdabaaec9f0cf16777ea222871e2179b3d067aecabbea595d00533a768ee759",
   "assets/js/features/tiktok-quote.js": "1ba9e81d2ef0414c940208464ab078b8c7060cf21d972f4185937caf881e123c",
@@ -25,7 +24,7 @@ const locked = Object.freeze({
   "assets/js/features/deploy-center.js": "904ceecdd55c8f6bc45bc881c3ed95800f44a56cead883f2d8afaef9da9bc740",
   "assets/css/features/deploy-center.css": "0732e69ce7daa1b02e579aaa1d5b88d2dcdd24af6351390523f4a3a2c1d90c79",
   "assets/apps/deploy-center/index.html": "ad9b424fbd2a0397c9c8d7f6a4df2904a8b3257cba77c99e9db56ab097af9d26",
-  "assets/apps/manifest.json": "577500832e419dacb88a0574fbbdf5cd30694b6d00dfed40a7ba1d3f6b95c94f"
+  "assets/apps/manifest.json": "4e96f7eb9780139ad173906ec112a777c248f1a6f374720e06a6da53f6e533a5"
 });
 
 for (const [relative, expected] of Object.entries(locked)) {
@@ -45,11 +44,12 @@ const legacyShells = [
 
 assert.doesNotMatch(legacyShells, /(?:TTQUOTE_APP_B64|UNBAN_B64|VIRUS_SCAN_APP_B64|VD_B64|payload\s*:\s*["'][A-Za-z0-9+/=]{1000,}["'])/);
 assert.doesNotMatch(legacyShells, /srcdoc\s*=|decodeUtf8Base64|decodeVirusApp|decodeBase64|URL\.createObjectURL\(new Blob/);
+assert.doesNotMatch(fs.readFileSync(path.join(root,"assets/js/features/imported-tools.js"),"utf8"), /fakeovo|fake-ovo\/index/);
+assert.equal(fs.existsSync(path.join(root,"assets/apps/fake-ovo/index.html")), false, "Standalone Fake OVO lama harus dibuang agar tidak dapat mengambil alih renderer baru");
 
 const requiredUrls = [
   "/assets/apps/ml-tools/index.html?v=standalone-v1",
   "/assets/apps/prompt-generator/index.html?v=standalone-v1",
-  "/assets/apps/fake-ovo/index.html?v=standalone-v1",
   "/assets/apps/quote-generator/index.html?v=standalone-v1",
   "/assets/apps/cari-fakta/index.html?v=standalone-v1",
   "/assets/apps/tiktok-quote/index.html?v=standalone-v1",
@@ -59,4 +59,4 @@ const requiredUrls = [
 ];
 for (const url of requiredUrls) assert.ok(legacyShells.includes(url), `Standalone canonical URL hilang: ${url}`);
 
-console.log(`Standalone Apps integrity lock lulus: ${Object.keys(locked).length} file terkunci; 9 embedded app legacy tidak dapat kembali sebagai Base64/srcdoc/blob.`);
+console.log(`Standalone Apps integrity lock lulus: ${Object.keys(locked).length} file terkunci; 8 embedded app legacy tidak dapat kembali sebagai Base64/srcdoc/blob.`);

@@ -40,7 +40,7 @@ for (const [relative, url] of [
   ["assets/js/features/unban-whatsapp.js", "/assets/apps/unban-whatsapp/index.html?v=standalone-v1"],
   ["assets/js/features/deploy-center.js", "/assets/apps/deploy-center/index.html?v=standalone-v1"]
 ]) assert.ok(read(relative).includes(url), `${relative} tidak memakai canonical standalone URL`);
-for (const url of ["/assets/apps/ml-tools/index.html?v=standalone-v1", "/assets/apps/prompt-generator/index.html?v=standalone-v1", "/assets/apps/fake-ovo/index.html?v=standalone-v1", "/assets/apps/quote-generator/index.html?v=standalone-v1", "/assets/apps/cari-fakta/index.html?v=standalone-v1"]) assert.ok(read("assets/js/features/imported-tools.js").includes(url));
+for (const url of ["/assets/apps/ml-tools/index.html?v=standalone-v1", "/assets/apps/prompt-generator/index.html?v=standalone-v1", "/assets/apps/quote-generator/index.html?v=standalone-v1", "/assets/apps/cari-fakta/index.html?v=standalone-v1"]) assert.ok(read("assets/js/features/imported-tools.js").includes(url));
 const comicShell = read("assets/js/features/comic-reader.js");
 assert.match(comicShell, /\/assets\/comic-reader\/index\.html\?v=standalone-v1/);
 assert.doesNotMatch(comicShell, /COMIC_READER_APP_B64|srcdoc|allow-same-origin|nxComicApiBridgeHandler|nx-comic-api-request/);

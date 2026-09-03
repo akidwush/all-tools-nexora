@@ -7,7 +7,6 @@
   var NX_SOURCE_APPS = {
     mltools:{title:"ML Tools Nexora",icon:"fa-solid fa-gamepad",engine:"ORIGINAL ML ENGINE",loading:"Memuat ML Tools",src:"/assets/apps/ml-tools/index.html?v=standalone-v1"},
     promptgenerate:{title:"Prompt Generator",icon:"fa-solid fa-wand-magic-sparkles",engine:"LOCAL SOURCE ENGINE",loading:"Memuat Prompt Generator",src:"/assets/apps/prompt-generator/index.html?v=standalone-v1"},
-    fakeovo:{title:"Fake OVO",icon:"fa-solid fa-wallet",engine:"ORIGINAL CANVAS",loading:"Memuat Generator OVO",src:"/assets/apps/fake-ovo/index.html?v=standalone-v1"},
     quotegenerator:{title:"Quote Generator",icon:"fa-solid fa-quote-left",engine:"ORIGINAL CANVAS",loading:"Memuat Quote Generator",src:"/assets/apps/quote-generator/index.html?v=standalone-v1"},
     carifakta:{title:"CariFakta",icon:"fa-solid fa-magnifying-glass-chart",engine:"ORIGINAL GROQ API",loading:"Memuat CariFakta",src:"/assets/apps/cari-fakta/index.html?v=standalone-v1"}
   };
@@ -33,7 +32,6 @@
   }
 
   window.renderPromptGenerator=function(body){renderSource(body,"promptgenerate");};
-  window.renderFakeOvo=function(body){renderSource(body,"fakeovo");};
   window.renderQuoteGenerator=function(body){renderSource(body,"quotegenerator");};
   window.renderCariFakta=function(body){renderSource(body,"carifakta");};
   window.renderMlTools=function(body){renderSource(body,"mltools");};
@@ -42,7 +40,7 @@
 /* ===== nxFourImportedToolsBackFix ===== */
 (function(){
   "use strict";
-  var importedTools = new Set(["promptgenerate","fakeovo","quotegenerator","carifakta","mltools"]);
+  var importedTools = new Set(["promptgenerate","quotegenerator","carifakta","mltools"]);
   function activeImportedRoom(){
     var room=document.getElementById("nxUniversalRoom");
     if(!room||!room.classList.contains("is-open")) return null;
@@ -57,7 +55,7 @@
     document.body.classList.remove("nx-universal-room-open"); document.body.style.overflow="auto";
     try{
       if(history.state&&importedTools.has(history.state.nxUniversalTool)) history.replaceState(null,"",location.href.split("#")[0]);
-      else if(/^#tool-(promptgenerate|fakeovo|quotegenerator|carifakta|mltools)/.test(location.hash)) history.replaceState(null,"",location.href.split("#")[0]);
+      else if(/^#tool-(promptgenerate|quotegenerator|carifakta|mltools)/.test(location.hash)) history.replaceState(null,"",location.href.split("#")[0]);
     }catch(error){}
     return true;
   }

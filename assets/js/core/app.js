@@ -179,20 +179,16 @@ const apiStatusChecks = [
     {
         id:'nexray', name:'NexRay',
         hosts:['api.nexray.eu.cc'],
-        tools:['iqc','fakedana','fakelobby','fakebankjago']
+        tools:['fakelobby']
     },
     {
         id:'siputzx', name:'Siputzx',
-        hosts:['api.siputzx.my.id'], tools:['brat','sertifikat']
-    },
-    {
-        id:'ikyyxd', name:'IkyyXD',
-        hosts:['api.ikyyxd.my.id'], tools:['fakedev']
+        hosts:['api.siputzx.my.id'], tools:['sertifikat']
     },
     {
         id:'nanzz', name:'Nanzz',
         hosts:['api-nanzz.my.id'],
-        tools:['tanyaustadz','removebg']
+        tools:['removebg']
     },
     {
         id:'qrserver', name:'QR Server',
@@ -825,21 +821,13 @@ function nxImageUrlSources(type, imageUrl) {
 
 function nxNanzzMakerSources(kind, text) {
     const encoded = encodeURIComponent(text);
-    const paths = kind === 'windows-quotes'
-        ? [
-            'docs/api/maker/windows-quotes.php',
-            'docs/api/maker/windows-quotes',
-            'api/maker/windows-quotes',
-            'api/maker/windowsquotes',
-            'maker/windows-quotes'
-        ]
-        : [
-            'docs/api/maker/tanyaustadz.php',
-            'docs/api/maker/tanyaustadz',
-            'api/maker/tanyaustadz',
-            'api/maker/tanya-ustadz',
-            'maker/tanyaustadz'
-        ];
+    const paths = [
+        'docs/api/maker/windows-quotes.php',
+        'docs/api/maker/windows-quotes',
+        'api/maker/windows-quotes',
+        'api/maker/windowsquotes',
+        'maker/windows-quotes'
+    ];
     const base = 'https://api-nanzz.my.id/';
     const sources = paths.map((path, i) => ({
         name: i === 0 ? 'Nanzz' : 'Backup ' + i,
@@ -1667,18 +1655,12 @@ function showTool(toolId) {
         case 'youtube': renderYoutube(body); break;
         case 'spotify': renderSpotify(body); break;
         case 'terabox': renderTerabox(body); break;
-        case 'brat': renderBrat(body); break;
-        case 'iqc': renderIqc2(body); break;
         case 'sertifikat': renderSertifikatTololSource(body); break;
 
         case 'ektp': renderEktp(body); break;
-        case 'fakedana': renderFakeDana(body); break;
-        case 'fakebankjago': renderFakeBankJago(body); break;
-        case 'fakedev': renderFakeDev(body); break;
         case 'fakelobby': renderFakeLobby(body); break;
         case 'winquotes': renderWinquotes2(body); break;
         case 'nokiamsg': renderNokiaMsg(body); break;
-        case 'tanyaustadz': renderTanyaUstadz(body); break;
         case 'getcode': window.openGetcode && window.openGetcode(); closeTool(); return;
         case 'virusscan': renderVirusScan(body); break;
         case 'cryptomarket': renderCryptoMarket(body); break;
@@ -2254,88 +2236,6 @@ function renderSpotify(body) {
     body.innerHTML = '<div class="dl-error">Modul Spotify belum selesai dimuat. Tutup lalu buka kembali tool ini.</div>';
 }
 
-function renderBrat(body) {
-    let mode = 'static';
-    let lastUrl = '';
-    body.innerHTML = `
-        <h2><i class="fas fa-wand-magic-sparkles"></i> BRAT Generator</h2>
-        <p style="color:#8b7ab8;font-size:13px;margin-bottom:12px;">Bisa static PNG atau animated GIF.</p>
-        <input type="text" id="bratText" class="v-input" placeholder="Contoh: nexora tools" maxlength="120">
-        <div class="provider-buttons" style="grid-template-columns:repeat(2,1fr);">
-            <button class="provider-btn active" id="bratStaticBtn"><i class="fas fa-image"></i> Static</button>
-            <button class="provider-btn" id="bratGifBtn"><i class="fas fa-film"></i> Animated GIF</button>
-        </div>
-        <button class="v-btn" id="bratBtn"><i class="fas fa-bolt"></i> Generate BRAT</button>
-        <div id="bratResult"></div>
-    `;
-    document.getElementById('bratStaticBtn').onclick = () => {
-        mode = 'static';
-        document.getElementById('bratStaticBtn').classList.add('active');
-        document.getElementById('bratGifBtn').classList.remove('active');
-    };
-    document.getElementById('bratGifBtn').onclick = () => {
-        mode = 'gif';
-        document.getElementById('bratGifBtn').classList.add('active');
-        document.getElementById('bratStaticBtn').classList.remove('active');
-    };
-    function localBrat(text) {
-        const canvas = document.createElement('canvas');
-        canvas.width = 900;
-        canvas.height = 900;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#8ace00';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#111';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        let fontSize = 132;
-        const clean = text.toLowerCase();
-        do {
-            ctx.font = `900 ${fontSize}px Arial, Helvetica, sans-serif`;
-            fontSize -= 6;
-        } while (ctx.measureText(clean).width > 760 && fontSize > 56);
-        const lines = nxWrapLines(ctx, clean, 760, 5);
-        const lh = fontSize + 26;
-        const start = canvas.height / 2 - ((lines.length - 1) * lh) / 2;
-        lines.forEach((line, i) => ctx.fillText(line, canvas.width / 2, start + i * lh));
-        ctx.font = '700 26px Arial, Helvetica, sans-serif';
-        ctx.globalAlpha = 0.45;
-        ctx.fillText('NEXORA BRAT', canvas.width / 2, 842);
-        ctx.globalAlpha = 1;
-        return canvas;
-    }
-    document.getElementById('bratBtn').onclick = async () => {
-        const text = document.getElementById('bratText').value.trim();
-        const target = document.getElementById('bratResult');
-        const btn = document.getElementById('bratBtn');
-        if (!text) return alert('Isi teks dulu!');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
-        target.innerHTML = `<div class="dl-loading"><div class="dl-spin"></div><p>Merender BRAT...</p></div>`;
-        const api = 'https://api.siputzx.my.id/api/m/brat?text=' + encodeURIComponent(text) + '&delay=500' + (mode === 'gif' ? '&isAnimated=true' : '');
-        try {
-            const { blob } = await nxFetchBlobWithBackup('siputzx', nxBackupSources('Siputzx', api));
-            if (lastUrl) URL.revokeObjectURL(lastUrl);
-            lastUrl = URL.createObjectURL(blob);
-            target.innerHTML = `
-                <div class="result-box">
-                    <img src="${lastUrl}" alt="BRAT" style="width:100%;max-height:420px;object-fit:contain;border-radius:12px;">
-                    <button class="v-btn" id="bratDl" style="margin-top:12px;background:rgba(168,85,247,0.12);"><i class="fas fa-download"></i> Download ${mode === 'gif' ? 'GIF' : 'PNG'}</button>
-                </div>
-            `;
-            document.getElementById('bratDl').onclick = () => nxDownloadUrl(lastUrl, 'brat_' + Date.now() + (mode === 'gif' ? '.gif' : '.png'), { tool: 'BRAT', type: mode === 'gif' ? 'GIF' : 'PNG', title: 'BRAT Generator' });
-        } catch (e) {
-            if (mode === 'gif') {
-                target.innerHTML = `<div class="dl-error">Animated GIF gagal dibuat dari API.<br><span style="font-size:11px;opacity:.7;">${nxEscape(e.message)}</span></div>`;
-            } else {
-                nxShowCanvas('bratResult', localBrat(text), 'brat_' + Date.now() + '.png');
-            }
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-bolt"></i> Generate BRAT';
-        }
-    };
-}
 
 
 function renderEktp(body) {
@@ -2466,207 +2366,8 @@ function renderEktp(body) {
     };
 }
 
-function renderFakeDev(body) {
-    body.innerHTML = `
-        <h2><i class="fas fa-laptop-code"></i> FakeDev Profile</h2>
-        <p style="color:#8b7ab8;font-size:13px;line-height:1.6;margin-bottom:14px;">Bikin kartu profil developer palsu yang rapi. Data bawaan hanya contoh.</p>
-        <div class="nx-form-grid">
-            <div class="nx-field"><label>Nama</label><input type="text" id="fdName" class="v-input" placeholder="Demo Developer" value="Demo Developer"></div>
-            <div class="nx-field"><label>Username</label><input type="text" id="fdUser" class="v-input" placeholder="@demo_dev" value="@demo_dev"></div>
-            <div class="nx-field"><label>Role</label><input type="text" id="fdRole" class="v-input" placeholder="Full Stack Developer" value="Full Stack Developer"></div>
-            <div class="nx-field"><label>Stack</label><input type="text" id="fdStack" class="v-input" placeholder="HTML, CSS, JS, Node" value="HTML, CSS, JS, Node"></div>
-            <div class="nx-field"><label>Repositories</label><input type="text" id="fdRepo" class="v-input" placeholder="128" value="128"></div>
-            <div class="nx-field"><label>Followers</label><input type="text" id="fdFollowers" class="v-input" placeholder="24.8K" value="24.8K"></div>
-            <div class="nx-field"><label>Stars</label><input type="text" id="fdStars" class="v-input" placeholder="9.7K" value="9.7K"></div>
-            <div class="nx-field"><label>Rank</label><input type="text" id="fdRank" class="v-input" placeholder="Senior" value="Senior"></div>
-            <div class="nx-field nx-span-2"><label>Bio</label><textarea id="fdBio" class="v-textarea" style="height:76px;resize:none;" placeholder="Bio">Ngoding cepat, UI rapi, dan suka bikin project demo.</textarea></div>
-        </div>
-        <button class="v-btn" id="fdBtn"><i class="fas fa-user-astronaut"></i> Generate Profile</button>
-        <div id="fdResult"></div>
-    `;
-    document.getElementById('fdBtn').onclick = () => {
-        const g = id => (document.getElementById(id).value || '').trim();
-        const name = g('fdName') || 'Demo Developer';
-        const user = g('fdUser') || '@demo_dev';
-        const canvas = document.createElement('canvas');
-        canvas.width = 1200;
-        canvas.height = 900;
-        const ctx = canvas.getContext('2d');
-        const bg = ctx.createLinearGradient(0, 0, 1200, 900);
-        bg.addColorStop(0, '#050014');
-        bg.addColorStop(0.55, '#16052c');
-        bg.addColorStop(1, '#2d0a52');
-        ctx.fillStyle = bg;
-        ctx.fillRect(0, 0, 1200, 900);
-        ctx.fillStyle = 'rgba(168,85,247,.12)';
-        for (let i = 0; i < 120; i++) {
-            ctx.fillRect(Math.random() * 1200, Math.random() * 900, 2, 2);
-        }
-        nxRoundRect(ctx, 115, 110, 970, 680, 34);
-        ctx.fillStyle = 'rgba(15,5,30,.86)';
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(192,132,252,.45)';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-        ctx.fillStyle = 'rgba(168,85,247,.2)';
-        nxRoundRect(ctx, 115, 110, 970, 160, 34);
-        ctx.fill();
-        ctx.fillStyle = '#c084fc';
-        ctx.font = '900 34px Orbitron, Arial, sans-serif';
-        ctx.fillText('FAKEDEV PROFILE', 155, 178);
-        ctx.fillStyle = '#7dd3fc';
-        ctx.font = '700 22px Poppins, Arial, sans-serif';
-        ctx.fillText('NEXORA TOOLS CARD', 155, 218);
-        const initials = name.split(/\s+/).slice(0, 2).map(s => s[0] || '').join('').toUpperCase();
-        ctx.beginPath();
-        ctx.arc(260, 365, 92, 0, Math.PI * 2);
-        ctx.fillStyle = '#7c3aed';
-        ctx.fill();
-        ctx.strokeStyle = '#c084fc';
-        ctx.lineWidth = 8;
-        ctx.stroke();
-        ctx.fillStyle = '#fff';
-        ctx.textAlign = 'center';
-        ctx.font = '900 64px Orbitron, Arial, sans-serif';
-        ctx.fillText(initials || 'FD', 260, 387);
-        ctx.textAlign = 'left';
-        ctx.fillStyle = '#f5f3ff';
-        ctx.font = '900 58px Poppins, Arial, sans-serif';
-        ctx.fillText(name, 390, 340);
-        ctx.fillStyle = '#a78bfa';
-        ctx.font = '700 30px Poppins, Arial, sans-serif';
-        ctx.fillText(user + ' - ' + (g('fdRole') || 'Full Stack Developer'), 390, 388);
-        ctx.fillStyle = '#d8b4fe';
-        ctx.font = '500 26px Poppins, Arial, sans-serif';
-        nxDrawWrapped(ctx, g('fdBio') || 'Ngoding cepat, UI rapi, dan suka bikin project demo.', 390, 445, 620, 34, 3);
-        const stats = [
-            ['REPOS', g('fdRepo') || '128'],
-            ['FOLLOWERS', g('fdFollowers') || '24.8K'],
-            ['STARS', g('fdStars') || '9.7K'],
-            ['RANK', g('fdRank') || 'Senior']
-        ];
-        stats.forEach((s, i) => {
-            const x = 160 + i * 240;
-            nxRoundRect(ctx, x, 610, 190, 105, 18);
-            ctx.fillStyle = 'rgba(168,85,247,.10)';
-            ctx.fill();
-            ctx.strokeStyle = 'rgba(168,85,247,.24)';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            ctx.textAlign = 'center';
-            ctx.fillStyle = '#ffffff';
-            ctx.font = '900 36px Orbitron, Arial, sans-serif';
-            ctx.fillText(s[1], x + 95, 655);
-            ctx.fillStyle = '#8b7ab8';
-            ctx.font = '800 16px Poppins, Arial, sans-serif';
-            ctx.fillText(s[0], x + 95, 690);
-        });
-        ctx.textAlign = 'left';
-        ctx.fillStyle = '#7dd3fc';
-        ctx.font = '700 24px Poppins, Arial, sans-serif';
-        ctx.fillText('STACK: ' + (g('fdStack') || 'HTML, CSS, JS, Node'), 155, 765);
-        ctx.textAlign = 'right';
-        ctx.fillStyle = 'rgba(255,255,255,.36)';
-        ctx.font = '700 20px Poppins, Arial, sans-serif';
-        ctx.fillText('generated by Nexora Tools', 1048, 765);
-        nxShowCanvas('fdResult', canvas, 'fakedev_' + Date.now() + '.png');
-    };
-}
 
-function renderIqc(body) {
-    let selectedProvider = 'Axis';
-    let globalIqcBlob = '';
-    body.innerHTML = `
-        <h2><i class="fas fa-image"></i> IQC Generator</h2>
-        <label>Pesan:</label>
-        <input type="text" id="iqcText" class="v-input" value="Hai">
-        <label>Pilih Operator:</label>
-        <div class="provider-buttons">
-            <button class="provider-btn active" onclick="window.setIqcProv(this,'Axis')">Axis</button>
-            <button class="provider-btn" onclick="window.setIqcProv(this,'Telkomsel')">Telkomsel</button>
-            <button class="provider-btn" onclick="window.setIqcProv(this,'Indosat')">Indosat</button>
-            <button class="provider-btn" onclick="window.setIqcProv(this,'XL')">XL</button>
-            <button class="provider-btn" onclick="window.setIqcProv(this,'Three')">Three</button>
-            <button class="provider-btn" onclick="window.setIqcProv(this,'Smartfren')">Smartfren</button>
-        </div>
-        <div style="display:flex;gap:12px;">
-            <div style="flex:1;"><label>Jam:</label><input type="number" id="iqcJam" class="v-input" value="12" min="0" max="23"></div>
-            <div style="flex:1;"><label>Baterai (%):</label><input type="number" id="iqcBaterai" class="v-input" value="65" min="0" max="100"></div>
-        </div>
-        <button class="v-btn" id="iqcGenBtn">Generate</button>
-        <div id="iqcResultDiv" style="display:none;">
-            <div class="iqc-preview" id="iqcPreviewBox"></div>
-            <div class="btn-group">
-                <button class="v-btn" id="iqcDlBtn">Download PNG</button>
-                <button class="v-btn" id="iqcCopyBtn">Copy URL</button>
-            </div>
-        </div>
-    `;
-    window.setIqcProv = (btn, prov) => {
-        document.querySelectorAll('.provider-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        selectedProvider = prov;
-    };
-    document.getElementById('iqcGenBtn').onclick = async () => {
-        const text = document.getElementById('iqcText').value.trim() || 'Hai';
-        const jam = document.getElementById('iqcJam').value || '12';
-        const bat = document.getElementById('iqcBaterai').value || '65';
-        const resDiv = document.getElementById('iqcResultDiv');
-        const preview = document.getElementById('iqcPreviewBox');
-        resDiv.style.display = 'block';
-        preview.innerHTML = `<div style="color:#8b7ab8;">Menggambar...</div>`;
-        try {
-            const iqcApi = `https://api.nexray.eu.cc/maker/v1/iqc?text=${encodeURIComponent(text)}&provider=${encodeURIComponent(selectedProvider)}&jam=${jam}&baterai=${bat}`;
-            const { blob } = await nxFetchBlobWithBackup('nexray', nxBackupSources('Nexray', iqcApi));
-            if (globalIqcBlob) URL.revokeObjectURL(globalIqcBlob);
-            globalIqcBlob = URL.createObjectURL(blob);
-            preview.innerHTML = `<img src="${globalIqcBlob}" alt="IQC Result">`;
-        } catch (e) {
-            preview.innerHTML = `<span style="color:#ef4444;">Gagal: ${e.message}</span>`;
-        }
-    };
-    document.getElementById('iqcDlBtn').onclick = () => { if (globalIqcBlob) { const a = document.createElement('a'); a.href = globalIqcBlob; a.download = `IQC_${Date.now()}.png`; a.click(); } };
-    document.getElementById('iqcCopyBtn').onclick = () => { if (globalIqcBlob) { navigator.clipboard.writeText(globalIqcBlob); alert('URL disalin!'); } };
-}
 
-function renderFakeDana(body) {
-    let danaBlobUrl = '';
-    body.innerHTML = `
-        <h2><i class="fas fa-money-bill-wave"></i> Fake Dana</h2>
-        <label>Nominal (Rp):</label>
-        <input type="number" id="danaNominal" class="v-input" placeholder="Contoh: 50000" value="10000">
-        <button class="v-btn" id="danaGenBtn"><i class="fas fa-bolt"></i> Generate</button>
-        <div id="danaResultDiv" style="display:none;">
-            <div class="iqc-preview" id="danaPreviewBox"></div>
-            <div class="btn-group" style="margin-top:10px;">
-                <button class="v-btn" id="danaDlBtn"><i class="fas fa-download"></i> Download PNG</button>
-            </div>
-        </div>
-    `;
-    document.getElementById('danaGenBtn').onclick = async () => {
-        const nominal = document.getElementById('danaNominal').value.trim() || '10000';
-        const resDiv = document.getElementById('danaResultDiv');
-        const preview = document.getElementById('danaPreviewBox');
-        resDiv.style.display = 'block';
-        preview.innerHTML = `<div style="color:#8b7ab8;padding:30px;text-align:center;"><i class="fas fa-spinner fa-spin" style="font-size:28px;"></i><br>Generating...</div>`;
-        try {
-            const danaApi = `https://api.nexray.eu.cc/maker/fakedana?nominal=${encodeURIComponent(nominal)}`;
-            const { blob } = await nxFetchBlobWithBackup('nexray', nxBackupSources('Nexray', danaApi));
-            if (danaBlobUrl) URL.revokeObjectURL(danaBlobUrl);
-            danaBlobUrl = URL.createObjectURL(blob);
-            preview.innerHTML = `<img src="${danaBlobUrl}" alt="Fake Dana" style="width:100%;border-radius:12px;">`;
-        } catch (e) {
-            preview.innerHTML = `<div style="color:#ef4444;padding:20px;text-align:center;"><i class="fas fa-exclamation-circle"></i> Gagal generate. Coba lagi!</div>`;
-        }
-    };
-    document.getElementById('danaDlBtn').onclick = () => {
-        if (!danaBlobUrl) return;
-        const a = document.createElement('a');
-        a.href = danaBlobUrl;
-        a.download = `FakeDana_${Date.now()}.png`;
-        a.click();
-    };
-}
 
 function renderFakeLobby(body) {
     let lobbyBlobUrl = '';
@@ -2752,32 +2453,6 @@ function renderWinquotes(body) {
     };
 }
 
-function renderTanyaUstadz(body) {
-    body.innerHTML = `
-        <h2><i class="fas fa-user-tie"></i> Tanya Ustadz</h2>
-        <p style="color:#8b7ab8;font-size:13px;margin-bottom:12px;">Buat meme Tanya Ustadz memakai API Nanzz, dengan backup/proxy otomatis.</p>
-        <textarea id="tuText" class="v-textarea" maxlength="260" placeholder="Contoh: Ustadz, apakah rebahan termasuk olahraga?" style="min-height:96px;"></textarea>
-        <button class="v-btn" id="tuBtn"><i class="fas fa-magic"></i> Buat Meme</button>
-        <div id="tuResult"></div>`;
-    document.getElementById('tuBtn').onclick = async () => {
-        const text = document.getElementById('tuText').value.trim();
-        const btn = document.getElementById('tuBtn');
-        const target = document.getElementById('tuResult');
-        if (!text) return alert('Isi pertanyaan terlebih dahulu!');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menghubungi API...';
-        target.innerHTML = `<div class="result-box"><i class="fas fa-spinner spin"></i><br>Merender lewat API...</div>`;
-        try {
-            const { img, source } = await nxFetchImageWithBackup('nanzz', nxNanzzMakerSources('tanyaustadz', text));
-            nxRenderImageResult(target, img, `tanya_ustadz_${Date.now()}.png`, 'Dibuat lewat API Nanzz' + (source && source.name ? ' · ' + source.name : '') + '.');
-        } catch (e) {
-            target.innerHTML = `<div class="result-box" style="color:#ef4444;">Gagal membuat meme lewat API: ${nxEscape(e.message)}</div>`;
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-magic"></i> Buat Meme';
-        }
-    };
-}
 
 function renderQrGenerator(body) {
     body.innerHTML = `

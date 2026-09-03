@@ -167,7 +167,7 @@ for (const relative of embeddedFrames) {
   if (/allow-same-origin/i.test(source)) fail(`${relative}: sandbox srcdoc masih memiliki allow-same-origin.`);
 }
 const standaloneApps = [
-  ["assets/js/features/imported-tools.js", ["/assets/apps/ml-tools/index.html?v=standalone-v1", "/assets/apps/prompt-generator/index.html?v=standalone-v1", "/assets/apps/fake-ovo/index.html?v=standalone-v1", "/assets/apps/quote-generator/index.html?v=standalone-v1", "/assets/apps/cari-fakta/index.html?v=standalone-v1"]],
+  ["assets/js/features/imported-tools.js", ["/assets/apps/ml-tools/index.html?v=standalone-v1", "/assets/apps/prompt-generator/index.html?v=standalone-v1", "/assets/apps/quote-generator/index.html?v=standalone-v1", "/assets/apps/cari-fakta/index.html?v=standalone-v1"]],
   ["assets/js/features/tiktok-quote.js", ["/assets/apps/tiktok-quote/index.html?v=standalone-v1"]],
   ["assets/js/features/virus-scan.js", ["/assets/apps/virus-scan/index.html?v=standalone-v1"]],
   ["assets/js/features/unban-whatsapp.js", ["/assets/apps/unban-whatsapp/index.html?v=standalone-v1"]],
@@ -179,7 +179,7 @@ for (const [relative, urls] of standaloneApps) {
   for (const url of urls) if (!source.includes(url)) fail(`${relative}: URL canonical hilang: ${url}`);
 }
 for (const relative of [
-  "assets/apps/ml-tools/index.html", "assets/apps/prompt-generator/index.html", "assets/apps/fake-ovo/index.html",
+  "assets/apps/ml-tools/index.html", "assets/apps/prompt-generator/index.html",
   "assets/apps/quote-generator/index.html", "assets/apps/cari-fakta/index.html", "assets/apps/tiktok-quote/index.html",
   "assets/apps/unban-whatsapp/index.html", "assets/apps/virus-scan/index.html", "assets/apps/deploy-center/index.html",
   "assets/apps/manifest.json"

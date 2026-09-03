@@ -13,11 +13,6 @@
       "url": "/assets/apps/prompt-generator/index.html?v=standalone-v1"
     },
     {
-      "id": "fakeovo",
-      "title": "Fake OVO",
-      "url": "/assets/apps/fake-ovo/index.html?v=standalone-v1"
-    },
-    {
       "id": "quotegenerator",
       "title": "Quote Generator",
       "url": "/assets/apps/quote-generator/index.html?v=standalone-v1"

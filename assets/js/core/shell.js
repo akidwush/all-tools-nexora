@@ -449,7 +449,6 @@
   window.isNexoraLockedTool=function(){return false;};
 })();
 
-
 /* ===== original script 26: nxUniversalToolRoomsScript ===== */
 (function(){
   'use strict';
@@ -505,18 +504,15 @@ instagram:  {renderer:'renderInstagram',   category:'downloader', icon:'fa-brand
     youtube:    {renderer:'renderYoutube',     category:'downloader', icon:'fa-brands fa-youtube', title:'YouTube Downloader', desc:'Unduh video MP4 atau audio MP3 dari link publik dengan fallback metadata saat provider sedang gangguan.', accent:'#fb7185', accent2:'#dc2626', rgb:'251,113,133', badge:'MP4 / MP3'},
     spotify:    {renderer:'renderSpotify',     category:'downloader', icon:'fa-brands fa-spotify', title:'Spotify Downloader', desc:'Coba unduh audio melalui provider; fallback otomatis ke metadata dan tautan Spotify resmi.', accent:'#4ade80', accent2:'#16a34a', rgb:'74,222,128', badge:'Best Effort MP3'},
     terabox:    {renderer:'renderTerabox', category:'downloader', icon:'fa-solid fa-box-open', title:'Terabox Downloader', desc:'Ambil daftar file dari tautan share Terabox dan unduh file yang tersedia.', accent:'#60a5fa', accent2:'#2563eb', rgb:'96,165,250', badge:'Nexora Cloud Downloader'},
-    brat:       {renderer:'renderBrat',        category:'maker', icon:'fa-solid fa-wand-magic-sparkles', title:'BRAT Generator', desc:'Buat karya BRAT statis atau animasi GIF dengan area kerja penuh dan hasil yang mudah dipantau.', accent:'#facc15', accent2:'#f97316', rgb:'250,204,21', badge:'Creative Maker'},
-    iqc:        {renderer:'renderIqc',         category:'maker', icon:'fa-solid fa-image', title:'IQC Generator', desc:'Susun gambar IQC, atur isi, lalu lihat preview dalam ruang desain khusus.', accent:'#67e8f9', accent2:'#0891b2', rgb:'103,232,249', badge:'Image Composer'},
+
     sertifikat: {renderer:'renderSertifikatTololSource', category:'maker', icon:'fa-solid fa-certificate', title:'Sertifikat Custom', desc:'Buat sertifikat melalui API sumber dengan renderer lokal otomatis saat layanan pihak ketiga tidak tersedia.', accent:'#facc15', accent2:'#a855f7', rgb:'250,204,21', badge:'API + Local Fallback'},
 
     ektp:       {renderer:'renderEktp',        category:'maker', icon:'fa-solid fa-id-card', title:'E-KTP Generator', desc:'Lengkapi formulir demo dan hasilkan kartu dalam ruang editor identitas terpisah.', accent:'#60a5fa', accent2:'#2563eb', rgb:'96,165,250', badge:'Identity Studio'},
-    fakedana:   {renderer:'renderFakeDana',    category:'maker', icon:'fa-solid fa-money-bill-wave', title:'Fake Dana', desc:'Atur tampilan saldo simulasi dan buat hasil visual dalam ruang generator khusus.', accent:'#38bdf8', accent2:'#0284c7', rgb:'56,189,248', badge:'Balance Mockup'},
-    fakebankjago:{renderer:'renderFakeBankJago', category:'maker', icon:'fa-solid fa-building-columns', title:'Fake Bank Jago', desc:'Buat visual simulasi saldo Bank Jago menggunakan nama dan nominal.', accent:'#facc15', accent2:'#f97316', rgb:'250,204,21', badge:'Nexora Simulation Maker'},
-    fakedev:    {renderer:'renderFakeDev',     category:'maker', icon:'fa-solid fa-laptop-code', title:'FakeDev', desc:'Generator profil developer menggunakan endpoint gambar asli dari HTML Nexora Tools.', accent:'#a78bfa', accent2:'#6d28d9', rgb:'167,139,250', badge:'Nexora Source API'},
+
     fakelobby:  {renderer:'renderFakeLobby',   category:'maker', icon:'fa-solid fa-gamepad', title:'Fake Lobby', desc:'Buat tampilan lobby game simulasi dengan kontrol dan preview dalam satu halaman.', accent:'#fb7185', accent2:'#7c3aed', rgb:'251,113,133', badge:'Gaming Room'},
     winquotes:  {renderer:'renderWinquotes',   category:'maker', icon:'fa-brands fa-windows', title:'Windows Quotes', desc:'Tulis quote dan hasilkan meme bergaya Windows dalam 2 pilihan style.', accent:'#38bdf8', accent2:'#2563eb', rgb:'56,189,248', badge:'Quote Creator'},
     nokiamsg:   {renderer:'renderNokiaMsg',   category:'maker', icon:'fa-solid fa-mobile-retro', title:'Nokia Message', desc:'Susun pesan SMS jadul dan hasilkan gambar dalam ruang generator retro.', accent:'#a3e635', accent2:'#65a30d', rgb:'163,230,52', badge:'Retro Message'},
-    tanyaustadz:{renderer:'renderTanyaUstadz', category:'maker', icon:'fa-solid fa-user-tie', title:'Tanya Ustadz', desc:'Susun teks meme dan lihat hasil generator dengan tampilan yang lebih fokus.', accent:'#4ade80', accent2:'#15803d', rgb:'74,222,128', badge:'Meme Studio'},
+
     calc:       {renderer:'renderCalc',        category:'tools', icon:'fa-solid fa-calculator', title:'Calculator', desc:'Lakukan perhitungan cepat dalam ruang kalkulator yang bersih dan responsif.', accent:'#22d3ee', accent2:'#2563eb', rgb:'34,211,238', badge:'Math Utility'},
     pwgen:      {renderer:'renderPwgen',       category:'tools', icon:'fa-solid fa-key', title:'Password Generator', desc:'Buat password kuat dengan kontrol keamanan dalam halaman utilitas khusus.', accent:'#fbbf24', accent2:'#ea580c', rgb:'251,191,36', badge:'Security Tool'},
     morse:      {renderer:'renderMorse',       category:'tools', icon:'fa-solid fa-tower-broadcast', title:'Morse Code', desc:'Konversi teks dan kode Morse, termasuk audio, dalam ruang komunikasi tersendiri.', accent:'#c084fc', accent2:'#7c3aed', rgb:'192,132,252', badge:'Signal Utility'},
@@ -696,15 +692,10 @@ instagram:  {renderer:'renderInstagram',   category:'downloader', icon:'fa-brand
         if(id === 'instagram') aliases.push('instagram');
         if(id === 'youtube') aliases.push('youtube');
         if(id === 'spotify') aliases.push('spotify downloader');
-        if(id === 'brat') aliases.push('brat generator');
-        if(id === 'iqc') aliases.push('iqc generator');
 
         if(id === 'ektp') aliases.push('e-ktp generator');
-        if(id === 'fakedana') aliases.push('fake dana');
-        if(id === 'fakedev') aliases.push('fakedev');
         if(id === 'fakelobby') aliases.push('fake lobby');
         if(id === 'winquotes') aliases.push('windows quotes');
-        if(id === 'tanyaustadz') aliases.push('tanya ustadz');
         if(id === 'calc') aliases.push('calculator');
         if(id === 'pwgen') aliases.push('password gen','password generator');
         if(id === 'morse') aliases.push('morse code');

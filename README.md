@@ -1,6 +1,6 @@
 # All Tools Nexora
 
-All Tools Nexora v6.4.0 adalah website toolkit statis dengan 65 tool, lazy-loaded feature modules, dashboard admin, Supabase opsional untuk fitur lama, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency server-side sesuai provider.
+All Tools Nexora v6.4.0 adalah website toolkit statis dengan 59 tool, lazy-loaded feature modules, dashboard admin, Supabase opsional untuk fitur lama, dan 12 Vercel Functions. Frontend tetap tanpa framework; backend fitur AI memakai dependency server-side sesuai provider.
 
 Konfigurasi branding, katalog tool, modul lazy-load, dan target health check sekarang dipusatkan di `assets/config.js`. Panduan edit manual tersedia di [docs/MAINTENANCE.md](docs/MAINTENANCE.md).
 

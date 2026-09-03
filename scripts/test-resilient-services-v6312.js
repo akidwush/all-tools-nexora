@@ -1,35 +1,17 @@
-const assert = require("node:assert/strict");
-const fs = require("node:fs");
-const path = require("node:path");
-
-const root = path.resolve(__dirname, "..");
-const pkg = require(path.join(root, "package.json"));
-assert.equal(pkg.version, "6.4.0");
-
-const bank = fs.readFileSync(
-  path.join(root, "assets/js/features/download-pack.js"),
-  "utf8"
-);
-for (const token of [
-  "nxBuildFakeBankJagoLocal",
-  "SIMULASI — BUKAN BUKTI SALDO",
-  "renderLocal(name,balance,reason)",
-  '() => fallback("timeout")',
-  "URL.revokeObjectURL(localObjectUrl)"
-]) {
-  assert.ok(bank.includes(token), `Fake Bank Jago belum memiliki: ${token}`);
-}
-
-const fakeDev = fs.readFileSync(
-  path.join(root, "assets/js/features/source-features.js"),
-  "utf8"
-);
-assert.ok(fakeDev.includes("Mode lokal aktif. Profile"));
-assert.ok(fakeDev.includes('"success"'));
-
-assert.equal(fs.existsSync(path.join(root, "assets/js/features/nexora-ai.js")), false, "Modul Nexora AI mati harus dibuang");
-assert.equal(fs.existsSync(path.join(root, "assets/js/features/pix-vault.js")), false, "Modul Pix Vault dengan key lama harus dibuang");
-
-console.log(
-  "Regression layanan lulus: Fake Bank/FakeDev fallback aktif dan modul mati berisiko sudah dibuang."
-);
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const root = path.resolve(__dirname, '..');
+const read = file => fs.readFileSync(path.join(root,file),'utf8');
+const config = require(path.join(root,'assets/config.js'));
+const ids = new Set(Object.values(config.tools).flat().map(x=>x.id));
+const removed = ['fakebankjago','brat','iqc','fakedana','fakedev','tanyaustadz'];
+for(const id of removed) assert.equal(ids.has(id),false,`${id} harus dibuang dari katalog`);
+for(const kept of ['fakeovo','sertifikat']) assert.equal(ids.has(kept),true,`${kept} harus tetap tersedia`);
+const server = read('lib/server-access-policy.js');
+for(const id of removed) assert.doesNotMatch(server,new RegExp('"'+id+'"'));
+assert.match(server,/const makerOriginalTools = new Set\(\["fakeovo", "sertifikat"\]\)/);
+assert.equal(fs.existsSync(path.join(root,'assets/js/features/stable-maker-local.js')),false);
+assert.equal(fs.existsSync(path.join(root,'assets/js/features/nexora-ai.js')),false);
+assert.equal(fs.existsSync(path.join(root,'assets/js/features/pix-vault.js')),false);
+console.log('Regression layanan lulus: 6 maker tidak stabil dipangkas sampai runtime; Fake OVO + Sertifikat tetap di jalur original.');
