@@ -16,6 +16,7 @@ const { handleDanbooruSearch } = require("../lib/kuroneko-danbooru");
 const { handleAnimeToReal } = require("../lib/kuroneko-anime-to-real");
 const { handleAiSong } = require("../lib/kuroneko-ai-song");
 const { handleHD4 } = require("../lib/kuroneko-hd4");
+const { handleMakerOriginal } = require("../lib/maker-originals");
 const { authorizeTool, handleAccount } = require("../lib/account-membership");
 const {
   publicToolHealthProbe: publicHealthOnly,
@@ -149,6 +150,9 @@ module.exports = async function handler(request, response) {
   }
   if (url.searchParams.get("mode") === "aio-download") {
     return handleAioDownload(request, response, url);
+  }
+  if (url.searchParams.get("mode") === "maker-original") {
+    return handleMakerOriginal(request, response, url);
   }
 
   if (request.method !== "GET" && request.method !== "POST") {

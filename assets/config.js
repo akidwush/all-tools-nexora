@@ -377,6 +377,14 @@
         "assets/js/features/nexora/logo-engine.js",
         "assets/js/features/nexora/nexora-runtime.js"
       ]
+    },
+    "maker-originals": {
+      "css": [
+        "assets/css/features/maker-originals.css"
+      ],
+      "js": [
+        "assets/js/features/maker-originals.js"
+      ]
     }
   },
   "tools": {
@@ -509,75 +517,80 @@
         "id": "fakebankjago",
         "icon": "fa-solid fa-building-columns",
         "name": "Fake Bank Jago",
-        "description": "Generator visual saldo Bank Jago",
+        "description": "Simulasi Bank Jago dari provider original dengan watermark permanen",
         "badge": "SIMULASI",
         "runtime": {
           "mode": "api",
-          "module": "download-pack",
+          "module": "maker-originals",
           "handler": "renderFakeBankJago",
-          "dependency": "https://api.nexray.eu.cc/"
+          "dependency": "https://www.keyrafara.com/"
         },
         "health": {
-          "key": "nexray-api",
-          "type": "external-api",
-          "url": "https://api.nexray.eu.cc/",
-          "method": "HEAD"
+          "key": "module-maker-originals",
+          "type": "module",
+          "path": "/assets/js/features/maker-originals.js",
+          "method": "HEAD",
+          "strict": true
         }
       },
       {
         "id": "brat",
         "icon": "fa-solid fa-wand-magic-sparkles",
         "name": "BRAT Generator",
-        "description": "Static + animated GIF",
-        "badge": "GIF",
+        "description": "BRAT original provider dengan fallback server-side",
+        "badge": "ORIGINAL",
         "runtime": {
           "mode": "api",
+          "module": "maker-originals",
           "handler": "renderBrat",
-          "dependency": "https://api.siputzx.my.id/"
+          "dependency": "https://www.keyrafara.com/"
         },
         "health": {
-          "key": "siputzx-api",
-          "type": "external-api",
-          "url": "https://api.siputzx.my.id/",
-          "method": "HEAD"
+          "key": "module-maker-originals",
+          "type": "module",
+          "path": "/assets/js/features/maker-originals.js",
+          "method": "HEAD",
+          "strict": true
         }
       },
       {
         "id": "iqc",
         "icon": "fa-solid fa-images",
         "name": "IQC Generator",
-        "description": "Buat gambar IQC — Operator, Image & Dark",
-        "badge": "3 STYLE",
+        "description": "IQC original v1/simple dengan provider fallback stabil",
+        "badge": "ORIGINAL",
         "runtime": {
           "mode": "api",
-          "module": "generator-pack",
+          "module": "maker-originals",
           "handler": "renderIqc2",
-          "dependency": "https://api.nexray.eu.cc/"
+          "dependency": "https://www.keyrafara.com/"
         },
         "health": {
-          "key": "nexray-api",
-          "type": "external-api",
-          "url": "https://api.nexray.eu.cc/",
-          "method": "HEAD"
+          "key": "module-maker-originals",
+          "type": "module",
+          "path": "/assets/js/features/maker-originals.js",
+          "method": "HEAD",
+          "strict": true
         }
       },
       {
         "id": "sertifikat",
         "icon": "fa-solid fa-certificate",
-        "name": "Sertifikat Custom",
-        "description": "Buat sertifikat custom dari nama melalui API atau renderer lokal",
-        "badge": "PNG",
+        "name": "Sertifikat Meme",
+        "description": "Sertifikat meme dari sumber original; tanpa template lokal palsu",
+        "badge": "ORIGINAL",
         "runtime": {
           "mode": "api",
-          "module": "source-features",
+          "module": "maker-originals",
           "handler": "renderSertifikatTololSource",
           "dependency": "https://api.siputzx.my.id/"
         },
         "health": {
-          "key": "siputzx-api",
-          "type": "external-api",
-          "url": "https://api.siputzx.my.id/",
-          "method": "HEAD"
+          "key": "module-maker-originals",
+          "type": "module",
+          "path": "/assets/js/features/maker-originals.js",
+          "method": "HEAD",
+          "strict": true
         }
       },
       {
@@ -602,37 +615,40 @@
         "id": "fakedana",
         "icon": "fa-solid fa-money-bill-wave",
         "name": "Fake Dana",
-        "description": "Generate saldo Dana palsu",
-        "badge": "Custom",
+        "description": "Simulasi DANA dari provider original dengan watermark permanen",
+        "badge": "SIMULASI",
         "runtime": {
           "mode": "api",
+          "module": "maker-originals",
           "handler": "renderFakeDana",
-          "dependency": "https://api.nexray.eu.cc/"
+          "dependency": "https://www.keyrafara.com/"
         },
         "health": {
-          "key": "nexray-api",
-          "type": "external-api",
-          "url": "https://api.nexray.eu.cc/",
-          "method": "HEAD"
+          "key": "module-maker-originals",
+          "type": "module",
+          "path": "/assets/js/features/maker-originals.js",
+          "method": "HEAD",
+          "strict": true
         }
       },
       {
         "id": "fakedev",
         "icon": "fa-solid fa-laptop-code",
         "name": "FakeDev",
-        "description": "Buat profil developer dari nama, bio, dan foto",
-        "badge": "API",
+        "description": "Novelty developer card dari provider original",
+        "badge": "ORIGINAL",
         "runtime": {
           "mode": "api",
-          "module": "source-features",
+          "module": "maker-originals",
           "handler": "renderFakeDev",
-          "dependency": "https://api.ikyyxd.my.id/"
+          "dependency": "https://www.keyrafara.com/"
         },
         "health": {
-          "key": "ikyyxd-api",
-          "type": "external-api",
-          "url": "https://api.ikyyxd.my.id/",
-          "method": "HEAD"
+          "key": "module-maker-originals",
+          "type": "module",
+          "path": "/assets/js/features/maker-originals.js",
+          "method": "HEAD",
+          "strict": true
         }
       },
       {
@@ -695,16 +711,18 @@
         "id": "tanyaustadz",
         "icon": "fa-solid fa-user-tie",
         "name": "Tanya Ustadz",
-        "description": "Meme generator",
-        "badge": "Lucu",
+        "description": "Maker Ustadz melalui proxy Nexora dan endpoint aktif",
+        "badge": "ORIGINAL",
         "runtime": {
-          "mode": "local",
-          "handler": "renderTanyaUstadz"
+          "mode": "api",
+          "module": "maker-originals",
+          "handler": "renderTanyaUstadz",
+          "dependency": "https://api.nexray.eu.cc/"
         },
         "health": {
-          "key": "core-app",
+          "key": "module-maker-originals",
           "type": "module",
-          "path": "/assets/js/core/app.js",
+          "path": "/assets/js/features/maker-originals.js",
           "method": "HEAD",
           "strict": true
         }
@@ -967,17 +985,18 @@
         "id": "fakeovo",
         "icon": "fa-solid fa-wallet",
         "name": "Fake OVO",
-        "description": "Generator tampilan saldo OVO",
-        "badge": "CANVAS",
+        "description": "Simulasi OVO dari provider original dengan watermark permanen",
+        "badge": "SIMULASI",
         "runtime": {
-          "mode": "module",
-          "module": "imported-tools",
-          "handler": "renderFakeOvo"
+          "mode": "api",
+          "module": "maker-originals",
+          "handler": "renderFakeOvo",
+          "dependency": "https://www.keyrafara.com/"
         },
         "health": {
-          "key": "module-imported",
+          "key": "module-maker-originals",
           "type": "module",
-          "path": "/assets/js/features/imported-tools.js",
+          "path": "/assets/js/features/maker-originals.js",
           "method": "HEAD",
           "strict": true
         }

@@ -347,18 +347,29 @@
         "assets/js/features/nexora/logo-engine.js",
         "assets/js/features/nexora/nexora-runtime.js"
       ]
+    },
+    "maker-originals": {
+      "css": [
+        "assets/css/features/maker-originals.css"
+      ],
+      "js": [
+        "assets/js/features/maker-originals.js"
+      ]
     }
   },
   "tools": {
     "aiodownloader": "aio-downloader",
     "terabox": "download-pack",
     "tiktok": "tiktok",
-    "fakebankjago": "download-pack",
-    "iqc": "generator-pack",
-    "sertifikat": "source-features",
-    "fakedev": "source-features",
+    "fakebankjago": "maker-originals",
+    "brat": "maker-originals",
+    "iqc": "maker-originals",
+    "sertifikat": "maker-originals",
+    "fakedana": "maker-originals",
+    "fakedev": "maker-originals",
     "winquotes": "generator-pack",
     "nokiamsg": "generator-pack",
+    "tanyaustadz": "maker-originals",
     "mltools": "imported-tools",
     "comicreader": "comic-reader",
     "aiimage": "puter-image",
@@ -370,7 +381,7 @@
     "elevenlabs": "elevenlabs-studio",
     "promptgenerate": "prompt-generator",
     "novelcover": "novel-cover-generator",
-    "fakeovo": "imported-tools",
+    "fakeovo": "maker-originals",
     "quotegenerator": "imported-tools",
     "carifakta": "imported-tools",
     "virusscan": "virus-scan",
