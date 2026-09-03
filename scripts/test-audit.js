@@ -159,7 +159,7 @@ async function main() {
   };
   await auditHandler({
     method: "POST",
-    headers: { "x-forwarded-for": "203.0.113.9" },
+    headers: { host: "nexora.test", origin: "https://nexora.test", "sec-fetch-site": "same-origin", "x-forwarded-for": "203.0.113.9", "user-agent": "NexoraAuditTest/1" },
     body: {
       target: "https://example.com/",
       items: [{ id: "private", type: "asset", kind: "image", url: "http://127.0.0.1/private.png" }]

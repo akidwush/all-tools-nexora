@@ -23,7 +23,12 @@ function responseMock() {
   delete require.cache[membershipPath];
   let membership = require(membershipPath);
   let response = responseMock();
-  assert.equal(await membership.authorizeTool({ method: "GET", headers: {}, socket: {} }, response, "webintel"), true);
+  assert.equal(await membership.authorizeTool({ method: "GET", headers: { host: "nexora.test" }, socket: {} }, response, "webintel"), false);
+  assert.equal(response.statusCode, 403);
+  assert.equal(response.payload.error, "FIRST_PARTY_PROOF_REQUIRED");
+
+  response = responseMock();
+  assert.equal(await membership.authorizeTool({ method: "GET", headers: { host: "nexora.test", origin: "https://nexora.test", "sec-fetch-site": "same-origin", "user-agent": "NexoraFunctionalityTest/1", "x-forwarded-for": "203.0.113.22" }, socket: {} }, response, "webintel"), true);
 
   response = responseMock();
   assert.equal(await membership.authorizeTool({ method: "GET", headers: {}, socket: {} }, response, "calc"), false);

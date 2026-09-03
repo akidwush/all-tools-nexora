@@ -137,7 +137,7 @@ async function main() {
     const originalConsoleError = console.error;
     try {
       console.error = () => {};
-      await handler({ method: "POST", url: "/api/tool-health?mode=ocr-intelligence", headers: { host: "nexora.test", "x-forwarded-for": "203.0.113.88" }, body: request, socket: {} }, missingKey.response);
+      await handler({ method: "POST", url: "/api/tool-health?mode=ocr-intelligence", headers: { host: "nexora.test", origin: "https://nexora.test", "sec-fetch-site": "same-origin", "user-agent": "NexoraOcrTest/1", "x-forwarded-for": "203.0.113.88" }, body: request, socket: {} }, missingKey.response);
     } finally {
       console.error = originalConsoleError;
     }

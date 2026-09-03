@@ -149,7 +149,7 @@ async function main() {
   assert.equal(health.captured.payload.engineVersion, "1.0.1");
 
   const invalid = responseCapture();
-  await handler({ method: "POST", url: "/api/audit?mode=web-intelligence", headers: { "x-forwarded-for": "203.0.113.77" }, body: { url: "http://127.0.0.1", mode: "standard" }, socket: {} }, invalid.response);
+  await handler({ method: "POST", url: "/api/audit?mode=web-intelligence", headers: { host: "nexora.test", origin: "https://nexora.test", "sec-fetch-site": "same-origin", "user-agent": "NexoraWebIntelTest/1", "x-forwarded-for": "203.0.113.77" }, body: { url: "http://127.0.0.1", mode: "standard" }, socket: {} }, invalid.response);
   database.databaseRequest = originalDatabaseRequest;
   assert.equal(invalid.captured.status, 400);
   assert.match(invalid.captured.payload.error, /PRIVATE_IP_BLOCKED/);

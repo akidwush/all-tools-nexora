@@ -31,6 +31,24 @@ for (const [relative, expected] of Object.entries(COMIC_READER_LOCK)) {
   if (actual !== expected) fail(`COMIC READER LOCK: ${relative} berubah. Build diblokir agar UI/engine tidak tertimpa.`);
 }
 
+const abuseShieldSource = read("lib/api-abuse-shield.js");
+if (!/FIRST_PARTY_PROOF_REQUIRED/.test(abuseShieldSource)) fail("API Abuse Shield kehilangan fail-closed no-origin guard.");
+if (!/rpc\/nexora_consume_api_quota/.test(abuseShieldSource)) fail("API Abuse Shield kehilangan durable quota RPC.");
+if (!/HttpOnly; SameSite=Strict/.test(abuseShieldSource)) fail("API Abuse Shield cookie tidak dikunci HttpOnly + SameSite=Strict.");
+if (!fs.existsSync(path.join(root, "database/migrations/034_api_abuse_shield.sql"))) fail("Migration 034 API Abuse Shield hilang.");
+
+// Frozen API Abuse Shield core. A refactor must deliberately update this lock.
+const API_ABUSE_SHIELD_LOCK = Object.freeze({
+  "lib/api-abuse-shield.js": "50225f1eaeb45096e4a6cfdf71537c43cad88a393a798b1c2133e670927e44d6",
+  "database/migrations/034_api_abuse_shield.sql": "d9ed96c73bbaf6d01ff8463a333cee774eb689e5d5ac48b7be9221d40b706906"
+});
+for (const [relative, expected] of Object.entries(API_ABUSE_SHIELD_LOCK)) {
+  const absolute = path.join(root, relative);
+  if (!fs.existsSync(absolute)) { fail(`API ABUSE SHIELD LOCK: file hilang: ${relative}`); continue; }
+  const actual = crypto.createHash("sha256").update(fs.readFileSync(absolute)).digest("hex");
+  if (actual !== expected) fail(`API ABUSE SHIELD LOCK: ${relative} berubah. Build diblokir agar anti-clone/quota tidak tertimpa.`);
+}
+
 const packageJson = json("package.json");
 const version = String(packageJson.version || "");
 const vercel = json("vercel.json");
@@ -58,7 +76,7 @@ const required = [
   "api/health.js", "api/feedback.js", "api/audit.js", "api/tool-health.js",
   "lib/database.js", "lib/memory-store.js", "lib/tool-health.js", "lib/vdeploy.js",
   "lib/gemini-config.js",
-  "lib/request-security.js", "lib/server-access-policy.js", "scripts/audit-public-build.js",
+  "lib/request-security.js", "lib/server-access-policy.js", "lib/api-abuse-shield.js", "scripts/audit-public-build.js",
   "lib/text-to-pdf.js",
   "lib/freeconvert-vectorizer.js", "lib/sitegrabber-proxy.js",
   "lib/downloader-service.js", "database/schema.sql"
