@@ -37,7 +37,7 @@
   var ASSET_VERSION = config.version;
   var ASSET_PATCH = 'branding1';
   var ASSET_PATCHES = [
-    [/nexray-splus(?:-hooks)?\\.(?:js|css)(?:$|\\?)/, "nexray-splus-v1"],
+    [/nexray-splus(?:-hooks)?\\.(?:js|css)(?:$|\\?)/, "nexray-splus-v2-integrated"],
     [/(?:assets\/(?:vendor\/nexora|js\/features\/nexora)\/|nexora-generators\.css(?:$|\?))/, 'nexora'],
     [/prompt-generator\.(?:js|css)(?:$|\?)/, 'prompt-android-branding1'],
     [/novel-cover(?:-generator|-puter|-director)?\.(?:js|css)(?:$|\?)/, 'novel-cover-v43'],

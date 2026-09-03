@@ -1,0 +1,14 @@
+"use strict";
+const fs=require("fs");
+const assert=require("node:assert/strict");
+const hook=fs.readFileSync("assets/js/features/nexray-splus-hooks.js","utf8");
+const css=fs.readFileSync("assets/css/features/nexray-splus.css","utf8");
+assert.match(hook,/Nano Banana — Nexray S\+ · Edit Image/);
+assert.match(hook,/GPT Image — Nexray S\+ · Edit Image/);
+assert.match(hook,/Veo 3 — Nexray S\+ · Image to Video/);
+assert.match(hook,/Suno — Nexray S\+/);
+assert.match(hook,/stopImmediatePropagation/);
+assert.match(hook,/nexray-nanobanana/);
+assert.match(hook,/nexray-veo3/);
+assert.match(css,/nxsplus-inline/);
+console.log("Nexray S+ V2 integrated UI tests lulus.");
