@@ -154,10 +154,11 @@ async function main() {
     assert.ok(!/GEMINI_API_KEY\s*=/.test(client));
     assert.match(client, /finally\{if\(state\.controller===controller\)\{state\.controller=null;waiting\.hidden=true;setBusy\(false\);\}\}/);
     const css = read("assets/css/features/prompt-generator.css");
-    for (const token of [".nx-prompt-layout", ".nx-prompt-details", "@media all", "min-height:44px", ".nx-prompt-file-input"]) assert.ok(css.includes(token));
+    for (const token of [".nx-prompt-layout", ".nx-prompt-details", "@media(max-width:900px)", "@media(max-width:600px)", "min-height:44px", ".nx-prompt-file-input"]) assert.ok(css.includes(token));
+    assert.ok(!css.includes("@media all"), "Gaya mobile Prompt Generator tidak boleh menimpa desktop.");
     assert.match(css, /\.nx-prompt-waiting\[hidden\]\{display:none!important\}/);
-    assert.match(read("assets/js/core/lazy-loader.js"), /'prompt-android-branding1'/);
-    assert.match(read("index.html"), /prompt-v2-responsive-audit2/);
+    assert.match(read("assets/js/core/lazy-loader.js"), /'prompt-responsive2'/);
+    assert.match(read("index.html"), /prompt-responsive2/);
     const manifest = JSON.parse(read("assets/module-manifest.json"));
     assert.equal(manifest.tools.promptgenerate, "prompt-generator");
     assert.ok(manifest.modules["prompt-generator"].js.includes("assets/js/features/prompt-generator.js"));

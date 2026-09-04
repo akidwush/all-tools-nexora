@@ -1,9 +1,9 @@
-/* Nexora original unified mode.
-   Android is the only visual source of truth; the same rules apply at every
-   viewport width, including desktop. */
+/* Nexora mobile usability rules.
+   The compact Android composition is preserved on phones only; tablet and
+   desktop use the native wide layouts from each feature. */
 :root{--nx-original-ui-width:430px}
-@media all{
-  /* Keep the physical composition mobile-sized on wide monitors too. */
+@media(max-width:600px){
+  /* Preserve the physical composition used by the existing mobile UI. */
   .nx-top-nav-block,
   .container{
     width:min(100%,var(--nx-original-ui-width))!important;
@@ -221,8 +221,7 @@
 .nx-membrane{animation:none!important;transform:none!important}
 html.nx-hero-video-disabled .video-banner video{display:none!important}
 
-/* The public surface intentionally uses the mobile layout everywhere.
-   The runtime adds this class on desktop so CSS needs no second visual layout. */
+/* Keep decorative layers calm on larger screens without constraining layout. */
 html.nx-desktop-static{scroll-behavior:auto!important}
 html.nx-desktop-static *,html.nx-desktop-static *::before,html.nx-desktop-static *::after{
   animation:none!important;

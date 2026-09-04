@@ -39,7 +39,7 @@
   var ASSET_PATCHES = [
     [/nexray-splus(?:-hooks)?\\.(?:js|css)(?:$|\\?)/, "nexray-splus-v2-integrated"],
     [/(?:assets\/(?:vendor\/nexora|js\/features\/nexora)\/|nexora-generators\.css(?:$|\?))/, 'nexora'],
-    [/prompt-generator\.(?:js|css)(?:$|\?)/, 'prompt-android-branding1'],
+    [/prompt-generator\.(?:js|css)(?:$|\?)/, 'prompt-responsive2'],
     [/novel-cover(?:-generator|-puter|-director)?\.(?:js|css)(?:$|\?)/, 'novel-cover-v43'],
     [/puter-image\.(?:js|css)(?:$|\?)/, 'puter-image-hf28'],
     [/(?:puter-runtime|puter-video)\.(?:js|css)(?:$|\?)/, 'puter-video-hf47'],
@@ -52,7 +52,7 @@
     [/hd4-enhancer\.(?:js|css)(?:$|\?)/, 'hd4-enhancer-v2'],
     [/smart-cutout(?:-core)?\.(?:js|css)(?:$|\?)/, 'smart-cutout-v3'],
     [/placeholder-studio\.(?:js|css)(?:$|\?)/, 'placeholder-studio-v3'],
-    [/document-ai\.(?:js|css)(?:$|\?)/, 'document-android-branding1'],
+    [/document-ai\.(?:js|css)(?:$|\?)/, 'document-responsive2'],
     [/text-to-pdf\.(?:js|css)(?:$|\?)/, 'auto-pdf-v2'],
     [/crypto-market\.(?:js|css)(?:$|\?)/, 'crypto-mtf'],
     [/comic-reader\.(?:js|css)(?:$|\?)/, 'comic-reader'],

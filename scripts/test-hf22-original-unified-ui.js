@@ -2,44 +2,26 @@
 
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
-const path = require("node:path");
 
 const read = file => fs.readFileSync(file, "utf8");
-const publicCss = [
-  "assets/css/core.css",
-  "assets/css/components.css",
-  "assets/css/account.css",
-  "assets/css/personal-ai.css",
-  "assets/css/mobile-usability.css",
-  ...fs.readdirSync("assets/css/features")
-    .filter(name => name.endsWith(".css"))
-    .map(name => path.join("assets/css/features", name))
-];
-
-for (const file of publicCss) {
-  const css = read(file);
-  assert.doesNotMatch(css, /@media[^\{]*(?:min-width|hover\s*:\s*hover|pointer\s*:\s*fine)/i, `${file} masih memiliki cabang visual desktop.`);
-  assert.doesNotMatch(css, /@media[^\{]*max-width\s*:\s*(?:4\d\d|[5-9]\d\d|[1-9]\d{3,})px/i, `${file} masih membatasi layout Android normal ke viewport kecil.`);
-}
-
 const html = read("index.html");
-const core = read("assets/css/core.css");
 const mobile = read("assets/css/mobile-usability.css");
+const prompt = read("assets/css/features/prompt-generator.css");
+const documentAi = read("assets/css/features/document-ai.css");
 const reactor = read("assets/js/core/liquid-reactor.js");
 
-assert.match(mobile, /Android is the only visual source of truth/);
-assert.match(mobile, /--nx-original-ui-width:430px/);
-assert.match(mobile, /\.container\{[\s\S]*?max-width:var\(--nx-original-ui-width\)!important/);
-assert.match(mobile, /#nxUniversalRoom \.nx-room-wrap\{[\s\S]*?max-width:var\(--nx-original-ui-width\)!important/);
-assert.match(mobile, /@media all\{[\s\S]*?\.tools-grid\{grid-template-columns:repeat\(3,minmax\(0,1fr\)\)!important/);
-assert.match(core, /HF16 — MOBILE PAINT-STABILITY \+ STATIC 3D GLASS[\s\S]*?@media all\{/);
-assert.match(core, /HF21 — ANDROID FLING PAINT BUDGET[\s\S]*?@media all\{/);
-assert.doesNotMatch(core + reactor, /custom-cursor|nx-liquid|nx-reactor-ghost|touch-follower|cursor-trail/);
-assert.doesNotMatch(reactor, /matchMedia|pointermove|pointerdown|pointerup|captureFlip|animateFlip|setupCursorReactor/);
-assert.match(reactor, /unifiedOriginalUi:true/);
-assert.match(reactor, /enabled:false,reason:"unified-original-ui"/);
-for (const asset of ["core.css", "components.css", "account.css", "personal-ai.css", "mobile-usability.css", "liquid-reactor.js"]) {
-  assert.match(html, new RegExp(`${asset.replace(".", "\\.")}\\?v=[^\"']*hf22-original-unified1`), `${asset} belum cache-busted untuk HF22.`);
-}
+// The mobile composition is intentionally unchanged, but it must not constrain
+// tablet and desktop widths. The compact rules are active only on phone sizes.
+assert.match(mobile, /Nexora mobile usability rules/);
+assert.match(mobile, /@media\(max-width:600px\)\{[\s\S]*?\.container\{[\s\S]*?max-width:var\(--nx-original-ui-width\)!important/);
+assert.doesNotMatch(mobile, /@media all\{[\s\S]*?max-width:var\(--nx-original-ui-width\)!important/);
+assert.match(prompt, /@media\(max-width:900px\)\{\.nx-prompt-layout\{grid-template-columns:1fr/);
+assert.match(prompt, /@media\(max-width:600px\)\{#nxUniversalRoom\[data-tool="promptgenerate"\]/);
+assert.match(documentAi, /@media\(max-width:900px\)\{\.nda-workspace\{grid-template-columns:1fr/);
+assert.match(documentAi, /@media\(max-width:600px\)\{\.tool-viewer:has\(\.nda\)/);
+assert.doesNotMatch(prompt + documentAi, /@media all/);
+assert.match(html, /mobile-usability\.css\?v=[^"']*responsive-desktop1/);
+assert.match(html, /lazy-loader\.js\?v=[^"']*document-ai-responsive2[^"']*prompt-responsive2/);
+assert.doesNotMatch(reactor, /custom-cursor|nx-liquid|nx-reactor-ghost|touch-follower|cursor-trail/);
 
-console.log("HF22 original unified UI lulus: PC dan Android memakai satu layout tanpa cabang visual desktop.");
+console.log("Responsive layout tests lulus: UI mobile tetap terjaga sampai 600px dan layout tablet/desktop kembali memakai ruang layar.");

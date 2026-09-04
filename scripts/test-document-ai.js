@@ -56,6 +56,9 @@ const documentCss = fs.readFileSync(path.join(root, "assets/css/features/documen
 const documentClient = fs.readFileSync(path.join(root, "assets/js/features/document-ai.js"), "utf8");
 assert.match(documentCss, /\.nda \[hidden\]\{display:none!important\}/, "Elemen hasil tersembunyi tidak boleh bocor sebelum analisis.");
 assert.match(documentCss, /tool-viewer-content:has\(\.nda\)/, "Workspace desktop harus menggunakan room lebar.");
+assert.match(documentCss, /@media\(max-width:900px\)\{\.nda-workspace/, "Layout tablet harus turun menjadi satu kolom pada breakpoint yang tepat.");
+assert.match(documentCss, /@media\(max-width:600px\)\{\.tool-viewer:has\(\.nda\)/, "Aturan mobile harus tetap terbatas pada layar mobile.");
+assert.doesNotMatch(documentCss, /@media all/, "Gaya mobile tidak boleh menimpa layout desktop.");
 for (const token of ["prepareFile", "maxSide = 1800", "foto kamera 12 MB", "nexoraTimeoutMs: 85000", "createImageBitmap(file).catch", "id=\"ndaChoose\" type=\"button\"", "function openFilePicker()", "fileInput.click()", "application/octet-stream"]) assert.ok(documentClient.includes(token), `Document AI mobile guard hilang: ${token}`);
 assert.match(documentCss, /\.nda-file-input/, "File picker Document AI harus tetap dapat diaktifkan browser Android.");
 
@@ -106,8 +109,8 @@ const response = {
     assert.equal(generated, "Ringkasan dokumen berhasil.");
     assert.deepEqual(attemptedModels, ["gemini-missing-test-model", DEFAULT_MODEL]);
     assert.deepEqual(generatedPayload.config.thinkingConfig, { thinkingLevel: "low" });
-    assert.match(lazySource, /'document-android-branding1'/);
-    assert.match(fs.readFileSync(path.join(root, "index.html"), "utf8"), /document-ai-v1/);
+    assert.match(lazySource, /'document-responsive2'/);
+    assert.match(fs.readFileSync(path.join(root, "index.html"), "utf8"), /document-ai-responsive2/);
 
     process.env.DOCUMENT_AI_MODEL = DEFAULT_MODEL;
     const defaultFailureModels = [];
