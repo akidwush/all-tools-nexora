@@ -69,7 +69,6 @@
     body.dataset.nxsplusImageV2="1";
 
     addOption(model,"nexray-nanobanana","Nano Banana — Nexray S+ · Edit Image");
-    addOption(model,"nexray-gptimage","GPT Image — Nexray S+ · Edit Image");
 
     var box=document.createElement("div");
     box.className="nxsplus-inline";
@@ -83,14 +82,14 @@
     var originalPromptLabel=promptLabel?promptLabel.textContent:"";
     var working=false,alive=true,guard=false;
 
-    function active(){return /^nexray-(?:nanobanana|gptimage)$/.test(model.value);}
+    function active(){return model.value==="nexray-nanobanana";}
     function sync(){
       if(!alive||guard)return;
       guard=true;
       var on=active();box.hidden=!on;
       if(promptLabel)promptLabel.textContent=on?"Instruksi edit gambar":originalPromptLabel;
       var span=generate.querySelector("span");
-      if(span&&!working)span.textContent=on?(model.value==="nexray-gptimage"?"Edit dengan GPT Image S+":"Edit dengan Nano Banana S+"):"Buat Gambar";
+      if(span&&!working)span.textContent=on?"Edit dengan Nano Banana S+":"Buat Gambar";
       if(on)setDisabled(generate,working||prompt.value.trim().length<3||!(file.files&&file.files[0]));
       guard=false;
     }
@@ -114,10 +113,10 @@
       working=true;setDisabled(generate,true);
       generate.querySelector("i").className="fa-solid fa-circle-notch fa-spin";
       generate.querySelector("span").textContent="Editing…";
-      message.className="npi-message is-loading";message.textContent="Mengirim ke "+(model.value==="nexray-gptimage"?"GPT Image":"Nano Banana")+" S+…";
+      message.className="npi-message is-loading";message.textContent="Mengirim ke Nano Banana S+…";
       try{
         var dataUrl=await fileData(chosen);
-        var data=await post("image-edit",{engine:model.value==="nexray-gptimage"?"gptimage":"nanobanana",param:text,imageData:dataUrl},115000);
+        var data=await post("image-edit",{engine:"nanobanana",param:text,imageData:dataUrl},115000);
         if(!alive)return;
         var url=safeUrl(data.imageUrl);if(!url)throw new Error("Provider tidak mengembalikan gambar valid.");
         image.src=url;image.hidden=false;placeholder.hidden=true;download.href=url;download.download="nexora-splus-edit-"+Date.now()+".png";download.hidden=false;

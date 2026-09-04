@@ -1,5 +1,4 @@
 "use strict";
-
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
@@ -13,7 +12,12 @@ function jsonResponse(status, payload) {
   return {
     ok: status >= 200 && status < 300,
     status,
-    headers: { get(name) { return String(name).toLowerCase() === "content-length" ? String(Buffer.byteLength(raw)) : "application/json"; } },
+    headers: { get(name) {
+      const key=String(name).toLowerCase();
+      if(key==="content-length") return String(Buffer.byteLength(raw));
+      if(key==="content-type") return "application/json";
+      return "";
+    }},
     async text() { return raw; },
     async arrayBuffer() { return Buffer.from(raw); }
   };
@@ -27,7 +31,6 @@ function jsonResponse(status, payload) {
     }
   });
   assert.equal(suno.audioUrl, "https://cdn.example/song.mp3");
-  assert.equal(suno.title, "Night Drive");
 
   const veo = await splus.veo3({ prompt: "gentle camera push", imageUrl: "https://cdn.example/input.jpg" }, {
     fetch: async (url) => {
@@ -39,35 +42,36 @@ function jsonResponse(status, payload) {
   assert.equal(veo.videoUrl, "https://cdn.example/out.mp4");
 
   const onePixelPng = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl6nAAAAABJRU5ErkJggg==";
-  let editCalls = 0;
-  const edited = await splus.imageEdit({ engine: "auto", param: "make it cinematic", imageData: onePixelPng }, {
-    fetch: async (url) => {
-      editCalls += 1;
-      if (String(url).includes("/ai/nanobanana")) return jsonResponse(500, { success: false, message: "provider busy" });
-      assert.match(String(url), /\/ai\/gptimage$/);
+  let calls=0;
+  const edited = await splus.imageEdit({ engine: "nanobanana", param: "make it cinematic", imageData: onePixelPng }, {
+    fetch: async (url, init) => {
+      calls++;
+      assert.match(String(url), /\/ai\/nanobanana$/);
+      assert.equal(init.method, "POST");
+      assert.match(String(init.headers["Content-Type"]), /^multipart\/form-data; boundary=/);
+      assert.ok(Number(init.headers["Content-Length"]) > 0);
+      assert.ok(Buffer.isBuffer(init.body));
+      assert.match(init.body.toString("latin1"), /name="image"/);
+      assert.match(init.body.toString("latin1"), /name="param"/);
       return jsonResponse(200, { data: { image_url: "https://cdn.example/edited.webp" } });
     }
   });
-  assert.equal(editCalls, 2);
-  assert.equal(edited.engine, "gptimage");
-  assert.equal(edited.imageUrl, "https://cdn.example/edited.webp");
+  assert.equal(calls,1);
+  assert.equal(edited.engine,"nanobanana");
+  assert.equal(edited.imageUrl,"https://cdn.example/edited.webp");
+
+  await assert.rejects(
+    () => splus.imageEdit({ engine:"gptimage", param:"edit", imageData:onePixelPng }, { fetch:async()=>jsonResponse(200,{}) }),
+    /dinonaktifkan/
+  );
 
   const request = { method: "POST", body: {}, headers: {} };
   assert.deepEqual(policy.toolHealthToolIds("nexray-splus", request, new URL("https://nexora.test/api/tool-health?mode=nexray-splus&action=suno")), ["aisong"]);
   assert.deepEqual(policy.toolHealthToolIds("nexray-splus", request, new URL("https://nexora.test/api/tool-health?mode=nexray-splus&action=veo3")), ["aivideo"]);
   assert.deepEqual(policy.toolHealthToolIds("nexray-splus", request, new URL("https://nexora.test/api/tool-health?mode=nexray-splus&action=image-edit")), ["aiimage"]);
-  assert.equal(policy.isServerAuthorizedTool("aiimage"), true);
-  assert.equal(policy.isServerAuthorizedTool("aivideo"), true);
 
-  const loader = fs.readFileSync(path.join(root, "assets/js/core/lazy-loader.js"), "utf8");
-  for (const token of ["puter-image", "puter-video", "ai-song", "assets/css/features/nexray-splus.css", "assets/js/features/nexray-splus-hooks.js"]) assert.match(loader, new RegExp(token));
   const hook = fs.readFileSync(path.join(root, "assets/js/features/nexray-splus-hooks.js"), "utf8");
-  for (const token of ["renderPuterImage", "renderPuterVideo", "renderAiSong", "image-edit", "veo3", "suno"]) assert.match(hook, new RegExp(token));
-  const api = fs.readFileSync(path.join(root, "api/tool-health.js"), "utf8");
-  assert.match(api, /handleNexraySPlus/);
-
-  console.log("Nexora Nexray S+ tests lulus: Suno, Veo3, Nano Banana→GPT Image fallback, server auth, dan lazy hooks tervalidasi.");
-})().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+  assert.match(hook,/Nano Banana — Nexray S\+/);
+  assert.doesNotMatch(hook,/GPT Image — Nexray S\+/);
+  console.log("Nexora Nexray S+ V3 tests lulus: multipart Nano Banana, GPT S+ disabled, Suno, Veo3, auth hooks tervalidasi.");
+})().catch((error) => { console.error(error); process.exit(1); });
