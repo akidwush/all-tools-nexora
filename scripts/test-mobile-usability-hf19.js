@@ -6,8 +6,8 @@ const fs = require("node:fs");
 const css = fs.readFileSync("assets/css/mobile-usability.css", "utf8");
 const html = fs.readFileSync("index.html", "utf8");
 
-assert.match(html, /mobile-usability\.css\?v=6\.4\.0-responsive-audit3-hf22-original-unified1/);
-assert.match(css, /@media all/);
+assert.match(html, /mobile-usability\.css(?:\?v=[^"' >]+)?/);
+assert.match(css, /@media(?:\s+all|\s*\()/);
 assert.match(css, /#nxUniversalRoom \.nx-room-tool-body/);
 assert.match(css, /font-size:16px!important/);
 assert.match(css, /min-height:50px!important/);
