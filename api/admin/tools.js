@@ -41,6 +41,20 @@ function sortValue(value) {
   return Math.max(-10000, Math.min(10000, Number.isFinite(number) ? Math.trunc(number) : 0));
 }
 
+function reorderItems(value) {
+  if (!Array.isArray(value) || !value.length || value.length > 200) return null;
+  const seen = new Set();
+  const rows = [];
+  for (const item of value) {
+    const id = toolId(item && item.id);
+    const order = Number(item && item.sortOrder);
+    if (!id || seen.has(id) || !Number.isFinite(order)) return null;
+    seen.add(id);
+    rows.push({ id, sort_order: sortValue(order) });
+  }
+  return rows;
+}
+
 function isCustomTool(item) {
   const metadata = item && item.metadata;
   return Boolean(metadata && typeof metadata === "object" && metadata.origin === "admin" && metadata.kind === "external-link");
@@ -204,6 +218,41 @@ module.exports = async function handler(request, response) {
     const session = await requireAdmin(request, response, { edit: true });
     if (!verifyMutationRequest(request)) return send(response, 403, { ok: false, error: "CSRF_REJECTED" });
     const body = request.body && typeof request.body === "object" ? request.body : {};
+
+    if (request.method === "PATCH" && clean(body.action, 30).toLowerCase() === "reorder") {
+      const items = reorderItems(body.items);
+      if (!items) return send(response, 400, { ok: false, error: "INVALID_TOOL_ORDER", message: "Urutan kartu tidak valid." });
+      const requestedIds = new Set(items.map((item) => item.id));
+      const beforeRows = await databaseRequest(`tools?select=${TOOL_SELECT}&order=sort_order.asc,name.asc`, { method: "GET" });
+      const known = (Array.isArray(beforeRows) ? beforeRows : []).filter((item) => requestedIds.has(item.id));
+      if (known.length !== requestedIds.size) return send(response, 409, { ok: false, error: "TOOL_ORDER_STALE", message: "Daftar tool berubah. Muat ulang Dashboard Layout Manager." });
+      try {
+        await databaseRequest("rpc/nexora_reorder_tools", {
+          method: "POST",
+          headers: { Prefer: "return=minimal" },
+          body: JSON.stringify({ items })
+        });
+      } catch (error) {
+        if (error?.postgresCode === "PGRST202" || error?.postgresCode === "42883" || error?.status === 404) {
+          return send(response, 409, { ok: false, error: "TOOL_ORDER_MIGRATION_REQUIRED", message: "Jalankan migration 036_dashboard_layout_manager.sql di Supabase terlebih dahulu." });
+        }
+        throw error;
+      }
+      const afterRows = await databaseRequest(`tools?select=${TOOL_SELECT}&order=sort_order.asc,name.asc`, { method: "GET" });
+      const afterKnown = (Array.isArray(afterRows) ? afterRows : []).filter((item) => requestedIds.has(item.id));
+      const auditLogged = await recordAdminAudit({
+        request,
+        session,
+        action: "tool.reorder",
+        entityType: "tool",
+        entityId: "public-dashboard",
+        summary: `${items.length} kartu public diurutkan ulang`,
+        before: known.map(auditShape),
+        after: afterKnown.map(auditShape)
+      });
+      return send(response, 200, { ok: true, data: (Array.isArray(afterRows) ? afterRows : []).filter((item) => !RETIRED_TOOL_IDS.has(item.id)).map(responseShape), auditLogged });
+    }
+
     const id = toolId(body.id);
     if (!id) return send(response, 400, { ok: false, error: "INVALID_TOOL_ID" });
 

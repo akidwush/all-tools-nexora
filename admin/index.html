@@ -16,7 +16,7 @@
   <link href="../assets/css/admin.css?v=6.4.0-hf12-no-login-loader" rel="stylesheet">
   <link href="../assets/css/admin-ai.css?v=6.4.0-ai1" rel="stylesheet">
   <link href="../assets/css/visual-qa.css?v=6.4.0" rel="stylesheet">
-  <link href="../assets/css/admin-redesign.css?v=6.4.0-admin-member-hf1" rel="stylesheet">
+  <link href="../assets/css/admin-redesign.css?v=6.4.0-admin-member-hf1-layout1" rel="stylesheet">
   <link href="../assets/css/custom-select.css?v=6.4.0-global-select-final1" rel="stylesheet">
 </head>
 <body class="admin-dashboard-page">
@@ -93,6 +93,7 @@
               <select id="toolStatusFilter" class="select-box" aria-label="Filter status tool"><option value="all">Semua status</option><option value="active">Aktif</option><option value="inactive">Nonaktif</option></select>
               <select id="toolCategoryFilter" class="select-box" aria-label="Filter kategori tool"><option value="all">Semua kategori</option><option value="downloader">Downloader</option><option value="maker">Maker</option><option value="tools">Tools</option><option value="vault">Vault</option><option value="external">External</option></select>
             </div>
+            <button id="openLayoutManager" class="secondary-button public-layout-button" type="button"><i class="fa-solid fa-table-cells-large"></i><span>Atur Kartu Public</span></button>
             <button id="addToolButton" data-add-tool="true" class="primary-button" type="button"><i class="fa-solid fa-plus"></i><span>Tambah Tool</span></button>
           </div>
           <div class="tool-admin-grid" id="toolAdminGrid"></div>
@@ -297,6 +298,21 @@
     </section>
   </div>
 
+
+  <div class="modal-backdrop" id="layoutModal" hidden>
+    <section class="tool-editor dashboard-layout-editor" role="dialog" aria-modal="true" aria-labelledby="layoutEditorTitle">
+      <header><div><p class="eyebrow">PUBLIC DASHBOARD</p><h2 id="layoutEditorTitle">Dashboard Layout Manager</h2></div><button id="closeLayoutModal" type="button" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button></header>
+      <div class="dashboard-layout-body">
+        <div class="dashboard-layout-intro"><i class="fa-solid fa-grip-vertical"></i><div><b>Atur posisi kartu di halaman public</b><span>Geser dari handle, gunakan tombol panah, atau pin kartu ke posisi teratas. Perubahan baru aktif setelah disimpan.</span></div></div>
+        <div class="dashboard-layout-tabs" id="layoutTabs" role="tablist" aria-label="Filter layout kartu"><button class="is-active" data-layout-filter="all" type="button">All</button><button data-layout-filter="downloader" type="button">Downloader</button><button data-layout-filter="maker" type="button">Maker</button></div>
+        <div class="dashboard-layout-list" id="layoutList" aria-live="polite"></div>
+        <div class="dashboard-layout-empty" id="layoutEmpty" hidden>Tidak ada kartu aktif pada kategori ini.</div>
+        <p class="modal-message" id="layoutMessage" role="status"></p>
+        <footer class="dashboard-layout-footer"><button class="secondary-button" id="resetLayoutDraft" type="button"><i class="fa-solid fa-rotate-left"></i> Reset perubahan</button><button class="primary-button" id="saveLayoutOrder" type="button"><i class="fa-solid fa-floppy-disk"></i> Simpan Urutan</button></footer>
+      </div>
+    </section>
+  </div>
+
   <div class="modal-backdrop" id="toolModal" hidden>
     <section class="tool-editor" role="dialog" aria-modal="true" aria-labelledby="toolEditorTitle">
       <header><div><p class="eyebrow" id="toolEditorEyebrow">EDIT TOOL</p><h2 id="toolEditorTitle">Pengaturan Tool</h2></div><button id="closeToolModal" type="button" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button></header>
@@ -351,7 +367,7 @@
   <script src="../assets/branding.js?v=6.4.0-config1"></script>
   <script src="../assets/js/core/custom-select.js?v=6.4.0-global-select-final1" defer></script>
   <script src="../assets/js/admin/admin-shell.js?v=6.4.0-admin-redesign1" defer></script>
-  <script src="../assets/js/admin/dashboard.js?v=6.4.0-hf3-admin-member-hf1" defer></script>
+  <script src="../assets/js/admin/dashboard.js?v=6.4.0-hf3-admin-member-hf1-layout1" defer></script>
   <script src="../assets/js/admin/members.js?v=6.4.0-admin-member-hf1" defer></script>
   <script src="../assets/js/admin/developer-profile.js?v=6.4.0-step3" defer></script>
   <script src="../assets/js/admin/visual-qa.js?v=6.4.0" defer></script>

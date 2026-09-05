@@ -1325,7 +1325,7 @@ const PUBLIC_TOOL_ICONS = Object.freeze(Object.fromEntries(
 ));
 
 function collectAllTools() {
-    return [
+    const rows = [
         toolsData.tools.find(item => item.id === 'comicreader'),
         ...toolsData.downloader,
         ...toolsData.maker,
@@ -1333,6 +1333,18 @@ function collectAllTools() {
         ...toolsData.vault,
         ...toolsData.external
     ].filter(Boolean);
+    if (!rows.some(item => Number.isFinite(Number(item && item.sortOrder)))) return rows;
+    return rows.map((item, index) => ({ item, index }))
+        .sort((left, right) => {
+            const a = Number(left.item && left.item.sortOrder);
+            const b = Number(right.item && right.item.sortOrder);
+            const aValid = Number.isFinite(a);
+            const bValid = Number.isFinite(b);
+            if (aValid && bValid && a !== b) return a - b;
+            if (aValid !== bValid) return aValid ? -1 : 1;
+            return left.index - right.index;
+        })
+        .map(entry => entry.item);
 }
 
 let allTools = collectAllTools();
