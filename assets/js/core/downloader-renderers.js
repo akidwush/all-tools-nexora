@@ -38,13 +38,6 @@
     bindRun(input,button,run);
   };
 
-  function renderOfficial(body,provider,brand,icon,placeholder){
-    body.innerHTML='<h2><i class="fa-brands '+icon+'"></i> '+brand+'</h2><p class="nx-downloader-lead">Metadata dan tautan resmi.</p><input type="url" class="v-input" data-official-input placeholder="'+esc(placeholder)+'" autocomplete="url" spellcheck="false"><button class="v-btn" data-official-button type="button"><i class="fas fa-magnifying-glass"></i> Ambil Metadata</button><div data-official-result aria-live="polite"></div>';
-    var input=body.querySelector("[data-official-input]"),button=body.querySelector("[data-official-button]"),target=body.querySelector("[data-official-result]");
-    async function run(){var url=input.value.trim();if(!url){target.innerHTML=errorHtml("Tempel URL "+brand+" terlebih dahulu.");return;}button.disabled=true;try{var result=await window.NexoraDownloader.request(provider,url),data=result.data;target.innerHTML='<article class="nx-official-result">'+(data.thumbnail?'<img class="nx-downloader-preview" src="'+esc(data.thumbnail)+'" alt="Thumbnail">':'')+'<div><div class="dl-title">'+esc(data.title||brand+" Media")+'</div><p class="nx-capability-notice">'+esc(data.notice||"Tautan resmi tersedia.")+'</p><a class="v-btn nx-official-link" href="'+esc(data.officialUrl)+'" target="_blank" rel="noopener noreferrer">Buka di '+esc(brand)+'</a></div></article>';}catch(error){if(error&&error.name!=="AbortError")target.innerHTML=errorHtml(error.message||"Metadata gagal diambil.");}finally{button.disabled=false;}}
-    bindRun(input,button,run);
-  }
-
   function renderDownloadProvider(body,config){
     body.innerHTML='<h2><i class="fa-brands '+config.icon+'"></i> '+config.title+'</h2><p class="nx-downloader-lead">'+esc(config.lead)+'</p><input type="url" class="v-input" data-real-input placeholder="'+esc(config.placeholder)+'" autocomplete="url" spellcheck="false"><button class="v-btn" data-real-button type="button"><i class="fas fa-download"></i> '+esc(config.button)+'</button><div data-real-result aria-live="polite"></div>';
     var input=body.querySelector("[data-real-input]"),button=body.querySelector("[data-real-button]"),target=body.querySelector("[data-real-result]");
@@ -66,6 +59,4 @@
   window.renderYoutube=function(body){renderDownloadProvider(body,{provider:"youtube",brand:"YouTube",title:"YouTube Downloader",icon:"fa-youtube",placeholder:"https://youtu.be/...",button:"Ambil MP4 / MP3",lead:"Tempel link YouTube publik. Nexora mencoba MP4 dan MP3 melalui provider server-side, lalu memvalidasi file sebelum download."});};
   function renderSpotify(body){renderDownloadProvider(body,{provider:"spotify",brand:"Spotify",title:"Spotify Downloader",icon:"fa-spotify",placeholder:"https://open.spotify.com/track/...",button:"Ambil MP3",lead:"Tempel link track Spotify. Nexora mencoba audio MP3 melalui provider server-side; jika provider gagal, metadata dan link resmi tetap ditampilkan."});}
   window.renderSpotify=renderSpotify;
-  window.NexoraDownloaderRenderSpotify=renderSpotify;
-  window.NexoraDownloaderRenderOfficial=renderOfficial;
 })();

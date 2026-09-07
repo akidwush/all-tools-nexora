@@ -18,13 +18,13 @@
   <link href="../assets/css/visual-qa.css?v=6.4.0" rel="stylesheet">
   <link href="../assets/css/admin-redesign.css?v=6.4.0-admin-member-hf1-layout1" rel="stylesheet">
   <link href="../assets/css/custom-select.css?v=6.4.0-global-select-final1" rel="stylesheet">
-</head>
+<link rel="stylesheet" href="../assets/css/branding.css?v=6.4.0-audit-brand1"/></head>
 <body class="admin-dashboard-page">
   <div class="admin-app" id="adminApp" hidden>
     <div class="admin-drawer-backdrop" id="adminDrawerBackdrop" hidden></div>
     <aside class="admin-sidebar" id="adminSidebar" aria-label="Navigasi utama admin">
       <div class="admin-brand-row"><a class="admin-logo" href="/admin">
-        <span><i class="fa-solid fa-bolt"></i></span>
+        <span><img class="nx-brand-image" data-nx-logo src="/favicon.svg" alt="Logo Nexora" width="32" height="32"></span>
         <div><b data-nx-brand="shortName">NEXORA</b><small>ADMIN WORKSPACE</small></div>
       </a><button class="sidebar-collapse" id="sidebarCollapse" type="button" aria-label="Ciutkan sidebar" title="Ciutkan sidebar"><i class="fa-solid fa-angles-left"></i></button><button class="drawer-close" id="adminDrawerClose" type="button" aria-label="Tutup menu"><i class="fa-solid fa-xmark"></i></button></div>
       <nav class="admin-nav" aria-label="Navigasi admin">
@@ -57,7 +57,7 @@
         <section class="admin-section is-active" data-panel="overview">
           <div class="metric-grid" id="metricGrid"></div>
           <div class="overview-utility-grid"><article class="panel-card quick-actions-card"><div class="panel-head"><div><p class="eyebrow">SHORTCUTS</p><h2>Quick Actions</h2></div></div><div class="quick-actions"><button data-go-section="tools" data-open-new-tool type="button"><i class="fa-solid fa-plus"></i><span>Tambah Tool</span></button><button data-go-section="members" type="button"><i class="fa-solid fa-magnifying-glass"></i><span>Cari Member</span></button><button data-go-section="members" data-member-filter="free" type="button"><i class="fa-solid fa-crown"></i><span>Aktifkan VVIP</span></button><button data-go-section="developer" type="button"><i class="fa-solid fa-pen-to-square"></i><span>Konten Website</span></button></div></article><article class="panel-card recent-activity-card"><div class="panel-head"><div><p class="eyebrow">AUDIT LOG</p><h2>Recent Activity</h2></div><button class="ghost-button" data-go-section="audit" type="button">Semua</button></div><div class="recent-activity-list" id="recentActivity"></div></article></div>
-          <div class="dashboard-grid">
+          <div class="dashboard-grid"><article class="panel-card nx-branding-card"><div class="panel-head"><div><p class="eyebrow">IDENTITAS WEBSITE</p><h2>Logo &amp; Ikon Nexora</h2></div></div><p>Ganti logo publik dan admin. Ikon tab dapat memakai gambar terpisah. PNG, JPEG, atau WebP maksimal 5 MB.</p><form id="brandingSettingsForm"><div class="nx-branding-fields"><div class="nx-branding-field"><div class="nx-branding-preview"><img id="brandPreview-logoUrl" src="/favicon.svg" alt="Pratinjau Logo Nexora" width="64" height="64"><div><b>Logo Nexora</b><br><small>Unggahan diperkecil hingga 192 px</small></div></div><label>URL Logo Nexora<input id="brandInput-logoUrl" type="text" inputmode="url" maxlength="2000" autocomplete="off" placeholder="https://... atau /assets/logo.png" disabled></label><label>Unggah Logo Nexora<input id="brandFile-logoUrl" type="file" accept="image/png,image/jpeg,image/webp" disabled></label><button class="secondary-button" id="brandReset-logoUrl" type="button" disabled>Pakai logo bawaan</button></div><div class="nx-branding-field"><div class="nx-branding-preview"><img id="brandPreview-iconUrl" src="/favicon.svg" alt="Pratinjau Ikon tab (favicon)" width="64" height="64"><div><b>Ikon tab (favicon)</b><br><small>Unggahan diperkecil hingga 64 px</small></div></div><label>URL Ikon tab (favicon)<input id="brandInput-iconUrl" type="text" inputmode="url" maxlength="2000" autocomplete="off" placeholder="https://... atau /assets/logo.png" disabled></label><label>Unggah Ikon tab (favicon)<input id="brandFile-iconUrl" type="file" accept="image/png,image/jpeg,image/webp" disabled></label><button class="secondary-button" id="brandReset-iconUrl" type="button" disabled>Ikuti logo Nexora</button></div></div><button class="primary-button" type="submit" disabled>Simpan Logo &amp; Ikon</button><p class="modal-message" id="brandingMessage" role="status" aria-live="polite"></p></form></article>
             <article class="panel-card panel-wide">
               <div class="panel-head"><div><p class="eyebrow">STATUS LIVE</p><h2>Kesehatan Tools</h2></div><button class="ghost-button" data-go-section="health" type="button">Lihat detail</button></div>
               <div class="health-summary" id="healthSummary"></div>
@@ -73,7 +73,7 @@
             <article class="panel-card">
               <div class="panel-head"><div><p class="eyebrow">TAMPILAN PUBLIK</p><h2>Video Header</h2></div><span class="read-only-badge" id="heroVideoPermissionBadge">Memuat...</span></div>
               <form class="hero-video-settings" id="heroVideoSettingsForm">
-                <label><span>URL video langsung (HTTPS)</span><input id="heroVideoUrl" maxlength="1000" type="url" inputmode="url" autocomplete="url" placeholder="https://cdn.example.com/banner.mp4" required></label>
+                <label><span>URL video langsung (HTTPS)</span><input id="heroVideoUrl" maxlength="1000" type="text" inputmode="url" autocomplete="url" placeholder="https://cdn.example.com/banner.mp4"></label>
                 <label class="switch-row"><span><b>Aktifkan video header</b><small>Video hanya diputar otomatis di HP yang cukup kuat; desktop dan perangkat lemah memakai background statis.</small></span><input id="heroVideoEnabled" type="checkbox" checked></label>
                 <p class="hero-video-hint"><i class="fa-solid fa-gauge-high"></i> Gunakan MP4/WebM terkompresi, durasi pendek, dan ukuran ideal di bawah 5 MB agar tetap ringan.</p>
                 <button class="primary-button" id="saveHeroVideoButton" type="submit"><i class="fa-solid fa-floppy-disk"></i> Simpan Video Header</button>
@@ -364,12 +364,13 @@
   </div>
 
   <div class="toast-stack" id="toastStack" aria-live="polite"></div>
-  <script src="../assets/branding.js?v=6.4.0-config1"></script>
+  <script src="../assets/js/shared/brand-config.js?v=6.4.0-audit-brand1"></script><script src="../assets/branding.js?v=6.4.0-config1-audit-brand1"></script>
   <script src="../assets/js/core/custom-select.js?v=6.4.0-global-select-final1" defer></script>
   <script src="../assets/js/admin/admin-shell.js?v=6.4.0-admin-redesign1" defer></script>
-  <script src="../assets/js/admin/dashboard.js?v=6.4.0-hf3-admin-member-hf1-layout1" defer></script>
+  <script src="../assets/js/admin/branding.js?v=6.4.0-audit-brand1" defer></script>
+  <script src="../assets/js/admin/dashboard.js?v=6.4.0-hf3-admin-member-hf1-layout1-audit-brand1" defer></script>
   <script src="../assets/js/admin/members.js?v=6.4.0-admin-member-hf1" defer></script>
-  <script src="../assets/js/admin/developer-profile.js?v=6.4.0-step3" defer></script>
+  <script src="../assets/js/admin/developer-profile.js?v=6.4.0-step3-audit-brand1" defer></script>
   <script src="../assets/js/admin/visual-qa.js?v=6.4.0" defer></script>
   <script src="../assets/js/admin/personal-ai.js?v=6.4.0-ai1-branding1" defer></script>
   <script src="../assets/js/admin/functional-audit.js?v=6.4.0-healthfix1" defer></script>

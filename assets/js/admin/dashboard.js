@@ -4,7 +4,7 @@
   const $=(selector,root=document)=>root.querySelector(selector);
   const $$=(selector,root=document)=>Array.from(root.querySelectorAll(selector));
   const headings={overview:"Ringkasan Sistem",tools:"Manajemen Tools",members:"Membership FREE / VVIP",ai:"Pengaturan Personal AI",socials:"Sosial Media",developer:"About Developer",analytics:"Analytics Penggunaan",health:"Tool Health Monitoring",feedback:"Feedback Pengguna",visual:"Runtime & Visual QA",functional:"Functional Audit",audit:"Audit Log Admin"};
-  let feedbackTimer=null;
+  let feedbackTimer=null, feedbackRequest=0, eventsBound=false;
 
   function escapeHtml(value){return String(value??"").replace(/[&<>'"]/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[char]));}
   function readCookie(name){const item=document.cookie.split(";").map(v=>v.trim()).find(v=>v.startsWith(`${name}=`));return item?decodeURIComponent(item.slice(name.length+1)):"";}
@@ -65,8 +65,9 @@
     const recent=state.dashboard.recentFeedback||[];
     $("#recentFeedback").innerHTML=recent.length?recent.slice(0,5).map(item=>`<button class="compact-item compact-button" data-overview-feedback="${escapeHtml(item.id)}" type="button"><span class="compact-mark"></span><div><b>${escapeHtml(item.name)} · ${escapeHtml(item.category)}</b><span>${escapeHtml(item.message)}</span></div><em class="status-pill status-${escapeHtml(item.status)}">${escapeHtml(statusLabel(item.status))}</em></button>`).join(""):'<div class="compact-item"><div><b>Belum ada feedback</b><span>Pesan pengguna akan tampil di sini.</span></div></div>';
     const activities=state.dashboard.recentActivity||[],activityBox=$("#recentActivity");if(activityBox)activityBox.innerHTML=activities.length?activities.map(item=>`<div class="recent-activity-item"><i class="${auditIcon(item)}"></i><div><b>${escapeHtml(item.summary||item.action)}</b><span>${escapeHtml(item.admin_email||"system")}</span></div><time>${formatDate(item.created_at)}</time></div>`).join(""):'<div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><b>Belum ada aktivitas</b><span>Tindakan admin akan tercatat otomatis.</span></div>';
+    window.NexoraAdminBranding?.sync(state.dashboard,canEdit());
     const settings=state.dashboard.settings||[];
-    $("#settingsList").innerHTML=settings.length?settings.map(item=>`<div class="setting-item"><span class="compact-mark"></span><div><b>${escapeHtml(item.key)}</b><span>${escapeHtml(JSON.stringify(item.value))}</span></div><em class="status-pill">${item.is_public?"public":"private"}</em></div>`).join(""):'<div class="setting-item"><div><b>Belum ada pengaturan</b><span>Jalankan migration database.</span></div></div>';
+    $("#settingsList").innerHTML=settings.length?settings.map(item=>`<div class="setting-item"><span class="compact-mark"></span><div><b>${escapeHtml(item.key)}</b><span>${escapeHtml(item.key==="branding"?"Logo dan ikon website":JSON.stringify(item.value))}</span></div><em class="status-pill">${item.is_public?"public":"private"}</em></div>`).join(""):'<div class="setting-item"><div><b>Belum ada pengaturan</b><span>Jalankan migration database.</span></div></div>';
     const siteSetting=settings.find(item=>item.key==="site");const hero=siteSetting?.value?.heroVideo||{};const heroUrl=$("#heroVideoUrl"),heroEnabled=$("#heroVideoEnabled"),heroButton=$("#saveHeroVideoButton"),heroBadge=$("#heroVideoPermissionBadge");
     if(!state.heroSettingsDirty){heroUrl.value=hero.url||"https://files.catbox.moe/4ijdle.mp4";heroEnabled.checked=hero.enabled!==false;}
     heroUrl.disabled=!canEdit();heroEnabled.disabled=!canEdit();heroButton.disabled=!canEdit();heroBadge.textContent=canEdit()?"Bisa diedit":"Read only";
@@ -133,8 +134,9 @@
   }
 
   async function loadFeedback(page=1){
+    const requestId=++feedbackRequest;
     const query=new URLSearchParams({page:String(page),pageSize:"30",q:$("#feedbackSearch").value.trim(),status:$("#feedbackStatusFilter").value,category:$("#feedbackCategoryFilter").value});
-    try{const result=await api(`/api/admin/feedback?${query}`);state.feedback=result.data||[];state.feedbackMeta={pagination:result.pagination,counts:result.counts};renderFeedback();}
+    try{const result=await api(`/api/admin/feedback?${query}`);if(requestId!==feedbackRequest)return;state.feedback=result.data||[];state.feedbackMeta={pagination:result.pagination,counts:result.counts};renderFeedback();}
     catch(error){toast(error.message,"error");}
   }
   function renderFeedback(){
@@ -158,11 +160,12 @@
   function openModal(selector){$(selector).hidden=false;document.body.style.overflow="hidden";}
   function closeModal(selector){$(selector).hidden=true;if($$(".modal-backdrop:not([hidden])").length===0)document.body.style.overflow="";}
   async function refreshDashboard(){const dashboard=await api("/api/admin/dashboard");state.dashboard=dashboard;renderOverview();renderHealth();}
-  async function logout(){try{await api("/api/admin/auth",{method:"DELETE",headers:csrfHeaders()});}catch{}location.replace("/admin/login");}
+  async function logout(){try{await api("/api/admin/auth",{method:"DELETE",headers:csrfHeaders()});location.replace("/admin/login");}catch(error){toast("Logout gagal: "+error.message,"error");}}
   function openAdminMore(){const sheet=$("#adminMoreSheet"),backdrop=$("#adminMoreBackdrop"),button=$("[data-admin-more]");if(!sheet||!backdrop)return;backdrop.hidden=false;sheet.classList.add("is-open");sheet.setAttribute("aria-hidden","false");if(button)button.setAttribute("aria-expanded","true");document.body.classList.add("admin-more-open");}
   function closeAdminMore(){const sheet=$("#adminMoreSheet"),backdrop=$("#adminMoreBackdrop"),button=$("[data-admin-more]");if(!sheet||!backdrop)return;sheet.classList.remove("is-open");sheet.setAttribute("aria-hidden","true");backdrop.hidden=true;if(button)button.setAttribute("aria-expanded","false");document.body.classList.remove("admin-more-open");}
 
   function bind(){
+    if(eventsBound)return;eventsBound=true;
     $$('[data-section]').forEach(button=>button.addEventListener("click",()=>switchSection(button.dataset.section)));
     $$('[data-go-section]').forEach(button=>button.addEventListener("click",()=>switchSection(button.dataset.goSection)));
     document.addEventListener("click",event=>{const quickTool=event.target.closest("[data-open-new-tool]");if(quickTool)setTimeout(openNewToolEditor,0);});
@@ -209,5 +212,11 @@
     }catch(error){console.error(error);$("#adminApp").hidden=true;let failure=$("#adminBootFailure");if(!failure){failure=document.createElement("main");failure.id="adminBootFailure";failure.className="admin-boot-failure";failure.innerHTML='<div class="admin-recovery"><i class="fa-solid fa-triangle-exclamation"></i><b>Dashboard belum dapat dimuat</b><p></p><button type="button">Coba Lagi</button><a href="/">Kembali ke website</a></div>';document.body.appendChild(failure);failure.querySelector("button").addEventListener("click",()=>{failure.remove();boot();});}failure.querySelector("p").textContent=error.message||"Dashboard gagal dimuat.";}
   }
   window.addEventListener("popstate",()=>{const match=String(location.hash||"").match(/^#section-([a-z]+)$/);switchSection(match&&headings[match[1]]?match[1]:"overview",false);});
+  document.addEventListener('nexora:branding-saved',event=>{
+    if(!state.dashboard)return;
+    const settings=state.dashboard.settings||[];const index=settings.findIndex(item=>item.key==='branding');
+    if(index>=0)settings[index]=event.detail;else settings.push(event.detail);
+    state.dashboard.settings=settings;state.audit=[];renderOverview();
+  });
   boot();
 })();

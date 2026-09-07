@@ -1,0 +1,17 @@
+/* Brand image dimensions stay fixed while assets load. */
+.nx-brand-image{display:inline-block!important;object-fit:contain!important;flex-shrink:0;vertical-align:middle;width:32px;height:32px;border-radius:6px}
+#nxBrandHero .nx-brand-image{width:clamp(32px,5vw,54px);height:clamp(32px,5vw,54px);margin-right:8px}
+.admin-logo>span .nx-brand-image,.brand-orb .nx-brand-image{width:80%;height:80%}
+.nx-brand-home{display:inline-flex;align-items:center;gap:10px;color:inherit;text-decoration:none;margin-bottom:18px}
+.nx-branding-card{grid-column:1/-1}
+.nx-branding-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.nx-branding-field{display:grid;gap:10px;min-width:0}
+.nx-branding-field label{display:grid;gap:7px;font-size:13px}
+.nx-branding-field input{width:100%;min-width:0;padding:10px;border:1px solid #353044;border-radius:10px;background:#100e17;color:#eceaf5;font:inherit}
+.nx-branding-field input[type=file]{font-size:12px}
+.nx-branding-preview{display:flex;align-items:center;gap:12px;min-height:84px;padding:10px;background:#17141f;border:1px solid #353044;border-radius:12px}
+.nx-branding-preview img{width:64px;height:64px;object-fit:contain;border-radius:8px}
+.nx-branding-preview small{color:#b1aabd}
+.nx-branding-field .secondary-button{justify-self:start}
+#brandingSettingsForm>.primary-button{margin-top:18px}
+@media(max-width:600px){.nx-branding-fields{grid-template-columns:1fr}}

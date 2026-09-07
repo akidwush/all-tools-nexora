@@ -67,7 +67,8 @@ async function main() {
   assert.doesNotMatch(service, /\/nexora-health-check/);
   assert.match(client, /nexoraTimeoutMs:30000/);
   assert.match(client, /payload\.password=password/);
-  assert.match(renderers, /NexoraDownloaderRenderSpotify/);
+  assert.match(renderers, /window\.renderSpotify=renderSpotify/);
+  assert.doesNotMatch(app, /function renderSpotify\(/, "Spotify hanya memiliki satu renderer canonical");
   assert.match(renderers, /renderDownloadProvider/);
   assert.match(renderers, /data-real-media/);
   assert.doesNotMatch(sourceFeatures + app, /api\.ikyyxd\.my\.id\/download\/spotifydl/);

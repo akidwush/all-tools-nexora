@@ -116,8 +116,8 @@
     try{
       const response = await fetch("/api/health?mode=database&resource=socials", { cache: "no-store", credentials: "same-origin", headers: { Accept: "application/json" } });
       const payload = await response.json().catch(() => ({}));
-      const rows=response.ok && Array.isArray(payload.data) ? payload.data : [];
-      if(rows.length)apply(rows);else if(!state.loaded)apply(FALLBACK_ROWS);
+      if(response.ok && payload.ok!==false && Array.isArray(payload.data))apply(payload.data);
+      else if(!state.loaded)apply(FALLBACK_ROWS);
     }catch{
       if(!state.loaded) apply(FALLBACK_ROWS);
     }

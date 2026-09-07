@@ -2,6 +2,7 @@ const { databaseRequest } = require("../../lib/database");
 const { publicSession, requireAdmin, verifyMutationRequest } = require("../../lib/admin-auth");
 const { recordAdminAudit } = require("../../lib/admin-audit");
 const { TOOL_CATALOG, normalizeCachedRows, summarizeHealth } = require("../../lib/tool-health");
+const updateBranding = require("../../lib/branding-settings");
 const RETIRED_TOOL_IDS = new Set(["bigimage"]);
 const handleAdminPersonalAi = require("../../lib/admin-personal-ai-http");
 const { sendJson: send } = require("../../lib/http-response");
@@ -136,6 +137,7 @@ module.exports = async function handler(request, response) {
   if (request.method === "PATCH") {
     try {
       const body = objectValue(request.body);
+      if (body.key === "branding") return await updateBranding(request, response);
       if (body.key === "developer_profile") return await updateDeveloperProfile(request, response);
       return await updateHeroVideo(request, response);
     }
@@ -145,7 +147,7 @@ module.exports = async function handler(request, response) {
       return send(response, status, {
         ok: false,
         error: error.code || "ADMIN_SETTINGS_FAILED",
-        message: status === 401 ? "Sesi admin berakhir." : status === 403 ? "Akses ditolak." : "Pengaturan video belum dapat disimpan."
+        message: status === 401 ? "Sesi admin berakhir." : status === 403 ? "Akses ditolak." : "Pengaturan belum dapat disimpan."
       });
     }
   }

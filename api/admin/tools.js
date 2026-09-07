@@ -169,7 +169,7 @@ async function memberRows(url) {
     databaseRequest("subscriptions?select=user_id,plan,status,started_at,expires_at,updated_at",{method:"GET"})
   ]);
   const byUser=new Map((subscriptions||[]).map(row=>[row.user_id,row]));
-  return (profiles||[]).map(profile=>{const sub=byUser.get(profile.id)||{};const expired=sub.plan==="vvip"&&sub.expires_at&&new Date(sub.expires_at).getTime()<=Date.now();const effective=profile.account_status==="suspended"||sub.status==="suspended"?"suspended":sub.plan==="vvip"&&sub.status==="active"&&!expired?"vvip":expired?"expired":"free";return {...profile,subscription:sub,effective_status:effective};}).filter(row=>(!q||`${row.email} ${row.display_name}`.toLowerCase().includes(q))&&(!status||status==="all"||row.effective_status===status));
+  return (profiles||[]).map(profile=>{const sub=byUser.get(profile.id)||{};const expired=sub.plan==="vvip"&&sub.expires_at&&new Date(sub.expires_at).getTime()<=Date.now();const effective=profile.account_status==="suspended"||sub.status==="suspended"?"suspended":sub.plan==="vvip"&&sub.status==="active"&&sub.expires_at&&new Date(sub.expires_at).getTime()>Date.now()?"vvip":expired?"expired":"free";return {...profile,subscription:sub,effective_status:effective};}).filter(row=>(!q||`${row.email} ${row.display_name}`.toLowerCase().includes(q))&&(!status||status==="all"||row.effective_status===status));
 }
 
 async function updateMember(body,request,session){
