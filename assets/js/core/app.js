@@ -1661,6 +1661,7 @@ function showTool(toolId) {
     if (!tool) { closeTool(); return; }
 
     switch (toolId) {
+        case 'worldclassics': renderWorldClassics(body); break;
         case 'aiodownloader': renderAioDownloader(body); break;
         case 'instagram': renderInstagram(body); break;
         case 'tiktok': renderTiktok(body); break;
@@ -1738,6 +1739,7 @@ function closeTool() {
       );
 
     if(body){
+      if(typeof body.__nxCleanup === 'function') body.__nxCleanup();
       body.innerHTML = '';
     }
 

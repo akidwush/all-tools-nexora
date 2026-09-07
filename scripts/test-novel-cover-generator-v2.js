@@ -317,7 +317,7 @@ async function main() {
   const vercel = JSON.parse(read("vercel.json"));
   const packageJson = JSON.parse(read("package.json"));
 
-  assert.equal(Object.values(config.tools).flat().length, 59);
+  assert.equal(Object.values(config.tools).flat().length, 60);
   const tool = config.tools.tools.find((entry) => entry.id === "novelcover");
   assert.equal(tool.runtime.module, "novel-cover-generator");
   assert.equal(tool.runtime.mode, "module", "Mode gratis tidak boleh bergantung pada health API provider Pro.");

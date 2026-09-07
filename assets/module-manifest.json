@@ -355,6 +355,16 @@
       "js": [
         "assets/js/features/maker-originals.js"
       ]
+    },
+    "world-classics": {
+      "css": [
+        "assets/css/world-classics.css"
+      ],
+      "js": [
+        "assets/js/shared/supabase-client.js",
+        "assets/js/features/world-classics/state.js",
+        "assets/js/features/world-classics/reader.js"
+      ]
     }
   },
   "tools": {
@@ -399,6 +409,7 @@
     "trimpath": "nexora-trimpath",
     "logoanimate": "nexora-logo-animate",
     "enhancer": "hd4-enhancer",
+    "worldclassics": "world-classics",
     "ttquote": "tiktok-quote",
     "getcode": "get-code",
     "vdeploy": "deploy-center",

@@ -466,6 +466,7 @@
     
     
     
+    worldclassics:{renderer:'renderWorldClassics', category:'tools', icon:'fa-solid fa-book-open', title:'World Classics Reader', desc:'Sastra klasik China, Jepang, dan Korea dengan teks asli, terjemahan Indonesia, bookmark, dan riwayat.', accent:'#c4b5fd', accent2:'#d4b483', rgb:'196,181,253', badge:'Nexora Library'},
     comicreader:{renderer:'renderComicReader', category:'tools', icon:'fa-solid fa-book-open-reader', title:'Komik Indonesia', desc:'Manga, manhwa, dan manhua lengkap dengan pencarian, favorit, riwayat, chapter, bahasa, serta reader vertikal.', accent:'#c084fc', accent2:'#ec4899', rgb:'192,132,252', badge:'Nexora Comic Core'},
     aiimage:{renderer:'renderPuterImage', category:'tools', icon:'fa-solid fa-image', title:'Nexora AI Image', desc:'Buat gambar AI dengan akun dan allowance Puter milik pengguna. Nexora tidak menyimpan prompt, password, atau gambar hasil.', accent:'#a78bfa', accent2:'#22d3ee', rgb:'167,139,250', badge:'Puter User-Pays AI'},
     aivideo:{renderer:'renderPuterVideo', category:'tools', icon:'fa-solid fa-clapperboard', title:'Nexora AI Video Generator', desc:'Buat video dari prompt atau gambar referensi memakai akun dan allowance Puter milik pengguna.', accent:'#a855f7', accent2:'#22d3ee', rgb:'168,85,247', badge:'Puter AI Video'},

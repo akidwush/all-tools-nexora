@@ -1,0 +1,86 @@
+name: World Classics — Verify and Deploy
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'supabase/**'
+      - 'assets/js/features/world-classics/**'
+      - 'assets/js/shared/supabase-client.js'
+      - 'assets/css/world-classics.css'
+      - 'lib/account-membership.js'
+      - '.github/workflows/world-classics.yml'
+permissions:
+  contents: read
+concurrency:
+  group: world-classics-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build
+      - run: npm ci --prefix supabase/tests --no-audit --no-fund
+      - run: npm test --prefix supabase/tests
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Check Edge Functions
+        working-directory: supabase/functions
+        run: deno check wikisource-search/index.ts wikisource-page/index.ts wikisource-chapters/index.ts translate-classic/index.ts
+      - name: Test Edge Functions
+        working-directory: supabase/functions
+        run: deno task test
+  deploy:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    needs: verify
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      WORLD_CLASSICS_ALLOWED_ORIGINS: ${{ vars.WORLD_CLASSICS_ALLOWED_ORIGINS || 'https://all-tools-nexora.vercel.app' }}
+      WORLD_CLASSICS_MODEL: ${{ vars.WORLD_CLASSICS_MODEL || 'gemini-2.5-flash' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Validate configuration
+        shell: bash
+        run: |
+          for key in SUPABASE_ACCESS_TOKEN SUPABASE_DB_PASSWORD SUPABASE_PROJECT_REF GEMINI_API_KEY; do
+            if [ -z "${!key}" ]; then echo "Missing GitHub Actions secret: $key"; exit 1; fi
+          done
+          if [[ ! "$SUPABASE_PROJECT_REF" =~ ^[a-z0-9]{20}$ ]]; then echo 'Invalid project reference'; exit 1; fi
+      - name: Apply migrations
+        run: |
+          supabase link --project-ref "$SUPABASE_PROJECT_REF"
+          supabase db push
+      - name: Configure Edge secrets
+        shell: bash
+        run: |
+          secret_file="$(mktemp)"
+          chmod 600 "$secret_file"
+          trap 'rm -f "$secret_file"' EXIT
+          python3 - "$secret_file" <<'PY'
+          import os,sys
+          with open(sys.argv[1], 'w') as f:
+              for key in ['GEMINI_API_KEY','WORLD_CLASSICS_ALLOWED_ORIGINS','WORLD_CLASSICS_MODEL']:
+                  value=os.environ[key]
+                  if '\n' in value or '\r' in value:
+                      raise ValueError('Invalid multiline secret')
+                  f.write(key+'='+value+'\n')
+          PY
+          supabase secrets set --project-ref "$SUPABASE_PROJECT_REF" --env-file "$secret_file"
+      - name: Deploy separate Edge Functions
+        run: |
+          for function in wikisource-search wikisource-page wikisource-chapters translate-classic; do
+            supabase functions deploy "$function" --project-ref "$SUPABASE_PROJECT_REF" --use-api
+          done

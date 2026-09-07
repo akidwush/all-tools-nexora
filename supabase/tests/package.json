@@ -1,0 +1,7 @@
+{
+  "name": "nexora-world-classics-verification",
+  "private": true,
+  "type": "module",
+  "scripts": {"test": "node database.mjs && node reader.mjs"},
+  "dependencies": {"@electric-sql/pglite": "0.3.14", "jsdom": "26.1.0"}
+}

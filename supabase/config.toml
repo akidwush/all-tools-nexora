@@ -1,0 +1,11 @@
+project_id = "nexora-world-classics"
+# Guests are supported. Each handler checks CORS, validates bearer tokens when
+# supplied, and enforces durable quotas. No service key is accepted from clients.
+[functions.wikisource-search]
+verify_jwt = false
+[functions.wikisource-page]
+verify_jwt = false
+[functions.wikisource-chapters]
+verify_jwt = false
+[functions.translate-classic]
+verify_jwt = false

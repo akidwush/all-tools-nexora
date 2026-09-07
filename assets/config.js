@@ -385,6 +385,16 @@
       "js": [
         "assets/js/features/maker-originals.js"
       ]
+    },
+    "world-classics": {
+      "css": [
+        "assets/css/world-classics.css"
+      ],
+      "js": [
+        "assets/js/shared/supabase-client.js",
+        "assets/js/features/world-classics/state.js",
+        "assets/js/features/world-classics/reader.js"
+      ]
     }
   },
   "tools": {
@@ -513,7 +523,7 @@
       }
     ],
     "maker": [
-                        {
+      {
         "id": "sertifikat",
         "icon": "fa-solid fa-certificate",
         "name": "Sertifikat Meme",
@@ -551,7 +561,7 @@
           "strict": true
         }
       },
-                  {
+      {
         "id": "fakelobby",
         "icon": "fa-solid fa-gamepad",
         "name": "Fake Lobby",
@@ -606,8 +616,7 @@
           "url": "https://apii.nexadev.my.id/",
           "method": "HEAD"
         }
-      },
-
+      }
     ],
     "tools": [
       {
@@ -1448,6 +1457,25 @@
           "key": "module-hd4-enhancer",
           "type": "module",
           "path": "/assets/js/features/hd4-enhancer.js",
+          "method": "HEAD",
+          "strict": true
+        }
+      },
+      {
+        "id": "worldclassics",
+        "name": "World Classics Reader",
+        "icon": "fa-solid fa-book-open",
+        "description": "Sastra klasik China, Jepang, dan Korea dengan terjemahan Indonesia, bookmark, dan riwayat membaca.",
+        "badge": "NEW",
+        "runtime": {
+          "mode": "module",
+          "module": "world-classics",
+          "handler": "renderWorldClassics"
+        },
+        "health": {
+          "key": "module-world-classics",
+          "type": "module",
+          "path": "/assets/js/features/world-classics/reader.js",
           "method": "HEAD",
           "strict": true
         }

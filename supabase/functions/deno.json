@@ -1,0 +1,5 @@
+{
+  "imports": { "linkedom": "npm:linkedom@0.18.12" },
+  "compilerOptions": { "strict": true, "lib": ["deno.ns", "dom", "esnext"] },
+  "tasks": { "test": "deno test --allow-env _shared/*_test.ts" }
+}
