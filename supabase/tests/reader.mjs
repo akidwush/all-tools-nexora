@@ -5,7 +5,7 @@ const root=new URL('../../',import.meta.url);
 const dom=new JSDOM('<!doctype html><main id="room"></main>',{url:'https://all-tools-nexora.vercel.app/',runScripts:'outside-only',pretendToBeVisual:true});
 const w=dom.window;const body=w.document.querySelector('main');let id='',offline=false,translationFails=false,writes=[],fetches=0;
 const page={source:'japan',pageTitle:'源氏物語/桐壺',title:'桐壺',html:'<p><ruby>源<rt>げん</rt></ruby>文学<a href="#cite_note-1">1</a></p><p id="cite_note-1">Catatan</p>',paragraphs:[{index:0,original:'源文学',html:'<p><ruby>源<rt>げん</rt></ruby>文学</p>'}]};
-w.NexoraSupabase={userId:()=>id,invoke:async(name,data)=>{fetches++;if(offline)throw Error('Offline');if(name==='wikisource-search')return {results:[{title:'源氏物語',pageTitle:page.pageTitle}]};if(name==='wikisource-page')return {...page};if(name==='wikisource-chapters')return {chapters:[{title:'桐壺',pageTitle:page.pageTitle}]};if(translationFails)throw Error('Terjemahan gagal');return {mode:data.mode,paragraphs:[{index:0,original:'源文学',translated:'Sastra sumber'}]};},rows:async(table,query,method,payload)=>{if(offline)throw Error('Offline');if(method)writes.push({table,query,method,payload});return [];}};
+w.NexoraSupabase={userId:()=>id,invoke:async(name,data)=>{fetches++;if(offline)throw Error('Offline');if(name==='wikisource-search')return {results:[{title:'源氏物語',pageTitle:page.pageTitle}]};if(name==='wikisource-page')return {...page};if(name==='wikisource-chapters')return {chapters:[{title:'桐壺',pageTitle:page.pageTitle}]};if(translationFails)throw Error('Terjemahan gagal. Teks asli tetap tersedia.');return {mode:data.mode,paragraphs:[{index:0,original:'源文学',translated:'Sastra sumber'}]};},rows:async(table,query,method,payload)=>{if(offline)throw Error('Offline');if(method)writes.push({table,query,method,payload});return [];}};
 for(const file of ['state.js','reader.js'])w.eval(await fs.readFile(new URL('assets/js/features/world-classics/'+file,root),'utf8'));
 const tick=()=>new Promise(r=>setTimeout(r,15));
 function click(selector){body.querySelector(selector).click();}
@@ -19,8 +19,9 @@ assert.equal(body.querySelector('.wc-work').hidden,false);assert(body.querySelec
 assert.equal(body.querySelector('.wc-content a').getAttribute('href'),'#cite_note-1');const beforeHash=w.location.hash;click('.wc-content a');assert.equal(w.location.hash,beforeHash);
 click('.wc-bookmark');await tick();assert.equal(store.list('bookmarks','').length,1);assert.equal(writes.length,0);
 click('.wc-translate');await tick();assert.equal(body.querySelector('.wc-view').value,'bilingual');assert(body.querySelector('.wc-content ruby'));assert.match(body.querySelector('.wc-content').textContent,/Sastra sumber/);
+change('.wc-view','indonesia');click('.wc-translate');await tick();assert.equal(body.querySelector('.wc-view').value,'indonesia');
 change('.wc-mode','Literal');assert.match(body.querySelector('.wc-content').textContent,/文学/);assert.doesNotMatch(body.querySelector('.wc-content').textContent,/Sastra sumber/);
-translationFails=true;click('.wc-translate');await tick();assert.match(body.querySelector('.wc-translation-status').textContent,/gagal/);assert(body.querySelector('.wc-content ruby'));
+translationFails=true;click('.wc-translate');await tick();assert.match(body.querySelector('.wc-translation-status').textContent,/gagal/);assert.equal((body.querySelector('.wc-translation-status').textContent.match(/Teks asli/g)||[]).length,1);assert(body.querySelector('.wc-content ruby'));
 body.__nxCleanup();assert.equal(store.list('history','').length,1);assert.equal(writes.length,0);
 console.log('PASS guest search/read/translate/bookmark/history, mode separation and provider failover');
 offline=true;w.renderWorldClassics(body);await tick();click('.wc-shelf-items button');await tick();assert.equal(body.querySelector('.wc-work').hidden,false);assert.match(body.querySelector('.wc-content').textContent,/文学/);body.__nxCleanup();console.log('PASS offline chapter fallback');

@@ -218,6 +218,8 @@ Deno.test("translation cache HIT, mode isolation, content hash invalidation and 
     calls++;
     equal(new Headers(options?.headers).get("x-goog-api-key"), "test-secret");
     const body = JSON.parse(String(options?.body));
+    equal(body.generationConfig.responseSchema.type, "OBJECT");
+    equal(body.generationConfig.responseJsonSchema, undefined);
     const parts = JSON.parse(body.contents[0].parts[0].text);
     return Response.json({
       candidates: [{
@@ -461,4 +463,45 @@ Deno.test("large paragraph chunking merges fragments, preserves indices and reje
     () => liveWiki.chapters("china", "Work", "Other/page"),
     "INVALID_CURSOR",
   );
+});
+Deno.test("translation stops queued chunks on provider rejection and keeps the original failure", async () => {
+  const store = new Memory();
+  const originals = Array.from({ length: 10 }, () => "文".repeat(3000));
+  const wiki = {
+    page: () =>
+      Promise.resolve({
+        paragraphs: originals.map((original) => ({ original })),
+      }),
+  } as unknown as Wiki;
+  let calls = 0;
+  const fake: typeof fetch = async (_url, options) => {
+    calls++;
+    if (calls === 1) {
+      return Response.json({ error: { message: "Permission denied" } }, {
+        status: 403,
+      });
+    }
+    return await new Promise<Response>((_resolve, reject) => {
+      const abort = () => reject(new DOMException("aborted", "AbortError"));
+      if (options?.signal?.aborted) abort();
+      else options?.signal?.addEventListener("abort", abort, { once: true });
+    });
+  };
+  await rejects(
+    () =>
+      translation(
+        store,
+        wiki,
+        "japan",
+        "Book",
+        { paragraphs: originals },
+        "user:test",
+        true,
+        fake,
+      ),
+    "TRANSLATION_ACCESS_DENIED",
+  );
+  equal(calls, 2);
+  equal(store.translations.length, 0);
+  equal(store.held, false);
 });

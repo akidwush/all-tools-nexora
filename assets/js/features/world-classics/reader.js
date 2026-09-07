@@ -462,12 +462,20 @@
         translations[mode] = data;
         status("Terjemahan " + mode + " tersedia.");
         if (el(".wc-mode").value === mode) {
-          el(".wc-view").value = "bilingual";
+          if (el(".wc-view").value === "original") {
+            el(".wc-view").value = "bilingual";
+          }
           redisplay();
         }
       } catch (error) {
         if (current === version) {
-          status(error.message + " Teks asli tetap dapat dibaca.");
+          var detail = error.message || "Terjemahan gagal. Coba lagi nanti.";
+          status(
+            detail +
+              (/teks asli/i.test(detail)
+                ? ""
+                : " Teks asli tetap dapat dibaca."),
+          );
         }
       } finally {
         if (current === version) btn.disabled = false;
