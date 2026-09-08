@@ -137,6 +137,7 @@ module.exports = async function handler(request, response) {
   if (request.method === "PATCH") {
     try {
       const body = objectValue(request.body);
+      if (body.key === "comic_translation") return await require("../../lib/comic-translation-settings")(request, response);
       if (body.key === "branding") return await updateBranding(request, response);
       if (body.key === "developer_profile") return await updateDeveloperProfile(request, response);
       return await updateHeroVideo(request, response);

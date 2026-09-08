@@ -135,7 +135,7 @@
         "Content-Type": "application/json",
         ...(options.headers || {}),
       },
-    }, path.includes("/translate-classic") ? 180000 : 25000);
+    }, (path.includes("/translate-classic") || path.includes("/comic-translate-page")) ? 180000 : 25000);
     if (r.status === 401 && s && !retry) {
       clear();
       return request(path, options, true);
@@ -149,6 +149,7 @@
       );
       error.status = r.status;
       error.code = data.error;
+      error.retryAfter = Number(data.retryAfter) || 0;
       throw error;
     }
     return data;
@@ -163,6 +164,8 @@
           "wikisource-page",
           "wikisource-chapters",
           "translate-classic",
+          "comic-translate-page",
+          "comic-translate-chapter",
         ].includes(name)
       ) return Promise.reject(Error("Function tidak dikenal."));
       return request("/functions/v1/" + name, {

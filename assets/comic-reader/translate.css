@@ -1,0 +1,12 @@
+.nx-ct-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 auto 12px;padding:10px;max-width:100%;background:#161025;border:1px solid #ffffff20;border-radius:12px;font-size:12px;box-sizing:border-box}
+.nx-ct-toolbar button,.nx-ct-toolbar select{font:inherit;min-height:36px;border:1px solid #ffffff30;border-radius:8px;padding:6px 10px;background:#292039;color:#f5f0ff;cursor:pointer;max-width:100%}
+.nx-ct-toolbar button:disabled{opacity:.55;cursor:default}.nx-ct-toolbar label{display:flex;align-items:center;gap:5px}.nx-ct-toolbar input{accent-color:#ba9aff;width:16px;height:16px}
+.nx-ct-status{flex-basis:100%;margin:0;overflow-wrap:anywhere;color:#d9ccec;font-size:12px}.nx-ct-toolbar [hidden]{display:none}
+.nx-ct-page{position:relative;width:100%;margin:0 auto;padding:0;line-height:0}.reader-pages .nx-ct-page img{display:block;width:100%;height:auto;margin:0;max-width:100%}
+.nx-ct-overlay{position:absolute;inset:0;pointer-events:none;overflow:hidden;line-height:normal}
+.nx-ct-region{position:absolute;box-sizing:border-box;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:1px;background:rgba(255,255,250,.97);color:#17131c;line-height:1.15;text-align:center;white-space:normal;overflow-wrap:anywhere;font-family:Arial,sans-serif;font-weight:600;border:0;border-radius:2px;pointer-events:auto;cursor:pointer}
+.nx-ct-region.is-dark{background:rgba(20,18,25,.97);color:#fff}.nx-ct-region span{display:block;width:100%;max-height:100%;overflow:hidden;line-height:1.15}.nx-ct-region.needs-detail{outline:1px dashed #a96200;outline-offset:-1px}
+.nx-ct-page-note{font:12px/1.4 Arial,sans-serif;display:block;padding:6px 8px;background:#241a30;color:#eee2ff;overflow-wrap:anywhere;line-height:1.4}
+.nx-ct-dialog{box-sizing:border-box;max-width:min(92vw,480px);max-height:75vh;overflow:auto;border:1px solid #82609a;border-radius:12px;padding:18px;background:#181021;color:#fff;font:15px/1.6 Arial,sans-serif;overflow-wrap:anywhere}
+.nx-ct-dialog::backdrop{background:#0009}.nx-ct-dialog button{padding:8px 14px;min-height:40px}.nx-ct-dialog p{white-space:pre-wrap}
+@media(max-width:420px){.nx-ct-toolbar{gap:6px;padding:8px}.nx-ct-toolbar button,.nx-ct-toolbar select{padding:6px 8px}.nx-ct-toolbar label{font-size:11px}}

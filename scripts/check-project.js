@@ -19,9 +19,9 @@ const sameSet = (left, right) => left.length === right.length && left.every((ite
 // Frozen Comic Reader architecture. Any accidental replacement/revert aborts the build.
 const COMIC_READER_LOCK = Object.freeze({
   "assets/js/features/comic-reader.js": "9f751be2e67f9ce72518f9d6d2544c4df31ea01b96dac617555934d68bb0cacc",
-  "assets/comic-reader/index.html": "448d1cdfea7ed368e53c8fbbd38237c05d1b23af8349756195d820c082913864",
+  "assets/comic-reader/index.html": "c13f181903ff4d377e199866418070bd5615bb9d59b21a729c8d0955b1e160c9",
   "assets/comic-reader/app.css": "2a6ca41369f11c8583ec2f000408deb3834d9725b08d683416d5d3092142e9a6",
-  "assets/comic-reader/app.js": "02d1bcb2b95a735cca9dc1d9feeae0276b3326ea17bea7b579b3d526af0e15ac",
+  "assets/comic-reader/app.js": "5fb8b6df36c1b0fd07e7b22b4d87654b26ba7a0f6c2b8524f2829d96d3ecbdfd",
   "assets/css/features/comic-reader.css": "61e079135af952ecebfa5a10e3a88c01cc9eb441bf4c7aa5dc70df6dd2007b2a"
 });
 for (const [relative, expected] of Object.entries(COMIC_READER_LOCK)) {

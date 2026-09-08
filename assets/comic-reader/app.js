@@ -587,7 +587,10 @@ async function mangaLoadChapters(detail){
     list.innerHTML=`<div class="error"><i class="fa-solid fa-triangle-exclamation"></i><span><strong>Tidak dapat memuat daftar chapter.</strong><small>Coba lagi beberapa saat.</small></span></div>`;
   }
 }
+let readerGeneration=0;
 async function mangaOpenReader(index){
+  const generation=++readerGeneration;
+  document.dispatchEvent(new CustomEvent('nexora:comic-loading'));
   state.view='reader';state.chapterIndex=index;
   const chapter=state.chapters[index];
   if(!chapter)return;
@@ -619,9 +622,12 @@ async function mangaOpenReader(index){
   $('qualityFull').onclick=()=>changeReaderQuality('full');
   try{
     const pages=await getPages(chapter);
+    if(generation!==readerGeneration||state.view!=='reader')return;
     $('mangaReaderPages').innerHTML=pages.map((url,pageIndex)=>`
       <img src="${escapeHtml(url)}" loading="${pageIndex<2?'eager':'lazy'}" decoding="async" alt="Halaman ${pageIndex+1}" data-raw="${escapeHtml(url)}" data-tries="0" onerror="mangaPageErrorHandler(this)">`).join('');
+    document.dispatchEvent(new CustomEvent('nexora:comic-pages',{detail:{mangaId:state.mangaId,chapterId:chapter.id}}));
   }catch(error){
+    if(generation!==readerGeneration||state.view!=='reader')return;
     $('mangaReaderPages').innerHTML=`
       <div class="page-loader"><i class="fa-solid fa-triangle-exclamation"></i>
       <span><strong>Tidak dapat memuat gambar chapter.</strong><small>Coba lagi beberapa saat.</small></span>

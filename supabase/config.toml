@@ -9,3 +9,7 @@ verify_jwt = false
 verify_jwt = false
 [functions.translate-classic]
 verify_jwt = false
+[functions.comic-translate-page]
+verify_jwt = false
+[functions.comic-translate-chapter]
+verify_jwt = false

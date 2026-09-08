@@ -1,4 +1,4 @@
-name: World Classics — Verify and Deploy
+name: Nexora Readers — Verify and Deploy
 on:
   workflow_dispatch:
   pull_request:
@@ -7,6 +7,9 @@ on:
       - 'assets/js/features/world-classics/**'
       - 'assets/js/shared/supabase-client.js'
       - 'assets/css/world-classics.css'
+      - 'assets/comic-reader/**'
+      - 'assets/js/admin/comic-translation.js'
+      - 'lib/comic-translation-settings.js'
       - 'lib/account-membership.js'
       - '.github/workflows/world-classics.yml'
 permissions:
@@ -32,7 +35,7 @@ jobs:
           deno-version: v2.x
       - name: Check Edge Functions
         working-directory: supabase/functions
-        run: deno check wikisource-search/index.ts wikisource-page/index.ts wikisource-chapters/index.ts translate-classic/index.ts
+        run: deno check wikisource-search/index.ts wikisource-page/index.ts wikisource-chapters/index.ts translate-classic/index.ts comic-translate-page/index.ts comic-translate-chapter/index.ts
       - name: Test Edge Functions
         working-directory: supabase/functions
         run: deno task test
@@ -46,6 +49,8 @@ jobs:
       SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       WORLD_CLASSICS_ALLOWED_ORIGINS: ${{ vars.WORLD_CLASSICS_ALLOWED_ORIGINS || 'https://all-tools-nexora.vercel.app' }}
+      COMIC_TRANSLATION_MODEL: ${{ vars.COMIC_TRANSLATION_MODEL || 'gemini-2.5-flash' }}
+      COMIC_TRANSLATION_DAILY_PAGES: ${{ vars.COMIC_TRANSLATION_DAILY_PAGES || '500' }}
       WORLD_CLASSICS_MODEL: ${{ vars.WORLD_CLASSICS_MODEL || 'gemini-2.5-flash' }}
     steps:
       - uses: actions/checkout@v4
@@ -72,7 +77,7 @@ jobs:
           python3 - "$secret_file" <<'PY'
           import os,sys
           with open(sys.argv[1], 'w') as f:
-              for key in ['GEMINI_API_KEY','WORLD_CLASSICS_ALLOWED_ORIGINS','WORLD_CLASSICS_MODEL']:
+              for key in ['GEMINI_API_KEY','WORLD_CLASSICS_ALLOWED_ORIGINS','WORLD_CLASSICS_MODEL', 'COMIC_TRANSLATION_MODEL', 'COMIC_TRANSLATION_DAILY_PAGES']:
                   value=os.environ[key]
                   if '\n' in value or '\r' in value:
                       raise ValueError('Invalid multiline secret')
@@ -81,6 +86,6 @@ jobs:
           supabase secrets set --project-ref "$SUPABASE_PROJECT_REF" --env-file "$secret_file"
       - name: Deploy separate Edge Functions
         run: |
-          for function in wikisource-search wikisource-page wikisource-chapters translate-classic; do
+          for function in wikisource-search wikisource-page wikisource-chapters translate-classic comic-translate-page comic-translate-chapter; do
             supabase functions deploy "$function" --project-ref "$SUPABASE_PROJECT_REF" --use-api
           done

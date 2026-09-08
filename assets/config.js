@@ -241,6 +241,7 @@
         "assets/css/features/comic-reader.css"
       ],
       "js": [
+        "assets/js/shared/supabase-client.js",
         "assets/js/features/comic-reader.js"
       ]
     },

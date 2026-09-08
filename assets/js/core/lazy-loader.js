@@ -37,6 +37,7 @@
   var ASSET_VERSION = config.version;
   var ASSET_PATCH = 'branding1';
   var ASSET_PATCHES = [
+    [/supabase-client\.js(?:$|\?)/, "comic-translate1"],
     [/world-classics\/reader\.js(?:$|\?)/, "classics-translation2"],
     [/nexray-splus(?:-hooks)?\.(?:js|css)(?:$|\?)/, "nexray-splus-v2-integrated"],
     [/(?:assets\/(?:vendor\/nexora|js\/features\/nexora)\/|nexora-generators\.css(?:$|\?))/, 'nexora'],
