@@ -74,7 +74,7 @@ jobs:
           deno-version: v2.x
       - name: Verify live Gemini text and image translation
         working-directory: supabase/functions
-        run: deno run --allow-env --allow-net=generativelanguage.googleapis.com --allow-read --allow-write="$GITHUB_ENV" ../tests/translation-live.ts
+        run: deno run --node-modules-dir=auto --allow-env --allow-net=generativelanguage.googleapis.com --allow-read --allow-write="$GITHUB_ENV" ../tests/translation-live.ts
       - name: Apply migrations
         run: |
           supabase link --project-ref "$SUPABASE_PROJECT_REF"
