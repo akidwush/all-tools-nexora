@@ -1,6 +1,11 @@
 name: Nexora Readers — Verify and Deploy
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/**'
+      - '.github/workflows/world-classics.yml'
   pull_request:
     paths:
       - 'supabase/**'
@@ -40,7 +45,7 @@ jobs:
         working-directory: supabase/functions
         run: deno task test
   deploy:
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'workflow_dispatch' || github.event_name == 'push') && github.ref == 'refs/heads/main'
     needs: verify
     runs-on: ubuntu-latest
     env:
@@ -49,9 +54,9 @@ jobs:
       SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       WORLD_CLASSICS_ALLOWED_ORIGINS: ${{ vars.WORLD_CLASSICS_ALLOWED_ORIGINS || 'https://all-tools-nexora.vercel.app' }}
-      COMIC_TRANSLATION_MODEL: ${{ vars.COMIC_TRANSLATION_MODEL || 'gemini-2.5-flash' }}
+      COMIC_TRANSLATION_MODEL: ${{ vars.COMIC_TRANSLATION_MODEL || 'auto' }}
       COMIC_TRANSLATION_DAILY_PAGES: ${{ vars.COMIC_TRANSLATION_DAILY_PAGES || '500' }}
-      WORLD_CLASSICS_MODEL: ${{ vars.WORLD_CLASSICS_MODEL || 'gemini-2.5-flash' }}
+      WORLD_CLASSICS_MODEL: ${{ vars.WORLD_CLASSICS_MODEL || 'auto' }}
     steps:
       - uses: actions/checkout@v4
       - uses: supabase/setup-cli@v1
@@ -64,6 +69,12 @@ jobs:
             if [ -z "${!key}" ]; then echo "Missing GitHub Actions secret: $key"; exit 1; fi
           done
           if [[ ! "$SUPABASE_PROJECT_REF" =~ ^[a-z0-9]{20}$ ]]; then echo 'Invalid project reference'; exit 1; fi
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Verify live Gemini text and image translation
+        working-directory: supabase/functions
+        run: deno run --allow-env --allow-net=generativelanguage.googleapis.com --allow-read --allow-write="$GITHUB_ENV" ../tests/translation-live.ts
       - name: Apply migrations
         run: |
           supabase link --project-ref "$SUPABASE_PROJECT_REF"

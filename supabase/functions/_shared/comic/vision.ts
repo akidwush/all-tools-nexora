@@ -1,6 +1,7 @@
+import { generateTranslation } from "../translation-model.ts";
 import { decode, encode, type Pixels, tile as cropTile } from "./codec.ts";
-import { bounded, type Env, Fault, type Fetcher, readJson } from "../core.ts";
-import { providerFailure, translationKey } from "../translation-provider.ts";
+import { type Env, Fault, type Fetcher, readJson } from "../core.ts";
+import { translationKey } from "../translation-provider.ts";
 export type Region = {
   id: string;
   x: number;
@@ -220,10 +221,6 @@ export async function vision(
   signal: AbortSignal,
 ) {
   const key = translationKey(env("GEMINI_API_KEY"));
-  const model = (env("COMIC_TRANSLATION_MODEL") || "gemini-2.5-flash").trim();
-  if (!/^gemini-[a-z0-9.-]{3,70}$/.test(model)) {
-    throw new Fault(503, "MODEL_CONFIG", "Layanan terjemahan belum siap.");
-  }
   const info = await inference(bytes);
   const parts: any[] = [{
     text:
@@ -234,27 +231,22 @@ export async function vision(
       inlineData: { mimeType: "image/jpeg", data: t.data },
     })
   );
-  const response = await bounded(
-    fetcher,
-    "https://generativelanguage.googleapis.com/v1beta/models/" + model +
-      ":generateContent",
+  const { response, model } = await generateTranslation(
+    key,
+    env("COMIC_TRANSLATION_MODEL"),
     {
-      method: "POST",
-      signal,
-      headers: { "Content-Type": "application/json", "x-goog-api-key": key },
-      body: JSON.stringify({
-        contents: [{ role: "user", parts }],
-        generationConfig: {
-          temperature: 0.2,
-          maxOutputTokens: 16000,
-          responseMimeType: "application/json",
-          responseSchema: schema,
-        },
-      }),
+      contents: [{ role: "user", parts }],
+      generationConfig: {
+        temperature: 0.2,
+        maxOutputTokens: 16000,
+        responseMimeType: "application/json",
+        responseSchema: schema,
+      },
     },
+    fetcher,
+    signal,
     90000,
   );
-  if (!response.ok) throw await providerFailure(response, model);
   const result = await readJson(response, 1_500_000);
   const candidate = result.candidates?.[0];
   if (candidate?.finishReason !== "STOP") {

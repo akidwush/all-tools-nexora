@@ -8,6 +8,7 @@ export function comicHandler(
   runVision?: Vision,
 ) {
   return async (req: Request) => {
+    const requestId = crypto.randomUUID();
     const origin = req.headers.get("origin") || "";
     const allowed = (env("WORLD_CLASSICS_ALLOWED_ORIGINS") ||
       "https://all-tools-nexora.vercel.app").split(",").map((x) => x.trim());
@@ -73,15 +74,22 @@ export function comicHandler(
         "COMIC_UNAVAILABLE",
         "Layanan terjemahan sedang tidak tersedia.",
       );
+      console.error("[comic translation]", {
+        requestId,
+        function: "comic-translate-" + kind,
+        code: f.code,
+        status: f.status,
+        // Never log Error.message/stack: upstream errors can contain secrets or text.
+        unexpected: !(e instanceof Fault),
+      });
       if (f.retryAfter) headers["Retry-After"] = String(f.retryAfter);
       // Safe codes only. Never return provider payloads, keys, or source request details.
       const message = f.status === 429
         ? "Batas Translate All sementara tercapai."
-        : f.code.startsWith("TRANSLATION_")
-        ? "Layanan terjemahan sedang tidak tersedia."
         : f.message;
       return send(f.status, {
         ok: false,
+        requestId,
         error: f.code,
         message,
         retryAfter: f.retryAfter,

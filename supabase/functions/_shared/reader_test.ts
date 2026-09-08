@@ -215,6 +215,7 @@ Deno.test("translation cache HIT, mode isolation, content hash invalidation and 
       Promise.resolve({ revisionId: "1", paragraphs: [{ original }] }),
   } as unknown as Wiki;
   const fake: typeof fetch = async (_url, options) => {
+    if (new URL(String(_url)).pathname === "/v1beta/models") return Response.json({ models: [{ name: "models/gemini-3.5-flash", supportedGenerationMethods: ["generateContent"] }] });
     calls++;
     equal(new Headers(options?.headers).get("x-goog-api-key"), "test-secret");
     const body = JSON.parse(String(options?.body));
@@ -287,7 +288,10 @@ Deno.test("provider failure, malformed mapping, rate limit and active lease neve
       { paragraphs: ["文学"] },
       "guest:test",
       false,
-      f,
+      async (url, options) => {
+        if (new URL(String(url)).pathname === "/v1beta/models") return Response.json({ models: [{ name: "models/gemini-3.5-flash", supportedGenerationMethods: ["generateContent"] }] });
+        return f(url, options);
+      },
     );
   await rejects(
     () => run(async () => new Response("", { status: 503 })),
@@ -407,6 +411,7 @@ Deno.test("large paragraph chunking merges fragments, preserves indices and reje
   } as unknown as Wiki;
   let requests = 0;
   const fake: typeof fetch = async (_url, options) => {
+    if (new URL(String(_url)).pathname === "/v1beta/models") return Response.json({ models: [{ name: "models/gemini-3.5-flash", supportedGenerationMethods: ["generateContent"] }] });
     requests++;
     const data = JSON.parse(String(options?.body));
     const parts = JSON.parse(data.contents[0].parts[0].text);
@@ -475,6 +480,7 @@ Deno.test("translation stops queued chunks on provider rejection and keeps the o
   } as unknown as Wiki;
   let calls = 0;
   const fake: typeof fetch = async (_url, options) => {
+    if (new URL(String(_url)).pathname === "/v1beta/models") return Response.json({ models: [{ name: "models/gemini-3.5-flash", supportedGenerationMethods: ["generateContent"] }] });
     calls++;
     if (calls === 1) {
       return Response.json({ error: { message: "Permission denied" } }, {

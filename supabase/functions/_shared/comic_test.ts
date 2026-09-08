@@ -439,6 +439,14 @@ Deno.test("comic vision request has fixed prompt, bounded inline images, schema 
   const bytes = await img.encode();
   let calls = 0;
   const f: typeof fetch = async (url, options) => {
+    if (new URL(String(url)).pathname === "/v1beta/models") {
+      return Response.json({
+        models: [{
+          name: "models/gemini-3.5-flash",
+          supportedGenerationMethods: ["generateContent"],
+        }],
+      });
+    }
     calls++;
     eq(
       new URL(String(url)).origin,
@@ -473,4 +481,47 @@ Deno.test("comic vision request has fixed prompt, bounded inline images, schema 
         ), new AbortController().signal),
     "TRANSLATION_RATE_LIMIT",
   );
+});
+
+Deno.test("comic OCR reproduces production model 404 and completes using available fallback", async () => {
+  const bytes = await fixture(40, 60).encode();
+  const models: string[] = [];
+  const f: typeof fetch = async (url, options) => {
+    const path = new URL(String(url)).pathname;
+    if (path === "/v1beta/models") {
+      return Response.json({
+        models: ["gemini-2.5-flash", "gemini-3.5-flash"].map((name) => ({
+          name: "models/" + name,
+          supportedGenerationMethods: ["generateContent"],
+        })),
+      });
+    }
+    models.push(path);
+    const input = JSON.parse(String(options?.body));
+    eq(input.contents[0].parts[2].inlineData.mimeType, "image/jpeg");
+    if (path.includes("2.5")) {
+      return Response.json({ error: { message: "Model not found" } }, {
+        status: 404,
+      });
+    }
+    return Response.json({
+      candidates: [{
+        finishReason: "STOP",
+        content: {
+          parts: [{
+            text: JSON.stringify({ sourceLanguage: "ja", regions: [region] }),
+          }],
+        },
+      }],
+    });
+  };
+  const r = await vision(
+    bytes,
+    (k) => k === "COMIC_TRANSLATION_MODEL" ? "gemini-2.5-flash" : env(k),
+    f,
+    AbortSignal.timeout(10000),
+  );
+  eq(r.model, "gemini-3.5-flash");
+  eq(r.translation.regions[0].translated, region.translated);
+  eq(models.length, 2);
 });
