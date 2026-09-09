@@ -250,6 +250,7 @@
         "assets/css/features/multi-ai.css"
       ],
       "js": [
+        "assets/js/features/multi-ai-layout.js",
         "assets/js/features/multi-ai.js"
       ]
     },

@@ -6,6 +6,7 @@ const path = require("node:path");
 const root = path.resolve(__dirname, "..");
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 const multi = require("../lib/kuroneko-multiai");
+const spatial = require("../assets/js/features/multi-ai-layout");
 const { getTool } = require("./config-test-helpers");
 
 assert.equal(multi.PUBLIC_PROVIDER_IDS.length, 27);
@@ -20,7 +21,7 @@ assert.throws(() => multi.validateInput(multi.PROVIDERS.imagenai, { q: "cat", st
 assert.throws(() => multi.validateInput(multi.PROVIDERS.aifilter, { url: "http:\/\/127.0.0.1\/secret" }), /INVALID_URL/);
 assert.throws(() => multi.validateInput(multi.PROVIDERS.chatgpt, { prompt: "hi", endpoint: "https:\/\/evil.invalid" }), /UNSUPPORTED_PARAMETER/);
 
-const runtimeFiles = ["lib/kuroneko-multiai.js", "assets/js/features/multi-ai.js", "assets/js/admin/multi-ai.js"];
+const runtimeFiles = ["lib/kuroneko-multiai.js", "assets/js/features/multi-ai-layout.js", "assets/js/features/multi-ai.js", "assets/js/admin/multi-ai.js"];
 for (const file of runtimeFiles) assert.doesNotMatch(read(file), /claude|anthropic/i, `${file} contains an excluded provider`);
 assert.doesNotMatch(read("assets/js/features/multi-ai.js") + read("assets/js/admin/multi-ai.js"), /sylvatica\.my\.id|KURONEKO_API_KEY|localStorage|sessionStorage/i);
 assert.match(read("assets/js/features/multi-ai.js"), /Promise\.allSettled/);
@@ -29,10 +30,40 @@ assert.match(read("assets/js/features/multi-ai.js"), /Stop All/);
 assert.match(read("assets/js/features/multi-ai.js"), /Compare/);
 assert.match(read("assets/js/features/multi-ai.js"), /Copy All/);
 const multiCss = read("assets/css/features/multi-ai.css");
-assert.match(multiCss, /@media\(max-width:560px\)/);
-assert.match(multiCss, /\.nx-mai-results,\.nx-mai-results\.is-compare\{display:grid;grid-template-columns:1fr/);
+const multiUi = read("assets/js/features/multi-ai.js");
+assert.match(multiCss, /touch-action:none/);
+assert.match(multiCss, /\.nx-mai-world\{[^}]*will-change:transform/);
+assert.match(multiCss, /@keyframes nxMaiRoute/);
+assert.match(multiCss, /-webkit-line-clamp:3/);
+assert.doesNotMatch(multiCss, /\.nx-mai-results/);
 assert.match(multiCss, /\.nx-mai-lab-form\{grid-template-columns:1fr\}/);
-for (const width of [360, 375, 390, 412]) assert.ok(width <= 560, `mobile branch rules cover ${width}px`);
+assert.match(multiUi, /NexoraMultiAiLayout/);
+assert.match(multiUi, /pointerdown/);
+assert.match(multiUi, /gesture\.mode==="pinch"/);
+assert.match(multiUi, /ResizeObserver/);
+assert.match(multiUi, /data-fit/);
+assert.match(multiUi, /nx-mai-bottom-composer/);
+assert.match(multiUi, /nx-mai-inspector-backdrop/);
+assert.match(multiCss, /#nxUniversalRoom\[data-tool="multiai"\] \.nx-room-scroll\{overflow:hidden!important/);
+for (const count of [4, 8, 12, 14]) {
+  const points = spatial.layout(count);
+  assert.equal(points.length, count, `${count}-provider layout must include every provider`);
+  assert.equal(spatial.overlaps(points), false);
+  const box = spatial.bounds(points);
+  assert.ok(box.left >= 0 && box.right <= spatial.WORLD_WIDTH);
+  assert.ok(box.top >= 0 && box.bottom <= spatial.WORLD_HEIGHT);
+  for (const width of [360, 375, 390, 412]) {
+    const fitted = spatial.fit(points, width, 520, 24);
+    const epsilon = 0.01;
+    assert.ok(box.left * fitted.scale + fitted.x >= 24 - epsilon, `${count} nodes fit left at ${width}px`);
+    assert.ok(box.right * fitted.scale + fitted.x <= width - 24 + epsilon, `${count} nodes fit right at ${width}px`);
+    assert.ok(box.top * fitted.scale + fitted.y >= 24 - epsilon, `${count} nodes fit top at ${width}px`);
+    assert.ok(box.bottom * fitted.scale + fitted.y <= 496 + epsilon, `${count} nodes fit bottom at ${width}px`);
+  }
+}
+
+const manifest = JSON.parse(read("assets/module-manifest.json"));
+assert.deepEqual(manifest.modules["multi-ai"].js, ["assets/js/features/multi-ai-layout.js", "assets/js/features/multi-ai.js"]);
 assert.equal(getTool("multiai").runtime.module, "multi-ai");
 assert.equal(getTool("multiai").runtime.dependency, "https://all-tools-nexora.vercel.app/api/ai/provider");
 const vercelConfig = JSON.parse(read("vercel.json"));
@@ -72,5 +103,5 @@ function response(payload, status = 200) {
   assert.equal(image.kind, "image");
   const documented = multi.normalizeResponse(multi.PROVIDERS.chatgpt, { status: true, creator: "Dandy", result: { message: "Hi" } });
   assert.equal(documented.text, "Hi");
-  console.log("Multi-AI passed: 27-provider registry, allowlist, normalizer, secret transport, UI/admin/routes, and 360/375/390/412px branch rules.");
+  console.log("Multi-AI spatial canvas passed: preserved 27-provider backend, 4/8/12/14 node layouts, mobile fit, pan/zoom controls, detail inspector, and routing.");
 })().catch((error) => { console.error(error); process.exitCode = 1; });
