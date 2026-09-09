@@ -77,13 +77,24 @@
 .nx-mai-canvas-controls button{display:grid;place-items:center;width:38px;height:38px;padding:0;border:0;background:transparent;font-size:16px;font-weight:700}
 .nx-mai-canvas-controls button+button{border-top:1px solid rgba(137,157,202,.1);border-radius:0}
 .nx-mai-canvas-controls button[data-fit]{font-size:11px}
-.nx-mai-bottom-composer{z-index:6;padding:7px 10px calc(8px + env(safe-area-inset-bottom));border-top:1px solid rgba(137,157,202,.12);background:rgba(5,9,20,.97);box-shadow:0 -10px 28px rgba(3,6,14,.44)}
+.nx-mai-bottom-composer{position:relative;z-index:6;max-height:calc(178px + env(safe-area-inset-bottom));padding:7px 10px calc(8px + env(safe-area-inset-bottom));overflow:hidden;border-top:1px solid rgba(137,157,202,.12);background:rgba(5,9,20,.97);box-shadow:0 -10px 28px rgba(3,6,14,.44);transition:max-height .19s ease,padding .19s ease,box-shadow .19s ease}
+.nx-mai-bottom-composer.is-collapsed{max-height:calc(52px + env(safe-area-inset-bottom));padding:4px 8px calc(4px + env(safe-area-inset-bottom));box-shadow:0 -5px 18px rgba(3,6,14,.32)}
+.nx-mai-composer-expanded{opacity:1;transform:translateY(0);transition:opacity .15s ease,transform .19s ease}
+.nx-mai-bottom-composer.is-collapsed .nx-mai-composer-expanded{opacity:0;transform:translateY(8px);pointer-events:none}
+.nx-mai-composer-collapsed{position:absolute;inset:4px 8px calc(4px + env(safe-area-inset-bottom));display:flex;align-items:center;justify-content:space-between;gap:8px;opacity:0;transform:translateY(7px);pointer-events:none;transition:opacity .15s ease,transform .19s ease}
+.nx-mai-bottom-composer.is-collapsed .nx-mai-composer-collapsed{opacity:1;transform:translateY(0);pointer-events:auto}
+.nx-mai-collapsed-count,.nx-mai-composer-ask{display:flex!important;align-items:center;gap:8px;height:42px!important;padding:0 12px!important;border-color:transparent!important;background:transparent!important;color:#a9b8d5!important;font-size:11px!important}
+.nx-mai-collapsed-count b{color:#edf3ff;font-size:11px}
+.nx-mai-collapsed-count i{color:#8192b3;font-size:10px}
+.nx-mai-composer-ask{margin-left:auto;color:#d7dfff!important}
+.nx-mai-composer-ask i{display:grid;place-items:center;width:24px;height:24px;border:1px solid rgba(167,139,250,.28);border-radius:8px;background:rgba(139,92,246,.12);color:#c4b5fd}
 .nx-mai-chip-row{display:flex;align-items:center;gap:5px;min-width:0;height:34px;margin-bottom:6px;overflow:hidden}
 .nx-mai-chip{flex:0 1 auto!important;min-width:0;height:32px;padding:5px 8px!important;border-color:color-mix(in srgb,var(--node-accent) 36%,transparent)!important;border-radius:999px!important;color:var(--node-accent)!important;background:color-mix(in srgb,var(--node-accent) 10%,#0b1123)!important;font-size:9px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .nx-mai-chip-more{--node-accent:#aebbd4;flex:0 0 auto!important;color:#9dadcb!important}
 .nx-mai-ai-count{flex:0 0 auto;margin-left:auto!important;width:32px;height:32px;padding:0!important;color:#aebbd4!important;font-size:10px!important}
+.nx-mai-composer-toggle{flex:0 0 auto!important;display:grid!important;place-items:center;width:32px;height:32px;padding:0!important;color:#91a2c2!important;font-size:9px!important}
 .nx-mai-compose-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:end;padding:4px 5px 4px 7px;border:1px solid rgba(167,139,250,.3);border-radius:15px;background:#0a1021}
-.nx-mai-compose-row textarea{width:100%;min-height:46px;max-height:112px;padding:13px 8px 9px;border:0;outline:0;resize:none;background:transparent;color:#f8fbff;line-height:1.35}
+.nx-mai-compose-row textarea{width:100%;height:50px;min-height:50px;max-height:112px;padding:14px 8px 9px;border:0;outline:0;resize:none;overflow-y:hidden;background:transparent;color:#f8fbff;line-height:1.35}
 .nx-mai-compose-row textarea::placeholder{color:#687794}
 #nxMaiRun{width:50px;height:50px;padding:0;border:0;border-radius:13px;background:linear-gradient(135deg,#4d8cff,#8b5cf6);box-shadow:0 7px 20px rgba(92,95,246,.25)}
 #nxMaiStop{color:#fda4af;background:rgba(88,23,43,.46)}
@@ -170,11 +181,12 @@
   .nx-mai-overflow{top:8px;right:8px}
   .nx-mai-canvas-controls{right:10px;bottom:10px}
   .nx-mai-bottom-composer{padding:6px 8px calc(8px + env(safe-area-inset-bottom))}
+  .nx-mai-bottom-composer.is-collapsed{padding:4px 8px calc(4px + env(safe-area-inset-bottom))}
   .nx-mai-chip-row{gap:4px;height:34px;margin-bottom:5px}
   .nx-mai-chip{max-width:86px;padding:4px 7px!important}
   .nx-mai-chip-more{max-width:none}
   .nx-mai-compose-row{gap:4px;padding:4px 5px 4px 7px}
-  .nx-mai-compose-row textarea{min-height:46px;padding:13px 7px 9px;font-size:12px}
+  .nx-mai-compose-row textarea{min-height:50px;padding:14px 7px 9px;font-size:12px}
   #nxMaiRun{width:50px;height:50px}
   .nx-mai-sheet-backdrop{place-items:end center;padding:0}
   .nx-mai-selector-sheet{width:100%;max-height:82vh;border-width:1px 0 0;border-radius:20px 20px 0 0;padding:14px 12px calc(14px + env(safe-area-inset-bottom))}
@@ -194,6 +206,7 @@
   #nxUniversalRoom[data-tool="multiai"] .nx-room-top-title{font-size:11px;letter-spacing:.06em}
   .nx-mai-chip{max-width:74px}
   .nx-mai-ai-count{width:30px;height:30px}
+  .nx-mai-composer-toggle{width:30px;height:30px}
 }
 @media(max-width:760px) and (orientation:landscape){
   #nxUniversalRoom[data-tool="multiai"] .nx-room-topbar{min-height:52px!important;height:52px!important;padding-block:5px!important}
@@ -201,8 +214,9 @@
   .nx-mai-tabs{padding-block:3px}
   .nx-mai-chip-row{height:30px;margin-bottom:3px}
   .nx-mai-chip,.nx-mai-ai-count{height:28px}
-  .nx-mai-bottom-composer{padding-top:4px}
+  .nx-mai-bottom-composer{max-height:calc(148px + env(safe-area-inset-bottom));padding-top:4px}
+  .nx-mai-bottom-composer.is-collapsed{max-height:calc(48px + env(safe-area-inset-bottom));padding-top:3px}
   .nx-mai-compose-row textarea{min-height:40px;padding-block:10px 7px}
   #nxMaiRun{width:44px;height:44px}
 }
-@media(prefers-reduced-motion:reduce){.nx-mai *{animation:none!important;scroll-behavior:auto!important}}
+@media(prefers-reduced-motion:reduce){.nx-mai *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}

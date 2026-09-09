@@ -49,6 +49,16 @@ assert.match(multiUi, /nx-mai-inspector-backdrop/);
 assert.match(multiUi, /nx-mai-overflow-menu/);
 assert.doesNotMatch(multiUi, /Multi-AI Canvas|AI ORCHESTRATION CONTROL ROOM/);
 assert.match(multiCss, /#nxUniversalRoom\[data-tool="multiai"\] \.nx-room-scroll\{overflow:hidden!important/);
+assert.match(multiUi, /composerCollapsed:false/);
+assert.match(multiUi, /function setComposerCollapsed\(collapsed,focusPrompt\)/);
+assert.match(multiUi, /data-composer-toggle/);
+assert.match(multiUi, /setComposerCollapsed\(true\)/);
+assert.ok(multiUi.indexOf("setComposerCollapsed(true)") < multiUi.indexOf("await Promise.allSettled(workers)"), "composer collapses before providers finish");
+assert.doesNotMatch(multiUi, /prompt\.value\s*=\s*["']{2}/, "collapse must preserve the prompt draft");
+assert.match(multiUi, /new ResizeObserver\(fitGraph\)/);
+assert.match(multiCss, /\.nx-mai-bottom-composer\.is-collapsed\{max-height:calc\(52px \+ env\(safe-area-inset-bottom\)\)/);
+assert.match(multiCss, /transition:max-height \.19s ease/);
+assert.match(multiCss, /\.nx-mai-composer-collapsed/);
 const mobileViewports = [
   { width: 360, height: 800 },
   { width: 375, height: 812 },
@@ -63,7 +73,9 @@ for (const count of [4, 8, 12, 14]) {
   assert.ok(box.left >= 0 && box.right <= spatial.WORLD_WIDTH);
   assert.ok(box.top >= 0 && box.bottom <= spatial.WORLD_HEIGHT);
   for (const viewport of mobileViewports) {
-    const canvasHeight = viewport.height - 64 - 48 - 118;
+    const expandedCanvasHeight = viewport.height - 64 - 48 - 118;
+    const collapsedCanvasHeight = viewport.height - 64 - 48 - 52;
+    const canvasHeight = collapsedCanvasHeight;
     const fitted = spatial.fit(points, viewport.width, canvasHeight, 30);
     fitted.x -= 26;
     const epsilon = 0.01;
@@ -72,7 +84,12 @@ for (const count of [4, 8, 12, 14]) {
     assert.ok(box.top * fitted.scale + fitted.y >= 30 - epsilon, `${count} nodes fit top at ${viewport.width}x${viewport.height}`);
     assert.ok(box.bottom * fitted.scale + fitted.y <= canvasHeight - 30 + epsilon, `${count} nodes fit bottom at ${viewport.width}x${viewport.height}`);
     assert.ok(spatial.NODE_WIDTH * fitted.scale >= 115, `${count} provider nodes remain readable at ${viewport.width}x${viewport.height}`);
-    assert.ok(canvasHeight > viewport.height * .62, `canvas stays dominant at ${viewport.width}x${viewport.height}`);
+    assert.ok(expandedCanvasHeight > viewport.height * .62, `expanded canvas stays dominant at ${viewport.width}x${viewport.height}`);
+    assert.ok(collapsedCanvasHeight > viewport.height * .75, `collapsed composer gives canvas priority at ${viewport.width}x${viewport.height}`);
+    assert.equal(collapsedCanvasHeight - expandedCanvasHeight, 66, `collapse reclaims composer space at ${viewport.width}x${viewport.height}`);
+    const keyboardCanvasHeight = 520 - 64 - 48 - 118;
+    const keyboardFit = spatial.fit(points, viewport.width, keyboardCanvasHeight, 30);
+    assert.ok(Number.isFinite(keyboardFit.scale) && keyboardFit.scale > 0, `keyboard resize remains fit-safe at ${viewport.width}px`);
   }
   const desktopPoints = spatial.layout(count);
   assert.equal(desktopPoints.length, count, `${count}-provider desktop layout must include every provider`);
