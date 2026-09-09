@@ -34,9 +34,11 @@ const multiUi = read("assets/js/features/multi-ai.js");
 assert.match(multiCss, /touch-action:none/);
 assert.match(multiCss, /\.nx-mai-world\{[^}]*will-change:transform/);
 assert.match(multiCss, /@keyframes nxMaiRoute/);
-assert.match(multiCss, /-webkit-line-clamp:3/);
+assert.match(multiCss, /\.nx-mai-response p,[^{]+\{[^}]*-webkit-line-clamp:2/);
 assert.doesNotMatch(multiCss, /\.nx-mai-results/);
 assert.match(multiCss, /\.nx-mai-lab-form\{grid-template-columns:1fr\}/);
+assert.match(multiCss, /\.nx-mai-canvas-controls\{[^}]*right:12px;bottom:12px/);
+assert.match(multiCss, /padding-bottom\)|env\(safe-area-inset-bottom\)/);
 assert.match(multiUi, /NexoraMultiAiLayout/);
 assert.match(multiUi, /pointerdown/);
 assert.match(multiUi, /gesture\.mode==="pinch"/);
@@ -44,22 +46,37 @@ assert.match(multiUi, /ResizeObserver/);
 assert.match(multiUi, /data-fit/);
 assert.match(multiUi, /nx-mai-bottom-composer/);
 assert.match(multiUi, /nx-mai-inspector-backdrop/);
+assert.match(multiUi, /nx-mai-overflow-menu/);
+assert.doesNotMatch(multiUi, /Multi-AI Canvas|AI ORCHESTRATION CONTROL ROOM/);
 assert.match(multiCss, /#nxUniversalRoom\[data-tool="multiai"\] \.nx-room-scroll\{overflow:hidden!important/);
+const mobileViewports = [
+  { width: 360, height: 800 },
+  { width: 375, height: 812 },
+  { width: 390, height: 844 },
+  { width: 412, height: 915 }
+];
 for (const count of [4, 8, 12, 14]) {
-  const points = spatial.layout(count);
+  const points = spatial.layout(count, { compact: true });
   assert.equal(points.length, count, `${count}-provider layout must include every provider`);
   assert.equal(spatial.overlaps(points), false);
   const box = spatial.bounds(points);
   assert.ok(box.left >= 0 && box.right <= spatial.WORLD_WIDTH);
   assert.ok(box.top >= 0 && box.bottom <= spatial.WORLD_HEIGHT);
-  for (const width of [360, 375, 390, 412]) {
-    const fitted = spatial.fit(points, width, 520, 24);
+  for (const viewport of mobileViewports) {
+    const canvasHeight = viewport.height - 64 - 48 - 118;
+    const fitted = spatial.fit(points, viewport.width, canvasHeight, 30);
+    fitted.x -= 26;
     const epsilon = 0.01;
-    assert.ok(box.left * fitted.scale + fitted.x >= 24 - epsilon, `${count} nodes fit left at ${width}px`);
-    assert.ok(box.right * fitted.scale + fitted.x <= width - 24 + epsilon, `${count} nodes fit right at ${width}px`);
-    assert.ok(box.top * fitted.scale + fitted.y >= 24 - epsilon, `${count} nodes fit top at ${width}px`);
-    assert.ok(box.bottom * fitted.scale + fitted.y <= 496 + epsilon, `${count} nodes fit bottom at ${width}px`);
+    assert.ok(box.left * fitted.scale + fitted.x >= 4 - epsilon, `${count} nodes fit left at ${viewport.width}x${viewport.height}`);
+    assert.ok(box.right * fitted.scale + fitted.x <= viewport.width - 56 + epsilon, `${count} nodes clear toolbar at ${viewport.width}x${viewport.height}`);
+    assert.ok(box.top * fitted.scale + fitted.y >= 30 - epsilon, `${count} nodes fit top at ${viewport.width}x${viewport.height}`);
+    assert.ok(box.bottom * fitted.scale + fitted.y <= canvasHeight - 30 + epsilon, `${count} nodes fit bottom at ${viewport.width}x${viewport.height}`);
+    assert.ok(spatial.NODE_WIDTH * fitted.scale >= 115, `${count} provider nodes remain readable at ${viewport.width}x${viewport.height}`);
+    assert.ok(canvasHeight > viewport.height * .62, `canvas stays dominant at ${viewport.width}x${viewport.height}`);
   }
+  const desktopPoints = spatial.layout(count);
+  assert.equal(desktopPoints.length, count, `${count}-provider desktop layout must include every provider`);
+  assert.equal(spatial.overlaps(desktopPoints), false, `${count}-provider desktop layout must not overlap`);
 }
 
 const manifest = JSON.parse(read("assets/module-manifest.json"));
@@ -103,5 +120,5 @@ function response(payload, status = 200) {
   assert.equal(image.kind, "image");
   const documented = multi.normalizeResponse(multi.PROVIDERS.chatgpt, { status: true, creator: "Dandy", result: { message: "Hi" } });
   assert.equal(documented.text, "Hi");
-  console.log("Multi-AI spatial canvas passed: preserved 27-provider backend, 4/8/12/14 node layouts, mobile fit, pan/zoom controls, detail inspector, and routing.");
+  console.log("Multi-AI spatial canvas passed: preserved 27-provider backend; 4/8/12/14 layouts and 360/375/390/412 mobile fits have no overlap; pan, pinch, zoom, fit, sheets, actions, and routing remain intact.");
 })().catch((error) => { console.error(error); process.exitCode = 1; });

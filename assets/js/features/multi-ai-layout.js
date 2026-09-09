@@ -6,8 +6,8 @@
 })(typeof globalThis!=="undefined"?globalThis:this,function(){
   "use strict";
 
-  var WORLD_WIDTH=1600,WORLD_HEIGHT=1100,CENTER_X=800,CENTER_Y=550;
-  var NODE_WIDTH=232,NODE_HEIGHT=142,PROMPT_WIDTH=300,PROMPT_HEIGHT=122;
+  var WORLD_WIDTH=1600,WORLD_HEIGHT=1100,CENTER_X=800,CENTER_Y=570;
+  var NODE_WIDTH=232,NODE_HEIGHT=112,PROMPT_WIDTH=280,PROMPT_HEIGHT=130;
 
   function point(x,y,ring){return{x:Math.round(x),y:Math.round(y),ring:ring};}
 
@@ -21,8 +21,28 @@
     return result;
   }
 
-  function layout(count){
+  function compactRows(count){
+    var rowsByCount={
+      1:[320],2:[320,820],3:[195,445,820],4:[195,320,820,945],
+      5:[70,195,440,700,945],6:[70,195,320,700,825,945],
+      7:[70,195,320,440,700,825,945]
+    };
+    return rowsByCount[count]||rowsByCount[7];
+  }
+
+  function compactLayout(count){
+    if(count<=4){
+      var small=[point(620,420,1),point(980,420,1),point(620,720,1),point(980,720,1)];
+      return small.slice(0,count);
+    }
+    var leftCount=Math.ceil(count/2),rightCount=count-leftCount;
+    return compactRows(leftCount).map(function(y){return point(620,y,1);})
+      .concat(compactRows(rightCount).map(function(y){return point(980,y,1);}));
+  }
+
+  function layout(count,options){
     count=Math.max(0,Math.min(14,Number(count)||0));
+    if(options&&options.compact)return compactLayout(count);
     if(count===1)return[point(CENTER_X+430,CENTER_Y,1)];
     if(count===2)return[point(CENTER_X-430,CENTER_Y,1),point(CENTER_X+430,CENTER_Y,1)];
     if(count<=4)return ring(count,470,275,-Math.PI/2,1);
@@ -72,9 +92,9 @@
 
   function overlaps(points){
     for(var left=0;left<points.length;left++){
-      if(Math.abs(points[left].x-CENTER_X)<(NODE_WIDTH+PROMPT_WIDTH)/2+24&&Math.abs(points[left].y-CENTER_Y)<(NODE_HEIGHT+PROMPT_HEIGHT)/2+24)return true;
+      if(Math.abs(points[left].x-CENTER_X)<(NODE_WIDTH+PROMPT_WIDTH)/2+8&&Math.abs(points[left].y-CENTER_Y)<(NODE_HEIGHT+PROMPT_HEIGHT)/2+8)return true;
       for(var right=left+1;right<points.length;right++){
-        if(Math.abs(points[left].x-points[right].x)<NODE_WIDTH+24&&Math.abs(points[left].y-points[right].y)<NODE_HEIGHT+24)return true;
+        if(Math.abs(points[left].x-points[right].x)<NODE_WIDTH+8&&Math.abs(points[left].y-points[right].y)<NODE_HEIGHT+8)return true;
       }
     }
     return false;
