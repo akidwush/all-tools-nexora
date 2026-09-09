@@ -35,7 +35,16 @@ assert.match(multiCss, /\.nx-mai-lab-form\{grid-template-columns:1fr\}/);
 for (const width of [360, 375, 390, 412]) assert.ok(width <= 560, `mobile branch rules cover ${width}px`);
 assert.equal(getTool("multiai").runtime.module, "multi-ai");
 assert.equal(getTool("multiai").runtime.dependency, "https://all-tools-nexora.vercel.app/api/ai/provider");
-assert.match(read("vercel.json"), /"source": "\/api\/ai\/provider"/);
+const vercelConfig = JSON.parse(read("vercel.json"));
+assert.equal(
+  vercelConfig.rewrites.some(
+    (rewrite) =>
+      rewrite.source === "/api/ai/provider" &&
+      rewrite.destination === "/api/health?mode=multi-ai"
+  ),
+  true,
+  "Rewrite /api/ai/provider -> multi-ai harus tersedia."
+);
 assert.match(read("lib/server-access-policy.js"), /"multiai"/);
 assert.match(read("lib/api-abuse-shield.js"), /multiai: \{ burst: 16, free: 60, vvip: 300 \}/);
 assert.equal((read(".env.example").match(/^KURONEKO_API_KEY=$/gm) || []).length, 1);
