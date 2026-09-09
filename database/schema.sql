@@ -198,6 +198,7 @@ values
   ('nokiamsg', 'Nokia Message', 'Buat gambar SMS jadul Nokia', 'maker', 'RETRO', 'fa-solid fa-mobile-retro', null, true, 90, '{}'::jsonb),
   ('mltools', 'ML Tools', 'Script ML, Winrate dan Stalk MLBB', 'tools', 'MLBB', 'fa-solid fa-gamepad', null, true, 0, '{}'::jsonb),
   ('comicreader', 'Baca Komik Full', 'Manga, manhwa, manhua + reader', 'tools', 'FULL', 'fa-solid fa-book-open-reader', null, true, 10, '{}'::jsonb),
+  ('multiai', 'Nexora Multi-AI', 'Ask multiple AIs at once. Chat, image, audio, dan utility dalam satu hub.', 'tools', '27 AI', 'fa-solid fa-diagram-project', null, true, 12, '{"provider":"kuroneko","serverProxy":true,"serverKey":true,"privacy":"not-stored","capabilities":["chat","image","image-transform","audio","detection","utility"]}'::jsonb),
   ('aiimage', 'Nexora AI Image', 'Buat gambar AI memakai akun dan allowance Puter milik pengguna', 'tools', 'PUTER AI', 'fa-solid fa-image', null, true, 15, '{"provider":"puter","billing":"user-pays","apiKeyRequired":false,"privacy":"not-stored"}'::jsonb),
   ('genmail', 'GenMail', 'Buat email sementara, periksa inbox, dan baca pesan dengan aman', 'tools', 'TEMP MAIL', 'fa-solid fa-envelope-open-text', null, true, 18, '{"provider":"kuroneko","serverProxy":true,"apiKeyRequired":true,"polling":"manual"}'::jsonb),
   ('danbooru', 'Danbooru Search', 'Cari ilustrasi anime berdasarkan tag dalam gallery ringan', 'tools', 'SAFE DEFAULT', 'fa-solid fa-images', null, true, 19, '{"provider":"kuroneko","serverProxy":true,"apiKeyRequired":true,"defaultMode":"safe","galleryColumns":2}'::jsonb),

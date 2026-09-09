@@ -103,6 +103,10 @@
       "destination": "/api/health?mode=ai-chat"
     },
     {
+      "source": "/api/ai/provider",
+      "destination": "/api/health?mode=multi-ai"
+    },
+    {
       "source": "/api/document-ai",
       "destination": "/api/health?mode=document-ai"
     },

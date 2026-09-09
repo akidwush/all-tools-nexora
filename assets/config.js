@@ -245,6 +245,14 @@
         "assets/js/features/comic-reader.js"
       ]
     },
+    "multi-ai": {
+      "css": [
+        "assets/css/features/multi-ai.css"
+      ],
+      "js": [
+        "assets/js/features/multi-ai.js"
+      ]
+    },
     "source-features": {
       "css": [
         "assets/css/features/source-tools.css"
@@ -654,6 +662,27 @@
           "key": "module-comic-reader",
           "type": "module",
           "path": "/assets/js/features/comic-reader.js",
+          "method": "HEAD",
+          "strict": true
+        }
+      },
+      {
+        "id": "multiai",
+        "icon": "fa-solid fa-diagram-project",
+        "name": "Nexora Multi-AI",
+        "description": "Ask multiple AIs at once. Chat, image, audio, dan utility dalam satu hub.",
+        "badge": "27 AI",
+        "aliases": ["nexora ai", "multi ai", "ai hub", "ask all ai"],
+        "runtime": {
+          "mode": "api",
+          "module": "multi-ai",
+          "handler": "renderMultiAi",
+          "dependency": "https://all-tools-nexora.vercel.app/api/ai/provider"
+        },
+        "health": {
+          "key": "module-multi-ai",
+          "type": "module",
+          "path": "/assets/js/features/multi-ai.js",
           "method": "HEAD",
           "strict": true
         }

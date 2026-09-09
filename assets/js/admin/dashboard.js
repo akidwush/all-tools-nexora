@@ -67,6 +67,7 @@
     const activities=state.dashboard.recentActivity||[],activityBox=$("#recentActivity");if(activityBox)activityBox.innerHTML=activities.length?activities.map(item=>`<div class="recent-activity-item"><i class="${auditIcon(item)}"></i><div><b>${escapeHtml(item.summary||item.action)}</b><span>${escapeHtml(item.admin_email||"system")}</span></div><time>${formatDate(item.created_at)}</time></div>`).join(""):'<div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><b>Belum ada aktivitas</b><span>Tindakan admin akan tercatat otomatis.</span></div>';
     window.NexoraAdminBranding?.sync(state.dashboard,canEdit());
     window.NexoraAdminComicTranslation?.sync(state.dashboard,canEdit());
+    window.NexoraAdminMultiAi?.sync(state.dashboard,canEdit());
     const settings=state.dashboard.settings||[];
     $("#settingsList").innerHTML=settings.length?settings.map(item=>`<div class="setting-item"><span class="compact-mark"></span><div><b>${escapeHtml(item.key)}</b><span>${escapeHtml(item.key==="branding"?"Logo dan ikon website":JSON.stringify(item.value))}</span></div><em class="status-pill">${item.is_public?"public":"private"}</em></div>`).join(""):'<div class="setting-item"><div><b>Belum ada pengaturan</b><span>Jalankan migration database.</span></div></div>';
     const siteSetting=settings.find(item=>item.key==="site");const hero=siteSetting?.value?.heroVideo||{};const heroUrl=$("#heroVideoUrl"),heroEnabled=$("#heroVideoEnabled"),heroButton=$("#saveHeroVideoButton"),heroBadge=$("#heroVideoPermissionBadge");

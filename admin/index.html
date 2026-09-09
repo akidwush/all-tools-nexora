@@ -126,6 +126,15 @@
             </article>
             <aside class="ai-admin-side"><article class="ai-preview" id="aiPreview"><header class="ai-preview-head"><span class="ai-preview-avatar" id="aiPreviewAvatar"><i class="fa-solid fa-wand-magic-sparkles"></i></span><div><b id="aiPreviewName">Nexora AI</b><span id="aiPreviewTagline">Personal intelligence</span></div></header><div class="ai-preview-body"><div class="ai-preview-message" id="aiPreviewMessage">Pesan pembuka Personal AI.</div><div class="ai-preview-prompts" id="aiPreviewPrompts"></div></div></article><article class="ai-admin-card ai-test-box"><div class="panel-head"><div><p class="eyebrow">SERVER TEST</p><h2>Test AI dengan Draft</h2></div></div><textarea id="aiTestPrompt" maxlength="4000">Perkenalkan dirimu secara singkat.</textarea><pre class="ai-test-result" id="aiTestResult">Hasil pengujian akan muncul di sini. Draft tidak dipublikasikan saat diuji.</pre></article></aside>
           </div>
+          <article class="ai-admin-card nx-multiai-admin">
+            <div class="panel-head"><div><p class="eyebrow">KURO NEKO / SYLVATICA</p><h2>Multi-AI Providers</h2></div><span class="ai-status-chip" id="multiAiKeyStatus"><i></i><span>Memeriksa secret</span></span></div>
+            <form id="multiAiSettingsForm">
+              <div class="nx-multiai-admin-options"><label class="ai-toggle"><span><b>Aktifkan Nexora Multi-AI</b><small>Mematikan hub dan seluruh provider tanpa menghapus konfigurasi.</small></span><input name="enabled" type="checkbox" disabled></label><label class="ai-field"><span>Concurrent AI di browser</span><select name="maxConcurrentAi" disabled><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4" selected>4</option><option value="5">5</option></select></label></div>
+              <div class="nx-multiai-provider-grid" id="multiAiProviderGrid" aria-live="polite"><p>Memuat registry provider…</p></div>
+              <p class="form-help">Secret tidak pernah ditampilkan. Status ONLINE/DEGRADED/OFFLINE berasal dari request provider nyata dan disimpan singkat di runtime server.</p>
+              <button class="primary-button" type="submit" disabled><i class="fa-solid fa-floppy-disk"></i> Simpan Provider</button><p class="modal-message" role="status" aria-live="polite"></p>
+            </form>
+          </article>
         </section>
 
         <section class="admin-section" data-panel="developer">
@@ -375,5 +384,6 @@
   <script src="../assets/js/admin/personal-ai.js?v=6.4.0-ai1-branding1" defer></script>
   <script src="../assets/js/admin/functional-audit.js?v=6.4.0-healthfix1" defer></script>
 <script src="../assets/js/admin/comic-translation.js?v=6.4.0-comic-translate1" defer></script>
+<script src="../assets/js/admin/multi-ai.js?v=6.4.0-multi-ai-v1" defer></script>
 </body>
 </html>

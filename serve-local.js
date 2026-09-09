@@ -80,6 +80,7 @@ const API_ROUTES = Object.freeze({
   "/api/alight-premium": { file: "api/tool-health.js", mode: "alight-premium" },
   "/api/vdeploy": { file: "api/health.js", mode: "vdeploy" },
   "/api/ai/chat": { file: "api/health.js", mode: "ai-chat" },
+  "/api/ai/provider": { file: "api/health.js", mode: "multi-ai" },
   "/api/document-ai": { file: "api/health.js", mode: "document-ai" },
   "/api/prompt-generator": { file: "api/health.js", mode: "prompt-generator" },
   "/api/ai/novel-cover": { file: "api/health.js", mode: "novel-cover" },
@@ -112,7 +113,7 @@ function bodyLimit(pathname, requestUrl) {
   if (pathname === "/api/tools/hd4" || requestUrl.searchParams.get("_service") === "hd4-enhancer") return 3_600_000;
   if (mode === "image-vectorizer") return 4_200_000;
   if (pathname === "/api/audit") return 230_000;
-  if (pathname === "/api/ai/chat" || pathname === "/api/admin/ai") return 80_000;
+  if (pathname === "/api/ai/chat" || pathname === "/api/ai/provider" || pathname === "/api/admin/ai") return 80_000;
   if (pathname === "/api/ai/novel-cover" || mode === "novel-cover") return 12_500_000;
   if (pathname === "/api/elevenlabs" || mode === "elevenlabs") return 21_000_000;
   if (pathname === "/api/document-ai" || mode === "document-ai" || pathname === "/api/prompt-generator" || mode === "prompt-generator") return 4_150_000;

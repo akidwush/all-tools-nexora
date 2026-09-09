@@ -39,7 +39,7 @@ if (!fs.existsSync(path.join(root, "database/migrations/034_api_abuse_shield.sql
 
 // Frozen API Abuse Shield core. A refactor must deliberately update this lock.
 const API_ABUSE_SHIELD_LOCK = Object.freeze({
-  "lib/api-abuse-shield.js": "50225f1eaeb45096e4a6cfdf71537c43cad88a393a798b1c2133e670927e44d6",
+  "lib/api-abuse-shield.js": "b933897716c416f640aa43ead1425d813111c708fcd27d096bb02ccd6e1fc311",
   "database/migrations/034_api_abuse_shield.sql": "d9ed96c73bbaf6d01ff8463a333cee774eb689e5d5ac48b7be9221d40b706906"
 });
 for (const [relative, expected] of Object.entries(API_ABUSE_SHIELD_LOCK)) {

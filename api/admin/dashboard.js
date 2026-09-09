@@ -138,6 +138,7 @@ module.exports = async function handler(request, response) {
     try {
       const body = objectValue(request.body);
       if (body.key === "comic_translation") return await require("../../lib/comic-translation-settings")(request, response);
+      if (body.key === "multi_ai") return await require("../../lib/admin-multiai-settings")(request, response);
       if (body.key === "branding") return await updateBranding(request, response);
       if (body.key === "developer_profile") return await updateDeveloperProfile(request, response);
       return await updateHeroVideo(request, response);
@@ -233,6 +234,7 @@ module.exports = async function handler(request, response) {
       health: normalizedHealth,
       settings: Array.isArray(settings) ? settings : [],
       developerProfile: Array.isArray(developerProfile) ? developerProfile[0] || null : null
+      ,multiAiConfigured: Boolean(String(process.env.KURONEKO_API_KEY || "").trim())
     });
   } catch (error) {
     const status = Number(error.status || 500);

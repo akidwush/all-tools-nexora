@@ -1662,6 +1662,7 @@ function showTool(toolId) {
 
     switch (toolId) {
         case 'worldclassics': renderWorldClassics(body); break;
+        case 'multiai': renderMultiAi(body); break;
         case 'aiodownloader': renderAioDownloader(body); break;
         case 'instagram': renderInstagram(body); break;
         case 'tiktok': renderTiktok(body); break;

@@ -58,6 +58,7 @@
     [/text-to-pdf\.(?:js|css)(?:$|\?)/, 'auto-pdf-v2'],
     [/crypto-market\.(?:js|css)(?:$|\?)/, 'crypto-mtf'],
     [/comic-reader\.(?:js|css)(?:$|\?)/, 'comic-reader'],
+    [/multi-ai\.(?:js|css)(?:$|\?)/, 'multi-ai-v1'],
     [/svg-alight\.(?:js|css)(?:$|\?)/, 'svg-alight'],
     [/alight-premium\.(?:js|css)(?:$|\?)/, 'alight-premium-hf30'],
     [/(?:tiktok|download-pack|source-features)\.js(?:$|\?)/, 'download']

@@ -33,6 +33,7 @@
     "/api/ocr-intelligence",
     "/api/vdeploy",
     "/api/ai/chat",
+    "/api/ai/provider",
     "/api/document-ai",
     "/api/prompt-generator",
     "/api/ai/novel-cover",

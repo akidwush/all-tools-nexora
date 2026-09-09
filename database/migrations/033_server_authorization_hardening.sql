@@ -28,6 +28,7 @@ where access_level = 'vvip'
     'imagevectorizer',
     'instagram',
     'ipintel',
+    'multiai',
     'novelcover',
     'ocrintel',
     'promptgenerate',

@@ -215,6 +215,14 @@
         "assets/js/features/comic-reader.js"
       ]
     },
+    "multi-ai": {
+      "css": [
+        "assets/css/features/multi-ai.css"
+      ],
+      "js": [
+        "assets/js/features/multi-ai.js"
+      ]
+    },
     "source-features": {
       "css": [
         "assets/css/features/source-tools.css"
@@ -377,6 +385,7 @@
     "nokiamsg": "generator-pack",
     "mltools": "imported-tools",
     "comicreader": "comic-reader",
+    "multiai": "multi-ai",
     "aiimage": "puter-image",
     "aivideo": "puter-video",
     "genmail": "genmail",
