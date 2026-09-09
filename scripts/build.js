@@ -17,7 +17,19 @@ function run(script) {
 }
 
 run("check-project.js");
-run("run-tests.js");
+if (process.env.VERCEL === "1") {
+  // The complete regression suite is enforced before push and in GitHub Actions.
+  // Keep Vercel's build process small so its runner cannot terminate the nested
+  // 114-process suite midway without a useful test failure.
+  for (const script of [
+    "test-multi-ai.js",
+    "test-security-authorization-v7.js",
+    "test-serverless-limit.js"
+  ]) run(script);
+  console.log("Vercel deployment gate lulus: Multi-AI, authorization, dan batas Functions tervalidasi.");
+} else {
+  run("run-tests.js");
+}
 
 fs.rmSync(output, { recursive: true, force: true });
 fs.mkdirSync(output, { recursive: true });
