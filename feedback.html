@@ -6,6 +6,7 @@
 <script src="assets/config.js?v=6.4.0-config1"></script>
 <script src="assets/js/core/runtime-observer.js"></script>
   <meta name="theme-color" content="#080312">
+  <meta http-equiv="Content-Security-Policy" content="script-src-attr &#39;none&#39;">
   <title>Feedback — All Tools Nexora</title>
   <style>
     :root{color-scheme:dark;--bg:#080312;--panel:#120922;--line:#321a50;--text:#f5edff;--muted:#ad99c7;--accent:#ad5cff;--green:#55db91;--yellow:#f0c85f;--red:#ff7d9c}
@@ -55,6 +56,40 @@
       const escapeHtml = value => String(value ?? "").replace(/[&<>'"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));
       const statusLabel = value => ({new:"Baru",reviewing:"Ditinjau",resolved:"Selesai",rejected:"Ditolak"})[value] || value;
       const formatDate = value => value ? new Intl.DateTimeFormat("id-ID",{dateStyle:"medium",timeStyle:"short",timeZone:"Asia/Jakarta"}).format(new Date(value)) : "-";
+      const safeStatus = value => ["new","reviewing","resolved","rejected"].includes(String(value || "")) ? String(value) : "new";
+      function textNode(tag, className, text) {
+        const node = document.createElement(tag);
+        if (className) node.className = className;
+        node.textContent = String(text ?? "");
+        return node;
+      }
+      function emptyReport(text) {
+        return textNode("div", "empty", text);
+      }
+      function reportCardNode(item) {
+        const article = document.createElement("article");
+        article.className = "report-card";
+        const header = document.createElement("header");
+        header.append(
+          textNode("b", "", String(item?.name ?? "") + " · " + String(item?.category ?? "")),
+          textNode("time", "", formatDate(item?.created_at))
+        );
+        article.append(header, textNode("p", "", item?.message));
+        if (item?.admin_reply) {
+          const reply = document.createElement("div");
+          reply.className = "reply";
+          reply.append(textNode("span", "", "Balasan admin"), textNode("p", "", item.admin_reply));
+          article.append(reply);
+        }
+        const footer = document.createElement("footer");
+        const status = safeStatus(item?.status);
+        footer.append(
+          textNode("span", "status status-" + status, statusLabel(status)),
+          textNode("time", "", "Diperbarui " + formatDate(item?.updated_at))
+        );
+        article.append(footer);
+        return article;
+      }
 
       function readList(key) { try { const value = JSON.parse(localStorage.getItem(key) || "[]"); return Array.isArray(value) ? value : []; } catch { return []; } }
       function writeList(key, items, max) { try { localStorage.setItem(key, JSON.stringify(items.slice(-max))); } catch {} }
@@ -78,11 +113,11 @@
       }
       async function renderReports() {
         const ids = readSent();
-        if (!ids.length) { reports.innerHTML = '<div class="empty">Belum ada laporan tersimpan di perangkat ini.</div>'; return; }
+        if (!ids.length) { reports.replaceChildren(emptyReport("Belum ada laporan tersimpan di perangkat ini.")); return; }
         refresh.disabled = true; refresh.textContent = "Memuat...";
         const rows = [];
         for (const entry of [...ids].reverse()) { try { rows.push(await readStatus(entry.id)); } catch {} }
-        reports.innerHTML = rows.length ? rows.map(item => `<article class="report-card"><header><b>${escapeHtml(item.name)} · ${escapeHtml(item.category)}</b><time>${formatDate(item.created_at)}</time></header><p>${escapeHtml(item.message)}</p>${item.admin_reply ? `<div class="reply"><span>Balasan admin</span><p>${escapeHtml(item.admin_reply)}</p></div>` : ""}<footer><span class="status status-${escapeHtml(item.status)}">${escapeHtml(statusLabel(item.status))}</span><time>Diperbarui ${formatDate(item.updated_at)}</time></footer></article>`).join("") : '<div class="empty">Status laporan belum dapat dimuat.</div>';
+        reports.replaceChildren(...(rows.length ? rows.map(reportCardNode) : [emptyReport("Status laporan belum dapat dimuat.")]));
         refresh.disabled = false; refresh.textContent = "Perbarui";
       }
       async function flushQueue() {

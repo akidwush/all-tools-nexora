@@ -7,7 +7,11 @@ const STATUSES = new Set(["new", "reviewing", "resolved", "rejected"]);
 const CATEGORIES = new Set(["bug", "suggestion", "idea", "other"]);
 
 function clean(value, maxLength) {
-  return String(value ?? "").replace(/[\u0000-\u001f\u007f]/g, " ").trim().slice(0, maxLength);
+  return String(value ?? "")
+    .normalize("NFKC")
+    .replace(/[\u0000-\u001f\u007f\u202a-\u202e\u2066-\u2069]/g, " ")
+    .trim()
+    .slice(0, maxLength);
 }
 
 function counts(rows) {
