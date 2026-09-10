@@ -183,13 +183,13 @@
           <p id="controlPlaneError" hidden></p>
           <div class="control-plane-grid">
             <article class="panel-card control-plane-card">
-              <div class="panel-head"><div><p class="eyebrow">PUBLIC ACCESS LOCK</p><h2>Public Tool Access</h2></div><span id="controlAccessState" class="control-state">UNKNOWN</span></div>
-              <p class="control-plane-copy">Lock ini ditegakkan pada server untuk tool yang memiliki API Nexora. Halaman informasi statis tetap dapat dibaca; panel tidak mengklaim dapat mengamankan URL eksternal atau tool frontend-only.</p>
+              <div class="panel-head"><div><p class="eyebrow">PUBLIC ACCESS LOCK</p><h2>Public Website Access</h2></div><span id="controlAccessState" class="control-state">UNKNOWN</span></div>
+              <p class="control-plane-copy">Saat LOCKED, Vercel Routing Middleware memblokir seluruh route publik Nexora sebelum HTML atau tool dijalankan. Route /admin dan asset statis tetap tersedia agar administrator dapat membuka kembali website.</p>
               <div class="control-access-form">
-                <label class="control-switch"><span><b>Kunci operasi tool publik</b><small>Request server-gated akan ditolak HTTP 503 sampai lock dibuka.</small></span><input id="controlPublicLocked" type="checkbox" disabled></label>
+                <label class="control-switch"><span><b>Kunci seluruh website publik</b><small>Halaman publik dan API non-admin akan ditolak HTTP 503 sampai lock dibuka.</small></span><input id="controlPublicLocked" type="checkbox" disabled></label>
                 <label><span>Pesan untuk pengguna</span><input id="controlPublicMessage" type="text" maxlength="300" disabled placeholder="Nexora sedang dalam pemeliharaan."></label>
                 <button id="savePublicAccess" class="primary-button" type="button" disabled><i class="fa-solid fa-floppy-disk"></i> Simpan Public Access</button>
-                <p class="control-warning"><i class="fa-solid fa-shield-halved"></i><span>Ini bukan UI-only lock: enforcement berjalan sebelum entitlement dan handler provider pada API Nexora.</span></p>
+                <p class="control-warning"><i class="fa-solid fa-shield-halved"></i><span>Global lock ditegakkan pada routing layer Vercel dan tetap dilapisi authorization API Nexora. Dashboard /admin tidak ikut dikunci.</span></p>
                 <p id="controlReadOnlyNote" class="control-readonly" hidden>Role ini read-only.</p>
               </div>
             </article>

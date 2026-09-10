@@ -71,7 +71,7 @@ for (const tool of configTools) {
 
 const required = [
   "index.html", "about.html", "feedback.html", "favicon.svg", "README.md", "CHANGELOG.md",
-  "docs/SECURITY_AUDIT.md", "serve-local.js", "vercel.json", "route-manifest.json",
+  "docs/SECURITY_AUDIT.md", "serve-local.js", "middleware.js", "vercel.json", "route-manifest.json",
   "assets/config.js", "assets/module-manifest.json", "assets/js/core/tool-registry.js", "assets/js/core/app.js",
   "api/health.js", "api/feedback.js", "api/audit.js", "api/tool-health.js",
   "lib/database.js", "lib/memory-store.js", "lib/tool-health.js", "lib/vdeploy.js",
@@ -95,10 +95,36 @@ function walk(directory) {
   return output;
 }
 
-const javascriptFiles = walk(root).filter((file) => /\.js$/i.test(file));
+const middlewareFile = path.join(root, "middleware.js");
+const javascriptFiles = walk(root).filter((file) => /\.js$/i.test(file) && file !== middlewareFile);
 for (const file of javascriptFiles) {
   try { new vm.Script(fs.readFileSync(file, "utf8"), { filename: path.relative(root, file) }); }
   catch (error) { fail(`Sintaks JavaScript gagal: ${path.relative(root, file)} (${error.message})`); }
+}
+
+
+const routingMiddleware = read("middleware.js");
+try {
+  const parseableMiddleware = routingMiddleware.replace(
+    /export\s+default\s+async\s+function\s+middleware/,
+    "async function middleware"
+  );
+  new vm.Script(parseableMiddleware, { filename: "middleware.js" });
+} catch (error) {
+  fail(`middleware.js sintaks tidak valid (${error.message})`);
+}
+for (const token of [
+  "PUBLIC_ACCESS_LOCKED",
+  "SUPABASE_URL",
+  "SUPABASE_SECRET_KEY",
+  "app_settings?select=value&key=eq.control_plane",
+  'path.startsWith("/admin/")',
+  'path.startsWith("/api/admin/")',
+  'path.startsWith("/assets/")',
+  "status: 503",
+  "fail-closed"
+]) {
+  if (!routingMiddleware.includes(token)) fail(`Routing Middleware kehilangan global PUBLIC_ACCESS_LOCKED contract: ${token}`);
 }
 
 for (const relative of ["index.html", "about.html", "feedback.html", "admin/index.html", "admin/login.html"]) {
