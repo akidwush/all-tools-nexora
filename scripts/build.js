@@ -23,10 +23,12 @@ if (process.env.VERCEL === "1") {
   // 114-process suite midway without a useful test failure.
   for (const script of [
     "test-multi-ai.js",
+    "test-elevenlabs-studio.js",
+    "test-elevenlabs-local.js",
     "test-security-authorization-v7.js",
     "test-serverless-limit.js"
   ]) run(script);
-  console.log("Vercel deployment gate lulus: Multi-AI, authorization, dan batas Functions tervalidasi.");
+  console.log("Vercel deployment gate lulus: Multi-AI, ElevenLabs Studio, authorization, dan batas Functions tervalidasi.");
 } else {
   run("run-tests.js");
 }

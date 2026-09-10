@@ -16,8 +16,9 @@
 .nel-kicker { display: inline-flex; align-items: center; gap: 8px; color: var(--nel-cyan); font-size: 11px; font-weight: 800; letter-spacing: .14em; }
 .nel-hero h2 { margin: 10px 0 6px; font-size: clamp(23px, 7vw, 34px); line-height: 1.1; }
 .nel-hero p, .nel-section-head p { margin: 0; color: var(--nel-muted); font-size: 13px; line-height: 1.55; }
-.nel-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 7px; border: 1px solid var(--nel-line); border-radius: 18px; background: rgba(13, 11, 21, .8); }
-.nel-tabs button { min-width: 0; min-height: 48px; border: 1px solid transparent; border-radius: 13px; background: transparent; color: #aaa3bb; font: inherit; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 7px; cursor: pointer; }
+.nel-tabs { display: flex; gap: 8px; padding: 7px; border: 1px solid var(--nel-line); border-radius: 18px; background: rgba(13, 11, 21, .8); overflow-x: auto; overscroll-behavior-inline: contain; scrollbar-width: none; }
+.nel-tabs::-webkit-scrollbar { display: none; }
+.nel-tabs button { flex: 0 0 146px; min-width: 0; min-height: 48px; border: 1px solid transparent; border-radius: 13px; background: transparent; color: #aaa3bb; font: inherit; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 7px; cursor: pointer; }
 .nel-tabs button.is-active { background: rgba(138, 87, 255, .17); border-color: rgba(162, 112, 255, .5); color: #fff; }
 .nel-tabs button i { color: var(--nel-cyan); }
 .nel-tabs button:disabled { opacity: .55; }
@@ -43,6 +44,7 @@
 .nel-slider { display: block; min-width: 0; }
 .nel-slider span { display: flex; justify-content: space-between; margin-bottom: 7px; color: #a9a1b8; font-size: 11px; font-weight: 700; }
 .nel-slider input { width: 100%; accent-color: var(--nel-violet); }
+.nel-slider-box { margin: 0 0 16px; padding: 13px 14px; border: 1px solid var(--nel-line); border-radius: 14px; background: rgba(255,255,255,.02); }
 .nel-primary { width: 100%; min-height: 54px; border: 1px solid rgba(194, 164, 255, .55); border-radius: 16px; background: linear-gradient(135deg, #8f55ee, #6230bc); color: #fff; font: inherit; font-size: 14px; font-weight: 850; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; box-shadow: 0 10px 28px rgba(79, 38, 145, .18); }
 .nel-primary:disabled { opacity: .62; cursor: wait; }
 .nel-upload { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 150px; margin-bottom: 15px; padding: 17px; border: 1px dashed rgba(155, 108, 255, .45); border-radius: 16px; background: rgba(155, 108, 255, .045); text-align: center; cursor: pointer; }
@@ -75,6 +77,46 @@
 .nel-empty h3 { margin: 14px 0 7px; }
 .nel-empty p { color: var(--nel-muted); font-size: 13px; line-height: 1.55; }
 .nel-empty .nel-secondary { margin-top: 8px; }
+
+.nel-engine-label { margin: 0 0 8px; color: #d7caed; font-size: 13px; font-weight: 800; }
+.nel-engine-switch { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin-bottom: 16px; }
+.nel-engine-card { min-width: 0; min-height: 64px; padding: 10px 12px; border: 1px solid rgba(255,255,255,.11); border-radius: 14px; background: #0d0c13; color: #b7afc4; font: inherit; text-align: left; cursor: pointer; }
+.nel-engine-card strong { display: block; margin-bottom: 5px; color: #f3eefb; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nel-engine-card small, .nel-local-badge { display: inline-flex; align-items: center; gap: 5px; color: #9d95ab; font-size: 9px; font-weight: 850; letter-spacing: .08em; }
+.nel-engine-card.is-active { border-color: rgba(155,108,255,.62); background: rgba(155,108,255,.12); box-shadow: inset 0 0 0 1px rgba(155,108,255,.09); }
+.nel-engine-card.is-active small { color: #c7f4f5; }
+.nel-local-banner { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin: 0 0 15px; padding: 12px 13px; border: 1px solid rgba(115,231,238,.15); border-radius: 13px; background: rgba(115,231,238,.04); }
+.nel-local-banner strong { display: block; margin-bottom: 3px; color: #e9e3f6; font-size: 13px; }
+.nel-local-banner p { margin: 0; color: #9b94a8; font-size: 10px; line-height: 1.5; }
+.nel-local-badge { flex: 0 0 auto; padding: 5px 7px; border: 1px solid rgba(115,231,238,.2); border-radius: 999px; color: #b8f3f4; white-space: nowrap; }
+.nel-local-info { margin: -4px 0 15px; color: #948ca2; font-size: 10px; line-height: 1.55; }
+.nel-local-actions { margin: -2px 0 15px; }
+.nel-local-actions > * { flex-basis: 170px; }
+.nel-cloud-unavailable, .nel-local-error { margin: 0 0 15px; padding: 13px; border: 1px solid rgba(251,113,133,.2); border-radius: 13px; background: rgba(127,29,52,.13); color: #dcbcc5; font-size: 11px; line-height: 1.5; }
+.nel-local-error strong { display: block; margin-bottom: 5px; color: #ffd1da; }
+.nel-wide { grid-column: 1 / -1; }
+.nel-lipsync-result { margin-top: 17px; }
+.nel-timeline { margin-top: 13px; padding: 12px; border: 1px solid rgba(255,255,255,.08); border-radius: 13px; background: #0c0b11; }
+.nel-timeline-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 9px; color: #beb3d1; font-size: 11px; font-weight: 800; }
+.nel-timeline-head small { color: #777080; font-size: 9px; font-weight: 650; }
+.nel-timeline-track { display: flex; gap: 6px; overflow-x: auto; padding: 1px 1px 5px; scrollbar-width: thin; scrollbar-color: rgba(155,108,255,.35) transparent; }
+.nel-timeline-item { flex: 0 0 auto; max-width: 180px; padding: 7px 9px; border: 1px solid rgba(255,255,255,.08); border-radius: 9px; background: #15121c; color: #9e96aa; font-size: 10px; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: border-color .14s, background .14s, color .14s; }
+.nel-timeline-item b { display: block; color: inherit; font-size: 11px; overflow: hidden; text-overflow: ellipsis; }
+.nel-timeline-item small { display: block; margin-top: 3px; color: #736c7e; font-size: 8px; }
+.nel-timeline-item.is-current { border-color: rgba(115,231,238,.55); background: rgba(115,231,238,.1); color: #e5ffff; }
+.nel-timeline-item.is-current small { color: #9fd9dc; }
+
+@media (min-width: 780px) {
+  .nel-tabs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); overflow: visible; }
+  .nel-tabs button { flex: initial; min-width: 0; }
+}
+@media (max-width: 520px) {
+  .nel-grid, .nel-slider-grid { grid-template-columns: 1fr; }
+  .nel-engine-switch { gap: 7px; }
+  .nel-engine-card { padding-inline: 10px; }
+  .nel-local-banner { flex-direction: column; }
+  .nel-local-badge { align-self: flex-start; }
+}
 @media (prefers-reduced-motion: reduce) {
   .nel-studio * { scroll-behavior: auto !important; transition: none !important; }
 }
