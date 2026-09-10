@@ -34,13 +34,13 @@
     if(state.running)return;
     var button=$("#runFunctionalAudit"),frame=$("#functionalAuditFrame");if(!button||!frame)return;
     state.running=true;button.disabled=true;button.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Mengaudit...';
-    setProgress(true,"Memuat halaman publik tanpa menjalankan aksi tool...",12);
+    setProgress(true,"Memuat halaman publik tanpa menjalankan aksi tool...",0);
     try{
       await new Promise(function(resolve,reject){var timer=setTimeout(function(){reject(new Error("Halaman publik gagal dimuat."));},18000);frame.onload=function(){clearTimeout(timer);resolve();};frame.onerror=function(){clearTimeout(timer);reject(new Error("Iframe audit gagal dimuat."));};frame.src="/?nxFunctionalAudit="+Date.now();});
-      setProgress(true,"Memeriksa registry dan memuat seluruh modul...",42);
+      setProgress(true,"Halaman publik sudah dimuat. Memeriksa registry dan modul...",33);
       var stability=await waitForStability(frame,12000);
-      var progressTimer=setInterval(function(){var bar=$("#functionalProgress i");if(bar){var current=parseFloat(bar.style.width)||42;bar.style.width=Math.min(88,current+3)+"%";}},350);
-      try{state.result=await stability.audit({loadModules:true,refreshHealth:false});}finally{clearInterval(progressTimer);}
+      setProgress(true,"Runtime observer siap. Menjalankan audit registry nyata...",66);
+      state.result=await stability.audit({loadModules:true,refreshHealth:false});
       try{localStorage.setItem("nexora-admin-functional-audit-healthfix1",JSON.stringify(state.result));}catch(_){ }
       setProgress(true,"Audit selesai. Menyusun laporan...",100);render();
       setTimeout(function(){setProgress(false,"",0);},650);

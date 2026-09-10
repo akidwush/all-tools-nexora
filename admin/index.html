@@ -16,6 +16,7 @@
   <link href="../assets/css/admin.css?v=6.4.0-hf12-no-login-loader" rel="stylesheet">
   <link href="../assets/css/admin-ai.css?v=6.4.0-ai1" rel="stylesheet">
   <link href="../assets/css/visual-qa.css?v=6.4.0" rel="stylesheet">
+  <link href="../assets/css/admin-control-plane.css?v=6.4.0-control-plane1" rel="stylesheet">
   <link href="../assets/css/admin-redesign.css?v=6.4.0-admin-member-hf1-layout1" rel="stylesheet">
   <link href="../assets/css/custom-select.css?v=6.4.0-global-select-final1" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/branding.css?v=6.4.0-audit-brand1"/></head>
@@ -33,7 +34,7 @@
         <div class="admin-nav-group"><span class="admin-nav-label">Content</span><button class="admin-nav-item" data-section="tools" type="button"><i class="fa-solid fa-toolbox"></i><span>Tools</span></button><button class="admin-nav-item" data-section="socials" type="button"><i class="fa-solid fa-link"></i><span>Social Media</span></button><button class="admin-nav-item" data-section="developer" type="button"><i class="fa-solid fa-user-pen"></i><span>About Developer</span></button></div>
         <div class="admin-nav-group"><span class="admin-nav-label">AI</span><button class="admin-nav-item" data-section="ai" type="button"><i class="fa-solid fa-microchip"></i><span>Personal AI</span></button></div>
         <div class="admin-nav-group"><span class="admin-nav-label">Insight</span><button class="admin-nav-item" data-section="analytics" type="button"><i class="fa-solid fa-chart-simple"></i><span>Usage Insight</span></button><button class="admin-nav-item" data-section="feedback" type="button"><i class="fa-solid fa-inbox"></i><span>Feedback</span></button></div>
-        <div class="admin-nav-group"><span class="admin-nav-label">System</span><button class="admin-nav-item" data-section="health" type="button"><i class="fa-solid fa-heart-pulse"></i><span>Tool Health</span></button><button class="admin-nav-item" data-section="functional" type="button"><i class="fa-solid fa-list-check"></i><span>Functional Audit</span></button><button class="admin-nav-item" data-section="visual" type="button"><i class="fa-solid fa-display"></i><span>Visual QA</span></button><button class="admin-nav-item" data-section="audit" type="button"><i class="fa-solid fa-clock-rotate-left"></i><span>Audit Log</span></button></div>
+        <div class="admin-nav-group"><span class="admin-nav-label">System</span><button class="admin-nav-item" data-section="control" type="button"><i class="fa-solid fa-sliders"></i><span>Control Plane</span></button><button class="admin-nav-item" data-section="health" type="button"><i class="fa-solid fa-heart-pulse"></i><span>Tool Health</span></button><button class="admin-nav-item" data-section="functional" type="button"><i class="fa-solid fa-list-check"></i><span>Functional Audit</span></button><button class="admin-nav-item" data-section="visual" type="button"><i class="fa-solid fa-display"></i><span>Visual QA</span></button><button class="admin-nav-item" data-section="audit" type="button"><i class="fa-solid fa-clock-rotate-left"></i><span>Audit Log</span></button></div>
       </nav>
       <div class="sidebar-bottom">
         <a href="/" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Lihat website</a>
@@ -173,6 +174,43 @@
           </div>
         </section>
 
+        <section class="admin-section" data-panel="control">
+          <div class="section-toolbar">
+            <div class="toolbar-title"><p class="eyebrow">ADMIN CONTROL PLANE</p><b>Server policy dan bukti operasional</b></div>
+            <button id="refreshControlPlane" class="secondary-button" type="button"><i class="fa-solid fa-rotate"></i> Refresh policy</button>
+          </div>
+          <p id="controlPlaneLoading" hidden><i class="fa-solid fa-spinner fa-spin"></i> Memuat policy server...</p>
+          <p id="controlPlaneError" hidden></p>
+          <div class="control-plane-grid">
+            <article class="panel-card control-plane-card">
+              <div class="panel-head"><div><p class="eyebrow">PUBLIC ACCESS LOCK</p><h2>Public Tool Access</h2></div><span id="controlAccessState" class="control-state">UNKNOWN</span></div>
+              <p class="control-plane-copy">Lock ini ditegakkan pada server untuk tool yang memiliki API Nexora. Halaman informasi statis tetap dapat dibaca; panel tidak mengklaim dapat mengamankan URL eksternal atau tool frontend-only.</p>
+              <div class="control-access-form">
+                <label class="control-switch"><span><b>Kunci operasi tool publik</b><small>Request server-gated akan ditolak HTTP 503 sampai lock dibuka.</small></span><input id="controlPublicLocked" type="checkbox" disabled></label>
+                <label><span>Pesan untuk pengguna</span><input id="controlPublicMessage" type="text" maxlength="300" disabled placeholder="Nexora sedang dalam pemeliharaan."></label>
+                <button id="savePublicAccess" class="primary-button" type="button" disabled><i class="fa-solid fa-floppy-disk"></i> Simpan Public Access</button>
+                <p class="control-warning"><i class="fa-solid fa-shield-halved"></i><span>Ini bukan UI-only lock: enforcement berjalan sebelum entitlement dan handler provider pada API Nexora.</span></p>
+                <p id="controlReadOnlyNote" class="control-readonly" hidden>Role ini read-only.</p>
+              </div>
+            </article>
+            <article class="panel-card control-plane-card">
+              <div class="panel-head"><div><p class="eyebrow">ENDPOINT MAINTENANCE</p><h2>Server-gated Tools</h2></div></div>
+              <p class="control-plane-copy">Maintenance hanya ditawarkan untuk tool yang benar-benar melewati authorization server. Status di bawah berasal dari policy tersimpan, bukan hasil simulasi.</p>
+              <div id="endpointMaintenanceList" class="control-endpoint-list"></div>
+            </article>
+            <article class="panel-card control-evidence">
+              <div class="panel-head"><div><p class="eyebrow">OPERATIONAL EVIDENCE</p><h2>Audit yang Sudah Terhubung</h2></div></div>
+              <div class="control-evidence-grid">
+                <button data-control-go="health" type="button"><i class="fa-solid fa-heart-pulse"></i><b>Tool Health</b><small>Cache/live probe nyata dari /api/tool-health.</small></button>
+                <button data-control-go="functional" type="button"><i class="fa-solid fa-list-check"></i><b>Functional Audit</b><small>Registry, modul, handler, dan dependensi tanpa fake progress.</small></button>
+                <button data-control-go="visual" type="button"><i class="fa-solid fa-display"></i><b>Visual QA</b><small>Runtime/resource errors, screenshot, baseline, dan history.</small></button>
+                <button data-control-go="audit" type="button"><i class="fa-solid fa-clock-rotate-left"></i><b>Audit Log</b><small>Perubahan lock dan maintenance ikut tercatat.</small></button>
+                <button data-control-go="analytics" type="button"><i class="fa-solid fa-chart-line"></i><b>API Analytics</b><small>Data RPC analytics tersimpan; tidak ada angka buatan.</small></button>
+              </div>
+            </article>
+          </div>
+        </section>
+
         <section class="admin-section" data-panel="health">
           <article class="panel-card">
             <div class="panel-head"><div><p class="eyebrow">MONITORING</p><h2>Detail Kesehatan Tools</h2></div><div class="panel-head-actions"><span class="panel-time" id="healthTime">Belum diperiksa</span><button id="refreshAdminHealth" class="secondary-button compact-action" type="button"><i class="fa-solid fa-rotate"></i> Periksa</button></div></div>
@@ -182,14 +220,14 @@
 
         <section class="admin-section" data-panel="functional">
           <div class="section-toolbar functional-toolbar">
-            <div class="toolbar-title"><p class="eyebrow">FUNCTIONAL READINESS</p><b>Audit 37 tools: kartu, modul, handler, dan dependensi</b></div>
+            <div class="toolbar-title"><p class="eyebrow">FUNCTIONAL READINESS</p><b>Audit registry tools: kartu, modul, handler, dan dependensi</b></div>
             <select id="functionalStatusFilter" class="select-box" aria-label="Filter hasil functional audit"><option value="all">Semua hasil</option><option value="ready">Siap</option><option value="degraded">Terbatas</option><option value="offline">Gangguan</option><option value="restricted">Akses khusus</option><option value="missing">Tidak lengkap</option></select>
             <button id="runFunctionalAudit" class="primary-button" type="button"><i class="fa-solid fa-play"></i> Jalankan Audit</button>
           </div>
           <div class="functional-note"><i class="fa-solid fa-shield-halved"></i><span>Audit hanya memuat modul dan memeriksa kesiapan handler. Form, upload, download, kamera, serta tindakan mutasi tidak dijalankan.</span></div>
           <div class="metric-grid functional-metrics" id="functionalMetrics"></div>
           <article class="panel-card functional-panel">
-            <div class="panel-head"><div><p class="eyebrow">37 TOOL CHECK</p><h2>Hasil Functional Audit</h2></div><span class="panel-time" id="functionalAuditTime">Belum dijalankan</span></div>
+            <div class="panel-head"><div><p class="eyebrow">REGISTRY TOOL CHECK</p><h2>Hasil Functional Audit</h2></div><span class="panel-time" id="functionalAuditTime">Belum dijalankan</span></div>
             <div class="functional-progress" id="functionalProgress" hidden><i></i><span>Menyiapkan halaman audit...</span></div>
             <div class="functional-audit-list" id="functionalAuditList"><div class="empty-state"><i class="fa-solid fa-list-check"></i><b>Belum ada hasil audit</b><span>Tekan Jalankan Audit untuk memeriksa seluruh tools.</span></div></div>
           </article>
@@ -265,6 +303,7 @@
         <button data-section="socials" type="button"><i class="fa-solid fa-share-nodes"></i><span>Sosial Media</span></button>
         <button data-section="ai" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Personal AI</span></button>
         <button data-section="developer" type="button"><i class="fa-solid fa-user-astronaut"></i><span>About Developer</span></button>
+        <button data-section="control" type="button"><i class="fa-solid fa-sliders"></i><span>Control Plane</span></button>
         <button data-section="health" type="button"><i class="fa-solid fa-heart-pulse"></i><span>Tool Health</span></button>
         <button data-section="functional" type="button"><i class="fa-solid fa-list-check"></i><span>Functional Audit</span></button>
         <button data-section="visual" type="button"><i class="fa-solid fa-camera-retro"></i><span>Visual QA</span></button>
@@ -380,6 +419,7 @@
   <script src="../assets/js/admin/dashboard.js?v=6.4.0-hf3-admin-member-hf1-layout1-audit-brand1-comic-translate1" defer></script>
   <script src="../assets/js/admin/members.js?v=6.4.0-admin-member-hf1" defer></script>
   <script src="../assets/js/admin/developer-profile.js?v=6.4.0-step3-audit-brand1" defer></script>
+  <script src="../assets/js/admin/control-plane.js?v=6.4.0-control-plane1" defer></script>
   <script src="../assets/js/admin/visual-qa.js?v=6.4.0" defer></script>
   <script src="../assets/js/admin/personal-ai.js?v=6.4.0-ai1-branding1" defer></script>
   <script src="../assets/js/admin/functional-audit.js?v=6.4.0-healthfix1" defer></script>

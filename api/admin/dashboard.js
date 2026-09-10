@@ -6,6 +6,7 @@ const updateBranding = require("../../lib/branding-settings");
 const RETIRED_TOOL_IDS = new Set(["bigimage"]);
 const handleAdminPersonalAi = require("../../lib/admin-personal-ai-http");
 const { sendJson: send } = require("../../lib/http-response");
+const { handleAdminControlPlane } = require("../../lib/admin-control-plane");
 
 function booleanValue(value, fallback = true) {
   if (value === true || value === "true" || value === 1 || value === "1") return true;
@@ -130,6 +131,7 @@ async function updateHeroVideo(request, response) {
 module.exports = async function handler(request, response) {
   const requestUrl = new URL(request.url || "/api/admin/dashboard", `http://${request.headers.host || "localhost"}`);
   if (requestUrl.searchParams.get("mode") === "personal-ai") return handleAdminPersonalAi(request, response);
+  if (requestUrl.searchParams.get("mode") === "control-plane") return handleAdminControlPlane(request, response);
   if (request.method === "OPTIONS") {
     response.setHeader("Allow", "GET, PATCH, OPTIONS");
     return response.status(204).end();
