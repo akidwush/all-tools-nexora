@@ -34,11 +34,49 @@ function escapeHtml(value) {
   })[character]);
 }
 
+const SAFE_STATIC_ASSET_EXTENSIONS = new Set([
+  "css", "js", "mjs", "json", "map",
+  "svg", "png", "jpg", "jpeg", "webp", "gif", "avif", "ico",
+  "woff", "woff2", "ttf", "otf",
+  "wasm", "bin", "onnx"
+]);
+
+const LOCKED_PUBLIC_BUNDLES = [
+  "/assets/apps/",
+  "/assets/comic-reader/",
+  "/assets/visuals/demos/"
+];
+
+function normalizeRequestPath(pathname) {
+  let path = String(pathname || "/");
+  try { path = decodeURIComponent(path); } catch {}
+  path = path.replace(/\\/g, "/").replace(/\/{2,}/g, "/");
+  return path;
+}
+
+function assetExtension(pathname) {
+  const clean = String(pathname || "").split("/").pop() || "";
+  const index = clean.lastIndexOf(".");
+  return index > 0 ? clean.slice(index + 1).toLowerCase() : "";
+}
+
+function isAllowedStaticAsset(pathname) {
+  const path = normalizeRequestPath(pathname).toLowerCase();
+  if (!path.startsWith("/assets/")) return false;
+
+  // These directories contain runnable/navigable public applications or demos.
+  // They must never be an escape hatch while the global website lock is active.
+  if (LOCKED_PUBLIC_BUNDLES.some((prefix) => path.startsWith(prefix))) return false;
+
+  const extension = assetExtension(path);
+  return SAFE_STATIC_ASSET_EXTENSIONS.has(extension);
+}
+
 function bypassPath(pathname) {
-  const path = String(pathname || "/");
+  const path = normalizeRequestPath(pathname);
   return (
     path === "/favicon.svg" ||
-    path.startsWith("/assets/") ||
+    isAllowedStaticAsset(path) ||
     path === "/admin" ||
     path.startsWith("/admin/") ||
     path === "/api/admin" ||

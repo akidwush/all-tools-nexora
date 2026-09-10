@@ -35,7 +35,7 @@ assert.doesNotMatch(client,/Math\.random|mockStatus|fakeMetric/i,"Control Plane 
 assert.match(middleware,/export default async function middleware/,"Vercel Routing Middleware harus terpasang");
 assert.match(middleware,/PUBLIC_ACCESS_LOCKED/,"Routing Middleware harus mengembalikan global lock");
 assert.match(middleware,/path\.startsWith\("\/admin\/"\)/,"dashboard admin harus dikecualikan dari global lock");
-assert.match(middleware,/path\.startsWith\("\/assets\/"\)/,"asset admin/public harus dapat dimuat saat maintenance");
+assert.match(middleware,/isAllowedStaticAsset/,"asset statis admin harus memakai allowlist sempit, bukan bypass seluruh /assets/");
 
 async function routingLayerTest(){
   let fetchCalls=0;
@@ -88,8 +88,42 @@ async function routingLayerTest(){
   const assetResponse=await context.__middleware({
     url:"https://nexora.test/assets/css/admin.css"
   });
-  assert.equal(assetResponse,undefined,"Asset admin harus tetap tersedia");
+  assert.equal(assetResponse,undefined,"Asset CSS admin harus tetap tersedia");
+
+  const assetJsResponse=await context.__middleware({
+    url:"https://nexora.test/assets/js/admin/dashboard.js"
+  });
+  assert.equal(assetJsResponse,undefined,"Asset JS admin harus tetap tersedia");
+
+  // Production bypass yang benar-benar ditemukan:
+  // cleanUrls mengubah .../index.html -> .../quote-generator lalu V4 menganggap
+  // seluruh /assets/ aman. V5 wajib menahan kedua bentuk.
+  const standaloneClean=await context.__middleware({
+    url:"https://nexora.test/assets/apps/quote-generator?v=standalone-v1"
+  });
+  assert.equal(standaloneClean.status,503,"Clean URL standalone app tidak boleh membypass global lock");
+  assert.equal((await standaloneClean.text()).includes("Maintenance test"),true);
+
+  const standaloneHtml=await context.__middleware({
+    url:"https://nexora.test/assets/apps/quote-generator/index.html?v=standalone-v1"
+  });
+  assert.equal(standaloneHtml.status,503,"index.html standalone app tidak boleh membypass global lock");
+
+  const comicReader=await context.__middleware({
+    url:"https://nexora.test/assets/comic-reader/index"
+  });
+  assert.equal(comicReader.status,503,"Comic Reader standalone tidak boleh membypass global lock");
+
+  const visualDemo=await context.__middleware({
+    url:"https://nexora.test/assets/visuals/demos/Hex-grid"
+  });
+  assert.equal(visualDemo.status,503,"HTML visual demo tidak boleh membypass global lock");
+
+  const arbitraryAssetDocument=await context.__middleware({
+    url:"https://nexora.test/assets/unknown-document"
+  });
+  assert.equal(arbitraryAssetDocument.status,503,"Path /assets tanpa ekstensi statis aman harus diblokir");
 }
 
 
-routingLayerTest().then(()=>console.log("Admin Control Plane contract lulus: global routing lock, server lock, maintenance, audit linkage, CSRF, dan no-fake-progress.")).catch((error)=>{console.error(error);process.exit(1);});
+routingLayerTest().then(()=>console.log("Admin Control Plane contract lulus: global routing lock V5 menutup standalone cleanUrls bypass, server lock, maintenance, audit linkage, CSRF, dan no-fake-progress.")).catch((error)=>{console.error(error);process.exit(1);});

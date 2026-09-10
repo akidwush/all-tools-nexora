@@ -120,11 +120,19 @@ for (const token of [
   "app_settings?select=value&key=eq.control_plane",
   'path.startsWith("/admin/")',
   'path.startsWith("/api/admin/")',
-  'path.startsWith("/assets/")',
+  "isAllowedStaticAsset",
+  "/assets/apps/",
+  "/assets/comic-reader/",
+  "/assets/visuals/demos/",
+  "SAFE_STATIC_ASSET_EXTENSIONS",
   "status: 503",
   "fail-closed"
 ]) {
   if (!routingMiddleware.includes(token)) fail(`Routing Middleware kehilangan global PUBLIC_ACCESS_LOCKED contract: ${token}`);
+}
+
+if (/path\.startsWith\(["']\/assets\/["']\)\s*\|\|/.test(routingMiddleware)) {
+  fail("Routing Middleware V5 masih membypass seluruh /assets/ tanpa klasifikasi.");
 }
 
 for (const relative of ["index.html", "about.html", "feedback.html", "admin/index.html", "admin/login.html"]) {
