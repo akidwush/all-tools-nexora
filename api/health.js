@@ -10,6 +10,7 @@ const { handleNovelCover } = require("../lib/ai-cover/http");
 const { handleElevenLabs } = require("../lib/elevenlabs-studio");
 const { handleTextToPdf } = require("../lib/text-to-pdf");
 const { handleMultiAi } = require("../lib/kuroneko-multiai");
+const { handleAnimeGallery } = require("../lib/anime-gallery");
 const { authorizeTool } = require("../lib/account-membership");
 const { healthToolId } = require("../lib/server-access-policy");
 const { verifySameOriginRequest } = require("../lib/request-security");
@@ -19,6 +20,7 @@ function publicMetadataRequest(mode, request, requestUrl) {
   if (!["GET", "HEAD"].includes(method)) return false;
   if (mode === "comic-reader") return !requestUrl.searchParams.get("action");
   if (mode === "multi-ai") return true;
+  if (mode === "anime-gallery") return true;
   return new Set([
     "document-ai",
     "prompt-generator",
@@ -54,6 +56,7 @@ module.exports = async function handler(request, response) {
   if (mode === "elevenlabs") return handleElevenLabs(request, response);
   if (mode === "text-to-pdf") return handleTextToPdf(request, response);
   if (mode === "multi-ai") return handleMultiAi(request, response);
+  if (mode === "anime-gallery") return handleAnimeGallery(request, response);
   if (mode === "database") {
     return publicDatabaseHandler(request, response);
   }

@@ -783,6 +783,32 @@
         }
       },
       {
+        "id": "animegallery",
+        "icon": "fa-regular fa-images",
+        "name": "Nexora Anime Discover",
+        "description": "Visual discovery anime, artist, source, dan reaction GIF dari Waifu.im + NEKOSBEST",
+        "badge": "NEW · SFW",
+        "aliases": [
+          "anime gallery",
+          "anime discover",
+          "waifu im",
+          "nekosbest",
+          "reaction gif"
+        ],
+        "runtime": {
+          "mode": "api",
+          "handler": "openAnimeGallery",
+          "dependency": "https://all-tools-nexora.vercel.app/api/health?mode=anime-gallery&provider=nekosbest&action=endpoints"
+        },
+        "health": {
+          "key": "route-anime-gallery",
+          "type": "module",
+          "path": "/anime-gallery",
+          "method": "HEAD",
+          "strict": true
+        }
+      },
+      {
         "id": "animetoreal",
         "icon": "fa-solid fa-person-rays",
         "name": "Anime to Real",

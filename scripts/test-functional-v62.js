@@ -5,7 +5,7 @@ const vm = require("node:vm");
 
 const root = path.resolve(__dirname, "..");
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
-const EXPECTED_TOOL_COUNT = 61;
+const EXPECTED_TOOL_COUNT = 62;
 
 const events = [];
 const sandbox = {

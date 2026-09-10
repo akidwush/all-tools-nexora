@@ -113,7 +113,7 @@ async function main() {
   assert.equal(captured.status, 200);
   assert.equal(captured.payload.source, "catalog");
   assert.equal(captured.payload.data.length, TOOL_CATALOG.length);
-  assert.equal(TOOL_CATALOG.length, 61);
+  assert.equal(TOOL_CATALOG.length, 62);
 
   const protectedResponse = {
     setHeader() {}, status(code) { captured.protectedStatus = code; return this; },

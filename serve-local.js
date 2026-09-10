@@ -5,8 +5,13 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const root = __dirname;
-const defaultPort = Number(process.env.PORT || 4173);
-const defaultHost = process.env.HOST || "127.0.0.1";
+function commandLineOption(name) {
+  const index = process.argv.indexOf(`--${name}`);
+  return index >= 0 ? process.argv[index + 1] : "";
+}
+
+const defaultPort = Number(commandLineOption("port") || process.env.PORT || 4173);
+const defaultHost = commandLineOption("host") || process.env.HOST || "127.0.0.1";
 const CONTENT_SECURITY_POLICY = (() => {
   const config = JSON.parse(fs.readFileSync(path.join(root, "vercel.json"), "utf8"));
   for (const route of config.headers || []) {
@@ -43,6 +48,9 @@ const cleanRoutes = {
   "/about.html": "about.html",
   "/feedback": "feedback.html",
   "/feedback.html": "feedback.html",
+  "/anime-gallery": "anime-gallery.html",
+  "/anime-gallery/": "anime-gallery.html",
+  "/anime-gallery.html": "anime-gallery.html",
   "/admin": "admin/index.html",
   "/admin/": "admin/index.html",
   "/admin/index.html": "admin/index.html",

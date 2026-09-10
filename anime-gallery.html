@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#fafaf8">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="Temukan ilustrasi anime, artist, source, dan reaction GIF dari Waifu.im serta NEKOSBEST.">
+  <title>Nexora Anime Discover</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/css/anime-gallery.css?v=6.4.0-anime-gallery1">
+</head>
+<body>
+  <header class="ag-header">
+    <div class="ag-header-inner">
+      <div class="ag-title-row">
+        <a class="ag-back" href="/" aria-label="Kembali ke All Tools Nexora">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+        </a>
+        <a class="ag-brand" href="/anime-gallery" aria-label="Nexora Anime Discover">
+          <span class="ag-brand-mark">N</span>
+          <span><small>NEXORA</small><strong>Anime Discover</strong></span>
+        </a>
+        <button class="ag-icon-button" id="savedShortcut" type="button" aria-label="Buka gambar tersimpan">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.7-7.5a5.5 5.5 0 0 0 1.1-8.9Z"/></svg>
+          <span id="savedCount" aria-label="0 gambar tersimpan">0</span>
+        </button>
+      </div>
+
+      <form class="ag-search" id="searchForm" role="search" autocomplete="off">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg>
+        <input id="searchInput" type="search" inputmode="search" maxlength="80" placeholder="Search anime, tag, artist..." aria-label="Cari anime, tag, atau artist" aria-controls="searchSuggestions" aria-autocomplete="list">
+        <button class="ag-search-clear" id="searchClear" type="button" aria-label="Hapus pencarian" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17"/></svg>
+        </button>
+        <button class="ag-filter-trigger" id="filterTrigger" type="button" aria-haspopup="dialog">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M6 14v6"/></svg>
+          <span>Filters</span><b id="filterCount" hidden>0</b>
+        </button>
+        <div class="ag-suggestions" id="searchSuggestions" role="listbox" hidden></div>
+      </form>
+
+      <nav class="ag-tabs" id="modeTabs" aria-label="Kategori Anime Discover">
+        <button class="is-active" type="button" data-mode="discover" aria-pressed="true">Discover</button>
+        <button type="button" data-mode="illustrations" aria-pressed="false">Illustrations</button>
+        <button type="button" data-mode="reactions" aria-pressed="false">Reactions</button>
+        <button type="button" data-mode="random" aria-pressed="false">Random</button>
+        <button type="button" data-mode="saved" aria-pressed="false">Saved</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="ag-main" id="mainContent">
+    <section class="ag-chip-section" aria-label="Tag dan kategori">
+      <div class="ag-chip-rail" id="interestChips"></div>
+    </section>
+
+    <section class="ag-feed-tools" aria-label="Kontrol galeri">
+      <div class="ag-provider" id="providerFilter" aria-label="Sumber gambar">
+        <button class="is-active" type="button" data-provider="all" aria-pressed="true">All</button>
+        <button type="button" data-provider="waifu-im" aria-pressed="false">Waifu.im</button>
+        <button type="button" data-provider="nekosbest" aria-pressed="false">NEKOSBEST</button>
+      </div>
+      <p class="ag-feed-summary" id="feedSummary" aria-live="polite">Memuat galeri…</p>
+      <button class="ag-surprise" id="surpriseButton" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+        <span>Surprise Me</span>
+      </button>
+    </section>
+
+    <div class="ag-notices" id="providerNotices" aria-live="polite"></div>
+    <section class="ag-masonry" id="gallery" aria-label="Galeri gambar anime"></section>
+    <div class="ag-empty" id="emptyState" hidden>
+      <span class="ag-empty-mark">✦</span>
+      <h2>Belum ada gambar untuk filter ini</h2>
+      <p>Coba hapus beberapa filter atau pilih tag lain.</p>
+      <button id="resetEmpty" type="button">Reset filters</button>
+    </div>
+    <div class="ag-load-more" id="loadState" aria-live="polite" hidden><i></i><span>Memuat lebih banyak artwork…</span></div>
+    <div id="feedSentinel" class="ag-sentinel" aria-hidden="true"></div>
+  </main>
+
+  <div class="ag-backdrop" id="filterBackdrop" hidden></div>
+  <section class="ag-filter-sheet" id="filterSheet" role="dialog" aria-modal="true" aria-labelledby="filterTitle" hidden>
+    <div class="ag-sheet-handle" aria-hidden="true"></div>
+    <header>
+      <div><small>REFINE DISCOVERY</small><h2 id="filterTitle">Filters</h2></div>
+      <button id="closeFilters" type="button" aria-label="Tutup filter">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17"/></svg>
+      </button>
+    </header>
+    <div class="ag-filter-body">
+      <fieldset>
+        <legend>Orientation</legend>
+        <div class="ag-choice-grid" id="orientationChoices">
+          <button class="is-active" type="button" data-orientation="All">Any</button>
+          <button type="button" data-orientation="Portrait">Portrait</button>
+          <button type="button" data-orientation="Landscape">Landscape</button>
+          <button type="button" data-orientation="Square">Square-ish</button>
+        </div>
+      </fieldset>
+
+      <div class="ag-filter-columns">
+        <label>Animation
+          <select id="animatedFilter">
+            <option value="All">Any</option>
+            <option value="False">Still image</option>
+            <option value="True">Animated</option>
+          </select>
+        </label>
+        <label>Sort
+          <select id="sortFilter">
+            <option value="Random">Random</option>
+            <option value="UploadedAt">Newest</option>
+            <option value="Favorites">Most saved</option>
+          </select>
+        </label>
+      </div>
+
+      <fieldset>
+        <legend>Minimum resolution</legend>
+        <div class="ag-filter-columns">
+          <label>Width <input id="minWidthFilter" type="number" inputmode="numeric" min="0" max="12000" step="100" placeholder="e.g. 1080"></label>
+          <label>Height <input id="minHeightFilter" type="number" inputmode="numeric" min="0" max="12000" step="100" placeholder="e.g. 1600"></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Tags</legend>
+        <div class="ag-tag-picker">
+          <label>Include
+            <select id="includeTagSelect"><option value="">Choose a tag</option></select>
+          </label>
+          <button id="addIncludeTag" type="button">Add</button>
+        </div>
+        <div class="ag-selected-tags" id="includedTagList"></div>
+        <div class="ag-tag-picker">
+          <label>Exclude
+            <select id="excludeTagSelect"><option value="">Choose a tag</option></select>
+          </label>
+          <button id="addExcludeTag" type="button">Add</button>
+        </div>
+        <div class="ag-selected-tags" id="excludedTagList"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Artist</legend>
+        <div class="ag-artist-search">
+          <input id="artistFilterInput" type="search" maxlength="80" placeholder="Search Waifu.im artist">
+          <button id="clearArtist" type="button">Clear</button>
+        </div>
+        <div class="ag-artist-results" id="artistFilterResults"></div>
+      </fieldset>
+
+      <p class="ag-safety-note"><span>SFW</span> Safe content is always enforced for Waifu.im.</p>
+    </div>
+    <footer>
+      <button class="ag-reset-button" id="resetFilters" type="button">Reset</button>
+      <button class="ag-apply-button" id="applyFilters" type="button">Show results</button>
+    </footer>
+  </section>
+
+  <div class="ag-detail-backdrop" id="detailBackdrop" hidden></div>
+  <section class="ag-detail" id="detailView" role="dialog" aria-modal="true" aria-labelledby="detailTitle" hidden>
+    <button class="ag-detail-close" id="detailClose" type="button" aria-label="Tutup detail">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17"/></svg>
+    </button>
+    <div class="ag-detail-media" id="detailMedia"><img id="detailImage" alt=""></div>
+    <div class="ag-detail-info">
+      <span class="ag-detail-provider" id="detailProvider"></span>
+      <h2 id="detailTitle">Artwork details</h2>
+      <p class="ag-detail-byline" id="detailByline"></p>
+      <dl id="detailMetadata"></dl>
+      <div class="ag-detail-tags" id="detailTags"></div>
+      <div class="ag-detail-actions">
+        <a id="openSourceAction" href="#" target="_blank" rel="noopener noreferrer">Open Source</a>
+        <button id="copyUrlAction" type="button">Copy URL</button>
+        <a id="downloadAction" href="#" target="_blank" rel="noopener noreferrer" download>Download</a>
+        <button id="shareAction" type="button">Share</button>
+      </div>
+      <button class="ag-detail-save" id="detailSave" type="button"><span>♡</span> Save artwork</button>
+      <p class="ag-attribution">Artwork remains owned by its creator. Nexora only helps you discover the provider metadata and original source.</p>
+    </div>
+  </section>
+
+  <div class="ag-toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <script src="/assets/js/anime-gallery.js?v=6.4.0-anime-gallery1" defer></script>
+</body>
+</html>

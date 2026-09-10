@@ -36,11 +36,11 @@ const iconMapMatch = dashboard.match(/const ADMIN_TOOL_ICONS=Object\.freeze\((\{
 assert(iconMapMatch, "Peta ikon tool admin tidak ditemukan.");
 const iconMap = Function(`"use strict";return (${iconMapMatch[1]});`)();
 const icons = Object.values(iconMap);
-assert(Object.keys(iconMap).length === 59, "Seluruh 59 tool bawaan harus memiliki ikon admin.");
+assert(Object.keys(iconMap).length === 60, "Seluruh 60 tool bawaan harus memiliki ikon admin.");
 assert(new Set(icons).size === icons.length, "Ikon tool bawaan di admin harus unik.");
 assert(iconMap.autopdf === "fa-solid fa-file-pdf", "Nexora Auto PDF harus memakai ikon PDF.");
 assert(dashboard.includes("resolveAdminToolIcon(item)"), "Renderer kartu belum menggunakan resolver ikon berprioritas.");
 assert(dashboard.includes("Ubah teks panjang menjadi PDF yang rapi."), "Copy Nexora Auto PDF belum diperbaiki.");
 assert(dashboard.includes('class="tool-card-head"') && dashboard.includes('class="tool-card-footer"'), "Struktur kartu tool compact belum digunakan.");
 
-console.log("Admin mobile-first lulus: stats 2 kolom, bottom nav, filter ringkas, kartu compact, 59 tool catalog, dan safe-area tervalidasi.");
+console.log("Admin mobile-first lulus: stats 2 kolom, bottom nav, filter ringkas, kartu compact, 60 tool catalog, dan safe-area tervalidasi.");

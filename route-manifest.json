@@ -5,6 +5,7 @@
     "/": "index.html",
     "/about": "about.html",
     "/feedback": "feedback.html",
+    "/anime-gallery": "anime-gallery.html",
     "/admin": "admin/index.html",
     "/admin/login": "admin/login.html"
   },

@@ -1645,6 +1645,11 @@ document.addEventListener('keydown', event => {
     card.click();
 });
 
+function openAnimeGallery() {
+    window.location.assign('/anime-gallery');
+    return false;
+}
+
 function showTool(toolId) {
     const viewer = document.getElementById('toolViewer');
     const body = document.getElementById('toolViewerBody');
@@ -1701,6 +1706,7 @@ function showTool(toolId) {
         case 'aivideo': renderPuterVideo(body); break;
         case 'genmail': renderGenMail(body); break;
         case 'danbooru': renderDanbooruSearch(body); break;
+        case 'animegallery': openAnimeGallery(); return;
         case 'animetoreal': renderAnimeToReal(body); break;
         case 'aisong': renderAiSong(body); break;
         case 'elevenlabs': renderElevenLabsStudio(body); break;
