@@ -396,6 +396,14 @@
         "assets/js/features/maker-originals.js"
       ]
     },
+    "avatar-studio": {
+      "css": [
+        "assets/css/features/avatar-studio.css"
+      ],
+      "js": [
+        "assets/js/features/avatar-studio.js"
+      ]
+    },
     "world-classics": {
       "css": [
         "assets/css/world-classics.css"
@@ -533,6 +541,32 @@
       }
     ],
     "maker": [
+      {
+        "id": "avatarstudio",
+        "icon": "fa-solid fa-user-astronaut",
+        "name": "Nexora Avatar Studio",
+        "description": "Buat avatar SVG unik dengan puluhan style dan editor visual.",
+        "badge": "SVG",
+        "aliases": [
+          "avatar studio",
+          "dicebear",
+          "avatar generator",
+          "svg avatar"
+        ],
+        "runtime": {
+          "mode": "module",
+          "module": "avatar-studio",
+          "handler": "renderAvatarStudio",
+          "dependency": "https://api.dicebear.com/10.x/"
+        },
+        "health": {
+          "key": "module-avatar-studio",
+          "type": "module",
+          "path": "/assets/js/features/avatar-studio.js",
+          "method": "HEAD",
+          "strict": true
+        }
+      },
       {
         "id": "sertifikat",
         "icon": "fa-solid fa-certificate",

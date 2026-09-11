@@ -366,6 +366,14 @@
         "assets/js/features/maker-originals.js"
       ]
     },
+    "avatar-studio": {
+      "css": [
+        "assets/css/features/avatar-studio.css"
+      ],
+      "js": [
+        "assets/js/features/avatar-studio.js"
+      ]
+    },
     "world-classics": {
       "css": [
         "assets/css/world-classics.css"
@@ -381,6 +389,7 @@
     "aiodownloader": "aio-downloader",
     "terabox": "download-pack",
     "tiktok": "tiktok",
+    "avatarstudio": "avatar-studio",
     "sertifikat": "maker-originals",
     "winquotes": "generator-pack",
     "nokiamsg": "generator-pack",

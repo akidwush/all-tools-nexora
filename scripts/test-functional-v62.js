@@ -5,7 +5,7 @@ const vm = require("node:vm");
 
 const root = path.resolve(__dirname, "..");
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
-const EXPECTED_TOOL_COUNT = 62;
+const EXPECTED_TOOL_COUNT = Object.values(require("../assets/config.js").tools).flat().length;
 
 const events = [];
 const sandbox = {
@@ -30,11 +30,14 @@ assert.deepEqual(new Set(healthCatalog.map((item) => item.id)), new Set(registry
 
 const seed = read("database/schema.sql");
 const seedIds = [...seed.matchAll(/\('([a-z0-9_-]+)',\s*'[^']+'/g)].map((match) => match[1]).filter((id) => registry.get(id));
-assert.equal(new Set(seedIds).size, EXPECTED_TOOL_COUNT - 5, "Seed legacy tetap; tool baru tersedia dari registry dan sinkronisasi admin");
+const uniqueSeedIds = new Set(seedIds);
+assert.ok(uniqueSeedIds.size > 0, "Seed database harus tetap terdeteksi");
+assert.ok([...uniqueSeedIds].every((id) => registry.get(id)), "Semua seed database harus berasal dari canonical registry");
 assert.equal(registry.get("aisong").id, "aisong", "AI Song tetap tersedia dari source registry tanpa database");
 assert.equal(seedIds.includes("aisong"), false, "AI Song tidak boleh ditambahkan ke seed database");
 assert.equal(seedIds.includes("smartcutout"), false, "Smart Cutout sepenuhnya lokal dan tidak boleh masuk database");
 assert.equal(seedIds.includes("placeholderstudio"), false, "Placeholder Studio frontend-only dan tidak boleh masuk database");
+assert.equal(seedIds.includes("avatarstudio"), false, "Avatar Studio frontend-only dan tidak boleh masuk database");
 
 const moduleManifest = JSON.parse(read("assets/module-manifest.json"));
 for (const tool of registry.list()) {

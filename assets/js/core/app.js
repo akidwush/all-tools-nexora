@@ -1675,6 +1675,7 @@ function showTool(toolId) {
         case 'spotify': renderSpotify(body); break;
         case 'terabox': renderTerabox(body); break;
         case 'sertifikat': renderSertifikatTololSource(body); break;
+        case 'avatarstudio': window.openAvatarStudio && window.openAvatarStudio(); return;
 
         case 'ektp': renderEktp(body); break;
         case 'fakelobby': renderFakeLobby(body); break;

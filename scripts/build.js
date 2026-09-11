@@ -36,7 +36,7 @@ if (process.env.VERCEL === "1") {
 fs.rmSync(output, { recursive: true, force: true });
 fs.mkdirSync(output, { recursive: true });
 
-for (const filename of ["index.html", "about.html", "feedback.html", "anime-gallery.html", "favicon.svg", "route-manifest.json"]) {
+for (const filename of ["index.html", "about.html", "feedback.html", "anime-gallery.html", "avatar-studio.html", "favicon.svg", "route-manifest.json"]) {
   fs.copyFileSync(path.join(root, filename), path.join(output, filename));
 }
 fs.cpSync(path.join(root, "assets"), path.join(output, "assets"), { recursive: true, force: true });
@@ -50,7 +50,7 @@ catch (error) {
 
 const manifest = JSON.parse(fs.readFileSync(path.join(root, "assets/module-manifest.json"), "utf8"));
 const expected = [
-  "public/index.html", "public/about.html", "public/feedback.html", "public/anime-gallery.html", "public/favicon.svg",
+  "public/index.html", "public/about.html", "public/feedback.html", "public/anime-gallery.html", "public/avatar-studio.html", "public/favicon.svg",
   "public/admin/index.html", "public/admin/login.html", "public/assets/js/core/app.js",
   "public/assets/config.js", "public/assets/js/core/tool-registry.js", "public/assets/module-manifest.json",
   ...Object.values(manifest.modules || {}).flatMap((module) => [...(module.css || []), ...(module.js || [])].map((file) => `public/${file}`))

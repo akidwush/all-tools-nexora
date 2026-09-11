@@ -169,7 +169,7 @@ try {
 const schema = read("database/schema.sql");
 const seedBlock = schema.match(/insert into public\.tools[\s\S]*?on conflict \(id\) do nothing;/i)?.[0] || "";
 const seedIds = [...seedBlock.matchAll(/^\s*\('([a-z0-9_-]+)'/gm)].map((match) => match[1]);
-const databaseOptionalIds = new Set(["aisong", "aivideo", "smartcutout", "placeholderstudio"]);
+const databaseOptionalIds = new Set(["aisong", "aivideo", "smartcutout", "placeholderstudio", "avatarstudio"]);
 const databaseBackedRegistryIds = registryIds.filter((id) => !databaseOptionalIds.has(id));
 const unknownSeedIds = seedIds.filter((id) => !databaseBackedRegistryIds.includes(id));
 if (unknownSeedIds.length) fail(`Seed database memiliki tool yang tidak dikenal: ${unknownSeedIds.join(", ")}.`);

@@ -80,7 +80,13 @@ assert.equal(getTool("aisong").health.path, "/assets/js/features/ai-song.js");
 assert.doesNotMatch(schema, /'aisong', 'Nexora AI Song Generator'/);
 assert.equal((read(".env.example").match(/^KURONEKO_API_KEY=$/gm) || []).length, 1);
 assert.equal(fs.existsSync(path.join(root, "database/migrations/032_ai_song.sql")), false, "AI Song tidak boleh menambah migration database");
-assert.match(read("scripts/check-project.js"), /databaseOptionalIds = new Set\(\["aisong", "aivideo", "smartcutout", "placeholderstudio"\]\)/);
+{
+  const checkProject = read("scripts/check-project.js");
+  assert.match(checkProject, /databaseOptionalIds = new Set/);
+  for (const id of ["aisong", "aivideo", "smartcutout", "placeholderstudio"]) {
+    assert.ok(checkProject.includes(`"${id}"`), `check-project harus tetap mengenali ${id} sebagai database-optional`);
+  }
+}
 
 assert.match(frontend, /window\.renderAiSong\s*=/);
 assert.match(frontend, /new AbortController\(\)/);
