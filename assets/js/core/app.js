@@ -1325,10 +1325,12 @@ const PUBLIC_TOOL_ICONS = Object.freeze(Object.fromEntries(
 ));
 
 function collectAllTools() {
+    const avatarStudio = toolsData.maker.find(item => item.id === 'avatarstudio');
     const rows = [
         toolsData.tools.find(item => item.id === 'comicreader'),
+        avatarStudio,
         ...toolsData.downloader,
-        ...toolsData.maker,
+        ...toolsData.maker.filter(item => item.id !== 'avatarstudio'),
         ...toolsData.tools.filter(item => item.id !== 'comicreader'),
         ...toolsData.vault,
         ...toolsData.external
@@ -1336,6 +1338,10 @@ function collectAllTools() {
     if (!rows.some(item => Number.isFinite(Number(item && item.sortOrder)))) return rows;
     return rows.map((item, index) => ({ item, index }))
         .sort((left, right) => {
+            const pinned = item => item && item.id === 'comicreader' ? 0 : (item && item.id === 'avatarstudio' ? 1 : 2);
+            const leftPinned = pinned(left.item);
+            const rightPinned = pinned(right.item);
+            if (leftPinned !== rightPinned) return leftPinned - rightPinned;
             const a = Number(left.item && left.item.sortOrder);
             const b = Number(right.item && right.item.sortOrder);
             const aValid = Number.isFinite(a);
@@ -1562,8 +1568,9 @@ async function applyDatabaseToolConfiguration() {
   // whenever Supabase lags behind the local catalog.
         const databaseById = new Map(rows.map(row => [String(row.id || ''), row]));
         let bundledOrder = 0;
+        const frontendOnlyToolIds = new Set(['avatarstudio']);
         for (const base of baseById.values()) {
-            const row = databaseById.get(base.id) || null;
+            const row = frontendOnlyToolIds.has(base.id) ? null : (databaseById.get(base.id) || null);
             databaseById.delete(base.id);
             if (row?.is_active === false) continue;
             const category = allowedCategories.has(row?.category) ? row.category : base.category;
