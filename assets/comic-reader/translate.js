@@ -38,7 +38,7 @@
   requestAnimationFrame(function(){if(current!==s||!p.visible)return;var overflow=false;p.layer.querySelectorAll('button').forEach(function(b){overflow=fit(b)||overflow;});p.note.textContent=[inaccurate?'Terjemahan mungkin kurang akurat.':'',overflow?'Teks terlalu panjang untuk balon kecil. Ketuk balon untuk membaca lengkap.':''].filter(Boolean).join(' ');p.note.hidden=!p.note.textContent;});
  }
  function render(s){s.pages.forEach(function(p,i){renderPage(s,i);});}
- function status(s,text){if(current===s)s.status.textContent=text;}
+ function status(s,text){if(current===s){s.status.textContent=text||'';s.status.hidden=!text;}}
  function progress(s){status(s,'Menerjemahkan chapter: '+s.results.size+' / '+s.pages.length+' halaman'+(s.failed.size?' • '+s.failed.size+' gagal':''));}
  function stop(s){if(!s)return;s.control.cancel&&s.control.cancel();s.controller.abort();s.observer&&s.observer.disconnect();s.resize&&s.resize.disconnect();clearInterval(s.timer);if(s.jobId&&s.api)s.api.invoke('comic-translate-chapter',{action:'cancel',jobId:s.jobId}).catch(function(){});}
  async function start(s){
@@ -79,14 +79,18 @@
  }
  document.addEventListener('nexora:comic-pages',function(event){
   stop(current);var d=event.detail,host=document.getElementById('mangaReaderPages');if(!host)return;
-  var compatible=d.translationCompatible!==false,source=d.source||'mangadex',sourceLabel=source==='mangadex'?'MangaDex':source;
-  var toolbar=node('div','nx-ct-toolbar'),mode=node('select'),startButton=node('button','','Translate All'),cancel=node('button','','Cancel'),retry=node('button','','Retry halaman gagal'),sfx=node('input'),message=node('p','nx-ct-status');
+  var compatible=d.translationCompatible!==false,source=d.source||'mangadex',sourceLabel=d.sourceLabel||(source==='mangadex'?'MangaDex':source);
+  var toolbar=node('div','nx-ct-toolbar '+(compatible?'is-compatible':'is-unavailable')),mode=node('select'),startButton=node('button','nx-ct-primary','Translate All'),cancel=node('button','nx-ct-secondary','Cancel'),retry=node('button','nx-ct-secondary','Retry gagal'),sfx=node('input'),message=node('p','nx-ct-status');
   mode.setAttribute('aria-label','Bahasa komik');[['original','Original']].concat(compatible?[['id','Indonesia']]:[]).forEach(function(pair){var o=node('option','',pair[1]);o.value=pair[0];mode.append(o);});
   var icon=node('i','fa-solid fa-language');icon.setAttribute('aria-hidden','true');startButton.prepend(icon,document.createTextNode(' '));
-  [startButton,cancel,retry].forEach(function(b){b.type='button';});startButton.disabled=!compatible;startButton.title=compatible?'Terjemahkan semua halaman chapter':'Belum kompatibel dengan source ini';cancel.hidden=true;retry.hidden=true;sfx.type='checkbox';var label=node('label');label.append(sfx,document.createTextNode('Translate SFX'));label.hidden=!compatible;message.setAttribute('role','status');message.setAttribute('aria-live','polite');
-  toolbar.append(mode,startButton,cancel,retry,label,message);host.before(toolbar);
+  [startButton,cancel,retry].forEach(function(b){b.type='button';});cancel.hidden=true;retry.hidden=true;sfx.type='checkbox';
+  var label=node('label','nx-ct-sfx');label.append(sfx,document.createTextNode('SFX'));label.hidden=!compatible;message.setAttribute('role','status');message.setAttribute('aria-live','polite');message.hidden=true;
+  toolbar.append(mode);
+  if(compatible){toolbar.append(startButton,cancel,retry,label,message);}else{
+    var info=node('button','nx-ct-info','Translate · N/A');info.type='button';info.setAttribute('aria-label','Translate All belum kompatibel untuk '+sourceLabel);info.title='Translate All belum kompatibel untuk '+sourceLabel;info.onclick=function(){if(window.NexoraComicUI&&window.NexoraComicUI.openTranslationInfo)window.NexoraComicUI.openTranslationInfo(sourceLabel);};toolbar.append(info);
+  }
+  var failure=document.getElementById('readerFailureBanner');(failure||host).before(toolbar);
   var s=current={source:source,sourceLabel:sourceLabel,translationCompatible:compatible,mangaId:d.mangaId,chapterId:d.chapterId,host:host,toolbar:toolbar,pages:[],results:new Map(),failed:new Set(),mode:mode,sfx:sfx,start:startButton,cancel:cancel,retry:retry,status:message,control:{},controller:new AbortController(),busy:false};
-  if(!compatible)message.textContent='Translate All belum kompatibel untuk '+sourceLabel+'. Mode Original tetap tersedia.';
   Array.from(host.querySelectorAll(':scope > img')).forEach(function(img,i){
    var wrap=node('div','nx-ct-page'),plane=node('div','nx-ct-overlay'),note=node('small','nx-ct-page-note'),container=node('div');
    note.hidden=true;container.style.position='relative';img.replaceWith(wrap);container.append(img,plane);wrap.append(container,note);

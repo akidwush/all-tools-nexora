@@ -108,7 +108,7 @@ The adapter uses the fixed `https://api.ainzscans01.com/api/` JSON flow. Search/
 
 ### MangaDotNet
 
-The adapter uses the fixed `https://mangadot.net/api/` JSON endpoints for list, chapters, volumes, and images. It does not add a new HTML parser just to enrich detail metadata; detail therefore retains only values already known from normalized search context when the current JSON connector does not expose them. Language filtering is applied to chapter rows when requested.
+The adapter uses the fixed `https://mangadot.net/api/` JSON endpoints for list, chapters, volumes, and images. It does not add a new HTML parser just to enrich detail metadata; detail therefore retains only values already known from normalized search context when the current JSON connector does not expose them. Language filtering is applied to chapter rows when requested. Reader page images are exposed through the existing allowlisted `page-image` proxy instead of direct browser hotlinks; the adapter marks those pages as referer-required and supplies only the fixed `https://mangadot.net/` referer. This keeps the existing HTTPS/hostname/SSRF checks intact while avoiding direct image failures caused by upstream hotlink/edge policy.
 
 ## Search and source switching
 

@@ -137,7 +137,10 @@ function healthLabel(row){if(!row||row.status==='unchecked')return'Belum dicek';
 function renderSourceHealth(){
   const node=$('comicSourceHealth');if(!node)return;
   const id=state.source==='all'?'mangadex':state.source;const row=state.sourceHealth[id]||sourceDefinition(id)?.health||{status:'unchecked'};
-  node.className='source-health is-'+String(row.status||'unchecked');node.innerHTML='<i></i><span>'+escapeHtml(sourceLabel(id))+' · '+escapeHtml(healthLabel(row))+'</span>';
+  const label=healthLabel(row);
+  node.className='source-health is-'+String(row.status||'unchecked');
+  node.dataset.shortStatus=label;
+  node.innerHTML='<i></i><span>'+escapeHtml(sourceLabel(id))+' · '+escapeHtml(label)+'</span>';
 }
 function updateAttribution(){
   const row=sourceDefinition(state.source);const host=$('mangaAttributionText');if(!host)return;
@@ -157,6 +160,81 @@ async function loadSourceRegistry(){
   }catch(error){state.sourceRegistry=[{id:'mangadex',label:'MangaDex',capabilities:{search:true,detail:true,chapters:true,pages:true,languageFilter:true,pagination:true,translationCompatible:true},health:{status:'unchecked'}}];}
   renderSourceSelector();
 }
+
+function setComicView(view){
+  state.view=view;
+  document.body.classList.toggle('home-mode',view==='home');
+  document.body.classList.toggle('detail-mode',view==='detail');
+  document.body.classList.toggle('reader-mode',view==='reader');
+}
+function mangaSkeletonHtml(count=6){
+  return '<div class="manga-skeleton-grid" aria-label="Memuat komik">'+Array.from({length:count},()=>'<div class="manga-skeleton"></div>').join('')+'</div>';
+}
+function detailSkeletonHtml(){
+  return '<div class="detail-skeleton" aria-label="Memuat detail"><div class="detail-skeleton-cover"></div><div class="detail-skeleton-copy"><div class="detail-skeleton-line"></div><div class="detail-skeleton-line short"></div><div class="detail-skeleton-line tiny"></div></div></div>';
+}
+function updateFilterButton(){
+  const count=Number(state.category!=='all')+Number(state.statusFilter!=='all');
+  const badge=$('mangaFilterCount');if(badge){badge.hidden=!count;badge.textContent=String(count)}
+  const button=$('mangaFilterBtn');if(button)button.classList.toggle('active',count>0);
+}
+let sheetReturnFocus=null;
+let sheetHistoryPushed=false;
+function closeComicSheet(fromPop=false){
+  const backdrop=$('comicSheetBackdrop');if(!backdrop||backdrop.hidden)return;
+  backdrop.hidden=true;document.body.classList.remove('sheet-open');
+  if(sheetHistoryPushed&&!fromPop){sheetHistoryPushed=false;history.back();}
+  else if(fromPop)sheetHistoryPushed=false;
+  const target=sheetReturnFocus;sheetReturnFocus=null;if(target&&target.focus)requestAnimationFrame(()=>target.focus());
+}
+function openComicSheet(title,bodyHtml,actionsHtml=''){
+  const backdrop=$('comicSheetBackdrop'),sheet=$('comicBottomSheet');if(!backdrop||!sheet)return;
+  sheetReturnFocus=document.activeElement;
+  $('comicSheetTitle').textContent=title;$('comicSheetBody').innerHTML=bodyHtml;
+  const actions=$('comicSheetActions');actions.innerHTML=actionsHtml;actions.hidden=!actionsHtml;
+  backdrop.hidden=false;document.body.classList.add('sheet-open');
+  if(!sheetHistoryPushed){history.pushState({nxComicSheet:true},'');sheetHistoryPushed=true;}
+  requestAnimationFrame(()=>sheet.focus());
+}
+function filterOption(kind,value,label,current){
+  return '<button class="sheet-option '+(value===current?'is-selected':'')+'" type="button" data-filter-kind="'+kind+'" data-filter-value="'+escapeHtml(value)+'"><span>'+escapeHtml(label)+'</span><i class="fa-solid '+(value===current?'fa-circle-check':'fa-circle')+'"></i></button>';
+}
+function openFilterSheet(){
+  let draftCategory=state.category,draftStatus=state.statusFilter;
+  const render=()=>{
+    $('comicSheetBody').innerHTML='<div class="sheet-section"><div class="sheet-label">Tipe</div><div class="sheet-options">'+[
+      ['all','Semua'],['manga','Manga'],['manhwa','Manhwa'],['manhua','Manhua']
+    ].map(row=>filterOption('category',row[0],row[1],draftCategory)).join('')+'</div></div><div class="sheet-section"><div class="sheet-label">Status</div><div class="sheet-options">'+[
+      ['all','Semua'],['ongoing','Ongoing'],['tamat','Tamat']
+    ].map(row=>filterOption('status',row[0],row[1],draftStatus)).join('')+'</div></div>';
+    $('comicSheetBody').querySelectorAll('[data-filter-kind]').forEach(button=>button.onclick=()=>{if(button.dataset.filterKind==='category')draftCategory=button.dataset.filterValue;else draftStatus=button.dataset.filterValue;render();});
+  };
+  openComicSheet('Filter komik','', '<button type="button" id="sheetFilterReset">Reset</button><button class="primary" type="button" id="sheetFilterApply">Terapkan</button>');
+  render();
+  $('sheetFilterReset').onclick=()=>{draftCategory='all';draftStatus='all';render()};
+  $('sheetFilterApply').onclick=()=>{state.category=draftCategory;state.statusFilter=draftStatus;document.querySelectorAll('#mangaCategoryTabs .tab').forEach(b=>b.classList.toggle('active',b.dataset.category===state.category));document.querySelectorAll('#mangaStatusTabs .tab').forEach(b=>b.classList.toggle('active',b.dataset.status===state.statusFilter));updateFilterButton();closeComicSheet();mangaShowHome(true)};
+}
+function providerSheetRow(id,current,enabled=true){
+  const health=state.sourceHealth[id]||sourceDefinition(id)?.health||{status:'unchecked'};
+  const status=healthLabel(health);
+  return '<button class="sheet-provider is-'+escapeHtml(health.status||'unchecked')+(id===current?' is-current':'')+'" type="button" data-source="'+escapeHtml(id)+'" '+(enabled?'':'disabled')+'><i></i><b>'+escapeHtml(sourceLabel(id))+'</b><small>'+(id===current?'Current · ':'')+escapeHtml(status)+'</small></button>';
+}
+function openReaderSourceSheet(){
+  const current=state.mangaData&&state.mangaData.source||state.source;
+  const mapped=[current,...state.sourceMatches.map(row=>row.source)];const seen=new Set();const ids=mapped.filter(id=>id&&!seen.has(id)&&seen.add(id));
+  openComicSheet('Pilih sumber','<div class="sheet-provider-list">'+ids.map(id=>providerSheetRow(id,current)).join('')+'</div>'+(ids.length<=1?'<p class="sheet-note">Source lain hanya dapat dipilih setelah mapping manga tervalidasi dari halaman detail.</p>':''));
+  $('comicSheetBody').querySelectorAll('[data-source]').forEach(button=>button.onclick=()=>{const source=button.dataset.source;closeComicSheet();mangaSwitchReaderSource(source)});
+}
+function openReaderSettingsSheet(){
+  const active=state.readerQuality;
+  openComicSheet('Reading Settings','<div class="sheet-section"><div class="sheet-label">Kualitas gambar</div><div class="sheet-setting-row"><button type="button" data-quality="saver" class="'+(active==='saver'?'active':'')+'">Hemat</button><button type="button" data-quality="full" class="'+(active==='full'?'active':'')+'">Original / HD</button></div></div><div class="sheet-section"><button class="sheet-option" type="button" id="sheetReaderHome"><span><i class="fa-solid fa-house"></i> Kembali ke daftar komik</span><i class="fa-solid fa-chevron-right"></i></button></div>');
+  $('comicSheetBody').querySelectorAll('[data-quality]').forEach(button=>button.onclick=()=>{closeComicSheet();changeReaderQuality(button.dataset.quality)});
+  $('sheetReaderHome').onclick=()=>{closeComicSheet();mangaShowHome(true)};
+}
+function openTranslationInfo(sourceLabelText){
+  openComicSheet('Tentang terjemahan','<p class="sheet-note">Translate All belum tersedia untuk <strong>'+escapeHtml(sourceLabelText||sourceLabel(state.source))+'</strong>. Mode Original tetap tersedia dan reader tidak mengaktifkan terjemahan sebelum kompatibilitas provider diverifikasi.</p>');
+}
+window.NexoraComicUI={openFilter:openFilterSheet,openReaderSource:openReaderSourceSheet,openReaderSettings:openReaderSettingsSheet,openTranslationInfo,closeSheet:closeComicSheet};
 function setSearchProgress(rows){const host=$('comicSourceProgress');if(!host)return;if(!rows||!rows.length){host.hidden=true;host.innerHTML='';return;}host.hidden=false;host.innerHTML=rows.map(row=>'<span class="source-progress is-'+escapeHtml(row.state)+'"><i></i>'+escapeHtml(sourceLabel(row.id))+' '+escapeHtml(row.state)+'</span>').join('');}
 async function runBounded(items,limit,worker,onState){
   const width=Math.max(1,Math.min(3,Number(limit)||1));const results=[];
@@ -399,12 +477,12 @@ function mangaSwitchTab(tab){
 function mangaSwitchCategory(category){
   state.category=category;state.query='';$('mangaSearchInput').value='';
   document.querySelectorAll('#mangaCategoryTabs .tab').forEach(b=>b.classList.toggle('active',b.dataset.category===category));
-  mangaShowHome(true);
+  updateFilterButton();mangaShowHome(true);
 }
 function mangaSwitchStatus(status){
   state.statusFilter=status;
   document.querySelectorAll('#mangaStatusTabs .tab').forEach(b=>b.classList.toggle('active',b.dataset.status===status));
-  mangaShowHome(true);
+  updateFilterButton();mangaShowHome(true);
 }
 function mangaResetFilters(){
   state.tab='latest';state.category='all';state.statusFilter='all';state.query='';
@@ -412,7 +490,7 @@ function mangaResetFilters(){
   document.querySelectorAll('#mangaTabs .tab').forEach(b=>b.classList.toggle('active',b.dataset.tab==='latest'));
   document.querySelectorAll('#mangaCategoryTabs .tab').forEach(b=>b.classList.toggle('active',b.dataset.category==='all'));
   document.querySelectorAll('#mangaStatusTabs .tab').forEach(b=>b.classList.toggle('active',b.dataset.status==='all'));
-  mangaShowHome(true);
+  updateFilterButton();mangaShowHome(true);
 }
 function mangaDoSearch(){
   state.query=$('mangaSearchInput').value.trim();if(state.searchController)state.searchController.abort();state.searchController=new AbortController();mangaShowHome(true);
@@ -424,19 +502,21 @@ function mangaSwitchSource(source){
   state.source=source;state.capabilities=source==='all'?{}:sourceCapabilities(source);state.sourceMatches=[];state.selectedLang='';state.query='';$('mangaSearchInput').value='';renderSourceSelector();mangaResetFilters();
 }
 function mangaShowHome(reset){
-  state.view='home';
+  setComicView('home');
   const isXyz=state.tab==='xyz';
   const special=state.tab==='favorite'||state.tab==='history'||isXyz;
-  document.body.classList.remove('reader-mode');
   $('mangaTitleBar').innerHTML=isXyz
     ?'<i class="fa-solid fa-bolt"></i> xyZ Manga'
     :'<i class="fa-solid fa-book-open"></i> Baca Komik';
-  $('mangaBackBtn').style.display='none';
-  document.querySelector('.manga-topbar').style.display='none';
-  $('mangaSearchBar').style.display=special?'none':'flex';
-  $('mangaTabs').style.display='flex';
-  $('mangaCategoryTabs').style.display=special?'none':'flex';
-  $('mangaStatusTabs').style.display=special?'none':'flex';
+  $('mangaBackBtn').hidden=true;
+  $('mangaSearchBar').hidden=special;
+  $('comicSourceStrip').hidden=special;
+  $('comicSourceProgress').hidden=true;
+  $('mangaTabs').hidden=false;
+  $('mangaCategoryTabs').hidden=true;
+  $('mangaStatusTabs').hidden=true;
+  const filterButton=$('mangaFilterBtn');if(filterButton)filterButton.hidden=special;
+  updateFilterButton();
   const content=$('mangaContent');
   if(isXyz){
     state.hasMore=false;state.loading=false;
@@ -447,7 +527,7 @@ function mangaShowHome(reset){
   content.className='manga-grid';
   if(reset){
     state.page=1;state.hasMore=true;
-    content.innerHTML='<div class="loading"><i class="fa-solid fa-spinner spin"></i><span>Memuat komik...</span></div>';
+    content.innerHTML=mangaSkeletonHtml(window.innerWidth<=640?4:6);
   }
   mangaFetchList(reset);
 }
@@ -562,17 +642,13 @@ function mangaOnFavClick(){
   }
 }
 async function mangaOpenDetail(id,source,hint){
-  state.view='detail';state.mangaId=id;if(source&&source!=='all')state.source=source;state.selectedLang='';state.availableLanguages=[];state.sourceMatches=[];renderSourceSelector();
-  $('mangaSearchBar').style.display='none';
-  $('mangaTabs').style.display='none';
-  $('mangaCategoryTabs').style.display='none';
-  $('mangaStatusTabs').style.display='none';
+  setComicView('detail');state.mangaId=id;if(source&&source!=='all')state.source=source;state.selectedLang='';state.availableLanguages=[];state.sourceMatches=[];renderSourceSelector();
+  $('mangaSearchBar').hidden=true;$('mangaTabs').hidden=true;$('mangaCategoryTabs').hidden=true;$('mangaStatusTabs').hidden=true;$('comicSourceStrip').hidden=true;$('comicSourceProgress').hidden=true;
   $('mangaTitleBar').innerHTML='<i class="fa-solid fa-book-open"></i> Detail Komik';
-  $('mangaBackBtn').style.display='';
-  document.querySelector('.manga-topbar').style.display='flex';
+  $('mangaBackBtn').hidden=false;
   const content=$('mangaContent');
   content.className='detail';
-  content.innerHTML='<div class="loading"><i class="fa-solid fa-spinner spin"></i><span>Memuat detail...</span></div>';
+  content.innerHTML=detailSkeletonHtml();
   window.scrollTo({top:0,behavior:'smooth'});
   try{
     const detail=await getDetail(id,hint||state.searchItems.get(sourceKey(id,state.source))||null);
@@ -594,9 +670,9 @@ async function mangaOpenDetail(id,source,hint){
           <div class="meta">${(detail.tags||[]).slice(0,12).map(tag=>`<span class="tag">${escapeHtml(tag)}</span>`).join('')}</div>
         </div>
       </div>
-      <div class="detail-source-row"><span class="tag"><i class="fa-solid fa-database"></i> Source: ${escapeHtml(sourceLabel(detail.source||state.source))}</span>${detail.url?`<a class="source-open-link" href="${escapeHtml(detail.url)}" target="_blank" rel="noopener noreferrer">Open Source <i class="fa-solid fa-arrow-up-right-from-square"></i></a>`:''}</div>
-      <div class="available-sources"><div><strong>Available Sources</strong><small>Source lain hanya dipetakan setelah pencocokan confidence.</small></div><div id="mangaSourceMatches"><button class="source-match-btn is-current" type="button">${escapeHtml(sourceLabel(detail.source||state.source))}</button><button class="source-match-btn" type="button" onclick="mangaDiscoverSources()"><i class="fa-solid fa-magnifying-glass"></i> Cari source lain</button></div></div>
-      <p class="detail-desc">${escapeHtml(detail.desc)}</p>
+      <div class="detail-source-row"><span class="tag"><i class="fa-solid fa-database"></i> Sumber: ${escapeHtml(sourceLabel(detail.source||state.source))}</span>${detail.url?`<a class="source-open-link" href="${escapeHtml(detail.url)}" target="_blank" rel="noopener noreferrer">Buka sumber <i class="fa-solid fa-arrow-up-right-from-square"></i></a>`:''}</div>
+      <div class="available-sources"><div><strong>Sumber tersedia</strong><small>Switch hanya jika mapping cukup yakin.</small></div><div id="mangaSourceMatches"><button class="source-match-btn is-current" type="button">${escapeHtml(sourceLabel(detail.source||state.source))}</button><button class="source-match-btn source-search-btn" type="button" onclick="mangaDiscoverSources()"><span><i class="fa-solid fa-magnifying-glass"></i> Cari sumber lain</span></button></div></div>
+      <div class="detail-desc-wrap" id="mangaDescWrap"><p class="detail-desc">${escapeHtml(detail.desc)}</p><button class="detail-desc-toggle" type="button" onclick="mangaToggleDescription()">Selengkapnya</button></div>
       <div id="mangaLangBar" class="lang-bar" style="display:none"></div>
       <div class="chapter-head"><h3><i class="fa-solid fa-book"></i> Daftar Chapter</h3><span class="tag" id="chapterCount">Memuat</span></div>
       <div id="mangaChapterList"><div class="loading"><i class="fa-solid fa-spinner spin"></i><span>Memuat chapter...</span></div></div>`;
@@ -607,6 +683,9 @@ async function mangaOpenDetail(id,source,hint){
       <span><strong>${escapeHtml(sourceLabel(state.source))} sedang tidak tersedia.</strong><small>Coba lagi atau pilih source lain.</small></span>
       <button class="nav-btn" onclick="mangaOpenDetail('${String(id).replace(/'/g,"\\'")}')"><i class="fa-solid fa-rotate-right"></i> Coba Lagi</button></div>`;
   }
+}
+function mangaToggleDescription(){
+  const wrap=$('mangaDescWrap');if(!wrap)return;const expanded=wrap.classList.toggle('is-expanded');const button=wrap.querySelector('.detail-desc-toggle');if(button)button.textContent=expanded?'Ringkas':'Selengkapnya';
 }
 const LANG_LABELS={
   en:'English',id:'Indonesia',ja:'Japanese',ko:'Korean',zh:'Chinese','zh-hk':'Chinese (HK)',
@@ -653,25 +732,28 @@ let readerGeneration=0;
 async function mangaOpenReader(index){
   const generation=++readerGeneration;
   document.dispatchEvent(new CustomEvent('nexora:comic-loading'));
-  state.view='reader';state.chapterIndex=index;
+  setComicView('reader');state.chapterIndex=index;
   const chapter=state.chapters[index];
   if(!chapter)return;
   if(state.mangaData)addHistory(state.mangaData,chapter);
-  document.body.classList.add('reader-mode');
+  closeComicSheet();
   window.scrollTo({top:0});
   const content=$('mangaContent');
   content.className='';
+  const currentSource=state.mangaData&&state.mangaData.source||state.source;
   content.innerHTML=`
     <div class="reader-topbar">
-      <button class="icon-btn" onclick="mangaOpenDetail(state.mangaId,state.mangaData&&state.mangaData.source,state.mangaData)" title="Kembali ke Detail"><i class="fa-solid fa-arrow-left"></i></button>
-      <div class="reader-title"><i class="fa-solid fa-book-open-reader"></i> ${escapeHtml(chapter.name)}${escapeHtml(chapter.extra||'')}</div>
-      <select class="reader-source-select" id="readerSourceSelect" aria-label="Source reader">${readerSourceOptions()}</select>
-      <div class="quality-switch">
+      <button class="icon-btn" id="readerBackBtn" type="button" onclick="mangaOpenDetail(state.mangaId,state.mangaData&&state.mangaData.source,state.mangaData)" aria-label="Kembali ke detail"><i class="fa-solid fa-arrow-left"></i></button>
+      <div class="reader-title" title="${escapeHtml(chapter.name)}${escapeHtml(chapter.extra||'')}">${escapeHtml(chapter.name)}${escapeHtml(chapter.extra||'')}</div>
+      <select class="reader-source-select" id="readerSourceSelect" aria-label="Sumber reader">${readerSourceOptions()}</select>
+      <div class="quality-switch" aria-label="Kualitas gambar">
         <button id="qualitySaver" class="${state.readerQuality==='saver'?'active':''}" type="button">Hemat</button>
         <button id="qualityFull" class="${state.readerQuality==='full'?'active':''}" type="button">HD</button>
       </div>
-      <button class="icon-btn" onclick="mangaShowHome(true)" title="Daftar Komik"><i class="fa-solid fa-house"></i></button>
+      <button class="reader-source-button" id="readerSourceButton" type="button" aria-label="Pilih sumber"><span>${escapeHtml(sourceLabel(currentSource))}</span><i class="fa-solid fa-chevron-down"></i></button>
+      <button class="reader-more" id="readerMoreButton" type="button" aria-label="Menu reader"><i class="fa-solid fa-ellipsis-vertical"></i></button>
     </div>
+    <div class="reader-failure-banner" id="readerFailureBanner" hidden><div><span>Beberapa halaman gagal dimuat.</span><button type="button" onclick="mangaRetryFailedPages()"><i class="fa-solid fa-rotate-right"></i> Retry gagal</button></div></div>
     <div class="reader-pages" id="mangaReaderPages">
       <div class="page-loader"><i class="fa-solid fa-spinner spin"></i><span>Memuat halaman komik...</span></div>
     </div>
@@ -682,13 +764,16 @@ async function mangaOpenReader(index){
   $('mangaPrevBtn').disabled=index>=state.chapters.length-1;
   $('mangaNextBtn').disabled=index<=0;
   $('qualitySaver').onclick=()=>changeReaderQuality('saver');
-  $('qualityFull').onclick=()=>changeReaderQuality('full');const readerSource=$('readerSourceSelect');if(readerSource)readerSource.onchange=e=>mangaSwitchReaderSource(e.target.value);
+  $('qualityFull').onclick=()=>changeReaderQuality('full');
+  const readerSource=$('readerSourceSelect');if(readerSource)readerSource.onchange=e=>mangaSwitchReaderSource(e.target.value);
+  $('readerSourceButton').onclick=openReaderSourceSheet;
+  $('readerMoreButton').onclick=openReaderSettingsSheet;
   try{
     const pages=await getPages(chapter);
     if(generation!==readerGeneration||state.view!=='reader')return;
     $('mangaReaderPages').innerHTML=pages.map((url,pageIndex)=>`
-      <img src="${escapeHtml(url)}" loading="${pageIndex<2?'eager':'lazy'}" decoding="async" alt="Halaman ${pageIndex+1}" data-raw="${escapeHtml(url)}" data-tries="0" onerror="mangaPageErrorHandler(this)">`).join('');
-    document.dispatchEvent(new CustomEvent('nexora:comic-pages',{detail:{source:state.mangaData&&state.mangaData.source||state.source,mangaId:state.mangaId,chapterId:chapter.id,translationCompatible:!!(state.capabilities&&state.capabilities.translationCompatible)}}));
+      <img src="${escapeHtml(url)}" loading="${pageIndex<2?'eager':'lazy'}" decoding="async" alt="Halaman ${pageIndex+1}" data-page-index="${pageIndex}" data-page-state="loading" data-raw="${escapeHtml(url)}" data-tries="0" onload="mangaPageLoadHandler(this)" onerror="mangaPageErrorHandler(this)">`).join('');
+    document.dispatchEvent(new CustomEvent('nexora:comic-pages',{detail:{source:currentSource,sourceLabel:sourceLabel(currentSource),mangaId:state.mangaId,chapterId:chapter.id,translationCompatible:!!(state.capabilities&&state.capabilities.translationCompatible)}}));
   }catch(error){
     if(generation!==readerGeneration||state.view!=='reader')return;
     $('mangaReaderPages').innerHTML=`
@@ -718,22 +803,36 @@ function changeReaderQuality(quality){
   toast(quality==='full'?'Mode gambar HD aktif':'Mode hemat data aktif');
   mangaOpenReader(state.chapterIndex);
 }
-window.mangaPageErrorHandler=function(img){
-  const tries=Number(img.dataset.tries||0);
-  const raw=img.dataset.raw||'';
-  if(tries<2){
-    img.dataset.tries=String(tries+1);
-    setTimeout(()=>{img.src=raw+(raw.includes('?')?'&':'?')+'retry='+Date.now()},1000);
-  }else if(tries===2&&raw){
-    img.dataset.tries='3';
-    img.src=sourceImageUrl(raw);
-  }else{
-    img.classList.add('page-failed');
-    img.style.cursor='pointer';
-    img.title='Tekan untuk mencoba lagi';
-    img.onclick=()=>{img.dataset.tries='0';img.classList.remove('page-failed');img.src=raw+'?retry='+Date.now()};
-  }
+function readerErrorContainer(img){return img.closest('.nx-ct-page')?.querySelector('div[style*="position"]')||img.parentElement}
+function updateReaderFailureWarning(){
+  const banner=$('readerFailureBanner');if(!banner)return;
+  const indexes=[...document.querySelectorAll('#mangaReaderPages img.page-failed')].map(img=>Number(img.dataset.pageIndex)).filter(Number.isFinite).sort((a,b)=>a-b);
+  let streak=0,maxStreak=0,previous=-2;for(const index of indexes){streak=index===previous+1?streak+1:1;maxStreak=Math.max(maxStreak,streak);previous=index;}
+  banner.hidden=maxStreak<3;
+  const text=banner.querySelector('span');if(text)text.textContent=indexes.length+' halaman gagal dimuat.';
+}
+function renderReaderPageFailure(img){
+  if(!img||img.classList.contains('page-failed'))return;
+  img.classList.add('page-failed');img.dataset.pageState='failed';img.hidden=true;img.title='Tekan Retry untuk mencoba lagi';
+  const existing=readerErrorContainer(img)?.querySelector('.reader-page-error[data-page-index="'+img.dataset.pageIndex+'"]');if(existing){existing.hidden=false;updateReaderFailureWarning();return;}
+  const block=document.createElement('div');block.className='reader-page-error';block.dataset.pageIndex=img.dataset.pageIndex||'';
+  const sourceUrl=state.mangaData&&state.mangaData.url;
+  block.innerHTML='<div><strong>Image gagal dimuat</strong>Halaman '+(Number(img.dataset.pageIndex||0)+1)+' tidak dapat diambil.</div><div class="reader-page-error-actions"><button type="button" class="retry-page"><i class="fa-solid fa-rotate-right"></i> Retry</button>'+(sourceUrl?'<a href="'+escapeHtml(sourceUrl)+'" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i> Buka sumber</a>':'')+'</div>';
+  block.querySelector('.retry-page').onclick=()=>mangaRetryPage(img);img.insertAdjacentElement('afterend',block);updateReaderFailureWarning();
+}
+function mangaRetryPage(img){
+  if(!img)return;const raw=img.dataset.raw||'';const block=readerErrorContainer(img)?.querySelector('.reader-page-error[data-page-index="'+img.dataset.pageIndex+'"]');if(block)block.remove();
+  img.hidden=false;img.classList.remove('page-failed');img.dataset.tries='0';img.dataset.pageState='loading';img.src=raw+(raw.includes('?')?'&':'?')+'retry='+Date.now();updateReaderFailureWarning();
+}
+window.mangaPageLoadHandler=function(img){
+  if(!img)return;img.dataset.pageState='loaded';img.dataset.tries='0';img.hidden=false;img.classList.remove('page-failed');const block=readerErrorContainer(img)?.querySelector('.reader-page-error[data-page-index="'+img.dataset.pageIndex+'"]');if(block)block.remove();updateReaderFailureWarning();
 };
+window.mangaPageErrorHandler=function(img){
+  const tries=Number(img.dataset.tries||0),raw=img.dataset.raw||'';img.dataset.pageState='failed';
+  if(tries<2&&raw){img.dataset.tries=String(tries+1);setTimeout(()=>{if(img.isConnected&&!img.classList.contains('page-failed'))img.src=raw+(raw.includes('?')?'&':'?')+'retry='+Date.now()},700*(tries+1));return;}
+  renderReaderPageFailure(img);
+};
+window.mangaRetryFailedPages=function(){document.querySelectorAll('#mangaReaderPages img.page-failed').forEach(img=>mangaRetryPage(img))};
 function mangaChangeChapter(direction){
   const next=state.chapterIndex+direction;
   if(next<0||next>=state.chapters.length)return;
@@ -744,9 +843,14 @@ $('mangaBackBtn').onclick=mangaGoBack;
 $('mangaSearchBtn').onclick=mangaDoSearch;
 let mangaSearchDebounce=0;$('mangaSearchInput').addEventListener('keydown',event=>{if(event.key==='Enter'){clearTimeout(mangaSearchDebounce);mangaDoSearch()}});$('mangaSearchInput').addEventListener('input',()=>{clearTimeout(mangaSearchDebounce);mangaSearchDebounce=setTimeout(()=>{if($('mangaSearchInput').value.trim().length>=2)mangaDoSearch()},420)});
 $('comicSourceSelect').onchange=e=>mangaSwitchSource(e.target.value);
-document.querySelectorAll('#mangaTabs .tab').forEach(button=>button.onclick=()=>mangaSwitchTab(button.dataset.tab));
+document.querySelectorAll('#mangaTabs .tab[data-tab]').forEach(button=>button.onclick=()=>mangaSwitchTab(button.dataset.tab));
 document.querySelectorAll('#mangaCategoryTabs .tab').forEach(button=>button.onclick=()=>mangaSwitchCategory(button.dataset.category));
 document.querySelectorAll('#mangaStatusTabs .tab').forEach(button=>button.onclick=()=>mangaSwitchStatus(button.dataset.status));
+$('mangaFilterBtn').onclick=openFilterSheet;
+$('comicSheetClose').onclick=()=>closeComicSheet();
+$('comicSheetBackdrop').addEventListener('click',event=>{if(event.target===$('comicSheetBackdrop'))closeComicSheet()});
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!$('comicSheetBackdrop').hidden)closeComicSheet()});
+window.addEventListener('popstate',()=>{if(!$('comicSheetBackdrop').hidden)closeComicSheet(true)});
 
 async function mangaXyzFetch(section){
   let sourceError=null;

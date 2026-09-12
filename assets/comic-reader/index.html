@@ -4,80 +4,96 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#07000f">
+<meta name="theme-color" content="#060509">
 <title>ALL TOOLS NEXORA — BACA KOMIK</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
-
-
-
-<link rel="stylesheet" href="/assets/comic-reader/app.css?v=standalone-v1-multisource1">
-<link rel="stylesheet" href="/assets/comic-reader/translate.css?v=comic-translate1">
+<link rel="stylesheet" href="/assets/comic-reader/app.css?v=standalone-v1-polish2">
+<link rel="stylesheet" href="/assets/comic-reader/translate.css?v=comic-translate2-polish1">
 </head>
-<body>
-
+<body class="home-mode">
 <div class="shell" id="comicShell">
-  <div class="hero-min">
+  <div class="hero-min" aria-hidden="true">
     <span class="kicker"><i class="fa-solid fa-book-open-reader"></i> Nexora // Comic Reader</span>
   </div>
 
-  <main class="workspace"><div class="manga-attribution"><i class="fa-solid fa-circle-info"></i><span id="mangaAttributionText">Source: <strong>MangaDex</strong>. Hak karya milik kreator/penerbit; Nexora hanya mengambil data on-demand.</span></div>
-    <div class="manga-topbar">
-      <button class="icon-btn" id="mangaBackBtn" type="button" title="Kembali"><i class="fa-solid fa-arrow-left"></i></button>
-      <div class="manga-title" id="mangaTitleBar"><i class="fa-solid fa-book-open"></i> Baca Komik</div>
-      <button class="icon-btn" type="button" onclick="mangaShowHome(true)" title="Daftar Komik"><i class="fa-solid fa-house"></i></button>
+  <main class="workspace">
+    <div class="manga-attribution">
+      <i class="fa-solid fa-circle-info"></i>
+      <span id="mangaAttributionText">Source: <strong>MangaDex</strong>. Hak karya tetap milik kreator/penerbit.</span>
     </div>
 
-    <div class="comic-source-strip" id="comicSourceStrip">
-      <label class="comic-source-control"><span>Source</span><select id="comicSourceSelect" aria-label="Pilih source komik"><option value="mangadex">MangaDex</option></select></label>
-      <div class="source-health is-unchecked" id="comicSourceHealth" aria-live="polite"><i></i><span>MangaDex · Belum dicek</span></div>
+    <div class="manga-topbar">
+      <button class="icon-btn" id="mangaBackBtn" type="button" aria-label="Kembali"><i class="fa-solid fa-arrow-left"></i></button>
+      <div class="manga-title" id="mangaTitleBar"><i class="fa-solid fa-book-open"></i> Baca Komik</div>
+      <button class="icon-btn" type="button" onclick="mangaShowHome(true)" aria-label="Daftar komik"><i class="fa-solid fa-house"></i></button>
     </div>
-    <div class="comic-source-progress" id="comicSourceProgress" hidden></div>
 
     <div id="mangaSearchBar" class="search-bar">
-      <i class="fa-solid fa-magnifying-glass"></i>
+      <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
       <input type="search" id="mangaSearchInput" placeholder="Cari manga, manhwa, atau manhua" aria-label="Cari komik" autocomplete="off" enterkeyhint="search">
       <button id="mangaSearchBtn" type="button" aria-label="Cari komik"><i class="fa-solid fa-arrow-right"></i></button>
     </div>
 
-    <div id="mangaTabs" class="tabs" data-label="Sort">
-      <button class="tab active" data-tab="latest" type="button"><i class="fa-solid fa-fire"></i> Update Terbaru</button>
-      <button class="tab" data-tab="popular" type="button"><i class="fa-solid fa-star"></i> Populer</button>
-      <button class="tab" data-tab="xyz" type="button"><i class="fa-solid fa-compass"></i> Pilihan</button>
-      <button class="tab" data-tab="favorite" type="button"><i class="fa-solid fa-heart"></i> Favorit</button>
-      <button class="tab" data-tab="history" type="button"><i class="fa-solid fa-clock-rotate-left"></i> Riwayat</button>
+    <div class="comic-source-strip" id="comicSourceStrip">
+      <label class="comic-source-control" for="comicSourceSelect">
+        <span>Sumber</span>
+        <select id="comicSourceSelect" aria-label="Pilih sumber komik"><option value="mangadex">MangaDex</option></select>
+      </label>
+      <div class="source-health is-unchecked" id="comicSourceHealth" aria-live="polite"><i></i><span>MangaDex · Belum dicek</span></div>
+    </div>
+    <div class="comic-source-progress" id="comicSourceProgress" hidden></div>
+
+    <div id="mangaTabs" class="home-nav" aria-label="Navigasi komik">
+      <div class="browse-nav" role="group" aria-label="Jelajah">
+        <button class="tab active" data-tab="latest" type="button"><i class="fa-solid fa-fire"></i><span>Terbaru</span></button>
+        <button class="tab" data-tab="popular" type="button"><i class="fa-solid fa-star"></i><span>Populer</span></button>
+        <button class="tab" data-tab="xyz" type="button"><i class="fa-solid fa-compass"></i><span>Pilihan</span></button>
+      </div>
+      <div class="library-nav" role="group" aria-label="Pustaka dan filter">
+        <button class="tab compact-tab" id="mangaFilterBtn" type="button"><i class="fa-solid fa-sliders"></i><span>Filter</span><b id="mangaFilterCount" hidden>0</b></button>
+        <button class="tab compact-tab" data-tab="favorite" type="button"><i class="fa-solid fa-heart"></i><span>Favorit</span></button>
+        <button class="tab compact-tab" data-tab="history" type="button"><i class="fa-solid fa-clock-rotate-left"></i><span>Riwayat</span></button>
+      </div>
     </div>
 
-    <div id="mangaCategoryTabs" class="tabs" data-label="Type">
-      <button class="tab active" data-category="all" type="button"><i class="fa-solid fa-border-all"></i> Semua</button>
-      <button class="tab" data-category="manga" type="button"><i class="fa-solid fa-book"></i> Manga</button>
-      <button class="tab" data-category="manhwa" type="button"><i class="fa-solid fa-book-open"></i> Manhwa</button>
-      <button class="tab" data-category="manhua" type="button"><i class="fa-solid fa-book-atlas"></i> Manhua</button>
+    <!-- State controls are kept for regression/state synchronization. Mobile/desktop UI uses the Filter sheet. -->
+    <div id="mangaCategoryTabs" class="filter-state-tabs" hidden aria-hidden="true">
+      <button class="tab active" data-category="all" type="button">Semua</button>
+      <button class="tab" data-category="manga" type="button">Manga</button>
+      <button class="tab" data-category="manhwa" type="button">Manhwa</button>
+      <button class="tab" data-category="manhua" type="button">Manhua</button>
+    </div>
+    <div id="mangaStatusTabs" class="filter-state-tabs" hidden aria-hidden="true">
+      <button class="tab active" data-status="all" type="button">Semua Status</button>
+      <button class="tab" data-status="ongoing" type="button">Ongoing</button>
+      <button class="tab" data-status="tamat" type="button">Tamat</button>
     </div>
 
-    <div id="mangaStatusTabs" class="tabs" data-label="Status">
-      <button class="tab active" data-status="all" type="button"><i class="fa-solid fa-list-check"></i> Semua Status</button>
-      <button class="tab" data-status="ongoing" type="button"><i class="fa-solid fa-rotate"></i> Ongoing</button>
-      <button class="tab" data-status="tamat" type="button"><i class="fa-solid fa-check-double"></i> Tamat</button>
-    </div>
-
-    <div id="mangaContent" class="manga-grid">
-      <div class="loading"><i class="fa-solid fa-spinner spin"></i><span>Memuat komik terbaru...</span></div>
+    <div id="mangaContent" class="manga-grid" aria-live="polite">
+      <div class="manga-skeleton-grid" aria-label="Memuat komik">
+        <div class="manga-skeleton"></div><div class="manga-skeleton"></div><div class="manga-skeleton"></div><div class="manga-skeleton"></div>
+      </div>
     </div>
   </main>
 </div>
+
+<div class="comic-sheet-backdrop" id="comicSheetBackdrop" hidden>
+  <section class="comic-sheet" id="comicBottomSheet" role="dialog" aria-modal="true" aria-labelledby="comicSheetTitle" tabindex="-1">
+    <div class="comic-sheet-handle" aria-hidden="true"></div>
+    <header class="comic-sheet-head">
+      <h2 id="comicSheetTitle">Menu</h2>
+      <button class="sheet-close" id="comicSheetClose" type="button" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+    </header>
+    <div class="comic-sheet-body" id="comicSheetBody"></div>
+    <div class="comic-sheet-actions" id="comicSheetActions" hidden></div>
+  </section>
+</div>
+
 <div class="toast-wrap" id="toastWrap"></div>
-
-
-
-
-
-
-
-<script src="/assets/comic-reader/app.js?v=standalone-v1-comic-translate1-multisource1"></script>
+<script src="/assets/comic-reader/app.js?v=standalone-v1-comic-translate1-multisource1-polish2"></script>
 <script src="/assets/comic-reader/translate-queue.js?v=comic-translate1"></script>
-<script src="/assets/comic-reader/translate.js?v=comic-translate1-multisource1"></script>
+<script src="/assets/comic-reader/translate.js?v=comic-translate2-multisource1-polish1"></script>
 </body>
 </html>

@@ -114,6 +114,8 @@ async function callApi(query) {
   assert.equal(sh.pages[0].refererRequired, true);
   assert.equal(ai.detail.title, "Komik Uji");
   assert.equal(mdn.chapters[0].language, "id");
+  assert.equal(mdn.pages[0].refererRequired, true, "MangaDotNet page harus lewat safe image proxy untuk menghindari direct hotlink/CF failure");
+  assert.equal(mdn.pages[0].metadata.referer, "https://mangadot.net/");
 
   clearSourceCache();
   const shinigamiChapterRequests = [];
@@ -183,6 +185,9 @@ async function callApi(query) {
   assert.equal(sourceSearch.payload.items[0].source, "shinigami");
   const afterRequest = await callApi("?action=sources");
   assert.equal(afterRequest.payload.sources.find((row) => row.id === "shinigami").health.status, "active");
+  const mangadotPagesApi = await callApi("?action=pages&source=mangadotnet&id=chapter:501&mangaId=41");
+  assert.equal(mangadotPagesApi.status, 200);
+  assert.match(mangadotPagesApi.payload.data.pages[0].url, /^\/api\/comics\?action=page-image&source=mangadotnet/, "MangaDotNet image harus diekspos melalui allowlisted page-image proxy");
   const invalidSource = await callApi("?action=search&source=https%3A%2F%2F127.0.0.1&q=x");
   assert.equal(invalidSource.status, 400);
   assert.equal(invalidSource.payload.error, "COMIC_SOURCE_INVALID");
@@ -212,7 +217,8 @@ async function callApi(query) {
   assert.match(readerClient, /listGeneration/, "List source harus punya generation guard agar request lama tidak menimpa source baru");
   assert.match(readerClient, /referrerpolicy="no-referrer"/, "Cover provider harus menghindari foreign referrer saat direct image load");
   assert.match(readerClient, /onerror="mangaPageErrorHandler\(this\)"/, "broken image harus masuk retry handler");
-  assert.match(readerClient, /window\.mangaPageErrorHandler[\s\S]*page-failed[\s\S]*Tekan untuk mencoba lagi/, "reader harus memiliki final broken-image retry state");
+  assert.match(readerClient, /window\.mangaPageErrorHandler[\s\S]*renderReaderPageFailure[\s\S]*page-failed/, "reader harus memiliki compact broken-image recovery state");
+  assert.match(readerClient, /mangaRetryFailedPages/, "reader harus dapat retry halaman gagal per-page/batch");
 
   const serverSource = fs.readFileSync(path.join(root, "lib/comic-reader.js"), "utf8");
   assert.doesNotMatch(serverSource, /searchParams\.get\(["']url["']\)/, "Comic dispatcher tidak boleh menerima arbitrary URL");
