@@ -37,4 +37,16 @@ assert.doesNotMatch(read("scripts/test-functional-v62.js"),/EXPECTED_TOOL_COUNT\
 const app=read("assets/js/core/app.js");
 assert.match(app,/item\.id === 'avatarstudio' \? 1 : 2/);
 assert.match(app,/frontendOnlyToolIds = new Set\(\['avatarstudio'\]\)/);
+
+// Public dashboard must expose Avatar Studio immediately and bust stale catalog/module caches.
+const publicIndex=read("index.html");
+const avatarCardPos=publicIndex.indexOf('data-tool-id="avatarstudio"');
+const teraboxCardPos=publicIndex.indexOf('data-tool-id="terabox"');
+assert.ok(avatarCardPos>=0,"Avatar Studio harus ada pada prerender dashboard publik");
+assert.ok(teraboxCardPos>=0&&avatarCardPos<teraboxCardPos,"Avatar Studio harus dipin sebelum downloader pada first paint");
+assert.match(publicIndex,/assets\/config\.js\?v=[^"']*avatar-dashboard2/);
+assert.match(publicIndex,/assets\/js\/core\/app\.js\?v=[^"']*avatar-dashboard2/);
+assert.match(publicIndex,/assets\/js\/core\/lazy-loader\.js\?v=[^"']*avatar-studio2/);
+assert.match(read("assets/js/core/lazy-loader.js"),/avatar-studio-v2/);
+assert.match(read("avatar-studio.html"),/lazy-loader\.js\?v=6\.4\.0-avatar-studio2/);
 console.log("Avatar Studio contract lulus: dynamic DiceBear, browser-only, no API key, no Supabase, no new Vercel Function.");

@@ -54,7 +54,7 @@
     [/hd4-enhancer\.(?:js|css)(?:$|\?)/, 'hd4-enhancer-v2'],
     [/smart-cutout(?:-core)?\.(?:js|css)(?:$|\?)/, 'smart-cutout-v3'],
     [/placeholder-studio\.(?:js|css)(?:$|\?)/, 'placeholder-studio-v3'],
-    [/avatar-studio\.(?:js|css)(?:$|\?)/, 'avatar-studio-v1'],
+    [/avatar-studio\.(?:js|css)(?:$|\?)/, 'avatar-studio-v2'],
     [/document-ai\.(?:js|css)(?:$|\?)/, 'document-responsive2'],
     [/text-to-pdf\.(?:js|css)(?:$|\?)/, 'auto-pdf-v2'],
     [/crypto-market\.(?:js|css)(?:$|\?)/, 'crypto-mtf'],
