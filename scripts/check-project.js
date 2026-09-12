@@ -21,7 +21,7 @@ const COMIC_READER_LOCK = Object.freeze({
   "assets/js/features/comic-reader.js": "9f751be2e67f9ce72518f9d6d2544c4df31ea01b96dac617555934d68bb0cacc",
   "assets/comic-reader/index.html": "eec42e4c258e8e225921f661d55a04806d3ec846ec2c9bd9c829ce44006913c0",
   "assets/comic-reader/app.css": "07037a92196e953b22e53edc4af85465d818853b52141ddd9e0f588ba37a681a",
-  "assets/comic-reader/app.js": "03b57566dce20322f23d5e2ca1cb9b4657c527dba99696f2d9a86ae85c19dde4",
+  "assets/comic-reader/app.js": "c3ec03dc111ad340c17e6754cf8c79dd44f984d01e417ef6ddc91eddd766728a",
   "assets/comic-reader/translate.js": "767c4da9127da71ea7ee67844605b3031d7c942a89a9ef21b663065c20e1f49e",
   "assets/css/features/comic-reader.css": "61e079135af952ecebfa5a10e3a88c01cc9eb441bf4c7aa5dc70df6dd2007b2a"
 });

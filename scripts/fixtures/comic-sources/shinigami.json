@@ -1,6 +1,1 @@
-{
-  "list": {"data":[{"manga_id":"sh-1","slug":"komik-uji","title":"Komik Uji","cover_url":"https://cdn.shngm.io/covers/sh-1.jpg"}]},
-  "detail": {"data":{"manga_id":"sh-1","slug":"komik-uji","title":"Komik Uji","description":"Sinopsis","status":"ongoing","author":"Penulis Uji"}},
-  "chapters": {"data":[{"chapter_id":"sh-ch-1","chapter_title":"Awal","chapter_number":"1"}]},
-  "pages": {"data":{"base_url":"https://cdn.shngm.io/","chapter":{"path":"chapters/sh-ch-1/","data":["001.webp","002.webp"]}}}
-}
+{"list":{"data":[{"manga_id":"sh-1","slug":"komik-uji","title":"Komik Uji","cover_image_url":"https://storage.shngm.id/covers/sh-1.jpg"}],"meta":{"page":1,"total_page":1}},"detail":{"data":{"manga_id":"sh-1","slug":"komik-uji","title":"Komik Uji","description":"Sinopsis","status":"ongoing","author":"Penulis Uji","cover_portrait_url":"https://storage.shngm.id/covers/sh-1-portrait.jpg"}},"chapters":{"data":[{"chapter_id":"sh-ch-1","chapter_title":"Awal","chapter_number":"1"}],"meta":{"page":1,"total_page":1}},"pages":{"data":{"base_url":"https://cdn.shngm.io/","chapter":{"path":"chapters/sh-ch-1/","data":["001.webp","002.webp"]}}}}

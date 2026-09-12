@@ -34,7 +34,8 @@ const state = {
   sourceMatches:[],
   searchController:null,
   searchItems:new Map(),
-  capabilities:null
+  capabilities:null,
+  listGeneration:0
 };
 
 function $(id){return document.getElementById(id)}
@@ -110,7 +111,8 @@ function sourceImageUrl(raw){
 function mangaCoverImgHtml(rawUrl){
   if(!rawUrl) return '<div class="manga-cover-wrap cover-broken"></div>';
   const raw=escapeHtml(rawUrl).replace(/'/g,'&#39;');
-  return `<img src="${sourceImageUrl(rawUrl)}" loading="lazy" decoding="async" alt="cover" data-raw="${raw}" data-fallback-stage="0" onerror="mangaCoverFallback(this)">`;
+  const src=escapeHtml(sourceImageUrl(rawUrl));
+  return `<img src="${src}" loading="lazy" decoding="async" alt="cover" referrerpolicy="no-referrer" data-raw="${raw}" data-fallback-stage="0" onerror="mangaCoverFallback(this)">`;
 }
 window.mangaCoverFallback=function(img){
   const stage=Number(img.dataset.fallbackStage||0);
@@ -280,7 +282,7 @@ async function sourceDetail(id,hint){
   const source=hint&&hint.source||state.source;const params=new URLSearchParams({action:'detail',source,id});
   if(hint&&hint.slug)params.set('slug',hint.slug);if(hint&&hint.title)params.set('title',hint.title);
   const json=await sourceCall(params,20000,null,source);const d=json.data||{};
-  return{...d,id:d.id||id,source:d.source||source,cover:d.coverUrl||'',type:itemType(d),desc:d.description||'Belum ada sinopsis untuk komik ini.',tags:d.genres||[],author:(d.authors||[])[0]||null,year:d.metadata&&d.metadata.year||'-',realStatus:d.status||'',capabilities:json.capabilities||sourceCapabilities(source)};
+  return{...d,id:d.id||id,source:d.source||source,cover:d.coverUrl||(hint&&((hint.coverUrl)||(hint.cover)))||'',type:itemType(d),desc:d.description||'Belum ada sinopsis untuk komik ini.',tags:d.genres||[],author:(d.authors||[])[0]||null,year:d.metadata&&d.metadata.year||'-',realStatus:d.status||'',capabilities:json.capabilities||sourceCapabilities(source)};
 }
 async function getDetail(id,hint){return sourceDetail(id,hint);}
 
@@ -416,7 +418,10 @@ function mangaDoSearch(){
   state.query=$('mangaSearchInput').value.trim();if(state.searchController)state.searchController.abort();state.searchController=new AbortController();mangaShowHome(true);
 }
 function mangaSwitchSource(source){
-  if(!source||source===state.source)return;if(state.searchController)state.searchController.abort();state.source=source;state.capabilities=source==='all'?{}:sourceCapabilities(source);state.sourceMatches=[];state.selectedLang='';state.query='';$('mangaSearchInput').value='';renderSourceSelector();mangaResetFilters();
+  if(!source||source===state.source)return;
+  if(state.searchController)state.searchController.abort();
+  state.searchController=null;state.loading=false;state.hasMore=true;state.page=1;state.searchItems.clear();
+  state.source=source;state.capabilities=source==='all'?{}:sourceCapabilities(source);state.sourceMatches=[];state.selectedLang='';state.query='';$('mangaSearchInput').value='';renderSourceSelector();mangaResetFilters();
 }
 function mangaShowHome(reset){
   state.view='home';
@@ -466,6 +471,13 @@ async function checkFavoriteUpdates(favs){
   }
 }
 async function mangaFetchList(reset){
+  if(reset){
+    state.listGeneration+=1;
+    if(state.searchController)state.searchController.abort();
+    state.searchController=new AbortController();
+    state.loading=false;
+  }
+  const generation=state.listGeneration;
   if(state.loading||(!state.hasMore&&!reset))return;
   state.loading=true;
   const content=$('mangaContent');
@@ -498,6 +510,7 @@ async function mangaFetchList(reset){
   try{
     const controller=state.searchController||(state.searchController=new AbortController());
     const result=await fetchList({query:state.query,category:state.category,page:state.page,signal:controller.signal});
+    if(generation!==state.listGeneration)return;
     if(result.needsQuery){content.innerHTML='<div class="empty"><i class="fa-solid fa-layer-group"></i><span><strong>All Sources siap.</strong><small>Masukkan judul untuk mencari paralel dengan concurrency terbatas.</small></span></div>';state.hasMore=false;state.loading=false;return;}
     if(reset)content.innerHTML='';
     document.querySelector('.loading')?.remove();
@@ -529,6 +542,7 @@ async function mangaFetchList(reset){
       content.appendChild(button);
     }
   }catch(error){
+    if(generation!==state.listGeneration||error&&error.name==='AbortError')return;
     if(reset)content.innerHTML=`
       <div class="error">
         <i class="fa-solid fa-triangle-exclamation"></i>
@@ -536,7 +550,7 @@ async function mangaFetchList(reset){
         <button class="nav-btn" onclick="mangaShowHome(true)"><i class="fa-solid fa-rotate-right"></i> Coba Lagi</button>
       </div>`;
     state.hasMore=false;
-  }finally{state.loading=false}
+  }finally{if(generation===state.listGeneration)state.loading=false}
 }
 function mangaOnFavClick(){
   if(!state.mangaData)return;

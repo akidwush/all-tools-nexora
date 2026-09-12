@@ -53,7 +53,7 @@ async function fixtureFetch(input, options = {}) {
     if (url.pathname === "/api/series/comic/komik-uji/chapter/chapter-1") return response(fixtures.ainzscans.pages);
   }
   if (url.hostname === "mangadot.net") {
-    if (url.pathname === "/api/manga") return response(fixtures.mangadotnet.list);
+    if (url.pathname === "/api/search") return response(fixtures.mangadotnet.list);
     if (url.pathname === "/api/manga/41/chapters/list") return response(fixtures.mangadotnet.chapters);
     if (url.pathname === "/api/manga/41/volumes") return response(fixtures.mangadotnet.volumes);
     if (url.pathname === "/api/chapters/501/images") return response(fixtures.mangadotnet.chapterPages);
@@ -72,6 +72,7 @@ async function testAdapter(adapter, args) {
   const search = await adapter.search({ query: "komik", page: 1, limit: 2, fetchImpl: fixtureFetch, timeoutMs: 1000 });
   assert.ok(search.items.length >= 1, `${adapter.definition.label}: SEARCH kosong`);
   exactKeys(search.items[0], mangaKeys, `${adapter.definition.id} Manga`);
+  assert.ok(/^https:\/\//.test(search.items[0].coverUrl || ""), `${adapter.definition.label}: cover URL tidak ternormalisasi`);
   const detail = await adapter.getManga({ id: args.mangaId, slug: args.slug, titleHint: "Komik Uji", fetchImpl: fixtureFetch, timeoutMs: 1000 });
   exactKeys(detail, mangaKeys, `${adapter.definition.id} Detail`);
   const chapters = await adapter.getChapters({ mangaId: args.mangaId, fetchImpl: fixtureFetch, timeoutMs: 1000, limit: 100, language: "id" });
@@ -110,18 +111,43 @@ async function callApi(query) {
   const ai = await testAdapter(ainzscans, { mangaId: "komik-uji", chapterId: "chapter-1" });
   const mdn = await testAdapter(mangadotnet, { mangaId: "41", chapterId: "chapter:501" });
   assert.equal(vo.pages[0].refererRequired, true, "Voratoon harus mempertahankan referer requirement");
-  assert.equal(sh.pages[0].refererRequired, false);
+  assert.equal(sh.pages[0].refererRequired, true);
   assert.equal(ai.detail.title, "Komik Uji");
   assert.equal(mdn.chapters[0].language, "id");
+
+  clearSourceCache();
+  const shinigamiChapterRequests = [];
+  const pagedShinigamiFetch = async (input, options = {}) => {
+    const url = new URL(input);
+    shinigamiChapterRequests.push({ url, options });
+    const page = Number(url.searchParams.get("page") || 1);
+    const count = page < 3 ? 100 : 5;
+    const start = (page - 1) * 100;
+    const rows = Array.from({ length: count }, (_, index) => ({
+      chapter_id: `sh-page-${start + index + 1}`,
+      chapter_number: String(205 - (start + index)),
+      chapter_title: null
+    }));
+    return response({ data: rows, meta: { page, total_page: 3 } });
+  };
+  const completeShinigamiChapters = await shinigami.getChapters({ mangaId: "sh-1", fetchImpl: pagedShinigamiFetch, timeoutMs: 1000 });
+  assert.equal(completeShinigamiChapters.length, 205, "Shinigami chapter pagination tidak boleh berhenti di 100");
+  assert.deepEqual(shinigamiChapterRequests.map((row) => row.url.searchParams.get("page")), ["1", "2", "3"]);
+  assert.ok(shinigamiChapterRequests.every((row) => Number(row.url.searchParams.get("page_size")) === 100), "Chapter pagination harus bounded 100 per request");
+  const shPages = await shinigami.getPages({ chapterId: "sh-ch-1", fetchImpl: fixtureFetch, timeoutMs: 1000 });
+  assert.equal(shPages[0].refererRequired, true);
+  assert.equal(shPages[0].metadata.referer, "https://app.shinigami.asia/");
 
   const shList = requested.find((row) => row.url.hostname === "api.shngm.io" && row.url.pathname.endsWith("/manga/list"));
   const voList = requested.find((row) => row.url.hostname === "api.voratoon.com" && /\/series\/?$/.test(row.url.pathname));
   const aiList = requested.find((row) => row.url.hostname === "api.ainzscans01.com" && row.url.pathname.endsWith("/search"));
-  const mdnList = requested.find((row) => row.url.hostname === "mangadot.net" && row.url.pathname.endsWith("/api/manga"));
+  const mdnList = requested.find((row) => row.url.hostname === "mangadot.net" && row.url.pathname.endsWith("/api/search"));
   assert.ok(Number(shList.url.searchParams.get("page_size")) <= 50);
+  assert.equal(shList.url.searchParams.get("q"), "komik", "Shinigami search harus dikirim ke API, bukan scan tiga halaman lokal");
   assert.ok(Number(voList.url.searchParams.get("take")) <= 50);
   assert.ok(Number(aiList.url.searchParams.get("limit")) <= 50);
   assert.ok(Number(mdnList.url.searchParams.get("limit")) <= 50);
+  assert.match(voList.url.searchParams.get("filter") || "", /title=ilike=/, "Voratoon search harus memakai filter API");
   assert.equal(voList.options.headers.Origin, "https://v2.voratoon.com");
   assert.match(voList.options.headers.Referer, /^https:\/\/v2\.voratoon\.com\//);
   for (const row of requested) {
@@ -182,6 +208,9 @@ async function callApi(query) {
   const emptyChapters = await ainzscans.getChapters({ mangaId: "komik-uji", fetchImpl: async () => response({ ...fixtures.ainzscans.detail, units: [] }), timeoutMs: 1000 });
   assert.deepEqual(emptyChapters, [], "empty chapter harus tetap usable dan tidak crash");
   const readerClient = fs.readFileSync(path.join(root, "assets/comic-reader/app.js"), "utf8");
+  assert.match(readerClient, /function mangaSwitchSource\(source\)[\s\S]*state\.loading=false[\s\S]*mangaResetFilters\(\)/, "Ganti source harus membatalkan load lama dan langsung reload katalog");
+  assert.match(readerClient, /listGeneration/, "List source harus punya generation guard agar request lama tidak menimpa source baru");
+  assert.match(readerClient, /referrerpolicy="no-referrer"/, "Cover provider harus menghindari foreign referrer saat direct image load");
   assert.match(readerClient, /onerror="mangaPageErrorHandler\(this\)"/, "broken image harus masuk retry handler");
   assert.match(readerClient, /window\.mangaPageErrorHandler[\s\S]*page-failed[\s\S]*Tekan untuk mencoba lagi/, "reader harus memiliki final broken-image retry state");
 

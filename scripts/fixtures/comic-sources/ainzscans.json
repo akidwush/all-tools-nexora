@@ -1,5 +1,1 @@
-{
-  "list": {"data":[{"slug":"komik-uji","title":"Komik Uji Bahasa Indonesia","cover":"https://cdn.ainzscans01.com/covers/uji.webp"}]},
-  "detail": {"slug":"komik-uji","title":"Komik Uji Bahasa Indonesia","description":"Sinopsis","author":"Penulis Uji","units":[{"slug":"chapter-1","number":"1","sort_number":"1"}]},
-  "pages": {"chapter":{"pages":[{"image_url":"https://cdn.ainzscans01.com/pages/001.webp"},{"image_url":"https://cdn.ainzscans01.com/pages/002.webp"}]}}
-}
+{"list":{"data":[{"slug":"komik-uji","title":"Komik Uji Bahasa Indonesia","poster_image_url":"https://cdn.ainzscans01.com/covers/uji.webp"}]},"detail":{"slug":"komik-uji","title":"Komik Uji Bahasa Indonesia","description":"Sinopsis","author":"Penulis Uji","units":[{"slug":"chapter-1","number":"1","sort_number":"1"}],"poster_image_url":"https://cdn.ainzscans01.com/covers/uji-detail.webp","comic_status":"ONGOING","author_name":"Penulis Uji"},"pages":{"chapter":{"pages":[{"image_url":"https://cdn.ainzscans01.com/pages/001.webp"},{"image_url":"https://cdn.ainzscans01.com/pages/002.webp"}]}}}
