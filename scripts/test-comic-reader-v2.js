@@ -72,20 +72,27 @@ async function call(query) {
   assert.equal(health.status, 200);
   assert.equal(health.payload.provider, "MangaDex");
 
+  const sources = await call("?action=sources");
+  assert.equal(sources.status, 200);
+  assert.deepEqual(sources.payload.sources.map((row) => row.id), ["mangadex", "shinigami", "voratoon", "ainzscans", "mangadotnet"]);
+
   const list = await call("?action=list&tab=latest&page=1&type=manga");
   assert.equal(list.status, 200);
   assert.equal(list.payload.items[0].title, "Komik Uji");
-  assert.match(list.payload.items[0].cover, /^\/api\/comics\?action=cover/);
+  assert.equal(list.payload.items[0].source, 'mangadex');
+  assert.match(list.payload.items[0].coverUrl, /^\/api\/comics\?action=cover/);
 
   const search = await call("?action=search&q=komik");
   assert.equal(search.payload.items.length, 1);
 
   const detail = await call(`?action=detail&id=${mangaId}`);
-  assert.equal(detail.payload.data.author, "Nexora Author");
+  assert.equal(detail.payload.data.source, 'mangadex');
+  assert.equal(detail.payload.data.authors[0], "Nexora Author");
+  assert.equal(detail.payload.capabilities.translationCompatible, true);
 
   const chapters = await call(`?action=chapters&id=${mangaId}&lang=id`);
   assert.equal(chapters.payload.data[0].group, "Grup Uji");
-  assert.match(chapters.payload.data[0].extra, /Grup Uji/);
+  assert.match(chapters.payload.data[0].metadata.displayExtra, /Grup Uji/);
 
   const pages = await call(`?action=pages&id=${chapterId}&quality=saver`);
   assert.equal(pages.payload.data.quality, "saver");
@@ -108,7 +115,8 @@ async function call(query) {
   assert.match(client, /frame\.src=COMIC_APP_URL/);
   assert.doesNotMatch(client, /COMIC_READER_APP_B64|srcdoc|nxComicApiBridgeHandler|nx-comic-api-request/);
   assert.match(comicApp, /const SOURCE_API = '\/api\/comics'/);
-  assert.match(comicHtml, /MangaDex<\/a>/);
+  assert.match(comicHtml, /id="comicSourceSelect"/);
+  assert.match(comicHtml, /id="mangaAttributionText"/);
   assert.match(comicApp, /quality:state\.readerQuality/);
   assert.doesNotMatch(comicApp, /nxComicBridgeFetch|NX_COMIC_BRIDGE_PENDING/);
   assert.match(fs.readFileSync(path.join(root, "assets/js/core/lazy-loader.js"), "utf8"), /'comic-reader'/);

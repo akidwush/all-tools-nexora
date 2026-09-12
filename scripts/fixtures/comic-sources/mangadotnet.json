@@ -1,0 +1,7 @@
+{
+  "list": {"manga_list":[{"id":41,"title":"Komik Uji"}]},
+  "chapters": [{"id":501,"chapter_number":1,"language":"id","source":"chapter","scanlator_name":"Grup Uji","group_name":""}],
+  "volumes": [{"id":601,"volume_number":1}],
+  "chapterPages": {"images":[{"url":"/images/501-1.webp","width":900,"height":1400}]},
+  "uploadPages": {"images":[{"url":"/images/601-1.webp"}]}
+}

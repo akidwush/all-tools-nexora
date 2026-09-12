@@ -43,6 +43,7 @@
  function stop(s){if(!s)return;s.control.cancel&&s.control.cancel();s.controller.abort();s.observer&&s.observer.disconnect();s.resize&&s.resize.disconnect();clearInterval(s.timer);if(s.jobId&&s.api)s.api.invoke('comic-translate-chapter',{action:'cancel',jobId:s.jobId}).catch(function(){});}
  async function start(s){
   if(s.busy||current!==s)return;
+  if(!s.translationCompatible){status(s,'Translate All belum kompatibel untuk '+(s.sourceLabel||s.source||'source ini')+'. Teks asli tetap tersedia.');return;}
   s.busy=true;s.start.disabled=true;s.cancel.hidden=false;s.retry.hidden=true;s.failed.clear();s.controller=new AbortController();s.control={};var cancelled=false,paused='';
   s.cancel.onclick=function(){cancelled=true;s.control.cancel&&s.control.cancel();status(s,'Menghentikan antrean… hasil yang sudah selesai tetap tersedia.');};
   try{
@@ -73,17 +74,19 @@
   finally{
 
    if(s.jobId&&s.api)await s.api.invoke('comic-translate-chapter',{action:'cancel',jobId:s.jobId}).catch(function(){});
-   s.jobId=null;s.busy=false;if(current===s){s.start.disabled=false;s.cancel.hidden=true;s.retry.hidden=!s.failed.size;}
+   s.jobId=null;s.busy=false;if(current===s){s.start.disabled=!s.translationCompatible;s.cancel.hidden=true;s.retry.hidden=!s.translationCompatible||!s.failed.size;}
   }
  }
  document.addEventListener('nexora:comic-pages',function(event){
   stop(current);var d=event.detail,host=document.getElementById('mangaReaderPages');if(!host)return;
+  var compatible=d.translationCompatible!==false,source=d.source||'mangadex',sourceLabel=source==='mangadex'?'MangaDex':source;
   var toolbar=node('div','nx-ct-toolbar'),mode=node('select'),startButton=node('button','','Translate All'),cancel=node('button','','Cancel'),retry=node('button','','Retry halaman gagal'),sfx=node('input'),message=node('p','nx-ct-status');
-  mode.setAttribute('aria-label','Bahasa komik');[['original','Original'],['id','Indonesia']].forEach(function(pair){var o=node('option','',pair[1]);o.value=pair[0];mode.append(o);});
+  mode.setAttribute('aria-label','Bahasa komik');[['original','Original']].concat(compatible?[['id','Indonesia']]:[]).forEach(function(pair){var o=node('option','',pair[1]);o.value=pair[0];mode.append(o);});
   var icon=node('i','fa-solid fa-language');icon.setAttribute('aria-hidden','true');startButton.prepend(icon,document.createTextNode(' '));
-  [startButton,cancel,retry].forEach(function(b){b.type='button';});cancel.hidden=true;retry.hidden=true;sfx.type='checkbox';var label=node('label');label.append(sfx,document.createTextNode('Translate SFX'));message.setAttribute('role','status');message.setAttribute('aria-live','polite');
+  [startButton,cancel,retry].forEach(function(b){b.type='button';});startButton.disabled=!compatible;startButton.title=compatible?'Terjemahkan semua halaman chapter':'Belum kompatibel dengan source ini';cancel.hidden=true;retry.hidden=true;sfx.type='checkbox';var label=node('label');label.append(sfx,document.createTextNode('Translate SFX'));label.hidden=!compatible;message.setAttribute('role','status');message.setAttribute('aria-live','polite');
   toolbar.append(mode,startButton,cancel,retry,label,message);host.before(toolbar);
-  var s=current={mangaId:d.mangaId,chapterId:d.chapterId,host:host,toolbar:toolbar,pages:[],results:new Map(),failed:new Set(),mode:mode,sfx:sfx,start:startButton,cancel:cancel,retry:retry,status:message,control:{},controller:new AbortController(),busy:false};
+  var s=current={source:source,sourceLabel:sourceLabel,translationCompatible:compatible,mangaId:d.mangaId,chapterId:d.chapterId,host:host,toolbar:toolbar,pages:[],results:new Map(),failed:new Set(),mode:mode,sfx:sfx,start:startButton,cancel:cancel,retry:retry,status:message,control:{},controller:new AbortController(),busy:false};
+  if(!compatible)message.textContent='Translate All belum kompatibel untuk '+sourceLabel+'. Mode Original tetap tersedia.';
   Array.from(host.querySelectorAll(':scope > img')).forEach(function(img,i){
    var wrap=node('div','nx-ct-page'),plane=node('div','nx-ct-overlay'),note=node('small','nx-ct-page-note'),container=node('div');
    note.hidden=true;container.style.position='relative';img.replaceWith(wrap);container.append(img,plane);wrap.append(container,note);

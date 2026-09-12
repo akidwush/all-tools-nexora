@@ -13,7 +13,7 @@
 
 
 
-<link rel="stylesheet" href="/assets/comic-reader/app.css?v=standalone-v1">
+<link rel="stylesheet" href="/assets/comic-reader/app.css?v=standalone-v1-multisource1">
 <link rel="stylesheet" href="/assets/comic-reader/translate.css?v=comic-translate1">
 </head>
 <body>
@@ -23,12 +23,18 @@
     <span class="kicker"><i class="fa-solid fa-book-open-reader"></i> Nexora // Comic Reader</span>
   </div>
 
-  <main class="workspace"><div class="manga-attribution"><i class="fa-solid fa-circle-info"></i><span>Data dan halaman dari <a href="https://mangadex.org" target="_blank" rel="noopener noreferrer">MangaDex</a>. Hak karya milik kreator; chapter dikreditkan kepada grup scanlation terkait.</span></div>
+  <main class="workspace"><div class="manga-attribution"><i class="fa-solid fa-circle-info"></i><span id="mangaAttributionText">Source: <strong>MangaDex</strong>. Hak karya milik kreator/penerbit; Nexora hanya mengambil data on-demand.</span></div>
     <div class="manga-topbar">
       <button class="icon-btn" id="mangaBackBtn" type="button" title="Kembali"><i class="fa-solid fa-arrow-left"></i></button>
       <div class="manga-title" id="mangaTitleBar"><i class="fa-solid fa-book-open"></i> Baca Komik</div>
       <button class="icon-btn" type="button" onclick="mangaShowHome(true)" title="Daftar Komik"><i class="fa-solid fa-house"></i></button>
     </div>
+
+    <div class="comic-source-strip" id="comicSourceStrip">
+      <label class="comic-source-control"><span>Source</span><select id="comicSourceSelect" aria-label="Pilih source komik"><option value="mangadex">MangaDex</option></select></label>
+      <div class="source-health is-unchecked" id="comicSourceHealth" aria-live="polite"><i></i><span>MangaDex · Belum dicek</span></div>
+    </div>
+    <div class="comic-source-progress" id="comicSourceProgress" hidden></div>
 
     <div id="mangaSearchBar" class="search-bar">
       <i class="fa-solid fa-magnifying-glass"></i>
@@ -70,8 +76,8 @@
 
 
 
-<script src="/assets/comic-reader/app.js?v=standalone-v1-comic-translate1"></script>
+<script src="/assets/comic-reader/app.js?v=standalone-v1-comic-translate1-multisource1"></script>
 <script src="/assets/comic-reader/translate-queue.js?v=comic-translate1"></script>
-<script src="/assets/comic-reader/translate.js?v=comic-translate1"></script>
+<script src="/assets/comic-reader/translate.js?v=comic-translate1-multisource1"></script>
 </body>
 </html>

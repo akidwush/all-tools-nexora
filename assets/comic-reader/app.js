@@ -27,7 +27,14 @@ const state = {
   chapters:[],
   chapterIndex:-1,
   readerQuality:'saver',
-  sourceMode:'auto'
+  sourceMode:'auto',
+  source:'mangadex',
+  sourceRegistry:[],
+  sourceHealth:{},
+  sourceMatches:[],
+  searchController:null,
+  searchItems:new Map(),
+  capabilities:null
 };
 
 function $(id){return document.getElementById(id)}
@@ -43,14 +50,16 @@ function toast(message){
   $('toastWrap').appendChild(item);
   setTimeout(()=>item.remove(),3200);
 }
-async function fetchJson(url,timeoutMs=20000){
+async function fetchJson(url,timeoutMs=20000,externalSignal){
   const controller=new AbortController();
+  const abort=()=>controller.abort();
+  if(externalSignal){if(externalSignal.aborted)controller.abort();else externalSignal.addEventListener('abort',abort,{once:true});}
   const timer=setTimeout(()=>controller.abort(),timeoutMs);
   try{
     const res=await fetch(url,{signal:controller.signal,headers:{Accept:'application/json'}});
-    if(!res.ok) throw new Error('HTTP '+res.status);
+    if(!res.ok){const error=new Error('HTTP '+res.status);error.status=res.status;error.retryAfter=res.headers&&res.headers.get?res.headers.get('retry-after'):'';throw error;}
     return await res.json();
-  }finally{clearTimeout(timer)}
+  }finally{clearTimeout(timer);if(externalSignal)externalSignal.removeEventListener('abort',abort)}
 }
 function storageGet(key){
   try{return JSON.parse(localStorage.getItem(key)||'[]')}catch(e){return[]}
@@ -108,24 +117,80 @@ window.mangaCoverFallback=function(img){
   const raw=img.dataset.raw||'';
   if(stage===0&&raw){
     img.dataset.fallbackStage='1';
-    img.src='https://wsrv.nl/?url='+encodeURIComponent(raw);
-  }else if(stage===1&&raw){
-    img.dataset.fallbackStage='2';
-    img.src=raw;
+    img.src=raw+(raw.includes('?')?'&':'?')+'retry='+Date.now();
   }else{
     if(img.parentElement) img.parentElement.classList.add('cover-broken');
     img.remove();
   }
 };
 
-async function sourceCall(params,timeout=18000){
-  const url=SOURCE_API+'?'+params.toString();
-  const json=await fetchJson(url,timeout);
-  if(!json||json.success===false) throw new Error((json&&json.message)||'API sumber gagal');
-  state.sourceMode='source';
-  const statusBadge=document.getElementById('nxComicApiHealth');
-  if(statusBadge){statusBadge.className='ok';statusBadge.innerHTML='<i></i><span>Nexora Comic API aktif</span>';}
-  return json;
+
+function sourceKey(id,source){return (source||state.source||'mangadex')+':'+String(id||'')}
+function sourceDefinition(id){return state.sourceRegistry.find(row=>row.id===id)||null}
+function sourceLabel(id){const row=sourceDefinition(id);return row?row.label:(id==='all'?'All Sources':id)}
+function sourceCapabilities(id){const row=sourceDefinition(id);return row&&row.capabilities?row.capabilities:{};}
+function itemType(item){return item&&item.metadata&&item.metadata.mediaType||typeFromLanguage(item&&item.language)||'Komik'}
+function updateSourceHealth(id,health){if(!id||id==='all')return;state.sourceHealth[id]={...(state.sourceHealth[id]||{}),...health};renderSourceHealth()}
+function healthLabel(row){if(!row||row.status==='unchecked')return'Belum dicek';if(row.status==='active')return'Online';if(row.status==='degraded')return'Degraded';return'Unavailable'}
+function renderSourceHealth(){
+  const node=$('comicSourceHealth');if(!node)return;
+  const id=state.source==='all'?'mangadex':state.source;const row=state.sourceHealth[id]||sourceDefinition(id)?.health||{status:'unchecked'};
+  node.className='source-health is-'+String(row.status||'unchecked');node.innerHTML='<i></i><span>'+escapeHtml(sourceLabel(id))+' · '+escapeHtml(healthLabel(row))+'</span>';
+}
+function updateAttribution(){
+  const row=sourceDefinition(state.source);const host=$('mangaAttributionText');if(!host)return;
+  if(state.source==='all'){host.textContent='Pencarian paralel memakai source yang dipilih secara on-demand. Hak karya tetap milik kreator dan penerbit masing-masing.';return;}
+  const label=row?row.label:sourceLabel(state.source);host.innerHTML='Source: <strong>'+escapeHtml(label)+'</strong>. Hak karya milik kreator/penerbit; Nexora hanya mengambil data on-demand.';
+}
+function renderSourceSelector(){
+  const select=$('comicSourceSelect');if(!select)return;
+  const options=[{id:'mangadex',label:'MangaDex'},...state.sourceRegistry.filter(row=>row.id!=='mangadex').map(row=>({id:row.id,label:row.label})),{id:'all',label:'All Sources'}];
+  const seen=new Set();select.innerHTML=options.filter(row=>!seen.has(row.id)&&seen.add(row.id)).map(row=>'<option value="'+escapeHtml(row.id)+'" '+(row.id===state.source?'selected':'')+'>'+escapeHtml(row.label)+'</option>').join('');
+  renderSourceHealth();updateAttribution();
+}
+async function loadSourceRegistry(){
+  try{
+    const json=await fetchJson(SOURCE_API+'?action=sources',10000);
+    if(Array.isArray(json.sources)&&json.sources.length){state.sourceRegistry=json.sources;json.sources.forEach(row=>{if(row.health)state.sourceHealth[row.id]=row.health});}
+  }catch(error){state.sourceRegistry=[{id:'mangadex',label:'MangaDex',capabilities:{search:true,detail:true,chapters:true,pages:true,languageFilter:true,pagination:true,translationCompatible:true},health:{status:'unchecked'}}];}
+  renderSourceSelector();
+}
+function setSearchProgress(rows){const host=$('comicSourceProgress');if(!host)return;if(!rows||!rows.length){host.hidden=true;host.innerHTML='';return;}host.hidden=false;host.innerHTML=rows.map(row=>'<span class="source-progress is-'+escapeHtml(row.state)+'"><i></i>'+escapeHtml(sourceLabel(row.id))+' '+escapeHtml(row.state)+'</span>').join('');}
+async function runBounded(items,limit,worker,onState){
+  const width=Math.max(1,Math.min(3,Number(limit)||1));const results=[];
+  for(let start=0;start<items.length;start+=width){
+    const batch=items.slice(start,start+width);batch.forEach(item=>onState&&onState(item,'loading'));
+    const settled=await Promise.allSettled(batch.map((item,index)=>worker(item,start+index)));
+    settled.forEach((row,index)=>{const item=batch[index];onState&&onState(item,row.status==='fulfilled'?'complete':(row.reason&&row.reason.name==='AbortError'?'cancelled':'failed'));results.push(row)});
+  }
+  return results;
+}
+async function searchOneSource(source,query,signal,limit=24){
+  const params=new URLSearchParams({action:'search',source,q:query,page:'1',limit:String(Math.min(50,limit))});
+  const json=await sourceCall(params,12000,signal,source);return Array.isArray(json.items)?json.items:[];
+}
+async function allSourceSearch(query,signal){
+  const providers=state.sourceRegistry.filter(row=>row.capabilities&&row.capabilities.search).map(row=>row.id);const progress=providers.map(id=>({id,state:'queued'}));setSearchProgress(progress);
+  const results=await runBounded(providers,2,source=>searchOneSource(source,query,signal,18),(id,next)=>{const row=progress.find(item=>item.id===id);if(row)row.state=next;setSearchProgress(progress)});
+  const items=[];results.forEach((row,index)=>{if(row.status==='fulfilled')items.push(...row.value.map(item=>({...item,source:item.source||providers[index]})));});
+  return{items,hasMore:false};
+}
+async function sourceCall(params,timeout=18000,signal,explicitSource){
+  const source=explicitSource||params.get('source')||state.source||'mangadex';if(source!=='all'&&!params.has('source'))params.set('source',source);
+  const url=SOURCE_API+'?'+params.toString();const started=performance.now();
+  try{
+    const json=await fetchJson(url,timeout,signal);
+    if(!json||json.success===false){const e=new Error((json&&json.message)||'API sumber gagal');e.status=json&&json.status;throw e;}
+    state.sourceMode='source';updateSourceHealth(source,{status:'active',latency:Math.max(1,Math.round(performance.now()-started)),lastCheckedAt:new Date().toISOString(),consecutiveFailures:0});
+    const statusBadge=document.getElementById('nxComicApiHealth');
+    if(statusBadge){statusBadge.className='ok';statusBadge.innerHTML='<i></i><span>Nexora Comic API aktif</span>';}
+    return json;
+  }catch(error){
+    if(error&&error.name!=='AbortError'){
+      const code=Number(error.status||0);if(!code||code===429||code>=500){const previous=state.sourceHealth[source]||{};const failures=Number(previous.consecutiveFailures||0)+1;updateSourceHealth(source,{status:failures>=3?'unavailable':'degraded',lastCheckedAt:new Date().toISOString(),consecutiveFailures:failures});}
+    }
+    throw error;
+  }
 }
 
 function appendMany(params,key,values){
@@ -172,29 +237,22 @@ async function directList({query,category,page}){
 }
 
 async function sourceList(args){
-  const params=new URLSearchParams();
-  if(args.query){params.set('action','search');params.set('q',args.query)}
-  else{
-    params.set('action','list');
-    params.set('tab',state.tab==='popular'?'popular':'latest');
-    params.set('page',String(args.page));
+  if(state.source==='all'){
+    if(!args.query)return{items:[],hasMore:false,needsQuery:true};
+    return allSourceSearch(args.query,args.signal);
   }
-  if(args.category&&args.category!=='all') params.set('type',args.category);
-  const json=await sourceCall(params,15000);
-  let items=(json.items||[]).map(m=>({
-    id:m.id,title:m.title,cover:m.cover,type:m.type||'Komik',
-    realStatus:String(m.status||'').toLowerCase()
-  }));
+  const params=new URLSearchParams();params.set('source',state.source);
+  if(args.query){params.set('action','search');params.set('q',args.query)}
+  else{params.set('action','list');params.set('tab',state.tab==='popular'?'popular':'latest');params.set('page',String(args.page));}
+  params.set('limit','24');if(args.category&&args.category!=='all'&&state.source==='mangadex')params.set('type',args.category);
+  const json=await sourceCall(params,15000,args.signal,state.source);
+  let items=(json.items||[]).map(m=>({...m,source:m.source||state.source,cover:m.coverUrl||'',type:itemType(m),realStatus:String(m.status||'').toLowerCase()}));
   if(state.statusFilter!=='all'){
-    const ended=state.statusFilter==='tamat';
-    items=items.filter(m=>!m.realStatus||(ended?['completed','cancelled'].includes(m.realStatus):['ongoing','hiatus'].includes(m.realStatus)));
+    const ended=state.statusFilter==='tamat';items=items.filter(m=>!m.realStatus||(ended?['completed','cancelled','tamat'].includes(m.realStatus):['ongoing','hiatus'].includes(m.realStatus)));
   }
   return{items,hasMore:!args.query&&!!json.hasMore};
 }
-
-async function fetchList(args){
-  return await sourceList(args);
-}
+async function fetchList(args){return sourceList(args);}
 
 async function directDetail(id){
   const params=new URLSearchParams();
@@ -218,19 +276,13 @@ async function directDetail(id){
     tags:(a.tags||[]).map(t=>chooseText((t.attributes||{}).name,['id','en'])).filter(Boolean)
   };
 }
-async function sourceDetail(id){
-  const params=new URLSearchParams({action:'detail',id});
-  const json=await sourceCall(params,20000);
-  const d=json.data||{};
-  return{
-    id,title:d.title,cover:d.cover,type:d.type||'Komik',
-    desc:d.desc||'Belum ada sinopsis untuk komik ini.',
-    status:d.status||'-',year:d.year||'-',author:d.author||null,tags:d.genres||[]
-  };
+async function sourceDetail(id,hint){
+  const source=hint&&hint.source||state.source;const params=new URLSearchParams({action:'detail',source,id});
+  if(hint&&hint.slug)params.set('slug',hint.slug);if(hint&&hint.title)params.set('title',hint.title);
+  const json=await sourceCall(params,20000,null,source);const d=json.data||{};
+  return{...d,id:d.id||id,source:d.source||source,cover:d.coverUrl||'',type:itemType(d),desc:d.description||'Belum ada sinopsis untuk komik ini.',tags:d.genres||[],author:(d.authors||[])[0]||null,year:d.metadata&&d.metadata.year||'-',realStatus:d.status||'',capabilities:json.capabilities||sourceCapabilities(source)};
 }
-async function getDetail(id){
-  return await sourceDetail(id);
-}
+async function getDetail(id,hint){return sourceDetail(id,hint);}
 
 async function directChapters(detail){
   let all=[];
@@ -277,17 +329,16 @@ async function directChapters(detail){
   });
 }
 async function sourceChapters(detail){
-  const params=new URLSearchParams({action:'chapters',id:detail.id});
-  if(state.selectedLang) params.set('lang',state.selectedLang);
-  const json=await sourceCall(params,22000);
-  state.availableLanguages=json.languages||[];
+  const params=new URLSearchParams({action:'chapters',source:detail.source||state.source,id:detail.id});if(state.selectedLang)params.set('lang',state.selectedLang);
+  const json=await sourceCall(params,22000,null,detail.source||state.source);state.availableLanguages=json.languages||[];
   return(json.data||[]).map(c=>({
-    id:c.id,name:c.name||'Chapter',extra:c.extra||'',lang:c.lang||'',date:c.date||''
+    ...c,id:c.id,source:c.source||detail.source||state.source,
+    name:c.metadata&&c.metadata.displayName||('Chapter '+(c.number==null?'?':c.number)),
+    extra:c.metadata&&c.metadata.displayExtra||(c.title?' — '+c.title:'')+(c.group?' · '+c.group:''),
+    lang:c.language||'',date:c.metadata&&c.metadata.displayDate||(c.publishedAt?new Date(c.publishedAt).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}):'')
   }));
 }
-async function getChapters(detail){
-  return await sourceChapters(detail);
-}
+async function getChapters(detail){return sourceChapters(detail);}
 
 async function directPages(chapter){
   const json=await fetchJson(MD_API+'/at-home/server/'+encodeURIComponent(chapter.id),22000);
@@ -302,39 +353,31 @@ async function directPages(chapter){
   return files.map(file=>`${base}/${folder}/${data.hash}/${file}`);
 }
 async function sourcePages(chapter){
-  const params=new URLSearchParams({action:'pages',id:chapter.id,quality:state.readerQuality});
-  const json=await sourceCall(params,22000);
-  const images=json.data&&json.data.image||[];
-  if(!images.length) throw new Error('Halaman chapter kosong');
-  return images;
+  const source=chapter.source||state.mangaData&&state.mangaData.source||state.source;const params=new URLSearchParams({action:'pages',source,id:chapter.id,quality:state.readerQuality});
+  if(state.mangaId)params.set('mangaId',state.mangaId);const json=await sourceCall(params,22000,null,source);const pages=json.data&&json.data.pages||[];
+  const images=pages.length?pages.map(page=>page.url):(json.data&&json.data.image||[]);if(!images.length)throw new Error('Halaman chapter kosong');return images;
 }
-async function getPages(chapter){
-  return await sourcePages(chapter);
-}
+async function getPages(chapter){return sourcePages(chapter);}
 
 function getFavorites(){return storageGet(FAVORITES_KEY)}
-function isFavorite(id){return getFavorites().some(item=>item.id===id)}
+function isFavorite(id,source){return getFavorites().some(item=>sourceKey(item.id,item.source||'mangadex')===sourceKey(id,source||state.source))}
 function toggleFavorite(item){
-  let favs=getFavorites();
-  if(favs.some(f=>f.id===item.id)) favs=favs.filter(f=>f.id!==item.id);
-  else{
-    const top=state.chapters&&state.chapters[0]?state.chapters[0].id:null;
-    favs.unshift({id:item.id,title:item.title,cover:item.cover,type:item.type||'Komik',lastSeenChapterId:top});
-  }
-  storageSet(FAVORITES_KEY,favs);
-  return isFavorite(item.id);
+  let favs=getFavorites();const key=sourceKey(item.id,item.source||state.source);
+  if(favs.some(f=>sourceKey(f.id,f.source||'mangadex')===key)) favs=favs.filter(f=>sourceKey(f.id,f.source||'mangadex')!==key);
+  else{const top=state.chapters&&state.chapters[0]?state.chapters[0].id:null;favs.unshift({id:item.id,source:item.source||state.source,title:item.title,cover:item.cover,type:item.type||'Komik',slug:item.slug||null,lastSeenChapterId:top});}
+  storageSet(FAVORITES_KEY,favs);return isFavorite(item.id,item.source||state.source);
 }
 function getHistory(){return storageGet(HISTORY_KEY)}
 function addHistory(item,chapter){
-  let history=getHistory().filter(h=>h.id!==item.id);
+  let history=getHistory().filter(h=>sourceKey(h.id,h.source||'mangadex')!==sourceKey(item.id,item.source||state.source));
   history.unshift({
-    id:item.id,title:item.title,cover:item.cover,type:item.type||'Komik',
+    id:item.id,source:item.source||state.source,title:item.title,cover:item.cover,type:item.type||'Komik',slug:item.slug||null,
     lastChapterId:chapter&&chapter.id,lastChapterName:chapter&&chapter.name,time:Date.now()
   });
   storageSet(HISTORY_KEY,history.slice(0,60));
   if(chapter){
     const favs=getFavorites();
-    const index=favs.findIndex(f=>f.id===item.id);
+    const index=favs.findIndex(f=>sourceKey(f.id,f.source||'mangadex')===sourceKey(item.id,item.source||state.source));
     if(index>=0){favs[index].lastSeenChapterId=chapter.id;storageSet(FAVORITES_KEY,favs)}
   }
 }
@@ -342,7 +385,7 @@ function closeComic(){
   parent.postMessage({type:'nx-close-comic-reader'},'*');
 }
 function mangaGoBack(){
-  if(state.view==='reader') mangaOpenDetail(state.mangaId);
+  if(state.view==='reader') mangaOpenDetail(state.mangaId,state.mangaData&&state.mangaData.source,state.mangaData||null);
   else if(state.view==='detail') mangaShowHome(true);
   else closeComic();
 }
@@ -370,8 +413,10 @@ function mangaResetFilters(){
   mangaShowHome(true);
 }
 function mangaDoSearch(){
-  state.query=$('mangaSearchInput').value.trim();
-  mangaShowHome(true);
+  state.query=$('mangaSearchInput').value.trim();if(state.searchController)state.searchController.abort();state.searchController=new AbortController();mangaShowHome(true);
+}
+function mangaSwitchSource(source){
+  if(!source||source===state.source)return;if(state.searchController)state.searchController.abort();state.source=source;state.capabilities=source==='all'?{}:sourceCapabilities(source);state.sourceMatches=[];state.selectedLang='';state.query='';$('mangaSearchInput').value='';renderSourceSelector();mangaResetFilters();
 }
 function mangaShowHome(reset){
   state.view='home';
@@ -409,7 +454,7 @@ async function checkFavoriteUpdates(favs){
       const chip=$('upd-'+fav.id);
       if(!chip)return;
       try{
-        const detail=await getDetail(fav.id);
+        const detail=await getDetail(fav.id,{...fav,source:fav.source||'mangadex'});
         const chapters=await getChapters(detail);
         const top=chapters[0]&&chapters[0].id;
         if(top&&top!==fav.lastSeenChapterId){
@@ -436,10 +481,10 @@ async function mangaFetchList(reset){
       items.forEach(m=>{
         const card=document.createElement('article');
         card.className='manga-card';
-        card.onclick=()=>mangaOpenDetail(m.id);
+        card.onclick=()=>mangaOpenDetail(m.id,m.source||state.source,m);
         card.innerHTML=`
           <div class="manga-cover-wrap">${mangaCoverImgHtml(m.cover)}</div>
-          <span class="manga-badge">${escapeHtml(m.type)}</span>
+          <span class="manga-badge">${escapeHtml(m.type)}</span><span class="manga-source-badge">${escapeHtml(sourceLabel(m.source||state.source))}</span>
           <div class="manga-card-title">${escapeHtml(m.title)}</div>
           ${m.lastChapterName?`<div class="manga-history-chip"><i class="fa-solid fa-bookmark"></i> ${escapeHtml(m.lastChapterName)}</div>`:''}
           ${state.tab==='favorite'?`<div class="manga-update-chip" id="upd-${escapeHtml(m.id)}"></div>`:''}`;
@@ -451,9 +496,9 @@ async function mangaFetchList(reset){
   }
 
   try{
-    const result=await fetchList({
-      query:state.query,category:state.category,page:state.page
-    });
+    const controller=state.searchController||(state.searchController=new AbortController());
+    const result=await fetchList({query:state.query,category:state.category,page:state.page,signal:controller.signal});
+    if(result.needsQuery){content.innerHTML='<div class="empty"><i class="fa-solid fa-layer-group"></i><span><strong>All Sources siap.</strong><small>Masukkan judul untuk mencari paralel dengan concurrency terbatas.</small></span></div>';state.hasMore=false;state.loading=false;return;}
     if(reset)content.innerHTML='';
     document.querySelector('.loading')?.remove();
     document.querySelector('.load-more')?.remove();
@@ -464,12 +509,13 @@ async function mangaFetchList(reset){
     }
 
     result.items.forEach(m=>{
+      state.searchItems.set(sourceKey(m.id,m.source||state.source),m);
       const card=document.createElement('article');
       card.className='manga-card';
-      card.onclick=()=>mangaOpenDetail(m.id);
+      card.onclick=()=>mangaOpenDetail(m.id,m.source||state.source,m);
       card.innerHTML=`
         <div class="manga-cover-wrap">${mangaCoverImgHtml(m.cover)}</div>
-        <span class="manga-badge">${escapeHtml(m.type)}</span>
+        <span class="manga-badge">${escapeHtml(m.type)}</span><span class="manga-source-badge">${escapeHtml(sourceLabel(m.source||state.source))}</span>
         <div class="manga-card-title">${escapeHtml(m.title)}</div>`;
       content.appendChild(card);
     });
@@ -486,7 +532,7 @@ async function mangaFetchList(reset){
     if(reset)content.innerHTML=`
       <div class="error">
         <i class="fa-solid fa-triangle-exclamation"></i>
-        <span><strong>Tidak dapat memuat daftar komik.</strong><small>Coba lagi beberapa saat.</small></span>
+        <span><strong>${escapeHtml(sourceLabel(state.source))} sedang tidak tersedia.</strong><small>Coba source lain atau ulangi beberapa saat lagi.</small></span>
         <button class="nav-btn" onclick="mangaShowHome(true)"><i class="fa-solid fa-rotate-right"></i> Coba Lagi</button>
       </div>`;
     state.hasMore=false;
@@ -501,8 +547,8 @@ function mangaOnFavClick(){
     button.innerHTML=active?'<i class="fa-solid fa-heart"></i> Favorit':'<i class="fa-regular fa-heart"></i> Tambah Favorit';
   }
 }
-async function mangaOpenDetail(id){
-  state.view='detail';state.mangaId=id;state.selectedLang='';state.availableLanguages=[];
+async function mangaOpenDetail(id,source,hint){
+  state.view='detail';state.mangaId=id;if(source&&source!=='all')state.source=source;state.selectedLang='';state.availableLanguages=[];state.sourceMatches=[];renderSourceSelector();
   $('mangaSearchBar').style.display='none';
   $('mangaTabs').style.display='none';
   $('mangaCategoryTabs').style.display='none';
@@ -515,16 +561,16 @@ async function mangaOpenDetail(id){
   content.innerHTML='<div class="loading"><i class="fa-solid fa-spinner spin"></i><span>Memuat detail...</span></div>';
   window.scrollTo({top:0,behavior:'smooth'});
   try{
-    const detail=await getDetail(id);
-    state.mangaData=detail;
+    const detail=await getDetail(id,hint||state.searchItems.get(sourceKey(id,state.source))||null);
+    state.mangaData=detail;state.capabilities=detail.capabilities||sourceCapabilities(detail.source||state.source);
     $('mangaTitleBar').innerHTML=`<i class="fa-solid fa-book-open"></i> ${escapeHtml(detail.title)}`;
     content.innerHTML=`
       <div class="detail-head">
         <div class="detail-cover manga-cover-wrap">${mangaCoverImgHtml(detail.cover)}</div>
         <div class="detail-info">
           <h2>${escapeHtml(detail.title)}</h2>
-          <button id="mangaFavBtn" class="fav-btn ${isFavorite(id)?'active':''}" onclick="mangaOnFavClick()">
-            <i class="${isFavorite(id)?'fa-solid':'fa-regular'} fa-heart"></i> ${isFavorite(id)?'Favorit':'Tambah Favorit'}
+          <button id="mangaFavBtn" class="fav-btn ${isFavorite(id,detail.source)?'active':''}" onclick="mangaOnFavClick()">
+            <i class="${isFavorite(id,detail.source)?'fa-solid':'fa-regular'} fa-heart"></i> ${isFavorite(id,detail.source)?'Favorit':'Tambah Favorit'}
           </button>
           <div class="meta">
             <span class="tag"><i class="fa-solid fa-circle"></i> ${escapeHtml(detail.status)}</span>
@@ -534,6 +580,8 @@ async function mangaOpenDetail(id){
           <div class="meta">${(detail.tags||[]).slice(0,12).map(tag=>`<span class="tag">${escapeHtml(tag)}</span>`).join('')}</div>
         </div>
       </div>
+      <div class="detail-source-row"><span class="tag"><i class="fa-solid fa-database"></i> Source: ${escapeHtml(sourceLabel(detail.source||state.source))}</span>${detail.url?`<a class="source-open-link" href="${escapeHtml(detail.url)}" target="_blank" rel="noopener noreferrer">Open Source <i class="fa-solid fa-arrow-up-right-from-square"></i></a>`:''}</div>
+      <div class="available-sources"><div><strong>Available Sources</strong><small>Source lain hanya dipetakan setelah pencocokan confidence.</small></div><div id="mangaSourceMatches"><button class="source-match-btn is-current" type="button">${escapeHtml(sourceLabel(detail.source||state.source))}</button><button class="source-match-btn" type="button" onclick="mangaDiscoverSources()"><i class="fa-solid fa-magnifying-glass"></i> Cari source lain</button></div></div>
       <p class="detail-desc">${escapeHtml(detail.desc)}</p>
       <div id="mangaLangBar" class="lang-bar" style="display:none"></div>
       <div class="chapter-head"><h3><i class="fa-solid fa-book"></i> Daftar Chapter</h3><span class="tag" id="chapterCount">Memuat</span></div>
@@ -542,7 +590,7 @@ async function mangaOpenDetail(id){
   }catch(error){
     content.innerHTML=`
       <div class="error"><i class="fa-solid fa-triangle-exclamation"></i>
-      <span><strong>Tidak dapat memuat detail komik.</strong><small>Coba lagi beberapa saat.</small></span>
+      <span><strong>${escapeHtml(sourceLabel(state.source))} sedang tidak tersedia.</strong><small>Coba lagi atau pilih source lain.</small></span>
       <button class="nav-btn" onclick="mangaOpenDetail('${String(id).replace(/'/g,"\\'")}')"><i class="fa-solid fa-rotate-right"></i> Coba Lagi</button></div>`;
   }
 }
@@ -560,7 +608,7 @@ async function mangaLoadChapters(detail){
     state.chapters=chapters;
     $('chapterCount').textContent=chapters.length+' chapter';
     const langs=state.availableLanguages||[];
-    if(langs.length){
+    if(langs.length&&(state.capabilities&&state.capabilities.languageFilter!==false)){
       langBar.style.display='flex';
       langBar.innerHTML=`
         <i class="fa-solid fa-language"></i>
@@ -584,7 +632,7 @@ async function mangaLoadChapters(detail){
         <i class="fa-solid fa-chevron-right"></i>
       </div>`).join('');
   }catch(error){
-    list.innerHTML=`<div class="error"><i class="fa-solid fa-triangle-exclamation"></i><span><strong>Tidak dapat memuat daftar chapter.</strong><small>Coba lagi beberapa saat.</small></span></div>`;
+    list.innerHTML=`<div class="error"><i class="fa-solid fa-triangle-exclamation"></i><span><strong>${escapeHtml(sourceLabel(detail.source||state.source))} sedang tidak tersedia.</strong><small>Daftar chapter source ini gagal dimuat; source lain tetap dapat dipakai.</small></span></div>`;
   }
 }
 let readerGeneration=0;
@@ -601,8 +649,9 @@ async function mangaOpenReader(index){
   content.className='';
   content.innerHTML=`
     <div class="reader-topbar">
-      <button class="icon-btn" onclick="mangaOpenDetail(state.mangaId)" title="Kembali ke Detail"><i class="fa-solid fa-arrow-left"></i></button>
+      <button class="icon-btn" onclick="mangaOpenDetail(state.mangaId,state.mangaData&&state.mangaData.source,state.mangaData)" title="Kembali ke Detail"><i class="fa-solid fa-arrow-left"></i></button>
       <div class="reader-title"><i class="fa-solid fa-book-open-reader"></i> ${escapeHtml(chapter.name)}${escapeHtml(chapter.extra||'')}</div>
+      <select class="reader-source-select" id="readerSourceSelect" aria-label="Source reader">${readerSourceOptions()}</select>
       <div class="quality-switch">
         <button id="qualitySaver" class="${state.readerQuality==='saver'?'active':''}" type="button">Hemat</button>
         <button id="qualityFull" class="${state.readerQuality==='full'?'active':''}" type="button">HD</button>
@@ -619,21 +668,36 @@ async function mangaOpenReader(index){
   $('mangaPrevBtn').disabled=index>=state.chapters.length-1;
   $('mangaNextBtn').disabled=index<=0;
   $('qualitySaver').onclick=()=>changeReaderQuality('saver');
-  $('qualityFull').onclick=()=>changeReaderQuality('full');
+  $('qualityFull').onclick=()=>changeReaderQuality('full');const readerSource=$('readerSourceSelect');if(readerSource)readerSource.onchange=e=>mangaSwitchReaderSource(e.target.value);
   try{
     const pages=await getPages(chapter);
     if(generation!==readerGeneration||state.view!=='reader')return;
     $('mangaReaderPages').innerHTML=pages.map((url,pageIndex)=>`
       <img src="${escapeHtml(url)}" loading="${pageIndex<2?'eager':'lazy'}" decoding="async" alt="Halaman ${pageIndex+1}" data-raw="${escapeHtml(url)}" data-tries="0" onerror="mangaPageErrorHandler(this)">`).join('');
-    document.dispatchEvent(new CustomEvent('nexora:comic-pages',{detail:{mangaId:state.mangaId,chapterId:chapter.id}}));
+    document.dispatchEvent(new CustomEvent('nexora:comic-pages',{detail:{source:state.mangaData&&state.mangaData.source||state.source,mangaId:state.mangaId,chapterId:chapter.id,translationCompatible:!!(state.capabilities&&state.capabilities.translationCompatible)}}));
   }catch(error){
     if(generation!==readerGeneration||state.view!=='reader')return;
     $('mangaReaderPages').innerHTML=`
       <div class="page-loader"><i class="fa-solid fa-triangle-exclamation"></i>
-      <span><strong>Tidak dapat memuat gambar chapter.</strong><small>Coba lagi beberapa saat.</small></span>
+      <span><strong>${escapeHtml(sourceLabel(chapter.source||state.source))} sedang tidak tersedia.</strong><small>Gambar chapter source ini gagal dimuat. Source lain tetap dapat dipakai.</small></span>
       <button class="nav-btn" onclick="mangaOpenReader(${index})"><i class="fa-solid fa-rotate-right"></i> Coba Lagi</button></div>`;
   }
 }
+function normalizeMatchTitle(value){return String(value||'').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g,' ').trim()}
+function matchConfidence(detail,candidate){const target=normalizeMatchTitle(detail.title),names=[candidate.title,...(candidate.altTitles||[])].map(normalizeMatchTitle);if(!target||!names.includes(target))return'low';const a=normalizeMatchTitle(detail.author),b=(candidate.authors||[]).map(normalizeMatchTitle);return a&&b.includes(a)?'high':'medium'}
+async function mangaDiscoverSources(){
+  if(!state.mangaData)return;const host=$('mangaSourceMatches');if(!host)return;host.innerHTML='<span class="source-match-loading"><i class="fa-solid fa-spinner spin"></i> Mencari…</span>';
+  const providers=state.sourceRegistry.filter(row=>row.id!==(state.mangaData.source||state.source)&&row.capabilities&&row.capabilities.search).map(row=>row.id);const matches=[];
+  const results=await runBounded(providers,2,source=>searchOneSource(source,state.mangaData.title,null,12));
+  results.forEach((row,index)=>{if(row.status!=='fulfilled')return;for(const candidate of row.value){const confidence=matchConfidence(state.mangaData,candidate);if(confidence==='high'||confidence==='medium')matches.push({...candidate,source:candidate.source||providers[index],confidence});}});
+  state.sourceMatches=matches;renderSourceMatches();
+}
+function renderSourceMatches(){
+  const host=$('mangaSourceMatches');if(!host||!state.mangaData)return;const current=state.mangaData.source||state.source;host.innerHTML='<button class="source-match-btn is-current" type="button">'+escapeHtml(sourceLabel(current))+'</button>'+state.sourceMatches.map((m,index)=>'<button class="source-match-btn" type="button" onclick="mangaOpenMatchedSource('+index+')">'+escapeHtml(sourceLabel(m.source))+' <small>'+escapeHtml(m.confidence)+'</small></button>').join('')+(state.sourceMatches.length?'':'<span class="source-match-empty">Tidak ada match medium/high.</span>');
+}
+function mangaOpenMatchedSource(index){const match=state.sourceMatches[index];if(match)mangaOpenDetail(match.id,match.source,match)}
+function readerSourceOptions(){const current=state.mangaData&&state.mangaData.source||state.source;const options=[{source:current,title:sourceLabel(current)},...state.sourceMatches.map(row=>({source:row.source,title:sourceLabel(row.source)}))];const seen=new Set();return options.filter(row=>!seen.has(row.source)&&seen.add(row.source)).map(row=>'<option value="'+escapeHtml(row.source)+'" '+(row.source===current?'selected':'')+'>'+escapeHtml(row.title)+'</option>').join('')}
+function mangaSwitchReaderSource(source){const current=state.mangaData&&state.mangaData.source||state.source;if(source===current)return;const match=state.sourceMatches.find(row=>row.source===source);if(!match){toast('Source belum memiliki mapping yang tervalidasi.');const select=$('readerSourceSelect');if(select)select.value=current;return;}mangaOpenDetail(match.id,match.source,match)}
 function changeReaderQuality(quality){
   if(state.readerQuality===quality)return;
   state.readerQuality=quality;
@@ -664,7 +728,8 @@ function mangaChangeChapter(direction){
 
 $('mangaBackBtn').onclick=mangaGoBack;
 $('mangaSearchBtn').onclick=mangaDoSearch;
-$('mangaSearchInput').addEventListener('keydown',event=>{if(event.key==='Enter')mangaDoSearch()});
+let mangaSearchDebounce=0;$('mangaSearchInput').addEventListener('keydown',event=>{if(event.key==='Enter'){clearTimeout(mangaSearchDebounce);mangaDoSearch()}});$('mangaSearchInput').addEventListener('input',()=>{clearTimeout(mangaSearchDebounce);mangaSearchDebounce=setTimeout(()=>{if($('mangaSearchInput').value.trim().length>=2)mangaDoSearch()},420)});
+$('comicSourceSelect').onchange=e=>mangaSwitchSource(e.target.value);
 document.querySelectorAll('#mangaTabs .tab').forEach(button=>button.onclick=()=>mangaSwitchTab(button.dataset.tab));
 document.querySelectorAll('#mangaCategoryTabs .tab').forEach(button=>button.onclick=()=>mangaSwitchCategory(button.dataset.category));
 document.querySelectorAll('#mangaStatusTabs .tab').forEach(button=>button.onclick=()=>mangaSwitchStatus(button.dataset.status));
@@ -672,9 +737,9 @@ document.querySelectorAll('#mangaStatusTabs .tab').forEach(button=>button.onclic
 async function mangaXyzFetch(section){
   let sourceError=null;
   try{
-    const params=new URLSearchParams({action:'list',tab:section.sourceTab,page:String(section.sourcePage||1)});
-    const json=await sourceCall(params,15000);
-    const items=(json.items||[]).map(m=>({id:m.id,title:m.title,cover:m.cover,type:m.type||'Komik'}));
+    const params=new URLSearchParams({action:'list',source:'mangadex',tab:section.sourceTab,page:String(section.sourcePage||1)});
+    const json=await sourceCall(params,15000,null,'mangadex');
+    const items=(json.items||[]).map(m=>({id:m.id,source:'mangadex',title:m.title,cover:m.coverUrl||m.cover||'',type:itemType(m)}));
     if(items.length) return items.slice(0,12);
     throw new Error('Data kosong');
   }catch(error){sourceError=error}
@@ -726,10 +791,10 @@ async function mangaXyzHome(){
     results[index].value.forEach(m=>{
       const card=document.createElement('article');
       card.className='manga-card';
-      card.onclick=()=>mangaOpenDetail(m.id);
+      card.onclick=()=>mangaOpenDetail(m.id,m.source||state.source,m);
       card.innerHTML=`
         <div class="manga-cover-wrap">${mangaCoverImgHtml(m.cover)}</div>
-        <span class="manga-badge">${escapeHtml(m.type)}</span>
+        <span class="manga-badge">${escapeHtml(m.type)}</span><span class="manga-source-badge">${escapeHtml(sourceLabel(m.source||state.source))}</span>
         <div class="manga-card-title">${escapeHtml(m.title)}</div>`;
       grid.appendChild(card);
     });
@@ -740,9 +805,9 @@ window.mangaShowHome=mangaShowHome;
 window.mangaOpenDetail=mangaOpenDetail;
 window.mangaOnFavClick=mangaOnFavClick;
 window.mangaOpenReader=mangaOpenReader;
-window.mangaChangeChapter=mangaChangeChapter;
+window.mangaChangeChapter=mangaChangeChapter;window.mangaDiscoverSources=mangaDiscoverSources;window.mangaOpenMatchedSource=mangaOpenMatchedSource;
 
-mangaShowHome(true);
+loadSourceRegistry().finally(()=>mangaShowHome(true));
 })();
 
 (function(){
@@ -787,7 +852,7 @@ mangaShowHome(true);
     try{
       parent.postMessage({
         type:"nx-api-status",
-        provider:"mangadex",
+        provider:(new URL(url,location.href)).searchParams.get("source")||"mangadex",
         state:state,
         detail:detail
       },"*");
@@ -803,14 +868,14 @@ mangaShowHome(true);
       var response = await nativeFetch(input,init);
       var ms = Math.max(1,Math.round(performance.now()-start));
       if(response.ok) set("ok","Nexora Comic API aktif · " + ms + " ms");
-      else if(response.status < 500) set("warn","MangaDex merespons HTTP " + response.status);
-      else set("err","MangaDex gangguan HTTP " + response.status);
+      else if(response.status < 500) set("warn","Comic source merespons HTTP " + response.status);
+      else set("err","Comic source gangguan HTTP " + response.status);
       return response;
     }catch(error){
       set(
         error && error.name === "AbortError" ? "warn" : "err",
         error && error.name === "AbortError"
-          ? "Request MangaDex dibatalkan"
+          ? "Request comic source dibatalkan"
           : "Nexora Comic API gagal jaringan"
       );
       throw error;

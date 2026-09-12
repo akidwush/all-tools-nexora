@@ -1,0 +1,6 @@
+{
+  "list": {"data":[{"data":{"slug":"komik-uji","title":"Komik Uji","cover":"https://cdn.voratoon.com/covers/uji.webp"}}]},
+  "detail": {"data":{"data":{"slug":"komik-uji","title":"Komik Uji","description":"Sinopsis","author":"Penulis Uji"}}},
+  "chapters": {"data":[{"data":{"index":1,"title":"Awal"}}]},
+  "pages": {"data":{"data":{"images":["https://cdn.voratoon.com/pages/001.webp","https://cdn.voratoon.com/pages/002.webp"]}}}
+}
