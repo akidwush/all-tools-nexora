@@ -16,7 +16,7 @@
   var previewTimer=null;
   var galleryObservers=new WeakMap();
   var mountedRoot=null;
-  var state={styles:[],style:"lorelei",seed:"Nexora",options:{},schema:{},definition:null,discovery:"dynamic",category:"ALL",format:"svg",rasterSize:256,lastMutation:null,lastGoodUrl:""};
+  var state={styles:[],style:"lorelei",seed:"Nexora",options:{},schema:{},definition:null,discovery:"dynamic",category:"ALL",format:"svg",rasterSize:256,lastMutation:null,lastGoodUrl:"",mobileView:"browse",browseScrollY:0};
 
   function text(v){return String(v==null?"":v);}
   function slug(v){return text(v).trim().toLowerCase().replace(/[^a-z0-9_-]/g,"");}
@@ -26,6 +26,25 @@
   function btn(label,cls){var b=create("button",cls||"as-btn",label);b.type="button";return b;}
   function q(sel){return mountedRoot?mountedRoot.querySelector(sel):null;}
   function qa(sel){return mountedRoot?Array.from(mountedRoot.querySelectorAll(sel)):[];}
+  function isMobileLayout(){return !!(window.matchMedia&&window.matchMedia("(max-width:639px)").matches);}
+  function setMobileView(view,restoreScroll){
+    state.mobileView=view==="editor"?"editor":"browse";
+    var app=q(".as-app");if(!app)return;
+    app.classList.toggle("as-mobile-browse",state.mobileView==="browse");
+    app.classList.toggle("as-mobile-editor",state.mobileView==="editor");
+    if(!isMobileLayout())return;
+    if(state.mobileView==="editor"){
+      requestAnimationFrame(function(){window.scrollTo({top:0,behavior:"auto"});});
+    }else if(restoreScroll!==false){
+      var top=Math.max(0,Number(state.browseScrollY)||0);
+      requestAnimationFrame(function(){window.scrollTo({top:top,behavior:"auto"});});
+    }
+  }
+  function showMobileBrowse(){setMobileView("browse",true);}
+  function showMobileEditor(captureBrowseScroll){
+    if(isMobileLayout()&&captureBrowseScroll!==false)state.browseScrollY=Math.max(0,Number(window.scrollY)||0);
+    setMobileView("editor",false);
+  }
   function status(message,type){var n=q("[data-as-status]");if(n){n.textContent=message||"";n.dataset.type=type||"";}}
   function setBusy(busy,label){qa("[data-as-busy]").forEach(function(n){n.disabled=!!busy;});var l=q("[data-as-busy-label]");if(l)l.textContent=busy?(label||"Memuat…"):"";}
   function wait(ms,signal){return new Promise(function(resolve,reject){var id=setTimeout(resolve,ms);if(signal)signal.addEventListener("abort",function(){clearTimeout(id);reject(new DOMException("Aborted","AbortError"));},{once:true});});}
@@ -50,10 +69,176 @@
   function currentConfig(){return{version:1,dicebear:"10.x",style:state.style,seed:state.seed,options:clone(state.options)};}
   function categoryFor(style){var s=style.toLowerCase();if(/pixel/.test(s))return"PIXEL";if(/bot|robot/.test(s))return"ROBOT";if(/initial/.test(s))return"INITIAL";if(/shape|identicon|rings|thumbprint|glass|icons/.test(s))return"ABSTRACT";if(/scene/.test(s))return"SCENE";if(/adventurer|avataaars|lorelei|personas|notion|big-smile|open-peeps/.test(s))return"CHARACTER";return"MINIMAL";}
 
-  function renderShell(root){root.replaceChildren();var app=create("main","as-app");app.innerHTML='<header class="as-header"><a class="as-brand" href="/"><img src="/favicon.svg" alt="" width="28" height="28"><span><b>Nexora Avatar Studio</b><small>DiceBear v10 · browser-side</small></span></a><div class="as-header-actions"><button type="button" class="as-btn as-btn-ghost" data-as-license>License Info</button><button type="button" class="as-btn as-btn-ghost" data-as-import>Import Config</button></div></header><section class="as-hero"><div class="as-hero-copy"><span class="as-kicker">CREATIVE AVATAR STUDIO</span><h1>Design an avatar, not a URL.</h1><p>Pilih style DiceBear aktual, ubah hanya opsi yang benar-benar tersedia, lalu simpan konfigurasi reproducible.</p></div><div class="as-gallery-toolbar"><label class="as-search"><span>Search style</span><input type="search" data-as-style-search placeholder="Lorelei, pixel, bot…"></label><div class="as-category-row" data-as-categories></div></div><div class="as-style-grid" data-as-style-grid></div></section><section class="as-editor"><aside class="as-panel as-controls-panel"><div class="as-panel-head"><div><span class="as-kicker">SETTINGS</span><h2>Avatar controls</h2></div><button type="button" class="as-icon-btn" data-as-style-open>Style</button></div><label class="as-search"><span>Search settings</span><input type="search" data-as-option-search placeholder="Hair, eyes, background…"></label><div class="as-seed-card"><label><span>Seed</span><input data-as-seed maxlength="120" autocomplete="off" spellcheck="false"></label><div><button type="button" class="as-btn as-btn-soft" data-as-random-seed>Random Seed</button><button type="button" class="as-btn as-btn-soft" data-as-copy-seed>Copy</button></div></div><div class="as-preset-row" data-as-presets></div><div class="as-option-groups" data-as-options></div></aside><section class="as-preview-zone"><div class="as-preview-top"><div><span class="as-kicker">LIVE PREVIEW</span><h2 data-as-current-title>Avatar</h2></div><span class="as-chip" data-as-discovery></span></div><div class="as-preview-card"><div class="as-preview-checker"><img data-as-preview alt="DiceBear avatar preview" decoding="async"></div><div class="as-preview-state"><span data-as-status role="status" aria-live="polite"></span><span data-as-busy-label></span></div></div><div class="as-primary-actions"><button type="button" class="as-btn as-btn-primary" data-as-random data-as-busy>Randomize Avatar</button><button type="button" class="as-btn" data-as-random-style data-as-busy>Random Style</button><button type="button" class="as-btn as-btn-ghost" data-as-reset>Reset</button></div></section><aside class="as-panel as-export-panel"><div class="as-panel-head"><div><span class="as-kicker">EXPORT</span><h2>Ready to use</h2></div></div><label class="as-field"><span>Format</span><select data-as-format><option>svg</option><option>png</option><option>jpg</option><option>webp</option><option>avif</option><option>json</option></select></label><label class="as-field"><span>Raster size</span><select data-as-size><option value="128">128 px</option><option value="256" selected>256 px · API max</option><option value="512">512 px · client render</option><option value="1024">1024 px · client render</option></select></label><div class="as-export-stack"><button type="button" class="as-btn as-btn-primary" data-as-download-svg data-as-busy>Download SVG</button><button type="button" class="as-btn" data-as-download-png data-as-busy>Download PNG</button><button type="button" class="as-btn" data-as-download-selected data-as-busy>Download selected</button></div><div class="as-copy-grid"><button type="button" class="as-btn as-btn-soft" data-as-copy-svg>Copy SVG URL</button><button type="button" class="as-btn as-btn-soft" data-as-copy-image>Copy Image URL</button><button type="button" class="as-btn as-btn-soft" data-as-copy-img>Copy &lt;img&gt;</button><button type="button" class="as-btn as-btn-soft" data-as-copy-md>Copy Markdown</button><button type="button" class="as-btn as-btn-soft" data-as-copy-config>Copy Config JSON</button><button type="button" class="as-btn as-btn-soft" data-as-metadata>Avatar Metadata</button></div><hr><div class="as-panel-head"><div><span class="as-kicker">LOCAL</span><h3>Saved Avatars</h3></div><button type="button" class="as-btn as-btn-soft" data-as-save>Save Preset</button></div><div class="as-saved" data-as-saved></div></aside></section><div class="as-mobile-actions"><button type="button" data-as-random>Randomize</button><button type="button" data-as-download-png>Download</button><button type="button" data-as-share>Share</button></div><dialog class="as-sheet" data-as-style-dialog><form method="dialog" class="as-sheet-card"><div class="as-sheet-head"><div><b>Choose style</b><span data-as-style-count></span></div><button value="cancel" aria-label="Close">×</button></div><label class="as-search"><span>Search style</span><input type="search" data-as-sheet-search placeholder="Search styles…"></label><div class="as-category-row" data-as-sheet-categories></div><div class="as-style-grid as-sheet-grid" data-as-sheet-grid></div></form></dialog><dialog class="as-modal" data-as-modal><form method="dialog" class="as-modal-card"><div class="as-sheet-head"><b data-as-modal-title>Info</b><button value="cancel" aria-label="Close">×</button></div><div data-as-modal-body></div></form></dialog>';root.append(app);}
+  function renderShell(root){
+    root.replaceChildren();
+    var app=create("main","as-app as-mobile-browse");
+    app.innerHTML=`
+<header class="as-header">
+  <a class="as-brand" href="/">
+    <img src="/favicon.svg" alt="" width="28" height="28">
+    <span><b>Nexora Avatar Studio</b><small>DiceBear v10 · browser-side</small></span>
+  </a>
+  <div class="as-header-actions">
+    <button type="button" class="as-btn as-btn-ghost" data-as-license>License Info</button>
+    <button type="button" class="as-btn as-btn-ghost" data-as-import>Import Config</button>
+    <button type="button" class="as-mobile-header-menu" data-as-mobile-menu aria-label="Avatar Studio menu">⋮</button>
+  </div>
+</header>
 
+<section class="as-hero">
+  <div class="as-hero-copy">
+    <div class="as-desktop-hero-copy">
+      <span class="as-kicker">CREATIVE AVATAR STUDIO</span>
+      <h1>Design an avatar, not a URL.</h1>
+      <p>Pilih style DiceBear aktual, ubah hanya opsi yang benar-benar tersedia, lalu simpan konfigurasi reproducible.</p>
+    </div>
+    <div class="as-mobile-hero-copy">
+      <h1>Nexora Avatar Studio</h1>
+      <p>Create and customize DiceBear avatars.</p>
+    </div>
+  </div>
+  <div class="as-gallery-toolbar">
+    <label class="as-search">
+      <span>Search style</span>
+      <input type="search" data-as-style-search placeholder="Search styles…">
+    </label>
+    <div class="as-category-row" data-as-categories></div>
+  </div>
+  <div class="as-style-grid" data-as-style-grid></div>
+  <p class="as-style-footnote" data-as-style-footnote></p>
+</section>
+
+<section class="as-editor">
+  <div class="as-editor-mobile-head">
+    <button type="button" class="as-editor-back" data-as-back-styles aria-label="Back to styles">← <span>Styles</span></button>
+    <strong data-as-editor-style-title>Avatar</strong>
+    <button type="button" class="as-editor-menu" data-as-editor-menu aria-label="Editor menu">⋮</button>
+  </div>
+
+  <aside class="as-panel as-controls-panel">
+    <div class="as-panel-head">
+      <div><span class="as-kicker">SETTINGS</span><h2>Avatar controls</h2></div>
+      <button type="button" class="as-icon-btn" data-as-style-open>Style</button>
+    </div>
+    <label class="as-search as-settings-search">
+      <span>Search settings</span>
+      <input type="search" data-as-option-search placeholder="Hair, eyes, background…">
+    </label>
+    <div class="as-seed-card">
+      <label><span>Seed</span><input data-as-seed maxlength="120" autocomplete="off" spellcheck="false"></label>
+      <div>
+        <button type="button" class="as-btn as-btn-soft" data-as-random-seed aria-label="Randomize seed">Random Seed</button>
+        <button type="button" class="as-btn as-btn-soft" data-as-copy-seed>Copy</button>
+      </div>
+    </div>
+    <div class="as-preset-row" data-as-presets></div>
+    <div class="as-option-groups" data-as-options></div>
+  </aside>
+
+  <section class="as-preview-zone">
+    <div class="as-preview-top">
+      <div><span class="as-kicker">LIVE PREVIEW</span><h2 data-as-current-title>Avatar</h2></div>
+      <span class="as-chip" data-as-discovery></span>
+    </div>
+    <div class="as-preview-card">
+      <div class="as-preview-checker"><img data-as-preview alt="DiceBear avatar preview" decoding="async"></div>
+      <div class="as-preview-state"><span data-as-status role="status" aria-live="polite"></span><span data-as-busy-label></span></div>
+    </div>
+    <div class="as-primary-actions">
+      <button type="button" class="as-btn as-btn-primary" data-as-random data-as-busy><span class="as-desktop-only">Randomize Avatar</span><span class="as-mobile-only">Shuffle Avatar</span></button>
+      <button type="button" class="as-btn" data-as-random-style data-as-busy>Random Style</button>
+      <button type="button" class="as-btn as-btn-ghost as-editor-actions-btn" data-as-editor-actions aria-label="More avatar actions">⋮</button>
+      <button type="button" class="as-btn as-btn-ghost as-reset-button" data-as-reset>Reset</button>
+    </div>
+  </section>
+
+  <aside class="as-panel as-export-panel">
+    <div class="as-panel-head"><div><span class="as-kicker">EXPORT</span><h2>Ready to use</h2></div></div>
+    <label class="as-field"><span>Format</span><select data-as-format><option>svg</option><option>png</option><option>jpg</option><option>webp</option><option>avif</option><option>json</option></select></label>
+    <label class="as-field"><span>Raster size</span><select data-as-size><option value="128">128 px</option><option value="256" selected>256 px · API max</option><option value="512">512 px · client render</option><option value="1024">1024 px · client render</option></select></label>
+    <div class="as-export-stack">
+      <button type="button" class="as-btn as-btn-primary" data-as-download-svg data-as-busy>Download SVG</button>
+      <button type="button" class="as-btn" data-as-download-png data-as-busy>Download PNG</button>
+      <button type="button" class="as-btn" data-as-download-selected data-as-busy>Download selected</button>
+    </div>
+    <div class="as-copy-grid">
+      <button type="button" class="as-btn as-btn-soft" data-as-copy-svg>Copy SVG URL</button>
+      <button type="button" class="as-btn as-btn-soft" data-as-copy-image>Copy Image URL</button>
+      <button type="button" class="as-btn as-btn-soft" data-as-copy-img>Copy &lt;img&gt;</button>
+      <button type="button" class="as-btn as-btn-soft" data-as-copy-md>Copy Markdown</button>
+      <button type="button" class="as-btn as-btn-soft" data-as-copy-config>Copy Config JSON</button>
+      <button type="button" class="as-btn as-btn-soft" data-as-metadata>Avatar Metadata</button>
+    </div>
+    <hr>
+    <div class="as-panel-head"><div><span class="as-kicker">LOCAL</span><h3>Saved Avatars</h3></div><button type="button" class="as-btn as-btn-soft" data-as-save>Save Preset</button></div>
+    <div class="as-saved" data-as-saved></div>
+  </aside>
+</section>
+
+<div class="as-mobile-actions" aria-label="Avatar quick actions">
+  <button type="button" data-as-random><span aria-hidden="true">↻</span><b>Shuffle</b></button>
+  <button type="button" data-as-download-menu><span aria-hidden="true">↓</span><b>Download</b></button>
+  <button type="button" data-as-share-menu><span aria-hidden="true">↗</span><b>Share</b></button>
+</div>
+
+<dialog class="as-sheet" data-as-style-dialog>
+  <form method="dialog" class="as-sheet-card">
+    <div class="as-sheet-head"><div><b>Choose style</b><span data-as-style-count></span></div><button value="cancel" aria-label="Close">×</button></div>
+    <label class="as-search"><span>Search style</span><input type="search" data-as-sheet-search placeholder="Search styles…"></label>
+    <div class="as-category-row" data-as-sheet-categories></div>
+    <div class="as-style-grid as-sheet-grid" data-as-sheet-grid></div>
+  </form>
+</dialog>
+
+<dialog class="as-sheet" data-as-action-dialog>
+  <form method="dialog" class="as-sheet-card as-action-sheet-card">
+    <div class="as-sheet-head"><div><b data-as-action-title>Menu</b><span data-as-action-subtitle></span></div><button value="cancel" aria-label="Close">×</button></div>
+    <div class="as-action-list" data-as-action-body></div>
+  </form>
+</dialog>
+
+<dialog class="as-modal" data-as-modal>
+  <form method="dialog" class="as-modal-card">
+    <div class="as-sheet-head"><b data-as-modal-title>Info</b><button value="cancel" aria-label="Close">×</button></div>
+    <div data-as-modal-body></div>
+  </form>
+</dialog>
+`;
+    root.append(app);
+  }
   function stylePreviewUrl(style){var u=new URL(API_BASE+"/"+encodeURIComponent(style)+"/svg");u.searchParams.set("seed","Nexora-Style-Preview");u.searchParams.set("size","96");return u.toString();}
-  function renderStyleCards(target,search,category){if(!target)return;var previousObserver=galleryObservers.get(target);if(previousObserver)previousObserver.disconnect();galleryObservers.delete(target);target.replaceChildren();var matches=state.styles.filter(function(style){return(!search||style.toLowerCase().includes(search.toLowerCase()))&&(!category||category==="ALL"||categoryFor(style)===category);});matches.forEach(function(style,index){var card=btn("","as-style-card");card.dataset.style=style;card.setAttribute("aria-label","Pilih style "+title(style));var frame=create("span","as-style-thumb"),img=document.createElement("img");img.alt="Preview "+title(style);img.loading="lazy";img.decoding="async";img.referrerPolicy="no-referrer";img.width=96;img.height=96;img.dataset.src=stylePreviewUrl(style);if(index<4)img.src=img.dataset.src;img.addEventListener("load",function(){img.classList.add("is-loaded");img.removeAttribute("data-load-error");},{once:true});img.addEventListener("error",function(){img.dataset.loadError="1";});frame.append(img);card.append(frame,create("b","",title(style)),create("small","",categoryFor(style)));if(style===state.style)card.classList.add("is-selected");card.addEventListener("click",function(){selectStyle(style);var dialog=card.closest("dialog");if(dialog)dialog.close();});target.append(card);});var pending=target.querySelectorAll("img[data-src]:not([src])");if(!pending.length)return;if("IntersectionObserver" in window){var observer=new IntersectionObserver(function(entries,currentObserver){entries.forEach(function(entry){if(entry.isIntersecting){var img=entry.target;if(img.dataset.src&&!img.src)img.src=img.dataset.src;currentObserver.unobserve(img);}});},{rootMargin:"220px 0px"});galleryObservers.set(target,observer);pending.forEach(function(img){observer.observe(img);});}else pending.forEach(function(img){img.src=img.dataset.src;});}
+  function renderStyleCards(target,search,category){
+    if(!target)return;
+    var previousObserver=galleryObservers.get(target);if(previousObserver)previousObserver.disconnect();
+    galleryObservers.delete(target);target.replaceChildren();
+    var matches=state.styles.filter(function(style){return(!search||style.toLowerCase().includes(search.toLowerCase()))&&(!category||category==="ALL"||categoryFor(style)===category);});
+    matches.forEach(function(style,index){
+      var card=btn("","as-style-card");card.dataset.style=style;card.setAttribute("aria-label","Pilih style "+title(style));
+      var frame=create("span","as-style-thumb"),img=document.createElement("img");
+      img.alt="Preview "+title(style);img.loading="lazy";img.decoding="async";img.referrerPolicy="no-referrer";img.width=96;img.height=96;img.dataset.src=stylePreviewUrl(style);
+      if(index<4)img.src=img.dataset.src;
+      img.addEventListener("load",function(){img.classList.add("is-loaded");img.removeAttribute("data-load-error");},{once:true});
+      img.addEventListener("error",function(){img.dataset.loadError="1";});
+      frame.append(img);card.append(frame,create("b","",title(style)),create("small","",categoryFor(style)));
+      if(style===state.style)card.classList.add("is-selected");
+      card.addEventListener("click",function(){
+        var dialog=card.closest("dialog");
+        var work=selectStyle(style);
+        if(dialog)dialog.close();
+        if(!dialog&&isMobileLayout())showMobileEditor(true);
+        Promise.resolve(work).catch(function(){});
+      });
+      target.append(card);
+    });
+    var pending=target.querySelectorAll("img[data-src]:not([src])");
+    if(!pending.length)return;
+    if("IntersectionObserver" in window){
+      var observer=new IntersectionObserver(function(entries,currentObserver){
+        entries.forEach(function(entry){if(entry.isIntersecting){var img=entry.target;if(img.dataset.src&&!img.src)img.src=img.dataset.src;currentObserver.unobserve(img);}});
+      },{rootMargin:"220px 0px"});
+      galleryObservers.set(target,observer);pending.forEach(function(img){observer.observe(img);});
+    }else pending.forEach(function(img){img.src=img.dataset.src;});
+  }
   function renderCategoryRow(target,active,onPick){if(!target)return;target.replaceChildren();["ALL","CHARACTER","PIXEL","ROBOT","MINIMAL","ABSTRACT","INITIAL","SCENE"].forEach(function(name){var b=btn(name,"as-chip-btn"+(name===active?" is-active":""));b.addEventListener("click",function(){onPick(name);});target.append(b);});}
   function refreshStyleViews(){renderStyleCards(q("[data-as-style-grid]"),text(q("[data-as-style-search]")&&q("[data-as-style-search]").value),state.category);renderStyleCards(q("[data-as-sheet-grid]"),text(q("[data-as-sheet-search]")&&q("[data-as-sheet-search]").value),state.category);qa("[data-as-style-count]").forEach(function(n){n.textContent=state.styles.length+" styles";});}
 
@@ -61,13 +246,66 @@
   function rollbackInvalid(){var m=state.lastMutation;if(!m)return false;if(m.had)state.options[m.key]=m.previous;else delete state.options[m.key];state.lastMutation=null;return true;}
   function colorFor(v){var x=text(v).replace(/^#/,"");if(/^[0-9a-f]{3,8}$/i.test(x))return"#"+x;var m={red:"#ef4444",blue:"#3b82f6",green:"#22c55e",yellow:"#eab308",purple:"#8b5cf6",pink:"#ec4899",orange:"#f97316",black:"#111827",white:"#fff",gray:"#9ca3af",grey:"#9ca3af"};return m[x.toLowerCase()]||"transparent";}
   function renderControl(key,d){var wrap=create("div","as-option"),label=create("div","as-option-label");label.append(create("b","",title(key)));if(d&&d.description)label.append(create("small","",d.description));wrap.append(label);var type=typeOf(d),values=valuesOf(d),current=state.options[key],def=defaultOf(d);if(type==="boolean"||type==="bool"){var row=create("label","as-switch"),input=document.createElement("input");input.type="checkbox";input.checked=current==null?Boolean(def):String(current)==="true";var ui=create("span","as-switch-ui"),em=create("em","",input.checked?"On":"Off");input.addEventListener("change",function(){setOption(key,input.checked);em.textContent=input.checked?"On":"Off";});row.append(input,ui,em);wrap.append(row);return wrap;}if(values.length){var colorLike=/color/i.test(key);if(values.length<=14){var chips=create("div",colorLike?"as-swatches":"as-value-chips");values.forEach(function(value){var b=btn("",colorLike?"as-swatch":"as-value-chip"),multiple=Boolean(d&&d.multiple)||type==="array"||type==="multi-select";if(colorLike){b.style.setProperty("--swatch",colorFor(value));b.setAttribute("aria-label",title(key)+": "+value);b.title=value;}else b.textContent=title(value);if(Array.isArray(current)?current.includes(value):String(current==null?"":current)===value)b.classList.add("is-selected");b.addEventListener("click",function(){if(multiple){var list=Array.isArray(state.options[key])?state.options[key].slice():[];var i=list.indexOf(value);if(i>=0)list.splice(i,1);else list.push(value);setOption(key,list);}else setOption(key,value);renderOptions();});chips.append(b);});wrap.append(chips);return wrap;}var select=document.createElement("select"),empty=document.createElement("option");empty.value="";empty.textContent="Default / Auto";select.append(empty);values.forEach(function(value){var o=document.createElement("option");o.value=value;o.textContent=title(value);if(String(current)==value)o.selected=true;select.append(o);});select.addEventListener("change",function(){setOption(key,select.value);});wrap.append(select);return wrap;}if(["range","number","integer","float"].includes(type)){var row2=create("div","as-range-row"),input2=document.createElement("input");input2.type="number";if(Number.isFinite(Number(d&&d.min)))input2.min=String(d.min);if(Number.isFinite(Number(d&&d.max)))input2.max=String(d.max);input2.step=String((d&&d.step)||((type==="integer")?1:"any"));input2.placeholder=def!=null?String(def):"Default";if(current!=null)input2.value=String(current);var auto=btn("Auto","as-btn as-btn-soft");auto.addEventListener("click",function(){setOption(key,null);input2.value="";});input2.addEventListener("input",function(){setOption(key,input2.value===""?null:Number(input2.value));});row2.append(input2,auto);wrap.append(row2);return wrap;}var input3=document.createElement("input");input3.type="text";input3.placeholder=def!=null?String(def):"Default / Auto";input3.value=current==null?"":String(current);input3.addEventListener("input",function(){setOption(key,input3.value.trim());});wrap.append(input3);return wrap;}
-  function renderOptions(){var host=q("[data-as-options]");if(!host)return;host.replaceChildren();var query=text(q("[data-as-option-search]")&&q("[data-as-option-search]").value).trim().toLowerCase(),groups={};Object.keys(state.schema||{}).forEach(function(key){if(key==="seed")return;if(query&&!(key.toLowerCase().includes(query)||title(key).toLowerCase().includes(query)))return;var g=groupFor(key);(groups[g]||(groups[g]=[])).push(key);});var count=0;GROUP_ORDER.forEach(function(group){var keys=groups[group];if(!keys||!keys.length)return;count+=keys.length;var details=document.createElement("details");details.className="as-group";details.open=["Face","Hair","Background","Transform"].includes(group);var summary=document.createElement("summary");summary.append(create("span","",group),create("small","",keys.length+" options"));details.append(summary);var body=create("div","as-group-body");keys.sort().forEach(function(key){body.append(renderControl(key,state.schema[key]));});details.append(body);host.append(details);});if(!count)host.append(create("div","as-empty","Tidak ada style-specific control. Basic style + seed tetap aktif."));}
+  function renderOptions(){
+    var host=q("[data-as-options]");if(!host)return;
+    host.replaceChildren();
+    var optionSearch=q("[data-as-option-search]");
+    var optionCount=Object.keys(state.schema||{}).filter(function(key){return key!=="seed";}).length;
+    if(optionSearch&&optionSearch.closest("label"))optionSearch.closest("label").hidden=isMobileLayout()&&optionCount<14;
+    var query=text(optionSearch&&optionSearch.value).trim().toLowerCase(),groups={};
+    Object.keys(state.schema||{}).forEach(function(key){
+      if(key==="seed")return;
+      if(query&&!(key.toLowerCase().includes(query)||title(key).toLowerCase().includes(query)))return;
+      var g=groupFor(key);(groups[g]||(groups[g]=[])).push(key);
+    });
+    var count=0;
+    GROUP_ORDER.forEach(function(group){
+      var keys=groups[group];if(!keys||!keys.length)return;
+      count+=keys.length;
+      var details=document.createElement("details");details.className="as-group";
+      details.open=isMobileLayout()?count===keys.length:["Face","Hair","Background","Transform"].includes(group);
+      var summary=document.createElement("summary");summary.append(create("span","",group),create("small","",keys.length+" options"));details.append(summary);
+      var body=create("div","as-group-body");keys.sort().forEach(function(key){body.append(renderControl(key,state.schema[key]));});details.append(body);host.append(details);
+    });
+    if(!count)host.append(create("div","as-empty","Tidak ada style-specific control. Basic style + seed tetap aktif."));
+  }
   function compatiblePreset(name){var s=state.schema||{},p={};function put(key,value){if(Object.prototype.hasOwnProperty.call(s,key))p[key]=value;}if(name==="Clean"){put("flip",false);put("rotate",0);put("scale",90);put("radius",12);}if(name==="Cute"){put("scale",92);put("radius",24);var v=valuesOf(s.backgroundColor);if(v.length)put("backgroundColor",[v[Math.min(1,v.length-1)]]);}if(name==="Professional"){put("flip",false);put("rotate",0);put("radius",8);put("scale",90);}if(name==="Dark"){var d=valuesOf(s.backgroundColor);if(d.length)put("backgroundColor",[d.find(function(x){return /black|gray|slate|111|222/i.test(x);})||d[d.length-1]]);}if(name==="Pastel"){var a=valuesOf(s.backgroundColor);if(a.length)put("backgroundColor",[a[0]]);put("radius",20);}return p;}
   function renderPresets(){var host=q("[data-as-presets]");if(!host)return;host.replaceChildren();["Clean","Cute","Professional","Dark","Pastel","Random"].forEach(function(name){var b=btn(name,"as-chip-btn");b.addEventListener("click",function(){if(name==="Random")randomizeAvatar();else{Object.assign(state.options,compatiblePreset(name));renderOptions();schedulePreview();}});host.append(b);});}
   function randomizeAvatar(){state.seed=randomSeed();q("[data-as-seed]").value=state.seed;var keys=Object.keys(state.schema||{}).filter(function(k){return k!=="seed";});for(var i=keys.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=keys[i];keys[i]=keys[j];keys[j]=t;}keys.slice(0,Math.min(5,keys.length)).forEach(function(key){var d=state.schema[key],v=valuesOf(d),type=typeOf(d);if(v.length)state.options[key]=v[Math.floor(Math.random()*v.length)];else if(type==="boolean"||type==="bool")state.options[key]=Math.random()>.5;else if(type==="range"&&Number.isFinite(Number(d.min))&&Number.isFinite(Number(d.max))){var min=Number(d.min),max=Number(d.max),step=Number(d.step)||1;state.options[key]=min+Math.floor(Math.random()*((max-min)/step+1))*step;}});state.lastMutation=null;renderOptions();schedulePreview();saveRecent();}
 
-  function renderMeta(){var t=q("[data-as-current-title]");if(t)t.textContent=title(state.style);var d=q("[data-as-discovery]");if(d)d.textContent=(state.discovery==="dynamic"?"Dynamic API":state.discovery==="session-cache"?"Session cache":"Fallback")+" · "+state.styles.length+" styles";qa("[data-as-style-count]").forEach(function(n){n.textContent=state.styles.length+" styles";});}
-  async function selectStyle(style){style=slug(style);if(!state.styles.includes(style))return;setBusy(true,"Loading "+title(style)+"…");state.style=style;state.options={};state.lastMutation=null;try{state.schema=await loadOptions(style);state.definition=await loadDefinition(style);status("options.json loaded","ok");}catch(error){if(error&&error.name==="AbortError")return;state.schema={};state.definition=null;status("options.json gagal. Basic generator tetap aktif.","warn");}finally{setBusy(false);renderMeta();renderOptions();renderPresets();refreshStyleViews();schedulePreview();}}
+  function renderMeta(){
+    var label=title(state.style);
+    var t=q("[data-as-current-title]");if(t)t.textContent=label;
+    qa("[data-as-editor-style-title]").forEach(function(n){n.textContent=label;});
+    var discoveryText=(state.discovery==="dynamic"?"Dynamic API":state.discovery==="session-cache"?"Session cache":"Fallback")+" · "+state.styles.length+" styles";
+    var d=q("[data-as-discovery]");if(d)d.textContent=discoveryText;
+    var foot=q("[data-as-style-footnote]");if(foot)foot.textContent=discoveryText;
+    qa("[data-as-style-count]").forEach(function(n){n.textContent=state.styles.length+" styles";});
+  }
+  async function selectStyle(style){
+    style=slug(style);if(!state.styles.includes(style))return;
+    var previousOptions=clone(state.options||{});
+    setBusy(true,"Loading "+title(style)+"…");
+    state.style=style;state.lastMutation=null;
+    try{
+      var nextSchema=await loadOptions(style);
+      state.schema=nextSchema;state.definition=await loadDefinition(style);
+      var preserved={};
+      Object.keys(previousOptions).forEach(function(key){
+        var group=groupFor(key);
+        var universal=group==="Background"||/^(flip|rotate|scale)$/i.test(key);
+        if(universal&&Object.prototype.hasOwnProperty.call(nextSchema,key)&&validOption(key,previousOptions[key],nextSchema[key]))preserved[key]=previousOptions[key];
+      });
+      state.options=preserved;
+      status("options.json loaded","ok");
+    }catch(error){
+      if(error&&error.name==="AbortError")return;
+      state.schema={};state.definition=null;state.options={};
+      status("options.json gagal. Basic generator tetap aktif.","warn");
+    }finally{
+      setBusy(false);renderMeta();renderOptions();renderPresets();refreshStyleViews();schedulePreview();
+    }
+  }
   function updatePreview(){var img=q("[data-as-preview]");if(!img)return;img.alt=title(state.style)+" avatar with seed "+state.seed;img.src=buildUrl("svg").toString();}
   function wirePreview(){var img=q("[data-as-preview]");img.addEventListener("load",function(){state.lastGoodUrl=img.src;state.lastMutation=null;status("Preview ready","ok");saveRecent();});img.addEventListener("error",function(){if(rollbackInvalid()){status("Pilihan ini tidak didukung oleh style tersebut. Perubahan dibatalkan.","error");renderOptions();setTimeout(updatePreview,0);}else status("DiceBear sementara tidak tersedia.","error");});}
 
@@ -88,17 +326,157 @@
   function decodeConfig(v){var s=v.replace(/-/g,"+").replace(/_/g,"/");while(s.length%4)s+="=";var b=atob(s),bytes=Uint8Array.from(b,function(c){return c.charCodeAt(0);});return JSON.parse(new TextDecoder().decode(bytes));}
   async function share(){var u=new URL(location.href);u.hash="avatar="+encodeConfig(currentConfig());history.replaceState(null,"",u);await copy(u.toString(),"Share URL copied");}
   function validOption(key,value,d){var values=valuesOf(d),type=typeOf(d);if(Array.isArray(value))return value.every(function(v){return !values.length||values.includes(String(v));});if(values.length)return values.includes(String(value));if(type==="boolean"||type==="bool")return typeof value==="boolean"||value==="true"||value==="false";if(["range","number","integer","float"].includes(type)){var n=Number(value);if(!Number.isFinite(n))return false;if(Number.isFinite(Number(d.min))&&n<Number(d.min))return false;if(Number.isFinite(Number(d.max))&&n>Number(d.max))return false;}return true;}
-  async function importConfigObject(config){if(!config||typeof config!=="object")throw new Error("Config tidak valid");var style=slug(config.style);if(!state.styles.includes(style))throw new Error("Style tidak dikenal");await selectStyle(style);var next={},opts=config.options&&typeof config.options==="object"&&!Array.isArray(config.options)?config.options:{};Object.keys(opts).forEach(function(key){if(Object.prototype.hasOwnProperty.call(state.schema,key)&&validOption(key,opts[key],state.schema[key]))next[key]=opts[key];});state.seed=text(config.seed).slice(0,120)||"Nexora";state.options=next;q("[data-as-seed]").value=state.seed;renderOptions();schedulePreview();status("Config imported; invalid keys skipped","ok");}
-
+  async function importConfigObject(config){
+    if(!config||typeof config!=="object")throw new Error("Config tidak valid");
+    var style=slug(config.style);if(!state.styles.includes(style))throw new Error("Style tidak dikenal");
+    await selectStyle(style);
+    var next={},opts=config.options&&typeof config.options==="object"&&!Array.isArray(config.options)?config.options:{};
+    Object.keys(opts).forEach(function(key){if(Object.prototype.hasOwnProperty.call(state.schema,key)&&validOption(key,opts[key],state.schema[key]))next[key]=opts[key];});
+    state.seed=text(config.seed).slice(0,120)||"Nexora";state.options=next;
+    q("[data-as-seed]").value=state.seed;renderOptions();schedulePreview();status("Config imported; invalid keys skipped","ok");
+    if(isMobileLayout())showMobileEditor(false);
+  }
   function openModal(name,builder){var d=q("[data-as-modal]"),t=q("[data-as-modal-title]"),body=q("[data-as-modal-body]");t.textContent=name;body.replaceChildren();builder(body);if(typeof d.showModal==="function")d.showModal();else d.setAttribute("open","");}
   function meta(){var d=state.definition||{},m=d.meta||d.metadata||d,creator=m.creator||{},license=m.license||{},source=m.source||{};return{style:m.title||title(state.style),creator:typeof creator==="string"?creator:(creator.name||"Not provided by definition.json"),creatorUrl:typeof creator==="object"?(creator.url||creator.website||""):"",license:typeof license==="string"?license:(license.name||"Not provided by definition.json"),licenseUrl:typeof license==="object"?(license.url||license.website||""):"",source:typeof source==="string"?source:(source.name||"DiceBear"),sourceUrl:typeof source==="object"?(source.url||source.website||"https://www.dicebear.com/"):"https://www.dicebear.com/"};}
   function openLicense(){var m=meta();openModal("License Info",function(body){[["Style",m.style],["Creator",m.creator],["License",m.license],["Source",m.source]].forEach(function(x){var r=create("div","as-info-row");r.append(create("span","",x[0]),create("b","",x[1]));body.append(r);});var actions=create("div","as-modal-actions");[[m.licenseUrl,"License source"],[m.creatorUrl,"Creator"],[m.sourceUrl,"DiceBear source"],["https://www.dicebear.com/licenses/","License overview"]].forEach(function(x){if(!x[0])return;var a=create("a","as-btn as-btn-soft",x[1]);a.href=x[0];a.target="_blank";a.rel="noopener noreferrer";actions.append(a);});body.append(actions,create("p","as-modal-note","License metadata berasal dari definition.json jika tersedia; Nexora tidak menganggap semua style memakai lisensi yang sama."));});}
   function openImport(){openModal("Import Configuration",function(body){var ta=document.createElement("textarea");ta.className="as-import-box";ta.placeholder='{"style":"lorelei","seed":"Dika","options":{}}';var apply=btn("Validate & Import","as-btn as-btn-primary"),note=create("p","as-modal-note","Only discovered styles and options.json keys are accepted.");apply.addEventListener("click",async function(){try{await importConfigObject(JSON.parse(ta.value));body.closest("dialog").close();}catch(e){note.textContent=e.message;}});body.append(ta,apply,note);});}
   async function openMetadata(){openModal("Avatar Metadata",function(body){body.append(create("p","as-modal-note","Loading DiceBear JSON output…"));});var body=q("[data-as-modal-body]");try{var data=await fetchJson(buildUrl("json").toString(),undefined,1),pre=create("pre","as-json"),raw=JSON.stringify(data,null,2);pre.textContent=raw.length>12000?raw.slice(0,12000)+"\n…truncated in UI":raw;body.replaceChildren(pre);var c=btn("Copy JSON","as-btn as-btn-soft");c.addEventListener("click",function(){copy(raw,"Metadata copied");});body.append(c);}catch(e){body.replaceChildren(create("p","as-modal-note","Metadata JSON tidak tersedia: "+e.message));}}
 
-  function wireEvents(){function renderCats(active){renderCategoryRow(q("[data-as-categories]"),active,function(cat){state.category=cat;renderCats(cat);renderSheetCats(cat);refreshStyleViews();});}function renderSheetCats(active){renderCategoryRow(q("[data-as-sheet-categories]"),active,function(cat){state.category=cat;renderCats(cat);renderSheetCats(cat);refreshStyleViews();});}renderCats(state.category);renderSheetCats(state.category);q("[data-as-style-search]").addEventListener("input",refreshStyleViews);q("[data-as-sheet-search]").addEventListener("input",refreshStyleViews);q("[data-as-option-search]").addEventListener("input",renderOptions);q("[data-as-style-open]").addEventListener("click",function(){var d=q("[data-as-style-dialog]");if(typeof d.showModal==="function")d.showModal();else d.setAttribute("open","");});q("[data-as-seed]").addEventListener("input",function(e){state.seed=e.target.value||"Nexora";state.lastMutation=null;schedulePreview();});q("[data-as-random-seed]").addEventListener("click",function(){state.seed=randomSeed();q("[data-as-seed]").value=state.seed;schedulePreview();});q("[data-as-copy-seed]").addEventListener("click",function(){copy(state.seed,"Seed copied");});qa("[data-as-random]").forEach(function(b){b.addEventListener("click",randomizeAvatar);});q("[data-as-random-style]").addEventListener("click",async function(){var pool=state.styles.slice();for(var i=0;i<Math.min(6,pool.length);i++){var s=pool.splice(Math.floor(Math.random()*pool.length),1)[0];try{await selectStyle(s);state.seed=randomSeed();q("[data-as-seed]").value=state.seed;schedulePreview();return;}catch(_){}}status("Random style gagal dimuat","error");});q("[data-as-reset]").addEventListener("click",function(){state.seed="Nexora";state.options={};q("[data-as-seed]").value=state.seed;renderOptions();schedulePreview();});q("[data-as-format]").addEventListener("change",function(e){state.format=e.target.value;});q("[data-as-size]").addEventListener("change",function(e){state.rasterSize=Number(e.target.value)||256;});qa("[data-as-download-svg]").forEach(function(b){b.addEventListener("click",downloadSvg);});qa("[data-as-download-png]").forEach(function(b){b.addEventListener("click",downloadPng);});q("[data-as-download-selected]").addEventListener("click",downloadSelected);q("[data-as-copy-svg]").addEventListener("click",function(){copy(buildUrl("svg").toString(),"SVG URL copied");});q("[data-as-copy-image]").addEventListener("click",function(){copy(buildUrl("png").toString(),"Image URL copied");});q("[data-as-copy-img]").addEventListener("click",function(){copy('<img src="'+buildUrl("svg").toString()+'" alt="DiceBear avatar">',"HTML copied");});q("[data-as-copy-md]").addEventListener("click",function(){copy("![DiceBear avatar]("+buildUrl("svg").toString()+")","Markdown copied");});q("[data-as-copy-config]").addEventListener("click",function(){copy(JSON.stringify(currentConfig(),null,2),"Config copied");});q("[data-as-metadata]").addEventListener("click",openMetadata);qa("[data-as-license]").forEach(function(b){b.addEventListener("click",openLicense);});q("[data-as-import]").addEventListener("click",openImport);q("[data-as-save]").addEventListener("click",savePreset);qa("[data-as-share]").forEach(function(b){b.addEventListener("click",share);});wirePreview();}
-
-  async function mount(root){mountedRoot=root;renderShell(root);setBusy(true,"Discovering styles…");state.styles=await discoverStyles();if(!state.styles.includes(state.style))state.style=state.styles[0]||FALLBACK_STYLES[0];q("[data-as-seed]").value=state.seed;wireEvents();renderMeta();refreshStyleViews();renderSaved();try{state.schema=await loadOptions(state.style);state.definition=await loadDefinition(state.style);status("DiceBear connected","ok");}catch(e){if(!e||e.name!=="AbortError")status("options.json gagal. Basic generator aktif.","warn");state.schema={};}renderOptions();renderPresets();setBusy(false);updatePreview();if(String(location.hash||"").indexOf("#avatar=")===0){try{await importConfigObject(decodeConfig(location.hash.slice(8)));}catch(e){status("Shared config invalid: "+e.message,"error");}}}
+  function openStyleSheet(){
+    var d=q("[data-as-style-dialog]");if(!d)return;
+    if(typeof d.showModal==="function")d.showModal();else d.setAttribute("open","");
+  }
+  function openActionSheet(name,subtitle,html){
+    var d=q("[data-as-action-dialog]"),body=q("[data-as-action-body]");
+    if(!d||!body)return null;
+    q("[data-as-action-title]").textContent=name||"Menu";
+    q("[data-as-action-subtitle]").textContent=subtitle||"";
+    body.innerHTML=html||"";
+    if(typeof d.showModal==="function")d.showModal();else d.setAttribute("open","");
+    return body;
+  }
+  function closeActionSheet(){var d=q("[data-as-action-dialog]");if(d&&d.open)d.close();}
+  function resetAvatar(){
+    state.seed="Nexora";state.options={};q("[data-as-seed]").value=state.seed;renderOptions();schedulePreview();
+  }
+  async function randomizeStyle(){
+    var pool=state.styles.slice();
+    for(var i=0;i<Math.min(6,pool.length);i++){
+      var s=pool.splice(Math.floor(Math.random()*pool.length),1)[0];
+      try{await selectStyle(s);state.seed=randomSeed();q("[data-as-seed]").value=state.seed;schedulePreview();return;}catch(_){}
+    }
+    status("Random style gagal dimuat","error");
+  }
+  function openSavedAvatars(){
+    openModal("Saved Avatars",function(body){
+      var save=btn("Save current avatar","as-btn as-btn-primary");save.addEventListener("click",function(){savePreset();});
+      body.append(save);
+      var rows=readSaved();
+      if(!rows.length){body.append(create("div","as-empty","Belum ada config tersimpan."));return;}
+      var list=create("div","as-saved");
+      rows.slice(0,12).forEach(function(item){
+        var row=create("div","as-saved-row"),load=btn(item.name,"as-saved-load"),del=btn("×","as-btn as-btn-soft");
+        load.addEventListener("click",async function(){await importConfigObject(item.config);var dialog=body.closest("dialog");if(dialog)dialog.close();});
+        del.addEventListener("click",function(){writeSaved(readSaved().filter(function(x){return x.id!==item.id;}));row.remove();});
+        row.append(load,del);list.append(row);
+      });
+      body.append(list);
+    });
+  }
+  function openHeaderMenu(){
+    var body=openActionSheet("Avatar Studio","More",'<button type="button" class="as-action-item" data-action="import"><span>Import Config</span><small>JSON configuration</small></button><button type="button" class="as-action-item" data-action="license"><span>License Info</span><small>Current style metadata</small></button><button type="button" class="as-action-item" data-action="saved"><span>Saved Avatars</span><small>Local presets</small></button><button type="button" class="as-action-item as-action-danger" data-action="reset"><span>Reset</span><small>Seed + options</small></button>');
+    if(!body)return;
+    body.querySelectorAll("[data-action]").forEach(function(button){button.addEventListener("click",function(){
+      var action=button.dataset.action;closeActionSheet();
+      if(action==="import")openImport();else if(action==="license")openLicense();else if(action==="saved")openSavedAvatars();else if(action==="reset")resetAvatar();
+    });});
+  }
+  function openEditorMenu(){
+    var body=openActionSheet("Editor","Avatar actions",'<button type="button" class="as-action-item" data-action="styles"><span>Change Style</span><small>'+text(title(state.style))+'</small></button><button type="button" class="as-action-item" data-action="save"><span>Save Preset</span><small>Store locally</small></button><button type="button" class="as-action-item" data-action="metadata"><span>Avatar Metadata</span><small>DiceBear JSON</small></button><button type="button" class="as-action-item as-action-danger" data-action="reset"><span>Reset</span><small>Seed + options</small></button>');
+    if(!body)return;
+    body.querySelectorAll("[data-action]").forEach(function(button){button.addEventListener("click",function(){
+      var action=button.dataset.action;closeActionSheet();
+      if(action==="styles")openStyleSheet();else if(action==="save")savePreset();else if(action==="metadata")openMetadata();else if(action==="reset")resetAvatar();
+    });});
+  }
+  function openDownloadMenu(){
+    var html='<label class="as-action-field"><span>Raster size</span><select data-as-download-size><option value="128">128 px</option><option value="256">256 px</option><option value="512">512 px</option><option value="1024">1024 px</option></select></label><div class="as-download-grid">'+["svg","png","webp","jpg","avif"].map(function(format){return '<button type="button" class="as-action-item" data-download-format="'+format+'"><span>'+format.toUpperCase()+'</span><small>'+(format==="svg"?"Vector":format==="png"?"PNG image":"Raster image")+'</small></button>';}).join("")+'</div>';
+    var body=openActionSheet("Download","Choose format",html);if(!body)return;
+    var size=body.querySelector("[data-as-download-size]");if(size){size.value=String(state.rasterSize);size.addEventListener("change",function(){state.rasterSize=Number(size.value)||256;var main=q("[data-as-size]");if(main)main.value=String(state.rasterSize);});}
+    body.querySelectorAll("[data-download-format]").forEach(function(button){button.addEventListener("click",function(){
+      var format=button.dataset.downloadFormat;state.format=format;var select=q("[data-as-format]");if(select)select.value=format;closeActionSheet();
+      if(format==="svg")downloadSvg();else if(format==="png")downloadPng();else downloadSelected();
+    });});
+  }
+  function openShareMenu(){
+    var body=openActionSheet("Share","Copy or share",'<button type="button" class="as-action-item" data-share="url"><span>Copy URL</span><small>SVG URL</small></button><button type="button" class="as-action-item" data-share="config"><span>Copy Config</span><small>JSON</small></button><button type="button" class="as-action-item" data-share="img"><span>Copy &lt;img&gt;</span><small>HTML</small></button><button type="button" class="as-action-item" data-share="markdown"><span>Copy Markdown</span><small>Markdown image</small></button><button type="button" class="as-action-item" data-share="share"><span>Share Config</span><small>Reproducible URL</small></button>');
+    if(!body)return;
+    body.querySelectorAll("[data-share]").forEach(function(button){button.addEventListener("click",function(){
+      var action=button.dataset.share;closeActionSheet();
+      if(action==="url")copy(buildUrl("svg").toString(),"URL copied");
+      else if(action==="config")copy(JSON.stringify(currentConfig(),null,2),"Config copied");
+      else if(action==="img")copy('<img src="'+buildUrl("svg").toString()+'" alt="DiceBear avatar">',"HTML copied");
+      else if(action==="markdown")copy("![DiceBear avatar]("+buildUrl("svg").toString()+")","Markdown copied");
+      else if(action==="share")share();
+    });});
+  }
+  function wireEvents(){
+    function renderCats(active){renderCategoryRow(q("[data-as-categories]"),active,function(cat){state.category=cat;renderCats(cat);renderSheetCats(cat);refreshStyleViews();});}
+    function renderSheetCats(active){renderCategoryRow(q("[data-as-sheet-categories]"),active,function(cat){state.category=cat;renderCats(cat);renderSheetCats(cat);refreshStyleViews();});}
+    renderCats(state.category);renderSheetCats(state.category);
+    q("[data-as-style-search]").addEventListener("input",refreshStyleViews);
+    q("[data-as-sheet-search]").addEventListener("input",refreshStyleViews);
+    q("[data-as-option-search]").addEventListener("input",renderOptions);
+    q("[data-as-style-open]").addEventListener("click",openStyleSheet);
+    q("[data-as-back-styles]").addEventListener("click",showMobileBrowse);
+    q("[data-as-mobile-menu]").addEventListener("click",openHeaderMenu);
+    q("[data-as-editor-menu]").addEventListener("click",openEditorMenu);
+    q("[data-as-editor-actions]").addEventListener("click",openEditorMenu);
+    q("[data-as-download-menu]").addEventListener("click",openDownloadMenu);
+    q("[data-as-share-menu]").addEventListener("click",openShareMenu);
+    q("[data-as-seed]").addEventListener("input",function(e){state.seed=e.target.value||"Nexora";state.lastMutation=null;schedulePreview();});
+    q("[data-as-random-seed]").addEventListener("click",function(){state.seed=randomSeed();q("[data-as-seed]").value=state.seed;schedulePreview();});
+    q("[data-as-copy-seed]").addEventListener("click",function(){copy(state.seed,"Seed copied");});
+    qa("[data-as-random]").forEach(function(b){b.addEventListener("click",randomizeAvatar);});
+    q("[data-as-random-style]").addEventListener("click",randomizeStyle);
+    q("[data-as-reset]").addEventListener("click",resetAvatar);
+    q("[data-as-format]").addEventListener("change",function(e){state.format=e.target.value;});
+    q("[data-as-size]").addEventListener("change",function(e){state.rasterSize=Number(e.target.value)||256;});
+    qa("[data-as-download-svg]").forEach(function(b){b.addEventListener("click",downloadSvg);});
+    qa("[data-as-download-png]").forEach(function(b){b.addEventListener("click",downloadPng);});
+    q("[data-as-download-selected]").addEventListener("click",downloadSelected);
+    q("[data-as-copy-svg]").addEventListener("click",function(){copy(buildUrl("svg").toString(),"SVG URL copied");});
+    q("[data-as-copy-image]").addEventListener("click",function(){copy(buildUrl("png").toString(),"Image URL copied");});
+    q("[data-as-copy-img]").addEventListener("click",function(){copy('<img src="'+buildUrl("svg").toString()+'" alt="DiceBear avatar">',"HTML copied");});
+    q("[data-as-copy-md]").addEventListener("click",function(){copy("![DiceBear avatar]("+buildUrl("svg").toString()+")","Markdown copied");});
+    q("[data-as-copy-config]").addEventListener("click",function(){copy(JSON.stringify(currentConfig(),null,2),"Config copied");});
+    q("[data-as-metadata]").addEventListener("click",openMetadata);
+    qa("[data-as-license]").forEach(function(b){b.addEventListener("click",openLicense);});
+    q("[data-as-import]").addEventListener("click",openImport);
+    q("[data-as-save]").addEventListener("click",savePreset);
+    qa("[data-as-share]").forEach(function(b){b.addEventListener("click",share);});
+    if(window.matchMedia){
+      var mobileQuery=window.matchMedia("(max-width:639px)");
+      var syncLayout=function(){setMobileView(state.mobileView,false);renderOptions();};
+      if(typeof mobileQuery.addEventListener==="function")mobileQuery.addEventListener("change",syncLayout);
+    }
+    wirePreview();
+  }
+  async function mount(root){
+    mountedRoot=root;renderShell(root);setMobileView("browse",false);
+    setBusy(true,"Discovering styles…");
+    state.styles=await discoverStyles();
+    if(!state.styles.includes(state.style))state.style=state.styles[0]||FALLBACK_STYLES[0];
+    q("[data-as-seed]").value=state.seed;
+    wireEvents();renderMeta();refreshStyleViews();renderSaved();
+    try{state.schema=await loadOptions(state.style);state.definition=await loadDefinition(state.style);status("DiceBear connected","ok");}
+    catch(e){if(!e||e.name!=="AbortError")status("options.json gagal. Basic generator aktif.","warn");state.schema={};}
+    renderOptions();renderPresets();setBusy(false);updatePreview();
+    if(String(location.hash||"").indexOf("#avatar=")===0){
+      try{await importConfigObject(decodeConfig(location.hash.slice(8)));if(isMobileLayout())showMobileEditor(false);}
+      catch(e){status("Shared config invalid: "+e.message,"error");}
+    }
+  }
   function openAvatarStudio(){window.location.assign("/avatar-studio");return false;}
   window.openAvatarStudio=openAvatarStudio;
   window.renderAvatarStudio=openAvatarStudio;
