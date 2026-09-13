@@ -18,12 +18,12 @@ const sameSet = (left, right) => left.length === right.length && left.every((ite
 
 // Frozen Comic Reader architecture. Any accidental replacement/revert aborts the build.
 const COMIC_READER_LOCK = Object.freeze({
-  "assets/js/features/comic-reader.js": "9f751be2e67f9ce72518f9d6d2544c4df31ea01b96dac617555934d68bb0cacc",
-  "assets/comic-reader/index.html": "190b142c53f88502b6e7453e1ec095c9eaf9da78c7af37915dbc5afce2df1891",
-  "assets/comic-reader/app.css": "db0da8f022d52f92d9acd4a6f2504073b4afaa07b547442544e7781e87c682c5",
-  "assets/comic-reader/app.js": "97834555876f33406408b098b363ec8dcda147f90272c2eac6cab7ff83b2a0a0",
-  "assets/comic-reader/translate.js": "be978a88666033e89d934576bda96935fb74b3a20f461f38b2578aec018219e8",
-  "assets/css/features/comic-reader.css": "61e079135af952ecebfa5a10e3a88c01cc9eb441bf4c7aa5dc70df6dd2007b2a"
+  "assets/js/features/comic-reader.js": "4ab812b4e56f5912343a5c9592146685cda2661c2f215d834a53aef6e6320d5e",
+  "assets/comic-reader/index.html": "5fafef538d7ea18e8c8d78fbb3d1ac9d0e98e9abbf4f9b08d133b8dea917848d",
+  "assets/comic-reader/app.css": "cbb1fd3f8ec85bf7153e84a1c5e45b37fdb9dd670a827132daea0183061ef3d2",
+  "assets/comic-reader/app.js": "d950eaa621809ea8e814473e7a461c59fe0e22fd4d1d1a05ca3bb8da253f2ef4",
+  "assets/comic-reader/translate.js": "672a63ff4877e90df0e450311736a1395232bf96793b5c3c8893aa97ee98a4de",
+  "assets/css/features/comic-reader.css": "49f665b05e4e2c0fb5cb36673c6e79a8298a3ac74890e040987e0f030bed76e2"
 });
 for (const [relative, expected] of Object.entries(COMIC_READER_LOCK)) {
   const absolute = path.join(root, relative);
@@ -221,7 +221,7 @@ for (const relative of [
 ]) if (!fs.existsSync(path.join(root, relative))) fail(`Standalone canonical asset hilang: ${relative}`);
 
 const comicShell = read("assets/js/features/comic-reader.js");
-if (!/COMIC_APP_URL\s*=\s*["']\/assets\/comic-reader\/index\.html\?v=standalone-v1["']/.test(comicShell)) fail("Comic Reader tidak memakai app standalone canonical.");
+if (!/COMIC_APP_URL\s*=\s*["']\/assets\/comic-reader\/index\.html\?v=standalone-v1-immersive1["']/.test(comicShell)) fail("Comic Reader tidak memakai app standalone canonical.");
 if (/COMIC_READER_APP_B64|srcdoc|nxComicApiBridgeHandler|nx-comic-api-request/.test(comicShell)) fail("Comic Reader legacy Base64/srcdoc/bridge kembali terdeteksi.");
 for (const relative of ["assets/comic-reader/index.html", "assets/comic-reader/app.css", "assets/comic-reader/app.js"]) {
   if (!fs.existsSync(path.join(root, relative))) fail(`Comic Reader standalone asset hilang: ${relative}`);

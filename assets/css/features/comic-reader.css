@@ -69,6 +69,13 @@
   height:7px!important;
   box-shadow:0 0 8px rgba(74,222,128,.38)!important;
 }
+
+#nxUniversalRoom[data-tool="comicreader"].is-reader-mode .nx-room-topbar{
+  display:none!important;
+}
+#nxUniversalRoom[data-tool="comicreader"].is-reader-mode .nx-comic-embed{
+  height:100dvh;
+}
 #nxUniversalRoom[data-tool="comicreader"] .nx-room-tool-body{
   height:100%!important;
   min-height:0!important;
@@ -122,8 +129,6 @@
   visibility:hidden;
 }
 @media all{
-  .nx-comic-embed{
-    height:calc(100dvh - 54px);
-    min-height:0;
-  }
+  .nx-comic-embed{height:calc(100dvh - 54px);min-height:0}
+  #nxUniversalRoom[data-tool="comicreader"].is-reader-mode .nx-comic-embed{height:100dvh}
 }

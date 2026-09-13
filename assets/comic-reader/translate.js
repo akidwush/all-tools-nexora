@@ -80,14 +80,14 @@
  document.addEventListener('nexora:comic-pages',function(event){
   stop(current);var d=event.detail,host=document.getElementById('mangaReaderPages');if(!host)return;
   var compatible=d.translationCompatible!==false,source=d.source||'mangadex',sourceLabel=d.sourceLabel||(source==='mangadex'?'MangaDex':source);
-  var toolbar=node('div','nx-ct-toolbar '+(compatible?'is-compatible':'is-unavailable')),mode=node('select'),startButton=node('button','nx-ct-primary','Translate All'),cancel=node('button','nx-ct-secondary','Cancel'),retry=node('button','nx-ct-secondary','Retry gagal'),sfx=node('input'),message=node('p','nx-ct-status');
-  mode.setAttribute('aria-label','Bahasa komik');[['original','Original']].concat(compatible?[['id','Indonesia']]:[]).forEach(function(pair){var o=node('option','',pair[1]);o.value=pair[0];mode.append(o);});
+  var toolbar=node('div','nx-ct-toolbar '+(compatible?'is-compatible':'is-unavailable')),mode=compatible?node('select'):node('span','nx-ct-mode-static','Original'),startButton=node('button','nx-ct-primary','Translate All'),cancel=node('button','nx-ct-secondary','Cancel'),retry=node('button','nx-ct-secondary','Retry gagal'),sfx=node('input'),message=node('p','nx-ct-status');
+  if(compatible){mode.setAttribute('aria-label','Bahasa komik');[['original','Original'],['id','Indonesia']].forEach(function(pair){var o=node('option','',pair[1]);o.value=pair[0];mode.append(o);});}else mode.value='original';
   var icon=node('i','fa-solid fa-language');icon.setAttribute('aria-hidden','true');startButton.prepend(icon,document.createTextNode(' '));
   [startButton,cancel,retry].forEach(function(b){b.type='button';});cancel.hidden=true;retry.hidden=true;sfx.type='checkbox';
   var label=node('label','nx-ct-sfx');label.append(sfx,document.createTextNode('SFX'));label.hidden=!compatible;message.setAttribute('role','status');message.setAttribute('aria-live','polite');message.hidden=true;
   toolbar.append(mode);
   if(compatible){toolbar.append(startButton,cancel,retry,label,message);}else{
-    var info=node('button','nx-ct-info','Translate · N/A');info.type='button';info.setAttribute('aria-label','Translate All belum kompatibel untuk '+sourceLabel);info.title='Translate All belum kompatibel untuk '+sourceLabel;info.onclick=function(){if(window.NexoraComicUI&&window.NexoraComicUI.openTranslationInfo)window.NexoraComicUI.openTranslationInfo(sourceLabel);};toolbar.append(info);
+    var info=node('button','nx-ct-info');info.type='button';info.append(document.createTextNode('Translation unavailable '),node('i','fa-solid fa-circle-info'));info.setAttribute('aria-label','Translate All belum kompatibel untuk '+sourceLabel);info.title='Translate All belum kompatibel untuk '+sourceLabel;info.onclick=function(){if(window.NexoraComicUI&&window.NexoraComicUI.openTranslationInfo)window.NexoraComicUI.openTranslationInfo(sourceLabel);};toolbar.append(info);
   }
   var failure=document.getElementById('readerFailureBanner');(failure||host).before(toolbar);
   var s=current={source:source,sourceLabel:sourceLabel,translationCompatible:compatible,mangaId:d.mangaId,chapterId:d.chapterId,host:host,toolbar:toolbar,pages:[],results:new Map(),failed:new Set(),mode:mode,sfx:sfx,start:startButton,cancel:cancel,retry:retry,status:message,control:{},controller:new AbortController(),busy:false};
@@ -99,7 +99,7 @@
   s.observer=new IntersectionObserver(function(entries){entries.forEach(function(entry){var i=s.pages.findIndex(function(p){return p.wrap===entry.target;});if(i>=0){s.pages[i].visible=entry.isIntersecting;renderPage(s,i);}});},{rootMargin:'500px 0px'});s.pages.forEach(function(p){s.observer.observe(p.wrap);});
   s.resize=new ResizeObserver(function(){render(s);});s.pages.forEach(function(p){s.resize.observe(p.img);});
   s.timer=setInterval(function(){if(!host.isConnected&&current===s){stop(s);current=null;}},1000);
-  mode.onchange=function(){render(s);if(mode.value==='id'&&!s.results.size)status(s,'Tekan Translate All untuk mulai menerjemahkan chapter.');};sfx.onchange=function(){s.sfxTouched=true;render(s);};startButton.onclick=retry.onclick=function(){start(s);};
+  if(compatible)mode.onchange=function(){render(s);if(mode.value==='id'&&!s.results.size)status(s,'Tekan Translate All untuk mulai menerjemahkan chapter.');};sfx.onchange=function(){s.sfxTouched=true;render(s);};startButton.onclick=retry.onclick=function(){start(s);};
  });
  document.addEventListener('nexora:comic-loading',function(){stop(current);current=null;});
  window.addEventListener('pagehide',function(){stop(current);current=null;});

@@ -6,7 +6,7 @@
   'use strict';
 
   var activeComicFrame = null;
-  var COMIC_APP_URL = '/assets/comic-reader/index.html?v=standalone-v1';
+  var COMIC_APP_URL = '/assets/comic-reader/index.html?v=standalone-v1-immersive1';
 
   function closeComicReader(event){
     if(event){
@@ -18,7 +18,7 @@
     var room=document.getElementById('nxUniversalRoom');
     if(!room || room.getAttribute('data-tool')!=='comicreader') return false;
 
-    room.classList.remove('is-visible','is-open');
+    room.classList.remove('is-visible','is-open','is-reader-mode');
     room.style.display='none';
     room.setAttribute('aria-hidden','true');
 
@@ -58,7 +58,11 @@
 
   window.addEventListener('message',function(event){
     if(!activeComicFrame || event.source!==activeComicFrame.contentWindow || !event.data) return;
-    if(event.data.type==='nx-close-comic-reader') closeComicReader();
+    if(event.data.type==='nx-close-comic-reader'){closeComicReader();return;}
+    if(event.data.type==='nx-comic-view'){
+      var room=document.getElementById('nxUniversalRoom');
+      if(room&&room.getAttribute('data-tool')==='comicreader')room.classList.toggle('is-reader-mode',event.data.view==='reader');
+    }
   });
 
   document.addEventListener('click',function(event){
