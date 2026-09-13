@@ -35,7 +35,9 @@ const state = {
   searchController:null,
   searchItems:new Map(),
   capabilities:null,
-  listGeneration:0
+  listGeneration:0,
+  detailScrollY:0,
+  restoreDetailScrollPending:false
 };
 
 function $(id){return document.getElementById(id)}
@@ -546,8 +548,33 @@ function addHistory(item,chapter){
 function closeComic(){
   parent.postMessage({type:'nx-close-comic-reader'},'*');
 }
+function restoreDetailScrollPosition(attempt=0){
+  if(!state.restoreDetailScrollPending)return;
+  if(state.view!=='detail'){state.restoreDetailScrollPending=false;return;}
+  const list=$('mangaChapterList');
+  if((!list||list.querySelector('.loading'))&&attempt<80){
+    setTimeout(()=>restoreDetailScrollPosition(attempt+1),75);
+    return;
+  }
+  state.restoreDetailScrollPending=false;
+  const top=Math.max(0,Number(state.detailScrollY)||0);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>window.scrollTo({top,behavior:'auto'})));
+}
+function mangaBackFromReader(){
+  const manga=state.mangaData;
+  const id=state.mangaId||(manga&&manga.id);
+  const source=(manga&&manga.source)||state.source;
+  if(id){
+    state.restoreDetailScrollPending=true;
+    mangaOpenDetail(id,source,manga||null);
+    restoreDetailScrollPosition();
+    return;
+  }
+  state.restoreDetailScrollPending=false;
+  mangaShowHome(false);
+}
 function mangaGoBack(){
-  if(state.view==='reader') mangaOpenDetail(state.mangaId,state.mangaData&&state.mangaData.source,state.mangaData||null);
+  if(state.view==='reader') mangaBackFromReader();
   else if(state.view==='detail') mangaShowHome(true);
   else closeComic();
 }
@@ -731,7 +758,7 @@ async function mangaOpenDetail(id,source,hint){
   const content=$('mangaContent');
   content.className='detail';
   content.innerHTML=detailSkeletonHtml();
-  window.scrollTo({top:0,behavior:'smooth'});
+  window.scrollTo({top:0,behavior:state.restoreDetailScrollPending?'auto':'smooth'});
   try{
     const detail=await getDetail(id,hint||state.searchItems.get(sourceKey(id,state.source))||null);
     state.mangaData=detail;state.capabilities=detail.capabilities||sourceCapabilities(detail.source||state.source);
@@ -812,11 +839,15 @@ async function mangaLoadChapters(detail){
 }
 let readerGeneration=0;
 async function mangaOpenReader(index){
+  const chapter=state.chapters[index];
+  if(!chapter)return;
+  if(state.view==='detail')state.detailScrollY=Math.max(0,Number(window.scrollY)||0);
+  const manga=state.mangaData;
+  if(!state.mangaId&&manga&&manga.id)state.mangaId=manga.id;
+  if(manga&&manga.source)state.source=manga.source;
   const generation=++readerGeneration;
   document.dispatchEvent(new CustomEvent('nexora:comic-loading'));
   setComicView('reader');state.chapterIndex=index;
-  const chapter=state.chapters[index];
-  if(!chapter)return;
   if(state.mangaData)addHistory(state.mangaData,chapter);
   closeComicSheet();
   window.scrollTo({top:0});
@@ -826,7 +857,7 @@ async function mangaOpenReader(index){
   const readerChapterTitle=formatReaderChapterTitle(chapter);
   content.innerHTML=`
     <div class="reader-topbar">
-      <button class="icon-btn" id="readerBackBtn" type="button" onclick="mangaOpenDetail(state.mangaId,state.mangaData&&state.mangaData.source,state.mangaData)" aria-label="Kembali ke detail"><i class="fa-solid fa-arrow-left"></i></button>
+      <button class="icon-btn" id="readerBackBtn" type="button" aria-label="Kembali ke detail"><i class="fa-solid fa-arrow-left"></i></button>
       <div class="reader-title" title="${escapeHtml(readerChapterTitle)}">${escapeHtml(readerChapterTitle)}</div>
       <button class="reader-more" id="readerMoreButton" type="button" aria-label="Menu reader"><i class="fa-solid fa-ellipsis-vertical"></i></button>
     </div>
@@ -840,6 +871,7 @@ async function mangaOpenReader(index){
     </div>`;
   $('mangaPrevBtn').disabled=index>=state.chapters.length-1;
   $('mangaNextBtn').disabled=index<=0;
+  $('readerBackBtn').onclick=mangaBackFromReader;
   $('readerMoreButton').onclick=openReaderMoreSheet;
   try{
     const pages=await getPages(chapter);
@@ -996,6 +1028,7 @@ window.mangaShowHome=mangaShowHome;
 window.mangaOpenDetail=mangaOpenDetail;
 window.mangaOnFavClick=mangaOnFavClick;
 window.mangaOpenReader=mangaOpenReader;
+window.mangaBackFromReader=mangaBackFromReader;
 window.mangaChangeChapter=mangaChangeChapter;window.mangaDiscoverSources=mangaDiscoverSources;window.mangaOpenMatchedSource=mangaOpenMatchedSource;
 
 loadSourceRegistry().finally(()=>mangaShowHome(true));

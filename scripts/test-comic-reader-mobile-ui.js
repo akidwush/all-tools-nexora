@@ -20,8 +20,8 @@ assert.match(shell, /event\.data\.type==='nx-comic-view'/);
 assert.match(shell, /classList\.toggle\('is-reader-mode'/);
 assert.doesNotMatch(shell, /COMIC_READER_APP_B64|srcdoc|nxComicApiBridgeHandler|nx-comic-api-request/);
 assert.match(html, /data-nexora-comic-ui="standalone-v1"/);
-assert.match(html, /app\.css\?v=standalone-v1-readerui2/);
-assert.match(html, /app\.js\?v=standalone-v1[^"']*readerui2/);
+assert.match(html, /app\.css\?v=standalone-v1-readerback1/);
+assert.match(html, /app\.js\?v=standalone-v1[^"']*readerback1/);
 assert.doesNotMatch(html, /<style\b|<script(?!\s+src=)/i);
 
 assert.match(html, /id="mangaTabs" class="home-nav"/);
@@ -39,6 +39,11 @@ assert.match(app, /function openFilterSheet\(\)/);
 assert.match(app, /function openReaderSourceSheet\(\)/);
 assert.match(app, /function openReaderSettingsSheet\(\)/);
 assert.match(app, /function openReaderMoreSheet\(\)/);
+assert.match(app, /function mangaBackFromReader\(\)/);
+assert.match(app, /function restoreDetailScrollPosition\([^)]*\)/);
+assert.match(app, /\$\('readerBackBtn'\)\.onclick=mangaBackFromReader/);
+assert.match(app, /window\.mangaBackFromReader=mangaBackFromReader/);
+assert.doesNotMatch(app, /id=\\"readerBackBtn\\"[^\n]*onclick=\\"mangaOpenDetail/);
 assert.match(app, /function openReaderChapterSheet\(\)/);
 assert.match(app, /function formatReaderChapterTitle\(chapter\)/);
 assert.match(app, /readerChapterTitle=formatReaderChapterTitle\(chapter\)/);
@@ -58,7 +63,8 @@ assert.doesNotMatch(app, /NX_COMIC_BRIDGE_PENDING|nxComicBridgeFetch|nx-comic-ap
 
 assert.match(css, /body\.reader-mode \.hero-min,[\s\S]*body\.reader-mode #mangaStatusTabs\{display:none\}/);
 assert.match(css, /\.filter-state-tabs\{display:none\}/);
-assert.match(css, /\.reader-topbar\{[\s\S]*grid-template-columns:42px minmax\(0,1fr\) 42px[\s\S]*height:54px/);
+assert.match(css, /\.reader-topbar\{[\s\S]*grid-template-columns:44px minmax\(0,1fr\) 44px[\s\S]*height:54px/);
+assert.match(css, /\.reader-topbar \.icon-btn\{[^}]*min-width:44px;[^}]*min-height:44px;[^}]*pointer-events:auto/);
 assert.match(css, /--toolbar-height:54px/);
 assert.match(css, /\.manga-grid\{[\s\S]*repeat\(6,minmax\(0,1fr\)\)/);
 assert.match(css, /@media\(max-width:640px\)[\s\S]*\.manga-grid,[\s\S]*repeat\(2,minmax\(0,1fr\)\)/);

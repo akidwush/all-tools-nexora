@@ -321,13 +321,13 @@ body.detail-mode #mangaStatusTabs{display:none}
 
 .reader-topbar{
   position:sticky;top:0;z-index:70;
-  display:grid;grid-template-columns:42px minmax(0,1fr) 42px;align-items:center;gap:6px;
-  height:54px;padding:6px max(8px,env(safe-area-inset-right)) 6px max(8px,env(safe-area-inset-left));
+  display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:6px;
+  height:54px;padding:5px max(8px,env(safe-area-inset-right));
   border-bottom:1px solid rgba(255,255,255,.08);background:rgba(5,5,7,.98);
 }
-.reader-topbar .icon-btn{width:40px;height:40px;border:0;background:#111016}
+.reader-topbar .icon-btn{width:44px;height:44px;min-width:44px;min-height:44px;border:0;background:#111016;position:relative;z-index:1;pointer-events:auto;touch-action:manipulation}
 .reader-title{min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:11px;font-weight:800;color:#f1edf3;text-align:left}
-.reader-more{width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:10px;background:#111016;color:#d9d4de;cursor:pointer}
+.reader-more{width:44px;height:44px;min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:0;border:0;border-radius:10px;background:#111016;color:#d9d4de;cursor:pointer;position:relative;z-index:1;pointer-events:auto;touch-action:manipulation}
 .reader-failure-banner{
   max-width:var(--reader-width);margin:0 auto;padding:7px 10px;
   border-bottom:1px solid rgba(239,68,68,.16);background:#160d11;color:#d8c9cd;font-size:9px;font-weight:650;
@@ -456,7 +456,7 @@ body.reader-mode #nxComicApiHealth,body.detail-mode #nxComicApiHealth{display:no
   .detail-source-row{margin-bottom:7px}.available-sources{padding:8px 9px}
   .detail-desc{font-size:10.5px}.chapter-item{min-height:48px;padding:7px 8px}.ch-name{font-size:10px}
 
-  .reader-topbar{grid-template-columns:40px minmax(0,1fr) 40px;gap:5px;height:54px}
+  .reader-topbar{grid-template-columns:44px minmax(0,1fr) 44px;gap:5px;height:54px}
   .reader-title{font-size:10.5px}
   .reader-pages{max-width:none;width:100%}
   .reader-bottom{max-width:none;gap:8px}.reader-bottom .nav-btn{font-size:9px;padding-inline:6px}
