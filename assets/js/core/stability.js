@@ -6,6 +6,8 @@
   var healthMap=Object.create(null);
   var lastAudit=null;
   var statusPromise=null;
+  var statusInitialized=false;
+  var initialStatusSignaled=false;
 
   /* visualViewport mengecil dan mengubah offset ketika pengguna melakukan
      pinch-zoom. Nilai tersebut tidak boleh dipakai sebagai geometri overlay:
@@ -181,10 +183,13 @@
     statusPromise=fetchJson("/api/tool-health?refresh=auto",{timeoutMs:15000}).then(function(payload){
       healthMap=Object.create(null);
       (payload.data||[]).forEach(function(row){healthMap[String(row.toolId||"")]=row;});
+      window.__NEXORA_TOOL_HEALTH_PAYLOAD__=payload;
+      statusInitialized=true;
       applyCardStatus();
       return payload;
     }).catch(function(error){
       console.warn("[Nexora stability] health belum tersedia",error&&error.message?error.message:error);
+      statusInitialized=true;
       applyCardStatus();
       return {ok:false,data:[]};
     }).finally(function(){statusPromise=null;});
@@ -193,10 +198,12 @@
   function consumeHealthPayload(payload){
     healthMap=Object.create(null);
     ((payload&&payload.data)||[]).forEach(function(row){healthMap[String(row.toolId||"")]=row;});
+    window.__NEXORA_TOOL_HEALTH_PAYLOAD__=payload;
+    statusInitialized=true;
     applyCardStatus();
   }
   document.addEventListener("nexora:tool-health-loaded",function(event){consumeHealthPayload(event.detail||{});});
-  document.addEventListener("nexora:tools-rendered",function(){applyCardStatus();});
+  document.addEventListener("nexora:tools-rendered",function(){if(statusInitialized)applyCardStatus();});
 
   function handlerReady(meta,frameWindow){
     var scope=frameWindow||window;
@@ -289,15 +296,23 @@
     if(detail.status&&detail.status<500)return;
     notify("Koneksi fitur terganggu",detail.reason==="TIMEOUT"?"Server terlalu lama merespons. Coba kembali beberapa saat lagi.":"API atau jaringan gagal dihubungi. Status fitur telah dicatat.","error");
   });
-  document.addEventListener("nexora:module-loaded",function(){setTimeout(applyCardStatus,0);});
+  document.addEventListener("nexora:module-loaded",function(){if(statusInitialized)setTimeout(applyCardStatus,0);});
   window.addEventListener("online",function(){loadHealth(true);},{passive:true});
-  function initializeStatus(){
-    if(window.__NEXORA_TOOL_HEALTH_PAYLOAD__) consumeHealthPayload(window.__NEXORA_TOOL_HEALTH_PAYLOAD__);
-    else{
-      applyCardStatus();
-      var schedule=window.NexoraScheduleIdle||function(task){return setTimeout(task,900);};
-      schedule(function(){loadHealth(false);},{timeout:1800});
+  function signalInitialStatusReady(payload){
+    if(initialStatusSignaled)return;
+    initialStatusSignaled=true;
+    document.dispatchEvent(new CustomEvent("nexora:tool-status-ready",{detail:payload||{ok:false}}));
+  }
+  async function initializeStatus(){
+    if(window.__NEXORA_TOOL_HEALTH_PAYLOAD__){
+      consumeHealthPayload(window.__NEXORA_TOOL_HEALTH_PAYLOAD__);
+      signalInitialStatusReady(window.__NEXORA_TOOL_HEALTH_PAYLOAD__);
+      return;
     }
+    /* Initial health is part of dashboard hydration. Do not paint UNKNOWN first,
+       and do not postpone the request behind idle work. */
+    var payload=await loadHealth(false);
+    signalInitialStatusReady(payload);
   }
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",function(){initializeRecovery();initializeStatus();},{once:true});
   else{initializeRecovery();initializeStatus();}

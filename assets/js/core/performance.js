@@ -253,9 +253,13 @@
   }
 
 
-  window.addEventListener("load",function(){
-    schedule(initHeroVideo,{timeout:2200});
-  },{once:true});
+  if(heroElement&&heroVideo){
+    Promise.resolve().then(initHeroVideo).catch(function(error){console.warn("[Nexora hero]",error&&error.message?error.message:error);});
+  }else if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",function(){Promise.resolve(initHeroVideo()).catch(function(){});},{once:true});
+  }else{
+    Promise.resolve(initHeroVideo()).catch(function(){});
+  }
 
   window.__NEXORA_PERFORMANCE__={
     version:"6.4.0",

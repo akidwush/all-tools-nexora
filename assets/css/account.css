@@ -5,3 +5,10 @@
 body.nx-tool-room-open .nx-account-button,
 body.nx-tool-room-open .nx-ai-launcher,
 body.nx-tool-room-open .nx-ai-panel{display:none!important}
+
+/* NEXORA ACCOUNT HYDRATION V1 */
+.nx-account-button{min-width:96px}
+.nx-account-button.is-hydrating{pointer-events:none;cursor:default}
+.nx-account-button.is-hydrating .nx-account-skeleton{
+  display:block;width:68px;height:9px;border-radius:999px;background:rgba(198,185,220,.18)
+}

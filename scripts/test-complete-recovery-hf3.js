@@ -33,8 +33,11 @@ assert.match(app, /event\.key !== 'Enter' && event\.key !== ' '/);
 assert.doesNotMatch(app, /isExternal \|\| item\.link/);
 
 // Status kesehatan harus dimuat walau panel health lama sudah tidak ada.
-assert.match(stability, /function initializeStatus\(\)/);
-assert.match(stability, /schedule\(function\(\)\{loadHealth\(false\);\}/);
+assert.ok(stability.includes("async function initializeStatus()"));
+assert.ok(stability.includes("var payload=await loadHealth(false)"));
+assert.ok(stability.includes("signalInitialStatusReady(payload)"));
+assert.ok(stability.includes("nexora:tool-status-ready"));
+assert.ok(stability.includes("if(statusInitialized)applyCardStatus()"));
 assert.match(stability, /\/api\/tool-health\?refresh=auto/);
 assert.doesNotMatch(stability, /refresh="\+\(force\?"force"/);
 

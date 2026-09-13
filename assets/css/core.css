@@ -1447,3 +1447,18 @@ html.nx-low-power .tools-card,html.nx-low-power .nav-tab,html.nx-low-power .nx-p
 .nx-skip-link{position:fixed;left:12px;top:12px;z-index:2147483647;padding:10px 14px;border:1px solid rgba(196,181,253,.45);border-radius:12px;background:#10081d;color:#fff;font:700 12px/1.2 Poppins,sans-serif;text-decoration:none;box-shadow:0 10px 28px rgba(0,0,0,.35);transform:translateY(-180%);transition:transform .16s ease;}
 .nx-skip-link:focus,.nx-skip-link:focus-visible{transform:translateY(0);outline:2px solid #67e8f9;outline-offset:2px;}
 #main-content:focus{outline:none;}
+
+/* NEXORA DASHBOARD HYDRATION V1 */
+html.nx-hydrating .tools-grid{pointer-events:none}
+html.nx-hydrating .nx-card-readiness{
+  min-width:48px;min-height:18px;color:transparent!important;
+  border-color:rgba(255,255,255,.08)!important;background:rgba(255,255,255,.035)!important
+}
+html.nx-hydrating .nx-card-readiness::before{
+  content:"";display:block;width:30px;height:6px;margin:auto;border-radius:999px;background:rgba(205,195,224,.18)
+}
+html.nx-hydrating #userCard .value,
+html.nx-hydrating #userCard .perc{visibility:hidden}
+html.nx-hydrating #userCard .battery-bar .fill{opacity:.18}
+html.nx-hydrating .nx-prerender-status{visibility:hidden}
+html.nx-hydrating .video-banner{background:#0a0015}

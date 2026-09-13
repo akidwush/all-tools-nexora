@@ -1,16 +1,68 @@
 <!DOCTYPE html>
-<html lang="id"><head>
+<html lang="id" class="nx-hydrating" data-app-state="booting"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" name="viewport"/>
 <script data-runtime-observer="assets/js/core/runtime-observer.js?v=6.4.0">
 /* Nexora v6.3 — tiny critical bootstrap. */
 (function(){
   "use strict";
+  var root=document.documentElement;
+  var required={account:false,catalog:false,registry:false,status:false};
+  var revealed=false;
+  var resolveReady;
+  var ready=new Promise(function(resolve){resolveReady=resolve;});
+  var bootTimer=0;
+
+  root.classList.add("nx-hydrating");
+  root.classList.remove("nx-ready");
+  root.dataset.appState="booting";
+
+  function complete(reason){
+    if(revealed)return;
+    revealed=true;
+    if(bootTimer)clearTimeout(bootTimer);
+    var paint=typeof requestAnimationFrame==="function"?requestAnimationFrame:function(fn){fn();};
+    paint(function(){
+      root.classList.remove("nx-hydrating");
+      root.classList.add("nx-ready");
+      root.dataset.appState=reason==="timeout"?"ready-timeout":"ready";
+      var detail={reason:reason,milestones:Object.assign({},required)};
+      resolveReady(detail);
+      window.dispatchEvent(new CustomEvent("nexora:app-ready",{detail:detail}));
+    });
+  }
+
+  function maybeComplete(){
+    if(required.account&&required.catalog&&required.registry&&required.status)complete("ready");
+  }
+
+  function mark(name){
+    if(Object.prototype.hasOwnProperty.call(required,name)){
+      required[name]=true;
+      maybeComplete();
+    }
+  }
+
+  window.addEventListener("nexora:account-ready",function(){mark("account");});
+  window.addEventListener("nexora:tool-registry-ready",function(){mark("registry");});
+  document.addEventListener("nexora:tools-rendered",function(){mark("catalog");});
+  document.addEventListener("nexora:tool-status-ready",function(){mark("status");});
+
+  /* Graceful ceiling only: this is not an artificial delay. Core state reveals
+     immediately when all milestones are ready, otherwise neutral shell wins. */
+  bootTimer=setTimeout(function(){complete("timeout");},4500);
+
+  window.NexoraBoot=Object.freeze({
+    ready:ready,
+    mark:mark,
+    state:function(){return{revealed:revealed,milestones:Object.assign({},required)};}
+  });
+
   try{
     var connection=navigator.connection||navigator.mozConnection||navigator.webkitConnection;
     var reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     var lowPower=Boolean((connection&&connection.saveData)||(navigator.deviceMemory&&navigator.deviceMemory<=4)||reduced);
-    if(lowPower)document.documentElement.classList.add("nx-low-power");
+    if(lowPower)root.classList.add("nx-low-power");
     var params=new URLSearchParams(location.search);
     if(params.get("__nexora_visual_test")==="1"){
       var current=document.currentScript;
@@ -68,9 +120,10 @@
 
 
 
-<link href="assets/css/core.css?v=6.4.0-hf17-desktop-nav2-hf21-fling1-hf22-original-unified1" rel="stylesheet"/><link href="assets/css/components.css?v=6.4.0-hf14-mobile-dedup1-hf22-original-unified1" rel="stylesheet"/><link href="assets/css/account.css?v=6.4.0-membership1-hf22-original-unified1-dashboard-only1" rel="stylesheet"/><link as="style" href="assets/css/personal-ai.css?v=6.4.0-hf16-mobile-paint1-hf22-original-unified1" onload="this.onload=null;this.rel='stylesheet'" rel="preload"/><link href="assets/css/mobile-usability.css?v=6.4.0-responsive-desktop1" rel="stylesheet"/><link as="script" href="assets/js/core/app.js?v=6.4.0-lr4-hf5-download1-hf6-dl4-hf13-catalog-merge-hf21-svg-v18-audit1-document-ai-v1-crypto-mtf1-prompt-v2-responsive-audit2-hf25-puter-image1-genmail1-branding1-hf47-puter-video1-dashboard-only1-unique-icons1-audit-brand1-world-classics1-avatar-dashboard2" rel="preload"/><link as="style" href="assets/css/custom-select.css?v=6.4.0-global-select-final1" onload="this.onload=null;this.rel='stylesheet'" rel="preload"/><link as="style" href="assets/css/features/visual-website.css?v=6.4.0-visual-website1" onload="this.onload=null;this.rel='stylesheet'" rel="preload"/><link as="style" href="assets/css/features/placeholder-prompt-limit.css?v=6.4.0-placeholder-limit1" onload="this.onload=null;this.rel='stylesheet'" rel="preload"/><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="assets/css/branding.css?v=6.4.0-audit-brand1"/></head>
+<link href="assets/css/core.css?v=6.4.0-hf17-desktop-nav2-hf21-fling1-hf22-original-unified1-hydration1" rel="stylesheet"/><link href="assets/css/components.css?v=6.4.0-hf14-mobile-dedup1-hf22-original-unified1" rel="stylesheet"/><link href="assets/css/account.css?v=6.4.0-membership1-hf22-original-unified1-dashboard-only1-hydration1" rel="stylesheet"/><link as="style" href="assets/css/personal-ai.css?v=6.4.0-hf16-mobile-paint1-hf22-original-unified1" onload="this.onload=null;this.rel='stylesheet'" rel="preload"/><link href="assets/css/mobile-usability.css?v=6.4.0-responsive-desktop1" rel="stylesheet"/><link as="script" href="assets/js/core/app.js?v=6.4.0-lr4-hf5-download1-hf6-dl4-hf13-catalog-merge-hf21-svg-v18-audit1-document-ai-v1-crypto-mtf1-prompt-v2-responsive-audit2-hf25-puter-image1-genmail1-branding1-hf47-puter-video1-dashboard-only1-unique-icons1-audit-brand1-world-classics1-avatar-dashboard2-hydration1" rel="preload"/><link as="style" href="assets/css/custom-select.css?v=6.4.0-global-select-final1" onload="this.onload=null;this.rel='stylesheet'" rel="preload"/><link as="style" href="assets/css/features/visual-website.css?v=6.4.0-visual-website1" onload="this.onload=null;this.rel='stylesheet'" rel="preload"/><link as="style" href="assets/css/features/placeholder-prompt-limit.css?v=6.4.0-placeholder-limit1" onload="this.onload=null;this.rel='stylesheet'" rel="preload"/><link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="assets/css/branding.css?v=6.4.0-audit-brand1"/></head>
 <body><a class="nx-skip-link" href="#main-content">Lewati ke konten utama</a><noscript><section class="nx-noscript-shell"><strong>All Tools Nexora</strong><p>Daftar fitur tersedia, tetapi pemrosesan tool membutuhkan JavaScript. Aktifkan JavaScript untuk membuka downloader, maker, AI, dan SVG Alight Motion.</p></section></noscript>
-<script src="assets/js/core/account.js?v=6.4.0-membership2-document-ai-v1"></script>
+<button id="nxAccountButton" class="nx-account-button is-hydrating" type="button" disabled aria-busy="true" aria-label="Memuat akun"><span class="nx-account-skeleton" aria-hidden="true"></span></button>
+<script src="assets/js/core/account.js?v=6.4.0-membership2-document-ai-v1-hydration1"></script>
 <div class="bg-glow" aria-hidden="true">
 <span class="nx-membrane nx-membrane-a"></span>
 <span class="nx-membrane nx-membrane-b"></span>
@@ -148,7 +201,7 @@
 </div>
 </section>
 <div class="video-banner" data-nx-hero>
-<video aria-hidden="true" autoplay="" data-src="https://files.catbox.moe/4ijdle.mp4" loop="" muted="" playsinline="" preload="metadata" webkit-playsinline="true"></video>
+<video aria-hidden="true" autoplay="" src="https://files.catbox.moe/4ijdle.mp4" data-src="https://files.catbox.moe/4ijdle.mp4" loop="" muted="" playsinline="" preload="metadata" webkit-playsinline="true"></video>
 <div class="video-overlay">
 <div class="nx-hero-meta" aria-hidden="true"><span><i></i> LIVE REACTOR</span><span>NEXORA SYSTEM · 06</span></div>
 <h1 id="nxBrandHero">
@@ -178,28 +231,28 @@
 <div class="item">
 <i class="fas fa-globe"></i>
 <span class="label">Negara</span>
-<span class="value" data-country-code="US" data-country-source="perkiraan perangkat" id="userCountry" title="Sumber deteksi: perkiraan perangkat">🇺🇸 Amerika Serikat</span>
+<span class="value" data-country-code="" data-country-source="" id="userCountry">—</span>
 </div>
 <div class="item">
 <i class="fas fa-mobile-alt"></i>
 <span class="label">Device</span>
-<span class="value" id="userDevice">Desktop</span>
+<span class="value" id="userDevice">—</span>
 </div>
 <div class="item">
 <i class="fas fa-globe"></i>
 <span class="label">Browser</span>
-<span class="value" id="userBrowser">Unknown</span>
+<span class="value" id="userBrowser">—</span>
 </div>
 <div class="item">
 <i class="fas fa-signal"></i>
 <span class="label">Status</span>
-<span class="value online" id="userStatus">● Online</span>
+<span class="value" id="userStatus">—</span>
 </div>
 <div class="item">
 <div class="battery-bar">
 <i class="fas fa-battery-three-quarters" style="color:#22c55e;font-size:12px;"></i>
-<div class="level"><div class="fill" id="batteryFill" style="width: 100%;"></div></div>
-<span class="perc" id="batteryPercent">100%</span>
+<div class="level"><div class="fill" id="batteryFill" style="width:0%;"></div></div>
+<span class="perc" id="batteryPercent">—</span>
 </div>
 </div>
 </div>
@@ -520,7 +573,7 @@
   <div class="nx-ai-suggestions" id="nxAiSuggestions" aria-label="Saran pertanyaan"></div>
   <form class="nx-ai-compose" id="nxAiForm"><div class="nx-ai-input-wrap"><textarea class="nx-ai-input" id="nxAiInput" rows="1" maxlength="4000" placeholder="Tulis pesan untuk Personal AI…" aria-label="Pesan untuk Personal AI"></textarea><button class="nx-ai-send" id="nxAiSend" type="submit" aria-label="Kirim pesan"><i class="fa-solid fa-arrow-up"></i></button></div><div class="nx-ai-compose-meta"><span>Nexora AI · respons dapat keliru</span><button class="nx-ai-stop" id="nxAiStop" type="button" hidden><i class="fa-solid fa-stop"></i> Hentikan respons</button></div></form>
 </section>
-<script src="assets/config.js?v=6.4.0-world-classics1-avatar-dashboard2"></script><script src="assets/js/core/downloader-client.js?v=6.4.0-dl1-hf6-dl4"></script><script src="assets/js/core/network.js?v=6.4.0-dl1"></script><script src="assets/js/core/performance.js?v=6.4.0-hf18-desktop-hero3-hf21-mobile-loop1"></script><script src="assets/js/core/app.js?v=6.4.0-lr4-hf5-download1-hf6-dl4-hf13-catalog-merge-hf21-svg-v18-audit1-document-ai-v1-crypto-mtf1-prompt-v2-responsive-audit2-hf25-puter-image1-genmail1-branding1-hf47-puter-video1-dashboard-only1-unique-icons1-audit-brand1-world-classics1-avatar-dashboard2"></script><script src="assets/js/core/downloader-renderers.js?v=6.4.0-hf5-download1-hf6-dl4-audit-brand1"></script><script src="assets/js/core/shell.js?v=6.4.0-hf11.1-no-wa-notif-crypto-mtf1-prompt-v2-responsive-audit2-hf25-puter-image1-genmail1-branding1-hf47-puter-video1-world-classics1"></script><script src="assets/js/core/liquid-reactor.js?v=6.4.0-hf18-desktop-hero1-hf22-original-unified1"></script><script src="assets/js/core/tool-registry.js?v=6.4.0-document-ai-v1-prompt-v2-responsive-audit2-hf25-puter-image1-genmail1-branding1-hf47-puter-video1"></script><script src="assets/js/core/stability.js?v=6.4.0-healthfix1"></script><script src="assets/js/core/lazy-loader.js?v=6.4.0-document-ai-responsive2-crypto-mtf1-prompt-responsive2-comic-reader-v4-responsive-audit2-hf25-puter-image1-hf26-puter-runtime2-hf27-models1-hf28-provider-recovery1-genmail1-hf30-all-email1-branding1-hf47-puter-video1-audit-brand1-classics-translation2-comic-translate1-avatar-studio4"></script><section class="nx-visual-room" id="nxVisualRoom" aria-hidden="true" aria-label="Nexora Visual Website">
+<script src="assets/config.js?v=6.4.0-world-classics1-avatar-dashboard2"></script><script src="assets/js/core/downloader-client.js?v=6.4.0-dl1-hf6-dl4"></script><script src="assets/js/core/network.js?v=6.4.0-dl1"></script><script src="assets/js/core/performance.js?v=6.4.0-hf18-desktop-hero3-hf21-mobile-loop1-hydration1"></script><script src="assets/js/core/app.js?v=6.4.0-lr4-hf5-download1-hf6-dl4-hf13-catalog-merge-hf21-svg-v18-audit1-document-ai-v1-crypto-mtf1-prompt-v2-responsive-audit2-hf25-puter-image1-genmail1-branding1-hf47-puter-video1-dashboard-only1-unique-icons1-audit-brand1-world-classics1-avatar-dashboard2-hydration1"></script><script src="assets/js/core/downloader-renderers.js?v=6.4.0-hf5-download1-hf6-dl4-audit-brand1"></script><script src="assets/js/core/shell.js?v=6.4.0-hf11.1-no-wa-notif-crypto-mtf1-prompt-v2-responsive-audit2-hf25-puter-image1-genmail1-branding1-hf47-puter-video1-world-classics1"></script><script src="assets/js/core/liquid-reactor.js?v=6.4.0-hf18-desktop-hero1-hf22-original-unified1"></script><script src="assets/js/core/tool-registry.js?v=6.4.0-document-ai-v1-prompt-v2-responsive-audit2-hf25-puter-image1-genmail1-branding1-hf47-puter-video1"></script><script src="assets/js/core/stability.js?v=6.4.0-healthfix1-hydration1"></script><script src="assets/js/core/lazy-loader.js?v=6.4.0-document-ai-responsive2-crypto-mtf1-prompt-responsive2-comic-reader-v4-responsive-audit2-hf25-puter-image1-hf26-puter-runtime2-hf27-models1-hf28-provider-recovery1-genmail1-hf30-all-email1-branding1-hf47-puter-video1-audit-brand1-classics-translation2-comic-translate1-avatar-studio4"></script><section class="nx-visual-room" id="nxVisualRoom" aria-hidden="true" aria-label="Nexora Visual Website">
 <header class="nx-visual-room-head">
 <button class="nx-visual-back" id="nxVisualBack" type="button" aria-label="Kembali ke katalog visual"><i class="fa-solid fa-arrow-left"></i></button>
 <div class="nx-visual-room-title"><b id="nxVisualRoomTitle">Visual</b><span id="nxVisualRoomMeta">Nexora Visual Website</span></div>

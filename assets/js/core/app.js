@@ -125,7 +125,7 @@ async function getUserInfo() {
         return false;
     }
 
-    await detectCountry();
+    void detectCountry();
     window.addEventListener('online', function nexoraRetryCountryOnce() {
         detectCountry();
     }, { once: true });
