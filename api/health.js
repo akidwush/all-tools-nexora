@@ -18,7 +18,17 @@ const { verifySameOriginRequest } = require("../lib/request-security");
 function publicMetadataRequest(mode, request, requestUrl) {
   const method = String(request.method || "GET").toUpperCase();
   if (!["GET", "HEAD"].includes(method)) return false;
-  if (mode === "comic-reader") return !requestUrl.searchParams.get("action");
+  if (mode === "comic-reader") {
+    const action = requestUrl.searchParams.get("action");
+    if (!action) return true;
+
+    // Experimental source registry is public metadata only.
+    // Actual experimental health/search/detail/chapter actions remain
+    // behind the normal first-party + tool authorization path.
+    return action === "sources"
+      && requestUrl.searchParams.get("scope") === "experimental"
+      && requestUrl.searchParams.get("mode") === "experimental";
+  }
   if (mode === "multi-ai") return true;
   if (mode === "anime-gallery") return true;
   return new Set([
