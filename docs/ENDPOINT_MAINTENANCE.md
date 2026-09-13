@@ -30,6 +30,12 @@ History perubahan dibatasi dan disimpan bersama config private, sedangkan event 
 
 Source lain tidak otomatis ditambahkan. DoujinDesu, APKomik, SoftKomik dan source bypass/protected/encrypted tetap tidak didukung.
 
+### Experimental Comic Sources
+
+- DoujinDesu — registered as adult/experimental, default DISABLED and currently UNSUPPORTED.
+- The provider cannot be activated until a normal legitimate HTTP flow is implemented in code.
+- No admin field can upload decrypt/parser JavaScript or add a new unreviewed hostname.
+
 ### AI Providers
 
 Daftar berasal langsung dari `lib/kuroneko-multiai.js` `PROVIDERS`. Claude Sonnet tidak ditambahkan karena tidak berada pada capability registry Nexora.

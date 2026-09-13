@@ -14,14 +14,14 @@ const app = read("assets/comic-reader/app.js");
 const translateCss = read("assets/comic-reader/translate.css");
 const shellCss = read("assets/css/features/comic-reader.css");
 
-assert.match(shell, /COMIC_APP_URL\s*=\s*['"]\/assets\/comic-reader\/index\.html\?v=standalone-v1-readerui2['"]/);
+assert.match(shell, /COMIC_APP_URL\s*=\s*['"]\/assets\/comic-reader\/index\.html\?v=standalone-v1-readerui2-experimental1['"]/);
 assert.match(shell, /frame\.src=COMIC_APP_URL/);
 assert.match(shell, /event\.data\.type==='nx-comic-view'/);
 assert.match(shell, /classList\.toggle\('is-reader-mode'/);
 assert.doesNotMatch(shell, /COMIC_READER_APP_B64|srcdoc|nxComicApiBridgeHandler|nx-comic-api-request/);
 assert.match(html, /data-nexora-comic-ui="standalone-v1"/);
-assert.match(html, /app\.css\?v=standalone-v1-readerback1/);
-assert.match(html, /app\.js\?v=standalone-v1[^"']*readerback1/);
+assert.match(html, /app\.css\?v=standalone-v1-readerback1-experimental1/);
+assert.match(html, /app\.js\?v=standalone-v1[^"']*readerback1-experimental1/);
 assert.doesNotMatch(html, /<style\b|<script(?!\s+src=)/i);
 
 assert.match(html, /id="mangaTabs" class="home-nav"/);

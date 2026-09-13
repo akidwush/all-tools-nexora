@@ -7,10 +7,10 @@ const path = require("node:path");
 
 const root = path.resolve(__dirname, "..");
 const locked = Object.freeze({
-  "assets/js/features/comic-reader.js": "ee19bb36ded050e55c42c0eaf647bfb4d98451ef72e6ea5d196e564866073748",
-  "assets/comic-reader/index.html": "d53e1ff4e2eb80e1fea6d9979e4715d14469c3bee8d0387ac05c1fb78e512e09",
-  "assets/comic-reader/app.css": "0fbdf484b637a0e5b7861a188b9ae48da064203f672e5dc8e2689e369e7ac87a",
-  "assets/comic-reader/app.js": "dcf8d1c9fecca1372e871aff8ebd2a9a821ea49527e65982a29f88645824340a",
+  "assets/js/features/comic-reader.js": "aa56bb59b41b0e57fd4a93eebd441738f6a3a40a15949cb427495277b4245ea5",
+  "assets/comic-reader/index.html": "9653381ca0f4b0ae79ef33b1b326cd9896290976bae643f79e2289d2161558fc",
+  "assets/comic-reader/app.css": "2c5165a4a4cdf3c1375278bd7dd0b845d1ddfdf160be5d60e15d893e981ef987",
+  "assets/comic-reader/app.js": "8d40ab15e8d134e03aafb35721b5a6ebb6831e4b2c3c7358367c54549aeb3fb7",
   "assets/comic-reader/translate.js": "672a63ff4877e90df0e450311736a1395232bf96793b5c3c8893aa97ee98a4de",
   "assets/css/features/comic-reader.css": "49f665b05e4e2c0fb5cb36673c6e79a8298a3ac74890e040987e0f030bed76e2"
 });

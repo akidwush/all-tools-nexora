@@ -18,6 +18,7 @@
   function toast(text,type){var stack=$("#toastStack");if(!stack)return;var el=document.createElement("div");el.className="toast "+(type||"success");el.textContent=text;stack.appendChild(el);setTimeout(function(){el.remove();},3800);}
   function modeLabel(mode){return mode==="maintenance"?"MAINTENANCE":mode==="disabled"?"DISABLED":"ACTIVE";}
   function statusLabel(provider){
+    if(provider.availability==="unsupported")return"UNSUPPORTED";
     if(provider.effective.mode==="maintenance")return"MAINTENANCE";
     if(provider.effective.mode==="disabled")return"DISABLED";
     var status=provider.lastCheck&&provider.lastCheck.status;
@@ -90,7 +91,8 @@
     body.innerHTML=
       '<div class="endpoint-current-candidate"><section><b>Current effective</b><code>'+esc(p.effective.baseUrl+(p.effective.path||""))+'</code><small>'+esc(p.source)+'</small></section><section><b>Code default</b><code>'+esc(p.default.baseUrl+(p.default.path||""))+'</code><small>DEFAULT</small></section></div>'+
       '<div class="endpoint-edit-fields">'+
-        '<label class="endpoint-field"><span>Mode</span><select data-endpoint-field="mode"><option value="active">Active</option><option value="maintenance">Maintenance</option><option value="disabled">Disabled</option></select></label>'+
+        '<label class="endpoint-field"><span>Mode</span><select data-endpoint-field="mode"><option value="active" '+(p.activationSupported===false?'disabled':'')+'>Active</option><option value="maintenance">Maintenance</option><option value="disabled">Disabled</option></select></label>'+
+        (p.availability==="unsupported"?'<p class="endpoint-unsupported-note"><strong>UNSUPPORTED</strong><span>'+esc(p.unsupportedReason||"Provider belum mempunyai normal HTTP flow yang didukung.")+'</span></p>':"")+
         (editable.has("baseUrl")?field("baseUrl","Base URL",p.effective.baseUrl):"")+
         (editable.has("path")?field("path","Provider path",p.effective.path):"")+
         (editable.has("apiVersion")?field("apiVersion","API Version",p.effective.apiVersion):"")+
