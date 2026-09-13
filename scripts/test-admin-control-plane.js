@@ -25,6 +25,7 @@ assert.match(helper,/recordAdminAudit/,"perubahan Control Plane harus masuk audi
 assert.match(account,/enforceToolControlPlane/,"authorizeTool harus terhubung ke Control Plane");
 assert.match(account,/await enforceToolControlPlane\(request, response, toolId\)/,"enforcement harus terjadi pada request server");
 assert.match(dashboardApi,/searchParams\.get\("mode"\) === "control-plane"/,"Control Plane harus memakai function admin yang sudah ada");
+assert.ok(dashboardApi.includes('searchParams.get("mode") === "endpoint-maintenance"'),"Endpoint Maintenance harus reuse admin dashboard function");
 assert.match(html,/data-panel="control"/,"panel Admin Control Plane harus terpasang");
 assert.match(html,/admin-control-plane\.css/,"CSS Control Plane harus dimuat");
 assert.match(html,/control-plane\.js/,"client Control Plane harus dimuat");

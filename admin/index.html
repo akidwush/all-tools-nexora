@@ -17,7 +17,8 @@
   <link href="../assets/css/admin.css?v=6.4.0-hf12-no-login-loader" rel="stylesheet">
   <link href="../assets/css/admin-ai.css?v=6.4.0-ai1" rel="stylesheet">
   <link href="../assets/css/visual-qa.css?v=6.4.0" rel="stylesheet">
-  <link href="../assets/css/admin-control-plane.css?v=6.4.0-control-plane1" rel="stylesheet">
+  <link href="../assets/css/admin-control-plane.css?v=6.4.0-control-plane2" rel="stylesheet">
+  <link href="../assets/css/admin-endpoint-maintenance.css?v=6.4.0-endpoint1" rel="stylesheet">
   <link href="../assets/css/admin-redesign.css?v=6.4.0-admin-member-hf1-layout1" rel="stylesheet">
   <link href="../assets/css/custom-select.css?v=6.4.0-global-select-final1" rel="stylesheet">
 <link rel="stylesheet" href="../assets/css/branding.css?v=6.4.0-audit-brand1"/></head>
@@ -195,9 +196,15 @@
               </div>
             </article>
             <article class="panel-card control-plane-card">
-              <div class="panel-head"><div><p class="eyebrow">ENDPOINT MAINTENANCE</p><h2>Server-gated Tools</h2></div></div>
+              <div class="panel-head"><div><p class="eyebrow">SERVER TOOL MAINTENANCE</p><h2>Authorized Tools</h2></div></div>
               <p class="control-plane-copy">Maintenance hanya ditawarkan untuk tool yang benar-benar melewati authorization server. Status di bawah berasal dari policy tersimpan, bukan hasil simulasi.</p>
-              <div id="endpointMaintenanceList" class="control-endpoint-list"></div>
+              <div id="serverMaintenanceList" class="control-endpoint-list"></div>
+            </article>
+            <article class="panel-card control-evidence endpoint-provider-maintenance">
+              <div class="panel-head"><div><p class="eyebrow">ENDPOINT MAINTENANCE</p><h2>Known Provider Control Plane</h2></div></div>
+              <p class="control-plane-copy">Kelola endpoint provider yang sudah dikenal Nexora. Host baru tetap memerlukan code review; secret tidak pernah disimpan di database.</p>
+              <div class="endpoint-tabs endpoint-tabs-static" aria-hidden="true"><span>COMIC SOURCES</span><span>AI PROVIDERS</span><span>EXTERNAL UTILITIES</span></div>
+              <div id="endpointProviderMaintenance"></div>
             </article>
             <article class="panel-card control-evidence">
               <div class="panel-head"><div><p class="eyebrow">OPERATIONAL EVIDENCE</p><h2>Audit yang Sudah Terhubung</h2></div></div>
@@ -420,7 +427,8 @@
   <script src="../assets/js/admin/dashboard.js?v=6.4.0-hf3-admin-member-hf1-layout1-audit-brand1-comic-translate1" defer></script>
   <script src="../assets/js/admin/members.js?v=6.4.0-admin-member-hf1" defer></script>
   <script src="../assets/js/admin/developer-profile.js?v=6.4.0-step3-audit-brand1" defer></script>
-  <script src="../assets/js/admin/control-plane.js?v=6.4.0-control-plane1" defer></script>
+  <script src="../assets/js/admin/control-plane.js?v=6.4.0-control-plane2" defer></script>
+  <script src="../assets/js/admin/endpoint-maintenance.js?v=6.4.0-endpoint1" defer></script>
   <script src="../assets/js/admin/visual-qa.js?v=6.4.0" defer></script>
   <script src="../assets/js/admin/personal-ai.js?v=6.4.0-ai1-branding1" defer></script>
   <script src="../assets/js/admin/functional-audit.js?v=6.4.0-healthfix1" defer></script>

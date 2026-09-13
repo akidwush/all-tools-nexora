@@ -58,7 +58,7 @@
     if(message){message.value=access.message||"";message.disabled=!state.editable;}
     if(save)save.disabled=!state.editable;
 
-    var list=$("#endpointMaintenanceList");
+    var list=$("#serverMaintenanceList");
     if(list){
       list.innerHTML=state.eligibleTools.map(function(toolId){
         var item=(state.config.endpoints||{})[toolId]||{enabled:false,reason:"",until:null};
@@ -145,7 +145,7 @@
   function bind(){
     var save=$("#savePublicAccess");if(save)save.addEventListener("click",savePublicAccess);
     var refresh=$("#refreshControlPlane");if(refresh)refresh.addEventListener("click",function(){load(true);});
-    var list=$("#endpointMaintenanceList");
+    var list=$("#serverMaintenanceList");
     if(list)list.addEventListener("click",function(event){
       var button=event.target.closest("[data-save-maint]");
       if(button)saveMaintenance(button.closest("[data-control-tool]"));
