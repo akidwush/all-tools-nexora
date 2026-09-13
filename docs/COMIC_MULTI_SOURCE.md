@@ -16,7 +16,7 @@ V1 registry:
 
 The non-MangaDex adapters are marked **experimental** because their public JSON behavior can change and the repository does not claim ownership of their content or an entitlement to a private API. Production operators should disable a source if its terms or runtime behavior no longer permit the integration.
 
-Not implemented in V1: DoujinDesu, SoftKomik, APKomik, Kiryuu, and Komiku. Nexora does not include decryption, signed-token extraction/forging, CAPTCHA/Cloudflare bypass, browser automation, DRM bypass, or anti-bot workarounds.
+Not implemented in standard V1: SoftKomik, APKomik, Kiryuu, and Komiku. DoujinDesu now exists only in the separate opt-in Adult / Experimental registry with a normal-HTML subset (search/detail/chapters) and pages disabled. Nexora does not include protected API decryption, signed-token extraction/forging, CAPTCHA/Cloudflare bypass, browser automation, DRM bypass, or anti-bot workarounds.
 
 ## Architecture
 
@@ -105,6 +105,12 @@ The adapter uses `https://api.voratoon.com/series/` with the normal `Origin` and
 ### Ainzscans
 
 The adapter uses the fixed `https://api.ainzscans01.com/api/` JSON flow. Search/list is bounded to at most 50 items per request. Chapter pages come from `chapter.pages[].image_url`. If the API disappears or changes contract, the provider fails independently and other sources continue to work.
+
+### DoujinDesu (Adult / Experimental)
+
+DoujinDesu is not part of the standard V1 registry. It is opt-in only and never participates in normal All Sources, fallback or source matching.
+
+Nexora implements only the normal public HTML subset currently represented by the adapter: search, detail and chapter-list parsing. Reader pages remain disabled because the legacy HTML connector required UI execution and the latest HaruNeko connector moved to a protected/encrypted API flow. Nexora does not copy the app secret, fake device identity or decrypt that response.
 
 ### MangaDotNet
 

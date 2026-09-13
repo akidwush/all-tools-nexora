@@ -21,16 +21,16 @@ assert.ok(ids.some((id) => id === "ai:deepseek"));
 assert.ok(!ids.some((id) => /claude|sonnet/i.test(id)));
 assert.ok(registry.has("experimental-comic:doujindesu"));
 assert.equal(registry.get("experimental-comic:doujindesu").group, "experimental-comic");
-assert.equal(registry.get("experimental-comic:doujindesu").activationSupported, false);
+assert.equal(registry.get("experimental-comic:doujindesu").activationSupported, true);
 assert.ok(!ids.some((id) => /apkomik|softkomik|kiryuu/i.test(id)));
 assert.ok(!ids.some((id) => /avatar|dicebear|kokoro|headtts|webllm|transformers/i.test(id)));
 assert.ok(!ids.some((id) => id === "utility:pixiv"), "Pixiv tidak boleh diinvent jika adapter server aktif tidak ada");
 
 const doujin = registry.get("experimental-comic:doujindesu");
-assert.equal(endpoints.defaultConfig(doujin).mode, "disabled");
-assert.equal(endpoints.defaultConfig(doujin).baseUrl, "");
-assert.equal(doujin.networkSupported, false);
-assert.equal(doujin.healthUnsupported, true);
+assert.equal(endpoints.defaultConfig(doujin).mode, "active");
+assert.equal(endpoints.defaultConfig(doujin).baseUrl, "https://doujin.desu.xxx/");
+assert.equal(doujin.networkSupported, true);
+assert.equal(doujin.healthUnsupported, false);
 
 const shinigami = registry.get("comic:shinigami");
 assert.equal(endpoints.normalizeBaseUrl("https://api.shngm.io/v1/", shinigami), "https://api.shngm.io/v1/");
@@ -66,10 +66,6 @@ assert.throws(() => validateFallback(gpt5, { ...endpoints.defaultConfig(gpt5), f
       probe: async () => ({ httpStatus:200 })
     })
   );
-
-  const unsupportedProbe = await endpoints.testCandidate(doujin, endpoints.defaultConfig(doujin));
-  assert.equal(unsupportedProbe.status, "unsupported");
-  assert.equal(unsupportedProbe.httpStatus, null);
 
   const result = await endpoints.testCandidate(shinigami, endpoints.defaultConfig(shinigami), {
     lookup: async () => [{ address:"104.21.1.2", family:4 }],

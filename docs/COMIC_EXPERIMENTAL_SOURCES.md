@@ -2,136 +2,109 @@
 
 ## Purpose
 
-Adult / Experimental Comic Sources adalah area opt-in terpisah dari katalog Comic Reader publik. Source pada area ini tidak boleh ikut normal discovery, `All Sources`, rekomendasi, automatic source matching, fallback, prefetch, standard History atau standard Favorites.
+Adult / Experimental Comic Sources adalah area opt-in yang terpisah dari Comic Reader publik. Source experimental tidak ikut normal Search, All Sources, recommendation, fallback, automatic source matching, standard History atau standard Favorites.
 
-Standard Comic Reader tetap:
-
-- MangaDex
-- Shinigami ID
-- Voratoon
-- Ainzscans
-- MangaDotNet
-
-## Classification
-
-Source experimental menggunakan metadata eksplisit seperti:
-
-- `category: adult-experimental`
-- `adult: true`
-- `experimental: true`
-- `defaultEnabled: false`
-- `optInRequired: true`
-- `participatesInSearch: false`
-- `participatesInFallback: false`
-
-Istilah `policy: experimental` yang sudah ada pada beberapa provider standard berarti stabilitas/terms provider dan **bukan** klasifikasi adult.
+Standard sources tetap MangaDex, Shinigami ID, Voratoon, Ainzscans dan MangaDotNet.
 
 ## Opt-in and privacy
 
-Preference disimpan hanya di perangkat:
+Experimental mode OFF by default. Enabling membutuhkan informasi adult/experimental dan explicit adult confirmation.
+
+Local-only keys:
 
 - `nx_comic_experimental_sources_v1`
 - `nx_comic_experimental_history_v1`
 - `nx_comic_experimental_favorites_v1`
 - `nx_comic_experimental_cache_v1`
 
-Fresh browser tidak mengaktifkan source experimental.
+Preference, search term, History dan Favorites experimental tidak disinkronkan ke Supabase/account.
 
-Enabling membutuhkan dua langkah:
+Standard `All Sources` tidak pernah menyertakan provider experimental.
 
-1. membuka informasi Adult / Experimental Sources;
-2. explicit adult confirmation.
+## DoujinDesu status
 
-Preference ini hanya visibility preference dan bukan authorization/security boundary. Nexora tidak menyinkronkan preference, title, search term, history atau favorite experimental ke profile/Supabase.
+DoujinDesu diregister sebagai:
 
-`Clear Experimental Data` menghapus preference dan seluruh local experimental library/cache.
+- adult: true
+- experimental: true
+- defaultEnabled: false
+- optInRequired: true
+- participatesInSearch: false
+- participatesInFallback: false
+- participatesInExperimentalSearch: true
+- translationCompatible: false
+- availability: degraded (partial capability)
 
-## Network isolation
+Capabilities current:
 
-Saat experimental mode OFF:
+- Search: implemented through normal public HTML search request.
+- Detail: implemented through normal public manga detail HTML.
+- Chapters: implemented through normal public chapter-list HTML.
+- Pages: disabled in the public capability registry.
 
-- client tidak meminta experimental source registry;
-- tidak ada experimental search;
-- tidak ada adult cover `<img>`;
-- tidak ada adult prefetch;
-- standard `All Sources` hanya memakai source standard;
-- automatic source matching hanya memakai source standard.
+Pages sengaja masih disabled. HakuNeko legacy HTML connector required browser/UI execution for reader pages, while current HaruNeko connector uses a protected API response with app-secret/device headers and a time-derived decode flow. Nexora does not copy that protected path.
 
-Experimental API request wajib membawa `mode=experimental`. Server memvalidasi bahwa source memang terklasifikasi experimental dan tetap menerapkan global Admin Endpoint Maintenance.
+The adapter contains a conservative static-page parser only for controlled diagnostics. It does not execute upstream JavaScript and the production capability remains `pages: false` until normal static page delivery is live-verified.
 
-LocalStorage tidak dapat melewati global admin `maintenance` / `disabled`.
+## Research boundary
+
+Latest HaruNeko research shows current origin `https://doujin.desu.xxx` and API-backed manga/chapter/page contracts, but the current connector also supplies `X-App-Secret`, generated device identity and decrypts an `_enc_resp_` payload.
+
+Nexora intentionally does **not** implement:
+
+- X-App-Secret copying
+- generated/fake device identity
+- encrypted response decryption
+- Cloudflare/CAPTCHA bypass
+- browser fingerprint spoofing
+- stolen cookies/session harvesting
+- signature forging
+- browser automation
+
+The legitimate subset is independently implemented against normal website HTML behavior documented by the older HakuNeko WordPress/Mangastream connector.
+
+If normal HTML access is blocked by anti-bot/protection at runtime, health/search return a normalized provider-unavailable state. Nexora will not fall back to the protected API.
+
+## Health
+
+After explicit opt-in, the UI may request one lightweight experimental health check. The probe uses GET only for status/headers and cancels the response body immediately because this upstream did not reliably answer HEAD. Before opt-in there are zero DoujinDesu network requests.
+
+Admin Endpoint Maintenance uses the known host allowlist:
+
+`doujin.desu.xxx`
+
+Admin can change mode, safe base URL within the allowlist, timeout and health path. Parser/decode code cannot be edited from Admin.
 
 ## Deep links
 
-Deep link `mode=experimental` tidak memuat provider/content jika preference OFF. User terlebih dahulu mendapat opt-in gate. Shared URL juga tidak melewati gate.
+Experimental deep links do not preload content while mode is OFF. They first show the opt-in gate.
 
-Experimental content tidak memiliki route katalog SEO terpisah dan tidak dimasukkan sitemap. Ketika experimental view aktif, client menambahkan `robots=noindex,nofollow` pada document iframe.
+## History / Favorites
 
-## History and favorites
-
-Standard dan experimental menggunakan storage key berbeda.
-
-Ketika experimental mode dimatikan:
-
-- experimental UI langsung hilang;
-- standard History/Favorites tetap bersih;
-- local experimental data tidak otomatis dihapus.
-
-Data hanya dihapus ketika user memilih `Clear Experimental Data`.
-
-## Admin control
-
-Endpoint Maintenance mempunyai group:
-
-`EXPERIMENTAL COMIC SOURCES`
-
-Admin mode tetap authoritative:
-
-- ACTIVE
-- MAINTENANCE
-- DISABLED
-
-Provider yang belum dapat diakses melalui normal legitimate HTTP flow dapat memiliki `activationSupported: false` dan `availability: unsupported`. Dashboard tidak boleh menjadikan parser/decryption/anti-bot logic sebagai editable config.
-
-## DoujinDesu
-
-DoujinDesu adalah provider pertama yang terdaftar pada arsitektur ini, tetapi current adapter **UNSUPPORTED**.
-
-Capabilities saat ini:
-
-- search: false
-- detail: false
-- chapters: false
-- pages: false
-- translationCompatible: false
-
-Alasannya: current known flow menggunakan protected/internal behavior yang tidak layak diimplementasikan melalui bypass pada Nexora serverless.
-
-Nexora tidak mengimplementasikan:
-
-- Cloudflare / anti-bot bypass
-- CAPTCHA workaround
-- stolen/session cookies
-- browser fingerprint spoofing
-- runtime secret extraction
-- signature forging
-- encrypted-response bypass
-- generic arbitrary URL proxy
-
-Karena itu health status DoujinDesu adalah `UNSUPPORTED`, bukan fake `Online`.
-
-Jika di masa depan upstream menyediakan normal documented/public HTTP flow, capabilities dapat diaktifkan melalui code review dan adapter normal yang mengembalikan schema Comic Reader existing. Perubahan parser/request format tetap CODE UPDATE REQUIRED.
+Experimental History and Favorites are local-only and separate. Turning experimental mode OFF hides them without deleting them. `Clear Experimental Data` removes preference/history/favorites/cache.
 
 ## Translation
 
-Experimental source default `translationCompatible: false`.
+DoujinDesu remains `translationCompatible: false`. MangaDex Translate All is unchanged.
 
-Adult pages tidak dikirim otomatis ke Translate All. MangaDex Translate All dan standard translation flow tidak berubah.
+## Reader limitation
 
-## Service worker / media cache
+Chapter lists may be browsed when normal HTML parsing succeeds. Reader opening is blocked when the provider publishes `pages: false`, so the UI does not pretend full reader support.
 
-Tidak ada experimental cover/page yang ditambahkan ke precache. Current DoujinDesu adapter tidak mempunyai media endpoint dan tidak membuat upstream media request.
+## Live verification
 
-## Telemetry
+Run one controlled probe:
 
-Operational provider-level success/failure dapat dicatat. Search term, title dan chapter experimental tidak dikirim sebagai analytics payload hanya untuk telemetry.
+```bash
+COMIC_DOUJIN_LIVE=1 node scripts/test-comic-doujindesu-live.js
+```
+
+The test performs a lightweight health request, one safe search query (`My Land Lady`), one detail request and obtains chapters from the cached detail HTML. It does not download images or raw adult response dumps.
+
+Optional static page probe:
+
+```bash
+COMIC_DOUJIN_LIVE=1 DOUJINDESU_PROBE_PAGES=1 node scripts/test-comic-doujindesu-live.js
+```
+
+A successful static page probe is evidence for a future code change; it does not auto-enable production pages.

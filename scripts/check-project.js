@@ -18,10 +18,10 @@ const sameSet = (left, right) => left.length === right.length && left.every((ite
 
 // Frozen Comic Reader architecture. Any accidental replacement/revert aborts the build.
 const COMIC_READER_LOCK = Object.freeze({
-  "assets/js/features/comic-reader.js": "aa56bb59b41b0e57fd4a93eebd441738f6a3a40a15949cb427495277b4245ea5",
-  "assets/comic-reader/index.html": "9653381ca0f4b0ae79ef33b1b326cd9896290976bae643f79e2289d2161558fc",
-  "assets/comic-reader/app.css": "2c5165a4a4cdf3c1375278bd7dd0b845d1ddfdf160be5d60e15d893e981ef987",
-  "assets/comic-reader/app.js": "8d40ab15e8d134e03aafb35721b5a6ebb6831e4b2c3c7358367c54549aeb3fb7",
+  "assets/js/features/comic-reader.js": "2c1bfbbcbcd8e7f09f15c9c9efc01d69b4ae922eaa9a7bb24846a52bd9c973fd",
+  "assets/comic-reader/index.html": "6cc8f35397970586d134c69dfd7f604eb24bf8211f11c31e82367541ce0e6360",
+  "assets/comic-reader/app.css": "84372a4da80876fb6cd2f9d4444cef3b74ad481777e9797ce2dc4a3c328cb82e",
+  "assets/comic-reader/app.js": "32461c561935b8f6c0c98520865a63ba2b9df0b3b4819d1ab1aaddc447179cf3",
   "assets/comic-reader/translate.js": "672a63ff4877e90df0e450311736a1395232bf96793b5c3c8893aa97ee98a4de",
   "assets/css/features/comic-reader.css": "49f665b05e4e2c0fb5cb36673c6e79a8298a3ac74890e040987e0f030bed76e2"
 });
@@ -221,7 +221,7 @@ for (const relative of [
 ]) if (!fs.existsSync(path.join(root, relative))) fail(`Standalone canonical asset hilang: ${relative}`);
 
 const comicShell = read("assets/js/features/comic-reader.js");
-if (!/COMIC_APP_URL\s*=\s*["']\/assets\/comic-reader\/index\.html\?v=standalone-v1-readerui2-experimental1["']/.test(comicShell)) fail("Comic Reader tidak memakai app standalone canonical.");
+if (!/COMIC_APP_URL\s*=\s*["']\/assets\/comic-reader\/index\.html\?v=standalone-v1-readerui2-experimental2["']/.test(comicShell)) fail("Comic Reader tidak memakai app standalone canonical.");
 if (/COMIC_READER_APP_B64|srcdoc|nxComicApiBridgeHandler|nx-comic-api-request/.test(comicShell)) fail("Comic Reader legacy Base64/srcdoc/bridge kembali terdeteksi.");
 for (const relative of ["assets/comic-reader/index.html", "assets/comic-reader/app.css", "assets/comic-reader/app.js"]) {
   if (!fs.existsSync(path.join(root, relative))) fail(`Comic Reader standalone asset hilang: ${relative}`);

@@ -908,6 +908,12 @@ async function mangaOpenReader(index){
   if(!state.mangaId&&manga&&manga.id)state.mangaId=manga.id;
   if(manga&&manga.source)state.source=manga.source;
   const generation=++readerGeneration;
+  const activeSource=state.mangaData&&state.mangaData.source||state.source;
+  const activeDefinition=state.sourceRegistry.find(row=>row.id===activeSource);
+  if(activeDefinition&&activeDefinition.capabilities&&activeDefinition.capabilities.pages===false){
+    toast('Reader pages belum tersedia untuk '+(activeDefinition.label||activeSource)+'. Chapter list tetap dapat digunakan.');
+    return;
+  }
   document.dispatchEvent(new CustomEvent('nexora:comic-loading'));
   setComicView('reader');state.chapterIndex=index;
   if(state.mangaData)addHistory(state.mangaData,chapter);
@@ -1095,7 +1101,26 @@ async function loadExperimentalSourceRegistry(){
   const standard=state.sourceRegistry.filter(row=>!isExperimentalSource(row.id));
   state.sourceRegistry=[...standard,...state.experimentalRegistry];
   state.experimentalRegistry.forEach(row=>{if(row.health)state.sourceHealth[row.id]=row.health});
+  void refreshExperimentalHealth();
   return state.experimentalRegistry;
+}
+async function refreshExperimentalHealth(){
+  if(!experimentalPreference()||!state.experimentalRegistry.length)return;
+  const rows=state.experimentalRegistry.filter(row=>row.enabled!==false&&!row.maintenance);
+  await runBounded(rows,2,async row=>{
+    try{
+      const json=await sourceCall(new URLSearchParams({action:'health',source:row.id,mode:'experimental'}),9000,null,row.id);
+      if(json&&json.health){row.health=json.health;row.status=json.health.status;state.sourceHealth[row.id]=json.health;}
+      return json;
+    }catch(error){
+      row.health={status:'unavailable',lastCheckedAt:new Date().toISOString(),reason:error.code||'PROVIDER_UNAVAILABLE'};
+      row.status='unavailable';state.sourceHealth[row.id]=row.health;return null;
+    }
+  });
+  if(state.experimentalView){
+    const host=document.querySelector('.experimental-provider-list');
+    if(host)host.innerHTML=renderExperimentalProviderRows();
+  }
 }
 function experimentalStatus(row){
   if(row.availability==='unsupported'||row.status==='unsupported')return'Unsupported';
@@ -1143,10 +1168,15 @@ function openExperimentalSettingsSheet(){
   $('experimentalDisable').onclick=()=>{closeComicSheet();disableExperimentalSources()};
   $('experimentalClear').onclick=()=>{if(confirm('Hapus opt-in, Experimental History, Favorites dan cache lokal?')){closeComicSheet();clearExperimentalData();mangaShowHome(true);toast('Experimental data dihapus.')}};
 }
+function experimentalCapabilityLabel(row){
+  const caps=row&&row.capabilities||{};const labels=[];
+  if(caps.search)labels.push('Search');if(caps.detail)labels.push('Detail');if(caps.chapters)labels.push('Chapters');if(caps.pages)labels.push('Reader');
+  return labels.length?labels.join(' · '):'No active capabilities';
+}
 function renderExperimentalProviderRows(){
   const rows=experimentalSourceRows();
-  if(!rows.length)return'<div class="experimental-provider"><div><strong>Experimental registry kosong</strong><small>Tidak ada provider experimental yang tersedia.</small></div></div>';
-  return rows.map(row=>'<div class="experimental-provider"><div><strong>'+escapeHtml(row.label)+'</strong><span class="experimental-badges"><b>18+</b><b>Experimental</b></span><small>'+escapeHtml(row.unsupportedReason||'Availability not guaranteed.')+'</small></div><span class="experimental-provider-status is-'+escapeHtml(String(row.availability||row.adminMode||'unknown'))+'">'+escapeHtml(experimentalStatus(row))+'</span></div>').join('');
+  if(!rows.length)return'<div class="experimental-provider"><div><strong>Tidak ada experimental source aktif.</strong><small>Provider dapat dinonaktifkan oleh administrator atau belum tersedia.</small></div></div>';
+  return rows.map(row=>'<div class="experimental-provider"><div><strong>'+escapeHtml(row.label)+'</strong><span class="experimental-badges"><b>18+</b><b>Experimental</b></span><small>'+escapeHtml(experimentalCapabilityLabel(row))+'</small></div><span class="experimental-provider-status is-'+escapeHtml(String(row.health&&row.health.status||row.availability||row.adminMode||'unknown'))+'">'+escapeHtml(experimentalStatus(row))+'</span></div>').join('');
 }
 function experimentalLibraryItems(kind){
   return storageGet(kind==='favorites'?EXPERIMENTAL_FAVORITES_KEY:EXPERIMENTAL_HISTORY_KEY);
@@ -1167,15 +1197,20 @@ async function experimentalSearch(query){
   const q=String(query||'').trim();state.experimentalQuery=q;
   if(q.length<2){host.innerHTML='<div class="empty"><i class="fa-solid fa-magnifying-glass"></i><span>Masukkan minimal 2 karakter.</span></div>';return;}
   const providers=experimentalSourceRows().filter(row=>row.enabled!==false&&!row.maintenance&&row.availability!=='unsupported'&&row.capabilities&&row.capabilities.search&&row.participatesInExperimentalSearch!==false);
-  if(!providers.length){host.innerHTML='<div class="empty"><i class="fa-solid fa-flask"></i><span><strong>Tidak ada provider experimental searchable.</strong><small>DoujinDesu saat ini Unsupported; Nexora tidak melakukan protection bypass.</small></span></div>';return;}
+  if(!providers.length){host.innerHTML='<div class="empty"><i class="fa-solid fa-flask"></i><span><strong>Tidak ada experimental source aktif.</strong><small>Cek status provider atau Admin Endpoint Maintenance.</small></span></div>';return;}
   host.innerHTML='<div class="loading"><i class="fa-solid fa-spinner spin"></i><span>Mencari experimental sources…</span></div>';
   const results=await runBounded(providers,2,row=>{
     const params=new URLSearchParams({action:'search',source:row.id,mode:'experimental',q,page:'1',limit:'24'});
     return sourceCall(params,12000,null,row.id).then(json=>Array.isArray(json.items)?json.items:[]);
   });
-  const items=[];results.forEach((result,index)=>{if(result.status==='fulfilled')items.push(...result.value.map(item=>({...item,source:item.source||providers[index].id,cover:item.coverUrl||item.cover||'',type:itemType(item)})))});
+  const items=[];let failures=0;
+  results.forEach((result,index)=>{
+    if(result.status==='fulfilled')items.push(...result.value.map(item=>({...item,source:item.source||providers[index].id,cover:item.coverUrl||item.cover||'',type:itemType(item)})));
+    else failures+=1;
+  });
   items.forEach(item=>state.searchItems.set(sourceKey(item.id,item.source),item));
-  renderExperimentalCards(items,'Tidak ada hasil experimental.');
+  if(!items.length&&failures===providers.length){host.innerHTML='<div class="empty"><i class="fa-solid fa-triangle-exclamation"></i><span><strong>DoujinDesu sementara tidak tersedia.</strong><small>Provider gagal dihubungi melalui normal HTTP flow.</small></span></div>';return;}
+  renderExperimentalCards(items,'Tidak ada hasil.');
 }
 function showExperimentalHome(){
   if(!experimentalPreference()){openExperimentalOptInInfo(null);return;}

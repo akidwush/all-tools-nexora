@@ -519,3 +519,7 @@ body.reader-mode #nxComicApiHealth,body.detail-mode #nxComicApiHealth{display:no
   .experimental-hub{gap:9px}.experimental-head{padding:10px}.experimental-head h2{font-size:15px}
   .experimental-search{height:44px}.experimental-provider{padding:9px 10px}
 }
+
+.experimental-provider-status.is-active{color:#86efac;background:rgba(34,197,94,.1)}
+.experimental-provider-status.is-degraded{color:#fde68a;background:rgba(245,158,11,.1)}
+.experimental-provider-status.is-unavailable{color:#fca5a5;background:rgba(239,68,68,.1)}
