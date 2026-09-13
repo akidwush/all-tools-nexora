@@ -32,11 +32,5 @@
 .nx-ct-dialog{box-sizing:border-box;max-width:min(92vw,480px);max-height:75vh;overflow:auto;border:1px solid #665573;border-radius:12px;padding:18px;background:#18131d;color:#fff;font:15px/1.6 Arial,sans-serif;overflow-wrap:anywhere}
 .nx-ct-dialog::backdrop{background:#0009}.nx-ct-dialog button{padding:8px 14px;min-height:40px}.nx-ct-dialog p{white-space:pre-wrap}
 @media(max-width:640px){
-  .nx-ct-toolbar{min-height:44px;padding:5px 6px;gap:5px}
-  .nx-ct-toolbar button,.nx-ct-toolbar select{min-height:34px;padding:5px 7px;font-size:9px}
-  .nx-ct-toolbar .nx-ct-sfx{display:none}
-  .nx-ct-status{font-size:8px}
-}
-@media(max-width:374px){
-  .nx-ct-toolbar .nx-ct-info{font-size:8px}
+  .nx-ct-toolbar{display:none}
 }

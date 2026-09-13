@@ -6,7 +6,7 @@
   'use strict';
 
   var activeComicFrame = null;
-  var COMIC_APP_URL = '/assets/comic-reader/index.html?v=standalone-v1-immersive1';
+  var COMIC_APP_URL = '/assets/comic-reader/index.html?v=standalone-v1-readerui2';
 
   function closeComicReader(event){
     if(event){

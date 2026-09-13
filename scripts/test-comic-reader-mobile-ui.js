@@ -14,14 +14,14 @@ const app = read("assets/comic-reader/app.js");
 const translateCss = read("assets/comic-reader/translate.css");
 const shellCss = read("assets/css/features/comic-reader.css");
 
-assert.match(shell, /COMIC_APP_URL\s*=\s*['"]\/assets\/comic-reader\/index\.html\?v=standalone-v1-immersive1['"]/);
+assert.match(shell, /COMIC_APP_URL\s*=\s*['"]\/assets\/comic-reader\/index\.html\?v=standalone-v1-readerui2['"]/);
 assert.match(shell, /frame\.src=COMIC_APP_URL/);
 assert.match(shell, /event\.data\.type==='nx-comic-view'/);
 assert.match(shell, /classList\.toggle\('is-reader-mode'/);
 assert.doesNotMatch(shell, /COMIC_READER_APP_B64|srcdoc|nxComicApiBridgeHandler|nx-comic-api-request/);
 assert.match(html, /data-nexora-comic-ui="standalone-v1"/);
-assert.match(html, /app\.css\?v=standalone-v1-immersive1/);
-assert.match(html, /app\.js\?v=standalone-v1[^"']*immersive1/);
+assert.match(html, /app\.css\?v=standalone-v1-readerui2/);
+assert.match(html, /app\.js\?v=standalone-v1[^"']*readerui2/);
 assert.doesNotMatch(html, /<style\b|<script(?!\s+src=)/i);
 
 assert.match(html, /id="mangaTabs" class="home-nav"/);
@@ -66,7 +66,14 @@ assert.match(css, /\.manga-card-title\{[\s\S]*-webkit-line-clamp:2/);
 assert.match(css, /\.reader-page-error\{[\s\S]*min-height:142px/);
 assert.match(css, /\.comic-sheet-backdrop\{/);
 assert.match(translateCss, /position:sticky;top:54px/);
-assert.match(translateCss, /min-height:44px/);
+assert.match(translateCss, /@media\(max-width:640px\)\{\s*\.nx-ct-toolbar\{display:none\}/);
+assert.match(css, /\.reader-bottom\{[\s\S]*margin:16px auto 8px;[\s\S]*padding-bottom:calc\(18px \+ env\(safe-area-inset-bottom\)\)[\s\S]*padding-left:max\(12px,env\(safe-area-inset-left\)\)[\s\S]*padding-right:max\(12px,env\(safe-area-inset-right\)\)/);
+assert.match(app, /function readerTranslationControls\(\)/);
+assert.match(app, /data-translation-mode/);
+assert.match(app, /Translate All/);
+assert.match(app, /Cancel Translation/);
+assert.match(app, /Retry Failed Pages/);
+assert.doesNotMatch(app, /Chapter Sebelumnya|Chapter Selanjutnya/);
 assert.match(shellCss, /\.is-reader-mode \.nx-room-topbar\{[\s\S]*display:none/);
 assert.match(shellCss, /\.is-reader-mode \.nx-comic-embed\{[\s\S]*height:100dvh/);
 assert.match(translateCss, /Translation|nx-ct-info/);
@@ -77,7 +84,7 @@ const viewportResults = [360, 375, 390, 412].map((viewport) => {
   const gap = 9;
   const cardWidth = (contentWidth - gap) / 2;
   const discoveryHeight = 26 + 7 + 31 + 8 + 36 + 7 + 46 + 8 + 36 + 6 + 36 + 9;
-  const readerChrome = 54 + 44;
+  const readerChrome = 54;
 
   assert.ok(cardWidth >= 160, `${viewport}px: card manga terlalu sempit (${cardWidth}px).`);
   assert.ok(discoveryHeight <= 280, `${viewport}px: manga grid terlambat muncul (${discoveryHeight}px).`);

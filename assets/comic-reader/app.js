@@ -261,20 +261,56 @@ function openReaderSettingsSheet(){
   openComicSheet('Reading Settings','<div class="sheet-section"><div class="sheet-label">Kualitas gambar</div><div class="sheet-setting-row"><button type="button" data-quality="saver" class="'+(active==='saver'?'active':'')+'">Hemat</button><button type="button" data-quality="full" class="'+(active==='full'?'active':'')+'">Original / HD</button></div></div><div class="sheet-section"><div class="sheet-option is-selected reader-fit-status"><span><i class="fa-solid fa-arrows-left-right-to-line"></i> Fit Width</span><i class="fa-solid fa-check"></i></div></div>');
   $('comicSheetBody').querySelectorAll('[data-quality]').forEach(button=>button.onclick=()=>{closeComicSheet();changeReaderQuality(button.dataset.quality)});
 }
+function readerTranslationControls(){
+  const toolbar=document.querySelector('.nx-ct-toolbar');if(!toolbar)return null;
+  const secondary=[...toolbar.querySelectorAll('.nx-ct-secondary')];
+  return{
+    toolbar,
+    mode:toolbar.querySelector('select'),
+    start:toolbar.querySelector('.nx-ct-primary'),
+    cancel:secondary.find(button=>/^Cancel$/i.test(button.textContent.trim()))||null,
+    retry:secondary.find(button=>/^Retry/i.test(button.textContent.trim()))||null,
+    status:toolbar.querySelector('.nx-ct-status')
+  };
+}
+function readerTranslationSection(current){
+  const tx=readerTranslationControls();const capabilities=state.capabilities||sourceCapabilities(current);
+  const compatible=tx?!tx.toolbar.classList.contains('is-unavailable'):capabilities.translationCompatible!==false;
+  if(!compatible)return '<div class="sheet-section"><div class="sheet-label">TRANSLATION</div><p class="sheet-note">Not available for <strong>'+escapeHtml(sourceLabel(current))+'</strong>.</p></div>';
+  if(!tx)return '<div class="sheet-section"><div class="sheet-label">TRANSLATION</div><p class="sheet-note">Translation controls sedang dimuat.</p></div>';
+  const mode=tx.mode&&tx.mode.value==='id'?'id':'original';
+  const busy=!!(tx.cancel&&!tx.cancel.hidden);const canRetry=!!(tx.retry&&!tx.retry.hidden);
+  const statusText=tx.status&&!tx.status.hidden?tx.status.textContent.trim():'';
+  return '<div class="sheet-section"><div class="sheet-label">TRANSLATION</div>'+
+    '<div class="sheet-label reader-translation-mode-label">Mode</div><div class="sheet-setting-row">'+
+      '<button type="button" data-translation-mode="original" class="'+(mode==='original'?'active':'')+'">Original</button>'+
+      '<button type="button" data-translation-mode="id" class="'+(mode==='id'?'active':'')+'">Indonesia</button></div>'+
+    (busy?'<button class="sheet-option" type="button" data-translation-action="cancel"><span><i class="fa-solid fa-stop"></i> Cancel Translation</span><i class="fa-solid fa-chevron-right"></i></button>':'<button class="sheet-option" type="button" data-translation-action="start"><span><i class="fa-solid fa-language"></i> Translate All</span><i class="fa-solid fa-chevron-right"></i></button>')+
+    (canRetry?'<button class="sheet-option" type="button" data-translation-action="retry"><span><i class="fa-solid fa-rotate-right"></i> Retry Failed Pages</span><i class="fa-solid fa-chevron-right"></i></button>':'')+
+    (statusText?'<p class="sheet-note reader-translation-status">'+escapeHtml(statusText)+'</p>':'')+'</div>';
+}
 function openReaderMoreSheet(){
   const current=state.mangaData&&state.mangaData.source||state.source;
   const failed=document.querySelectorAll('#mangaReaderPages img.page-failed').length;
-  const incompatible=!(state.capabilities&&state.capabilities.translationCompatible);
-  openComicSheet('Reader Menu','<div class="reader-menu-list">'+
+  openComicSheet('Reader Menu','<div class="sheet-section"><div class="sheet-label">READING</div><div class="reader-menu-list">'+
     '<button class="sheet-option" type="button" data-reader-action="source"><span><i class="fa-solid fa-layer-group"></i> Source</span><small>'+escapeHtml(sourceLabel(current))+'</small></button>'+
     '<button class="sheet-option" type="button" data-reader-action="chapters"><span><i class="fa-solid fa-list"></i> Chapter List</span><i class="fa-solid fa-chevron-right"></i></button>'+
-    '<button class="sheet-option" type="button" data-reader-action="settings"><span><i class="fa-solid fa-sliders"></i> Reading Settings</span><small>'+(state.readerQuality==='full'?'Original / HD':'Hemat')+'</small></button>'+
-    '<button class="sheet-option" type="button" data-reader-action="reload" '+(failed?'':'disabled')+'><span><i class="fa-solid fa-rotate-right"></i> Reload Failed Pages</span><small>'+(failed?failed+' gagal':'Tidak ada gagal')+'</small></button>'+
-    (incompatible?'<button class="sheet-option" type="button" data-reader-action="translation"><span><i class="fa-solid fa-language"></i> About Translation</span><i class="fa-solid fa-circle-info"></i></button>':'')+
-    '<button class="sheet-option" type="button" data-reader-action="home"><span><i class="fa-solid fa-house"></i> Comic Home</span><i class="fa-solid fa-chevron-right"></i></button></div>');
-  $('comicSheetBody').querySelectorAll('[data-reader-action]').forEach(button=>button.onclick=()=>{
+    '<button class="sheet-option" type="button" data-reader-action="settings"><span><i class="fa-solid fa-sliders"></i> Reading Quality</span><small>'+(state.readerQuality==='full'?'Original / HD':'Hemat')+'</small></button>'+
+    '<button class="sheet-option" type="button" data-reader-action="reload" '+(failed?'':'disabled')+'><span><i class="fa-solid fa-rotate-right"></i> Reload Failed Images</span><small>'+(failed?failed+' gagal':'Tidak ada gagal')+'</small></button>'+
+    '<button class="sheet-option" type="button" data-reader-action="home"><span><i class="fa-solid fa-house"></i> Comic Home</span><i class="fa-solid fa-chevron-right"></i></button></div></div>'+readerTranslationSection(current));
+  const body=$('comicSheetBody');
+  body.querySelectorAll('[data-reader-action]').forEach(button=>button.onclick=()=>{
     const action=button.dataset.readerAction;
-    if(action==='source')openReaderSourceSheet();else if(action==='chapters')openReaderChapterSheet();else if(action==='settings')openReaderSettingsSheet();else if(action==='translation')openTranslationInfo(sourceLabel(current));else if(action==='reload'){closeComicSheet();mangaRetryFailedPages();}else if(action==='home'){closeComicSheet();mangaShowHome(true);}
+    if(action==='source')openReaderSourceSheet();else if(action==='chapters')openReaderChapterSheet();else if(action==='settings')openReaderSettingsSheet();else if(action==='reload'){closeComicSheet();mangaRetryFailedPages();}else if(action==='home'){closeComicSheet();mangaShowHome(true);}
+  });
+  body.querySelectorAll('[data-translation-mode]').forEach(button=>button.onclick=()=>{
+    const tx=readerTranslationControls();if(!tx||!tx.mode)return;
+    tx.mode.value=button.dataset.translationMode;tx.mode.dispatchEvent(new Event('change',{bubbles:true}));openReaderMoreSheet();
+  });
+  body.querySelectorAll('[data-translation-action]').forEach(button=>button.onclick=()=>{
+    const tx=readerTranslationControls();if(!tx)return;
+    const action=button.dataset.translationAction;const target=action==='start'?tx.start:action==='cancel'?tx.cancel:action==='retry'?tx.retry:null;
+    if(target&&!target.disabled){target.click();closeComicSheet();}
   });
 }
 function openTranslationInfo(sourceLabelText){
@@ -799,8 +835,8 @@ async function mangaOpenReader(index){
       <div class="page-loader"><i class="fa-solid fa-spinner spin"></i><span>Memuat halaman komik...</span></div>
     </div>
     <div class="reader-bottom">
-      <button class="nav-btn" id="mangaPrevBtn" onclick="mangaChangeChapter(1)"><i class="fa-solid fa-backward-step"></i> Chapter Sebelumnya</button>
-      <button class="nav-btn" id="mangaNextBtn" onclick="mangaChangeChapter(-1)">Chapter Selanjutnya <i class="fa-solid fa-forward-step"></i></button>
+      <button class="nav-btn" id="mangaPrevBtn" onclick="mangaChangeChapter(1)"><i class="fa-solid fa-backward-step"></i> Sebelumnya</button>
+      <button class="nav-btn" id="mangaNextBtn" onclick="mangaChangeChapter(-1)">Selanjutnya <i class="fa-solid fa-forward-step"></i></button>
     </div>`;
   $('mangaPrevBtn').disabled=index>=state.chapters.length-1;
   $('mangaNextBtn').disabled=index<=0;
