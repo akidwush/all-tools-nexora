@@ -54,10 +54,13 @@ module.exports = async function handler(request, response) {
   if (mode === "ai-chat") return handlePersonalAi(request, response);
 
   const protectedId = healthToolId(mode);
-  if (protectedId && !verifySameOriginRequest(request)) {
+  const isPublicMetadata = publicMetadataRequest(mode, request, requestUrl);
+
+  if (protectedId && !isPublicMetadata && !verifySameOriginRequest(request)) {
     return send(response, 403, { ok: false, error: "ORIGIN_NOT_ALLOWED", message: "Permintaan lintas situs ditolak." });
   }
-  if (protectedId && !publicMetadataRequest(mode, request, requestUrl) && !(await authorizeTool(request, response, protectedId))) return;
+
+  if (protectedId && !isPublicMetadata && !(await authorizeTool(request, response, protectedId))) return;
 
   if (mode === "document-ai") return handleDocumentAi(request, response);
   if (mode === "prompt-generator") return handlePromptGenerator(request, response);
