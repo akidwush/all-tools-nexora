@@ -565,3 +565,67 @@ body.reader-mode #nxComicApiHealth,body.detail-mode #nxComicApiHealth{display:no
 .experimental-results{
   margin-top:3px;
 }
+
+/* Experimental source uses the same compact visual hierarchy as normal sources */
+.experimental-source-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  min-height:58px;
+  padding:10px 12px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:var(--surface);
+}
+
+.experimental-source-title{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:6px 8px;
+  min-width:0;
+}
+
+.experimental-source-title strong{
+  width:100%;
+  font-size:14px;
+  line-height:1.2;
+}
+
+.experimental-source-title .experimental-provider-status{
+  margin-left:auto;
+}
+
+.experimental-settings-button{
+  flex:0 0 auto;
+  width:38px;
+  height:38px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:var(--surface-2);
+  color:var(--text);
+}
+
+.experimental-search{
+  margin-top:0;
+}
+
+.experimental-library-nav{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+
+.experimental-library-nav::-webkit-scrollbar{
+  display:none;
+}
+
+.experimental-library-nav button{
+  flex:0 0 auto;
+}
+
+.experimental-results{
+  margin-top:0;
+}
