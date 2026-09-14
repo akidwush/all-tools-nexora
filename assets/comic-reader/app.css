@@ -523,3 +523,45 @@ body.reader-mode #nxComicApiHealth,body.detail-mode #nxComicApiHealth{display:no
 .experimental-provider-status.is-active{color:#86efac;background:rgba(34,197,94,.1)}
 .experimental-provider-status.is-degraded{color:#fde68a;background:rgba(245,158,11,.1)}
 .experimental-provider-status.is-unavailable{color:#fca5a5;background:rgba(239,68,68,.1)}
+
+/* Experimental sources: same visual weight as normal source cards */
+.experimental-hub{
+  gap:10px;
+}
+
+.experimental-head{
+  padding:10px 11px;
+  border-radius:12px;
+}
+
+.experimental-head h2{
+  font-size:16px;
+}
+
+.experimental-head p{
+  font-size:9px;
+}
+
+.experimental-provider{
+  min-height:54px;
+  padding:10px 11px;
+  border-radius:12px;
+  transition:transform .15s ease,border-color .15s ease;
+}
+
+.experimental-provider:active{
+  transform:scale(.985);
+}
+
+.experimental-provider strong{
+  font-size:12px;
+}
+
+.experimental-provider-status{
+  min-width:58px;
+  text-align:center;
+}
+
+.experimental-results{
+  margin-top:3px;
+}
