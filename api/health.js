@@ -26,8 +26,7 @@ function publicMetadataRequest(mode, request, requestUrl) {
     // Actual experimental health/search/detail/chapter actions remain
     // behind the normal first-party + tool authorization path.
     return action === "sources"
-      && requestUrl.searchParams.get("scope") === "experimental"
-      && requestUrl.searchParams.get("mode") === "experimental";
+      && requestUrl.searchParams.get("scope") === "experimental";
   }
   if (mode === "multi-ai") return true;
   if (mode === "anime-gallery") return true;
