@@ -1222,24 +1222,21 @@ function renderExperimentalHomeNow(){
   if(!isExperimentalSource(state.source))state.standardSourceBeforeExperimental=state.source==='all'?'mangadex':state.source;
   state.experimentalView=true;setExperimentalRobots(true);setComicView('home');
   $('mangaBackBtn').hidden=false;$('mangaBackBtn').onclick=exitExperimentalHome;
-  $('mangaTitleBar').innerHTML='<i class="fa-solid fa-book-open"></i> KOMIK INDONESIA';
+  $('mangaTitleBar').innerHTML='<i class="fa-solid fa-flask"></i> EXPERIMENTAL SOURCES';
   $('mangaSearchBar').hidden=true;$('comicSourceStrip').hidden=true;$('comicSourceProgress').hidden=true;$('mangaTabs').hidden=true;$('mangaCategoryTabs').hidden=true;$('mangaStatusTabs').hidden=true;
 
   const content=$('mangaContent');
   content.className='experimental-hub';
 
   content.innerHTML=
-    '<div class="experimental-source-bar">'+
-      '<div class="experimental-source-title">'+
-        '<span class="experimental-badges"><b>18+</b><b>Experimental</b></span>'+
-        '<strong>DoujinDesu</strong>'+
-        '<span class="experimental-provider-status is-active">ONLINE</span>'+
-      '</div>'+
-      '<button type="button" id="experimentalManage" class="experimental-settings-button"><i class="fa-solid fa-gear"></i></button>'+
+    '<div class="experimental-head">'+
+      '<div><h2>Experimental Sources</h2><p>18+ / Adult / Unstable</p></div>'+
+      '<button type="button" id="experimentalManage" class="experimental-settings-button"><i class="fa-solid fa-gear"></i> Manage</button>'+
     '</div>'+
+    '<div class="experimental-provider-list">'+renderExperimentalProviderRows()+'</div>'+
     '<div class="experimental-search">'+
       '<i class="fa-solid fa-magnifying-glass"></i>'+
-      '<input id="experimentalSearchInput" type="search" autocomplete="off" enterkeyhint="search" placeholder="Cari komik…">'+
+      '<input id="experimentalSearchInput" type="search" autocomplete="off" enterkeyhint="search" placeholder="Cari di experimental sources…">'+
       '<button type="button" id="experimentalSearchButton">Search</button>'+
     '</div>'+
     '<div class="experimental-library-nav">'+
@@ -1248,7 +1245,7 @@ function renderExperimentalHomeNow(){
       '<button type="button" data-experimental-tab="history">History</button>'+
     '</div>'+
     '<div id="experimentalResults" class="manga-grid experimental-results">'+
-      '<div class="empty"><i class="fa-solid fa-book-open"></i><span><strong>DoujinDesu</strong><small>Search · Detail · Chapters</small></span></div>'+
+      '<div class="empty"><i class="fa-solid fa-flask"></i><span>Cari atau pilih tab library.</span></div>'+
     '</div>';
 
   const input=$('experimentalSearchInput');
@@ -1258,8 +1255,25 @@ function renderExperimentalHomeNow(){
     input.onkeydown=e=>{if(e.key==='Enter')experimentalSearch(input.value);};
   }
 
+  const tabs=document.querySelectorAll('.experimental-library-nav button');
+  tabs.forEach(btn=>{
+    btn.onclick=()=>{
+      tabs.forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const tab=btn.dataset.experimentalTab;
+      if(tab==='search'){
+        const q=input?input.value.trim():'';
+        if(q)experimentalSearch(q);
+        else $('experimentalResults').innerHTML='<div class="empty"><i class="fa-solid fa-flask"></i><span>Cari atau pilih tab library.</span></div>';
+      }else{
+        const items=experimentalLibraryItems(tab);
+        renderExperimentalCards(items,tab==='favorites'?'Belum ada favorites experimental.':'Belum ada riwayat baca experimental.');
+      }
+    };
+  });
+
   const manage=$('experimentalManage');
-  if(manage)manage.onclick=()=>openExperimentalSettings();
+  if(manage)manage.onclick=()=>openExperimentalSettingsSheet();
 }
 function exitExperimentalHome(){
   state.experimentalView=false;setExperimentalRobots(false);
