@@ -14,7 +14,7 @@ const EXPERIMENTAL_PREF_KEY = 'nx_comic_experimental_sources_v1';
 const EXPERIMENTAL_FAVORITES_KEY = 'nx_comic_experimental_favorites_v1';
 const EXPERIMENTAL_HISTORY_KEY = 'nx_comic_experimental_history_v1';
 const EXPERIMENTAL_CACHE_KEY = 'nx_comic_experimental_cache_v1';
-const KNOWN_EXPERIMENTAL_SOURCE_IDS = new Set(['doujindesu']);
+const KNOWN_EXPERIMENTAL_SOURCE_IDS = new Set();
 
 const state = {
   view:'home',
