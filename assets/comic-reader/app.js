@@ -10,11 +10,7 @@ const MD_API = 'https://api.mangadex.org';
 const SOURCE_IMAGE_PROXY = '';
 const FAVORITES_KEY = 'nx_manga_favorites_v1';
 const HISTORY_KEY = 'nx_manga_history_v1';
-const EXPERIMENTAL_PREF_KEY = 'nx_comic_experimental_sources_v1';
-const EXPERIMENTAL_FAVORITES_KEY = 'nx_comic_experimental_favorites_v1';
-const EXPERIMENTAL_HISTORY_KEY = 'nx_comic_experimental_history_v1';
-const EXPERIMENTAL_CACHE_KEY = 'nx_comic_experimental_cache_v1';
-const KNOWN_EXPERIMENTAL_SOURCE_IDS = new Set();
+
 
 const state = {
   view:'home',
@@ -43,9 +39,6 @@ const state = {
   listGeneration:0,
   detailScrollY:0,
   restoreDetailScrollPending:false,
-  experimentalView:false,
-  experimentalRegistry:[],
-  experimentalQuery:'',
   standardSourceBeforeExperimental:'mangadex'
 };
 
@@ -79,45 +72,24 @@ function storageGet(key){
 function storageSet(key,value){
   try{localStorage.setItem(key,JSON.stringify(value))}catch(e){}
 }
-function experimentalPreference(){
-  try{
-    const value=JSON.parse(localStorage.getItem(EXPERIMENTAL_PREF_KEY)||'null');
-    return !!(value&&value.enabled===true&&value.adultConfirmed===true);
-  }catch(e){return false}
-}
+
 function setExperimentalPreference(enabled){
   try{
     if(enabled)localStorage.setItem(EXPERIMENTAL_PREF_KEY,JSON.stringify({enabled:true,adultConfirmed:true,confirmedAt:new Date().toISOString()}));
     else localStorage.removeItem(EXPERIMENTAL_PREF_KEY);
   }catch(e){}
 }
-function experimentalDefinition(id){
-  return state.experimentalRegistry.find(row=>row.id===id)||state.sourceRegistry.find(row=>row.id===id)||null;
-}
-function isExperimentalSource(id){
-  const row=experimentalDefinition(id);
-  return !!(KNOWN_EXPERIMENTAL_SOURCE_IDS.has(String(id||''))||row&&(
-    row.adult===true||row.optInRequired===true||row.category==='adult-experimental'
-  ));
-}
+
+function isExperimentalSource(id){return false;}
 function standardSourceRows(){
   return state.sourceRegistry.filter(row=>!isExperimentalSource(row.id));
 }
-function experimentalSourceRows(){
-  return state.experimentalRegistry.slice();
-}
+
 function libraryKey(kind,source){
-  const experimental=isExperimentalSource(source);
-  if(kind==='favorites')return experimental?EXPERIMENTAL_FAVORITES_KEY:FAVORITES_KEY;
-  return experimental?EXPERIMENTAL_HISTORY_KEY:HISTORY_KEY;
+    if(kind==='favorites')return FAVORITES_KEY;
+  return HISTORY_KEY;
 }
-function setExperimentalRobots(active){
-  let meta=document.querySelector('meta[data-experimental-robots]');
-  if(active){
-    if(!meta){meta=document.createElement('meta');meta.name='robots';meta.dataset.experimentalRobots='1';document.head.appendChild(meta)}
-    meta.content='noindex,nofollow,noarchive';
-  }else if(meta)meta.remove();
-}
+
 function chooseText(object,preferred){
   if(!object||typeof object!=='object') return '';
   for(const key of preferred){
@@ -214,8 +186,7 @@ async function loadSourceRegistry(){
 
 function setComicView(view){
   state.view=view;
-  if(view!=='home')state.experimentalView=false;
-  document.body.classList.toggle('home-mode',view==='home');
+    document.body.classList.toggle('home-mode',view==='home');
   document.body.classList.toggle('detail-mode',view==='detail');
   document.body.classList.toggle('reader-mode',view==='reader');
   if(window.parent&&window.parent!==window){
@@ -279,9 +250,9 @@ function openFilterSheet(){
     ].map(row=>filterOption('category',row[0],row[1],draftCategory)).join('')+'</div></div><div class="sheet-section"><div class="sheet-label">Status</div><div class="sheet-options">'+[
       ['all','Semua'],['ongoing','Ongoing'],['tamat','Tamat']
     ].map(row=>filterOption('status',row[0],row[1],draftStatus)).join('')+'</div></div>';
-    $('comicSheetBody').innerHTML+='<div class="sheet-section experimental-settings-entry"><div class="sheet-label">SOURCES</div><button class="sheet-option" type="button" data-open-experimental-settings><span><i class="fa-solid fa-flask"></i> Experimental Sources</span><small>'+(experimentalPreference()?'ON':'OFF')+'</small></button></div>';
+
     $('comicSheetBody').querySelectorAll('[data-filter-kind]').forEach(button=>button.onclick=()=>{if(button.dataset.filterKind==='category')draftCategory=button.dataset.filterValue;else draftStatus=button.dataset.filterValue;render();});
-    const experimentalButton=$('comicSheetBody').querySelector('[data-open-experimental-settings]');if(experimentalButton)experimentalButton.onclick=openExperimentalSettingsSheet;
+
   };
   openComicSheet('Filter komik','', '<button type="button" id="sheetFilterReset">Reset</button><button class="primary" type="button" id="sheetFilterApply">Terapkan</button>');
   render();
@@ -352,12 +323,12 @@ function openReaderMoreSheet(){
     '<button class="sheet-option" type="button" data-reader-action="chapters"><span><i class="fa-solid fa-list"></i> Chapter List</span><i class="fa-solid fa-chevron-right"></i></button>'+
     '<button class="sheet-option" type="button" data-reader-action="settings"><span><i class="fa-solid fa-sliders"></i> Reading Quality</span><small>'+(state.readerQuality==='full'?'Original / HD':'Hemat')+'</small></button>'+
     '<button class="sheet-option" type="button" data-reader-action="reload" '+(failed?'':'disabled')+'><span><i class="fa-solid fa-rotate-right"></i> Reload Failed Images</span><small>'+(failed?failed+' gagal':'Tidak ada gagal')+'</small></button>'+
-    '<button class="sheet-option" type="button" data-reader-action="experimental"><span><i class="fa-solid fa-flask"></i> Experimental Sources</span><small>'+(experimentalPreference()?'ON':'OFF')+'</small></button>'+
+
     '<button class="sheet-option" type="button" data-reader-action="home"><span><i class="fa-solid fa-house"></i> Comic Home</span><i class="fa-solid fa-chevron-right"></i></button></div></div>'+readerTranslationSection(current));
   const body=$('comicSheetBody');
   body.querySelectorAll('[data-reader-action]').forEach(button=>button.onclick=()=>{
     const action=button.dataset.readerAction;
-    if(action==='source')openReaderSourceSheet();else if(action==='chapters')openReaderChapterSheet();else if(action==='settings')openReaderSettingsSheet();else if(action==='experimental')openExperimentalSettingsSheet();else if(action==='reload'){closeComicSheet();mangaRetryFailedPages();}else if(action==='home'){closeComicSheet();mangaShowHome(true);}
+    if(action==='source')openReaderSourceSheet();else if(action==='chapters')openReaderChapterSheet();else if(action==='settings')openReaderSettingsSheet();else if(action==='reload'){closeComicSheet();mangaRetryFailedPages();}else if(action==='home'){closeComicSheet();mangaShowHome(true);}
   });
   body.querySelectorAll('[data-translation-mode]').forEach(button=>button.onclick=()=>{
     const tx=readerTranslationControls();if(!tx||!tx.mode)return;
@@ -396,8 +367,8 @@ async function allSourceSearch(query,signal){
 async function sourceCall(params,timeout=18000,signal,explicitSource){
   const source=explicitSource||params.get('source')||state.source||'mangadex';if(source!=='all'&&!params.has('source'))params.set('source',source);
   if(isExperimentalSource(source)){
-    if(!experimentalPreference()){const error=new Error('Experimental Sources belum diaktifkan.');error.code='EXPERIMENTAL_OPT_IN_REQUIRED';throw error;}
-    params.set('mode','experimental');
+
+
   }
   const url=SOURCE_API+'?'+params.toString();const started=performance.now();
   try{
@@ -633,7 +604,7 @@ function mangaGoBack(){
   if(state.view==='reader') mangaBackFromReader();
   else if(state.view==='detail'&&isExperimentalSource(state.mangaData&&state.mangaData.source||state.source))showExperimentalHome();
   else if(state.view==='detail') mangaShowHome(true);
-  else if(state.experimentalView)exitExperimentalHome();
+
   else closeComic();
 }
 function mangaSwitchTab(tab){
@@ -664,13 +635,13 @@ function mangaDoSearch(){
 }
 function mangaSwitchSource(source){
   if(!source||source===state.source)return;
-  if(isExperimentalSource(source)){openExperimentalSettingsSheet();return;}
+
   if(state.searchController)state.searchController.abort();
   state.searchController=null;state.loading=false;state.hasMore=true;state.page=1;state.searchItems.clear();
   state.source=source;state.capabilities=source==='all'?{}:sourceCapabilities(source);state.sourceMatches=[];state.selectedLang='';state.query='';$('mangaSearchInput').value='';renderSourceSelector();mangaResetFilters();
 }
 function mangaShowHome(reset){
-  state.experimentalView=false;setExperimentalRobots(false);
+
   if(isExperimentalSource(state.source))state.source=state.standardSourceBeforeExperimental||'mangadex';
   setComicView('home');
   const isXyz=state.tab==='xyz';
@@ -812,7 +783,7 @@ function mangaOnFavClick(){
   }
 }
 async function mangaOpenDetail(id,source,hint){
-  if(isExperimentalSource(source)&&!experimentalPreference()){openExperimentalOptInInfo({source,id,hint});return;}
+
   setComicView('detail');state.mangaId=id;if(source&&source!=='all')state.source=source;state.selectedLang='';state.availableLanguages=[];state.sourceMatches=[];renderSourceSelector();
   $('mangaSearchBar').hidden=true;$('mangaTabs').hidden=true;$('mangaCategoryTabs').hidden=true;$('mangaStatusTabs').hidden=true;$('comicSourceStrip').hidden=true;$('comicSourceProgress').hidden=true;
   $('mangaTitleBar').innerHTML='<i class="fa-solid fa-book-open"></i> Detail Komik';
@@ -1094,210 +1065,19 @@ async function mangaXyzHome(){
     content.appendChild(grid);
   });
 }
-async function loadExperimentalSourceRegistry(){
-  if(!experimentalPreference())return[];
-  const json=await fetchJson(SOURCE_API+'?action=sources&scope=experimental&mode=experimental',10000);
-  state.experimentalRegistry=Array.isArray(json.sources)?json.sources:[];
-  const standard=state.sourceRegistry.filter(row=>!isExperimentalSource(row.id));
-  state.sourceRegistry=[...standard,...state.experimentalRegistry];
-  state.experimentalRegistry.forEach(row=>{if(row.health)state.sourceHealth[row.id]=row.health});
-  void refreshExperimentalHealth();
-  return state.experimentalRegistry;
-}
-async function refreshExperimentalHealth(){
-  if(!experimentalPreference()||!state.experimentalRegistry.length)return;
-  const rows=state.experimentalRegistry.filter(row=>row.enabled!==false&&!row.maintenance);
-  await runBounded(rows,2,async row=>{
-    try{
-      const json=await sourceCall(new URLSearchParams({action:'health',source:row.id,mode:'experimental'}),9000,null,row.id);
-      if(json&&json.health){row.health=json.health;row.status=json.health.status;state.sourceHealth[row.id]=json.health;}
-      return json;
-    }catch(error){
-      row.health={status:'unavailable',lastCheckedAt:new Date().toISOString(),reason:error.code||'PROVIDER_UNAVAILABLE'};
-      row.status='unavailable';state.sourceHealth[row.id]=row.health;return null;
-    }
-  });
-  if(state.experimentalView){
-    const host=document.querySelector('.experimental-provider-list');
-    if(host)host.innerHTML=renderExperimentalProviderRows();
-  }
-}
-function experimentalStatus(row){
-  if(row.availability==='unsupported'||row.status==='unsupported')return'Unsupported';
-  if(row.adminMode==='disabled'||row.enabled===false)return'Disabled';
-  if(row.maintenance||row.adminMode==='maintenance')return'Maintenance';
-  return healthLabel(row.health||{status:row.status||'unchecked'});
-}
-function clearExperimentalData(){
-  try{
-    [EXPERIMENTAL_PREF_KEY,EXPERIMENTAL_FAVORITES_KEY,EXPERIMENTAL_HISTORY_KEY,EXPERIMENTAL_CACHE_KEY].forEach(key=>localStorage.removeItem(key));
-  }catch(e){}
-  state.experimentalRegistry=[];state.sourceRegistry=state.sourceRegistry.filter(row=>!isExperimentalSource(row.id));
-  state.experimentalView=false;setExperimentalRobots(false);
-}
-function disableExperimentalSources(){
-  setExperimentalPreference(false);
-  state.experimentalRegistry=[];state.sourceRegistry=state.sourceRegistry.filter(row=>!isExperimentalSource(row.id));
-  if(state.searchController)state.searchController.abort();
-  state.experimentalView=false;setExperimentalRobots(false);mangaShowHome(true);toast('Experimental Sources dinonaktifkan.');
-}
-function openExperimentalOptInInfo(pending){
-  openComicSheet('Experimental Sources','<div class="experimental-consent"><span class="experimental-badges"><b>18+</b><b>Experimental</b></span><p>Source ini dapat berisi konten dewasa dan bersifat experimental. Source experimental tidak termasuk katalog utama Nexora, All Sources, rekomendasi, fallback, History atau Favorites standard.</p><small>Preference disimpan lokal pada perangkat ini.</small></div>','<button type="button" id="experimentalCancel">Cancel</button><button class="primary" type="button" id="experimentalContinue">Continue</button>');
-  $('experimentalCancel').onclick=()=>closeComicSheet();
-  $('experimentalContinue').onclick=()=>openExperimentalAdultConfirmation(pending);
-}
-function openExperimentalAdultConfirmation(pending){
-  openComicSheet('Adult confirmation','<label class="experimental-confirm"><input type="checkbox" id="experimentalAdultConfirm"><span><strong>I confirm I am an adult</strong> and want to enable Adult / Experimental Sources on this device.</span></label><p class="sheet-note">This does not grant access to a provider disabled by the administrator.</p>','<button type="button" id="experimentalConfirmCancel">Cancel</button><button class="primary" type="button" id="experimentalEnable" disabled>Enable</button>');
-  const check=$('experimentalAdultConfirm'),enable=$('experimentalEnable');
-  check.onchange=()=>{enable.disabled=!check.checked};
-  $('experimentalConfirmCancel').onclick=()=>closeComicSheet();
-  enable.onclick=async()=>{
-    if(!check.checked)return;
-    setExperimentalPreference(true);closeComicSheet();
-    try{
-      await loadExperimentalSourceRegistry();
-      if(pending&&pending.source&&pending.id)mangaOpenDetail(pending.id,pending.source,pending.hint||null);
-      else showExperimentalHome();
-    }catch(error){toast('Experimental registry belum tersedia.');showExperimentalHome();}
-  };
-}
-function openExperimentalSettingsSheet(){
-  if(!experimentalPreference()){openExperimentalOptInInfo(null);return;}
-  openComicSheet('Experimental Sources','<div class="experimental-consent"><span class="experimental-badges"><b>18+</b><b>Experimental</b></span><p>Enabled on this device. Katalog dan library experimental tetap terpisah dari Comic Reader standard.</p></div>','<button type="button" id="experimentalOpen" class="primary">Open Experimental Sources</button><button type="button" id="experimentalDisable">Disable</button><button type="button" id="experimentalClear">Clear Experimental Data</button>');
-  $('experimentalOpen').onclick=async()=>{closeComicSheet();await loadExperimentalSourceRegistry().catch(()=>[]);showExperimentalHome()};
-  $('experimentalDisable').onclick=()=>{closeComicSheet();disableExperimentalSources()};
-  $('experimentalClear').onclick=()=>{if(confirm('Hapus opt-in, Experimental History, Favorites dan cache lokal?')){closeComicSheet();clearExperimentalData();mangaShowHome(true);toast('Experimental data dihapus.')}};
-}
-function experimentalCapabilityLabel(row){
-  const caps=row&&row.capabilities||{};const labels=[];
-  if(caps.search)labels.push('Search');if(caps.detail)labels.push('Detail');if(caps.chapters)labels.push('Chapters');if(caps.pages)labels.push('Reader');
-  return labels.length?labels.join(' · '):'No active capabilities';
-}
-function renderExperimentalProviderRows(){
-  const rows=experimentalSourceRows();
-  if(!rows.length)return'<div class="experimental-provider"><div><strong>Tidak ada experimental source aktif.</strong><small>Provider dapat dinonaktifkan oleh administrator atau belum tersedia.</small></div></div>';
-  return rows.map(row=>'<div class="experimental-provider"><div><strong>'+escapeHtml(row.label)+'</strong><span class="experimental-badges"><b>18+</b><b>Experimental</b></span><small>'+escapeHtml(experimentalCapabilityLabel(row))+'</small></div><span class="experimental-provider-status is-'+escapeHtml(String(row.health&&row.health.status||row.availability||row.adminMode||'unknown'))+'">'+escapeHtml(experimentalStatus(row))+'</span></div>').join('');
-}
-function experimentalLibraryItems(kind){
-  return storageGet(kind==='favorites'?EXPERIMENTAL_FAVORITES_KEY:EXPERIMENTAL_HISTORY_KEY);
-}
-function renderExperimentalCards(items,emptyText){
-  const host=$('experimentalResults');if(!host)return;
-  host.innerHTML='';
-  if(!items.length){host.innerHTML='<div class="empty"><i class="fa-solid fa-book-open"></i><span>'+escapeHtml(emptyText)+'</span></div>';return;}
-  items.forEach(m=>{
-    const card=document.createElement('article');card.className='manga-card experimental-card';
-    card.onclick=()=>mangaOpenDetail(m.id,m.source,m);
-    card.innerHTML='<div class="manga-cover-wrap">'+mangaCoverImgHtml(m.cover||m.coverUrl||'')+'</div><span class="manga-badge">18+</span><span class="manga-source-badge">Experimental</span><div class="manga-card-title">'+escapeHtml(m.title||'Untitled')+'</div>';
-    host.appendChild(card);
-  });
-}
-async function experimentalSearch(query){
-  const host=$('experimentalResults');if(!host)return;
-  const q=String(query||'').trim();state.experimentalQuery=q;
-  if(q.length<2){host.innerHTML='<div class="empty"><i class="fa-solid fa-magnifying-glass"></i><span>Masukkan minimal 2 karakter.</span></div>';return;}
-  const providers=experimentalSourceRows().filter(row=>row.enabled!==false&&!row.maintenance&&row.availability!=='unsupported'&&row.capabilities&&row.capabilities.search&&row.participatesInExperimentalSearch!==false);
-  if(!providers.length){host.innerHTML='<div class="empty"><i class="fa-solid fa-flask"></i><span><strong>Tidak ada experimental source aktif.</strong><small>Cek status provider atau Admin Endpoint Maintenance.</small></span></div>';return;}
-  host.innerHTML='<div class="loading"><i class="fa-solid fa-spinner spin"></i><span>Mencari experimental sources…</span></div>';
-  const results=await runBounded(providers,2,row=>{
-    const params=new URLSearchParams({action:'search',source:row.id,mode:'experimental',q,page:'1',limit:'24'});
-    return sourceCall(params,12000,null,row.id).then(json=>Array.isArray(json.items)?json.items:[]);
-  });
-  const items=[];let failures=0;
-  results.forEach((result,index)=>{
-    if(result.status==='fulfilled')items.push(...result.value.map(item=>({...item,source:item.source||providers[index].id,cover:item.coverUrl||item.cover||'',type:itemType(item)})));
-    else failures+=1;
-  });
-  items.forEach(item=>state.searchItems.set(sourceKey(item.id,item.source),item));
-  if(!items.length&&failures===providers.length){host.innerHTML='<div class="empty"><i class="fa-solid fa-triangle-exclamation"></i><span><strong>Pencarian tidak menemukan hasil.</strong><small>Source sedang gagal merespons permintaan pencarian.</small></span></div>';return;}
-  renderExperimentalCards(items,'Tidak ada hasil.');
-}
-function showExperimentalHome(){
-  if(!experimentalPreference()){openExperimentalOptInInfo(null);return;}
-  if(!state.experimentalRegistry.length){loadExperimentalSourceRegistry().then(showExperimentalHome).catch(()=>{state.experimentalRegistry=[];renderExperimentalHomeNow()});return;}
-  renderExperimentalHomeNow();
-}
-function renderExperimentalHomeNow(){
-  if(!experimentalPreference())return;
-  if(!isExperimentalSource(state.source))state.standardSourceBeforeExperimental=state.source==='all'?'mangadex':state.source;
-  state.experimentalView=true;setExperimentalRobots(true);setComicView('home');
-  $('mangaBackBtn').hidden=false;$('mangaBackBtn').onclick=exitExperimentalHome;
-  $('mangaTitleBar').innerHTML='<i class="fa-solid fa-flask"></i> EXPERIMENTAL SOURCES';
-  $('mangaSearchBar').hidden=true;$('comicSourceStrip').hidden=true;$('comicSourceProgress').hidden=true;$('mangaTabs').hidden=true;$('mangaCategoryTabs').hidden=true;$('mangaStatusTabs').hidden=true;
 
-  const content=$('mangaContent');
-  content.className='experimental-hub';
 
-  content.innerHTML=
-    '<div class="experimental-head">'+
-      '<div><h2>Experimental Sources</h2><p>18+ / Adult / Unstable</p></div>'+
-      '<button type="button" id="experimentalManage" class="experimental-settings-button"><i class="fa-solid fa-gear"></i> Manage</button>'+
-    '</div>'+
-    '<div class="experimental-provider-list">'+renderExperimentalProviderRows()+'</div>'+
-    '<div class="experimental-search">'+
-      '<i class="fa-solid fa-magnifying-glass"></i>'+
-      '<input id="experimentalSearchInput" type="search" autocomplete="off" enterkeyhint="search" placeholder="Cari di experimental sources…">'+
-      '<button type="button" id="experimentalSearchButton">Search</button>'+
-    '</div>'+
-    '<div class="experimental-library-nav">'+
-      '<button type="button" data-experimental-tab="search" class="active">Search</button>'+
-      '<button type="button" data-experimental-tab="favorites">Favorites</button>'+
-      '<button type="button" data-experimental-tab="history">History</button>'+
-    '</div>'+
-    '<div id="experimentalResults" class="manga-grid experimental-results">'+
-      '<div class="empty"><i class="fa-solid fa-flask"></i><span>Cari atau pilih tab library.</span></div>'+
-    '</div>';
 
-  const input=$('experimentalSearchInput');
-  const button=$('experimentalSearchButton');
-  if(input&&button){
-    button.onclick=()=>experimentalSearch(input.value);
-    input.onkeydown=e=>{if(e.key==='Enter')experimentalSearch(input.value);};
-  }
 
-  const tabs=document.querySelectorAll('.experimental-library-nav button');
-  tabs.forEach(btn=>{
-    btn.onclick=()=>{
-      tabs.forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      const tab=btn.dataset.experimentalTab;
-      if(tab==='search'){
-        const q=input?input.value.trim():'';
-        if(q)experimentalSearch(q);
-        else $('experimentalResults').innerHTML='<div class="empty"><i class="fa-solid fa-flask"></i><span>Cari atau pilih tab library.</span></div>';
-      }else{
-        const items=experimentalLibraryItems(tab);
-        renderExperimentalCards(items,tab==='favorites'?'Belum ada favorites experimental.':'Belum ada riwayat baca experimental.');
-      }
-    };
-  });
 
-  const manage=$('experimentalManage');
-  if(manage)manage.onclick=()=>openExperimentalSettingsSheet();
-}
-function exitExperimentalHome(){
-  state.experimentalView=false;setExperimentalRobots(false);
-  state.source=state.standardSourceBeforeExperimental||'mangadex';
-  $('mangaBackBtn').onclick=mangaGoBack;
-  renderSourceSelector();mangaShowHome(true);
-}
-function handleExperimentalDeepLink(){
-  const params=new URLSearchParams(location.search);
-  if(params.get('mode')!=='experimental')return false;
-  const source=String(params.get('source')||'').toLowerCase();
-  if(!KNOWN_EXPERIMENTAL_SOURCE_IDS.has(source))return false;
-  const id=params.get('id')||'';
-  if(!experimentalPreference()){openExperimentalOptInInfo(id?{source,id,hint:null}:null);return true;}
-  loadExperimentalSourceRegistry().then(()=>{if(id)mangaOpenDetail(id,source,null);else showExperimentalHome()}).catch(()=>showExperimentalHome());
-  return true;
-}
-window.NexoraComicExperimental={
-  enabled:experimentalPreference,
-  openSettings:openExperimentalSettingsSheet,
-  open:showExperimentalHome,
-  disable:disableExperimentalSources,
-  clear:clearExperimentalData
-};
+
+
+
+
+
+
+
+
 
 window.mangaShowHome=mangaShowHome;
 window.mangaOpenDetail=mangaOpenDetail;
@@ -1306,7 +1086,7 @@ window.mangaOpenReader=mangaOpenReader;
 window.mangaBackFromReader=mangaBackFromReader;
 window.mangaChangeChapter=mangaChangeChapter;window.mangaDiscoverSources=mangaDiscoverSources;window.mangaOpenMatchedSource=mangaOpenMatchedSource;
 
-loadSourceRegistry().finally(()=>{if(!handleExperimentalDeepLink())mangaShowHome(true)});
+loadSourceRegistry().finally(()=>mangaShowHome(true));
 })();
 
 (function(){
