@@ -28,7 +28,7 @@ assert.ok(!ids.some((id) => id === "utility:pixiv"), "Pixiv tidak boleh diinvent
 
 const doujin = registry.get("experimental-comic:doujindesu");
 assert.equal(endpoints.defaultConfig(doujin).mode, "active");
-assert.equal(endpoints.defaultConfig(doujin).baseUrl, "https://doujin.desu.xxx/");
+assert.equal(endpoints.defaultConfig(doujin).baseUrl, "https://doujin.desu.xxx/api");
 assert.equal(doujin.networkSupported, true);
 assert.equal(doujin.healthUnsupported, false);
 
