@@ -14,7 +14,7 @@ const { validateFallback } = require("../lib/admin-endpoint-maintenance");
 const registry = registryModule.endpointRegistry();
 const ids = [...registry.keys()];
 
-for (const id of ["comic:mangadex","comic:shinigami","comic:voratoon","comic:ainzscans","comic:mangadotnet"]) assert.ok(registry.has(id), id);
+for (const id of ["comic:mangadex","comic:shinigami","comic:voratoon","comic:ainzscans","comic:mangadotnet","comic:gilakomik"]) assert.ok(registry.has(id), id);
 for (const id of ["utility:aio","utility:danbooru","utility:animetoreal","utility:aisong","utility:hd4","utility:genmail"]) assert.ok(registry.has(id), id);
 assert.ok(ids.some((id) => id === "ai:gpt5"));
 assert.ok(ids.some((id) => id === "ai:deepseek"));

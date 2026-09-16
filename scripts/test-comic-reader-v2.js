@@ -74,7 +74,7 @@ async function call(query) {
 
   const sources = await call("?action=sources");
   assert.equal(sources.status, 200);
-  assert.deepEqual(sources.payload.sources.map((row) => row.id), ["mangadex", "shinigami", "voratoon", "ainzscans", "mangadotnet"]);
+  assert.deepEqual(sources.payload.sources.map((row) => row.id), ["mangadex", "shinigami", "voratoon", "ainzscans", "mangadotnet", "gilakomik"]);
 
   const list = await call("?action=list&tab=latest&page=1&type=manga");
   assert.equal(list.status, 200);
