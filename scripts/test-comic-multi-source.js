@@ -159,7 +159,7 @@ async function callApi(query) {
 
   const fakeLegacy = { list: async () => ({ items: [] }), detail: async () => ({ data: {} }), chapters: async () => ({ data: [], languages: [] }), manifest: async () => ({ images: [], quality: "saver" }) };
   const registry = createComicSourceRegistry(fakeLegacy);
-  assert.deepEqual([...registry.keys()], ["mangadex", "shinigami", "voratoon", "ainzscans", "mangadotnet"]);
+  assert.deepEqual([...registry.keys()], ["mangadex", "shinigami", "voratoon", "ainzscans", "mangadotnet", "gilakomik"]);
   for (const id of registry.keys()) {
     const definition = registry.get(id).definition;
     assert.equal(definition.capabilities.search, true);
@@ -178,7 +178,7 @@ async function callApi(query) {
   resetComicReaderState();
   const sources = await callApi("?action=sources");
   assert.equal(sources.status, 200);
-  assert.deepEqual(sources.payload.sources.map((row) => row.id), ["mangadex", "shinigami", "voratoon", "ainzscans", "mangadotnet"]);
+  assert.deepEqual(sources.payload.sources.map((row) => row.id), ["mangadex", "shinigami", "voratoon", "ainzscans", "mangadotnet", "gilakomik"]);
   assert.ok(sources.payload.sources.every((row) => row.health.status === "unchecked"));
   const sourceSearch = await callApi("?action=search&source=shinigami&q=komik&limit=2");
   assert.equal(sourceSearch.status, 200);
